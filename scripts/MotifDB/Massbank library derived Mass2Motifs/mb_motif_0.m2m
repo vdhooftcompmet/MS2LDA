@@ -1,0 +1,6 @@
+#NAME mb_motif_0
+#ANNOTATION nitrogen containing substructure [C5H12N] (in beer related to Leucine)
+#SHORT_ANNOTATION nitrogen containing substructure [C5H12N] (in beer related to Leucine)
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+fragment_86.0975,0.942535719546325
+fragment_132.1025,0.0574642804536751

@@ -1,0 +1,6 @@
+#NAME gnps_motif_15
+#ANNOTATION Fragments indicative for y-aminobutyric acid (amimobutyrate) substructure (MzCloud) – present in Beer 2 & Beer 3 – in beer 3 mainly based on C4H7O2 fragment.
+#SHORT_ANNOTATION Fragments indicative for y-aminobutyric acid (amimobutyrate) substructure (MzCloud) – present in Beer 2 & Beer 3 – in beer 3 mainly based on C4H7O2 fragment.
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_87.0425,0.991241280913126
+loss_86.0375,0.00875871908687381

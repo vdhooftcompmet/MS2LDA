@@ -1,0 +1,6 @@
+#NAME mb_motif_17
+#ANNOTATION Fragment ions indicative for pyroglutamic acid (pyroglutamate) or glutamine (both in MzCloud) – structure can be formed from glutamic acid (glutamate) in the mass spectrometer as well.
+#SHORT_ANNOTATION Fragment ions indicative for pyroglutamic acid (pyroglutamate) or glutamine (both in MzCloud) – structure can be formed from glutamic acid (glutamate) in the mass spectrometer as well.
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+fragment_84.0425,0.893422585512118
+fragment_56.0475,0.106577414487882

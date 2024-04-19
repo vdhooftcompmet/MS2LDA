@@ -1,0 +1,5 @@
+#NAME gnps_motif_48
+#ANNOTATION Fragment ion indicative for conjugation of a phosphate group (H4O4P)
+#SHORT_ANNOTATION Fragment ion indicative for conjugation of a phosphate group (H4O4P)
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_98.9825,1.0

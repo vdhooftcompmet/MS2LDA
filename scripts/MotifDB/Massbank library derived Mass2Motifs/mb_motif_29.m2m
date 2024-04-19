@@ -1,0 +1,8 @@
+#NAME mb_motif_29
+#ANNOTATION Oxygen-rich losses and fragments also occurring in hexose spectra – related to M2M 211 (hexose [glucose] conjugatation) – possibly hydrated-hexose loss?
+#SHORT_ANNOTATION Oxygen-rich losses and fragments also occurring in hexose spectra – related to M2M 211 (hexose [glucose] conjugatation) – possibly hydrated-hexose loss?
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+loss_180.0625,0.62851269921721
+loss_198.0775,0.244438812862533
+fragment_69.0325,0.0670439826547277
+fragment_81.0325,0.0600045052655291

@@ -1,0 +1,8 @@
+#NAME mb_motif_25
+#ANNOTATION Fragments indicative for histidine (C6H10N3O2) substructure (MzCloud)
+#SHORT_ANNOTATION Fragments indicative for histidine (C6H10N3O2) substructure (MzCloud)
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+fragment_110.0725,0.745965620066655
+fragment_93.0425,0.135107875811261
+fragment_156.0775,0.0947640764778109
+fragment_95.0625,0.0241624276442729

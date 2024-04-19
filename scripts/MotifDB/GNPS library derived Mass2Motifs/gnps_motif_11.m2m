@@ -1,0 +1,7 @@
+#NAME gnps_motif_11
+#ANNOTATION Alkyl aromatic substructure – indicative for aromatic ring with 2-carbon alkyl chain attached i.e. phenylethene fragment from ethylbenzene as a result of the fragmentation process.
+#SHORT_ANNOTATION Alkyl aromatic substructure – indicative for aromatic ring with 2-carbon alkyl chain attached i.e. phenylethene fragment from ethylbenzene as a result of the fragmentation process.
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_105.0675,0.837644065836642
+fragment_79.0525,0.12030220097907
+fragment_53.0375,0.0420537331842886

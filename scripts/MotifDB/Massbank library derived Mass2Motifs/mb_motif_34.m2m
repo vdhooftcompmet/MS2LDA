@@ -1,0 +1,5 @@
+#NAME mb_motif_34
+#ANNOTATION Double water loss i.e. 2*H20 – Generic feature for metabolites containing several free OH groups attached to a aliphatic chain like sugars.
+#SHORT_ANNOTATION Double water loss i.e. 2*H20 – Generic feature for metabolites containing several free OH groups attached to a aliphatic chain like sugars.
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+loss_36.0225,1.0

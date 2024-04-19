@@ -1,0 +1,6 @@
+#NAME gnps_motif_4
+#ANNOTATION Fragment and loss of [proline-H2O] - indicative for conjugated proline or arginine/ornithine – EF fits
+#SHORT_ANNOTATION Fragment and loss of [proline-H2O] - indicative for conjugated proline or arginine/ornithine – EF fits
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_116.0725,0.823553235532355
+loss_115.0625,0.176446764467645

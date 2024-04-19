@@ -1,0 +1,11 @@
+#NAME urine_mass2motif_238
+#ANNOTATION Pyroglutamate (pyroglutamic acid) or glutamine related Mass2Motif
+#SHORT_ANNOTATION Pyroglutamate (pyroglutamic acid) or glutamine related Mass2Motif
+#COMMENT Derived from Urine ms2lda experiment id=93
+fragment_84.0425,0.76557747093047
+fragment_56.0475,0.188737076233518
+fragment_53.0025,0.00840352445937034
+fragment_162.1025,0.00839645368424353
+fragment_101.0725,0.00272969357015601
+loss_77.0475,0.00119750922989283
+loss_26.9975,0.00113740189229717

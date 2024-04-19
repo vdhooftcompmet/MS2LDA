@@ -1,0 +1,5 @@
+#NAME mb_motif_7
+#ANNOTATION Aliphatic alkylamine (in beer: NH3 loss indicates free NH2 group coupled to aliphatic chain)
+#SHORT_ANNOTATION Aliphatic alkylamine (in beer: NH3 loss indicates free NH2 group coupled to aliphatic chain)
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+fragment_72.0825,1.0

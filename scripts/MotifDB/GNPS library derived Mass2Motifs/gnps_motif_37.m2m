@@ -1,0 +1,8 @@
+#NAME gnps_motif_37
+#ANNOTATION Fragments indicative for cinnamic/hydroxycinnamic acid substructure
+#SHORT_ANNOTATION Fragments indicative for cinnamic/hydroxycinnamic acid substructure
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_147.0425,0.40748031496063
+fragment_119.0475,0.348796612687565
+fragment_91.0525,0.17831674342594
+fragment_65.0375,0.0654063289258654

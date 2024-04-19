@@ -1,0 +1,6 @@
+#NAME mb_motif_14
+#ANNOTATION Combination of small losses (i.e. NH3 and CH2O2)
+#SHORT_ANNOTATION Combination of small losses (i.e. NH3 and CH2O2)
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+loss_63.0325,0.966237942122186
+loss_91.0275,0.0337620578778135

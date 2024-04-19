@@ -1,0 +1,5 @@
+#NAME mb_motif_9
+#ANNOTATION Loss of [hexose-H2O] – indication of hexose conjugation (for example glucose)
+#SHORT_ANNOTATION Loss of [hexose-H2O] – indication of hexose conjugation (for example glucose)
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+loss_150.0525,1.0

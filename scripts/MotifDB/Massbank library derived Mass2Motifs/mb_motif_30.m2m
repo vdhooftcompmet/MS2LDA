@@ -1,0 +1,5 @@
+#NAME mb_motif_30
+#ANNOTATION Fragment indicative for aromatic compounds related to methylbenzene substructure (C7H7 fragment)
+#SHORT_ANNOTATION Fragment indicative for aromatic compounds related to methylbenzene substructure (C7H7 fragment)
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+fragment_91.0525,1.0

@@ -1,0 +1,9 @@
+#NAME mb_motif_41
+#ANNOTATION Loss indicative of [hexose-H20]
+#SHORT_ANNOTATION Loss indicative of [hexose-H20]
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+loss_162.0525,0.956154675691232
+fragment_340.1975,0.0235701357988863
+loss_161.0475,0.00806236542120735
+fragment_297.1475,0.00610641154433702
+loss_43.0425,0.00610641154433702

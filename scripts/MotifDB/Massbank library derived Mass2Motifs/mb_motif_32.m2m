@@ -1,0 +1,9 @@
+#NAME mb_motif_32
+#ANNOTATION Fragments indicative for ferulic acid based substructure (MzCloud)
+#SHORT_ANNOTATION Fragments indicative for ferulic acid based substructure (MzCloud)
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+fragment_177.0525,0.308592392353736
+fragment_115.0525,0.236763854025874
+fragment_145.0275,0.222475381347751
+fragment_117.0325,0.186947287121066
+fragment_149.0575,0.0452210851515737

@@ -1,0 +1,7 @@
+#NAME gnps_motif_57
+#ANNOTATION Fragment ions indicative for alkylamine substructure C5H10N (in beer often pipecolic acid [pipecolate])
+#SHORT_ANNOTATION Fragment ions indicative for alkylamine substructure C5H10N (in beer often pipecolic acid [pipecolate])
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_84.0825,0.910573077827841
+fragment_56.0475,0.0711325841883358
+fragment_67.0525,0.0182943379838228

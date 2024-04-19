@@ -1,0 +1,7 @@
+#NAME gnps_motif_59
+#ANNOTATION Fragments indicative for [phenylalanine-CHOOH] based substructure
+#SHORT_ANNOTATION Fragments indicative for [phenylalanine-CHOOH] based substructure
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_120.0825,0.960131989332369
+fragment_91.0525,0.0371106992722506
+fragment_103.0525,0.00275731139538037

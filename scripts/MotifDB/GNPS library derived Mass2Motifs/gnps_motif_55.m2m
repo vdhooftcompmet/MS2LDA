@@ -1,0 +1,7 @@
+#NAME gnps_motif_55
+#ANNOTATION Fragments indicative for dihydroxylated benzene ring substructure (MzCloud) – C6H5O2 fragment corresponds to positively charged fragment with two hydroxyl groups.
+#SHORT_ANNOTATION Fragments indicative for dihydroxylated benzene ring substructure (MzCloud) – C6H5O2 fragment corresponds to positively charged fragment with two hydroxyl groups.
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_81.0325,0.770386952350495
+fragment_53.0375,0.223892264506272
+fragment_109.0275,0.00572078314323278

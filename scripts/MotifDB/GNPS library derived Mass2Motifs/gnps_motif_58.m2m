@@ -1,0 +1,9 @@
+#NAME gnps_motif_58
+#ANNOTATION Fragments indicative for asparagine substructure (MzCloud) – prevalent in Beer 3
+#SHORT_ANNOTATION Fragments indicative for asparagine substructure (MzCloud) – prevalent in Beer 3
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_74.0225,0.414132015120675
+fragment_88.0375,0.362372782785694
+fragment_87.0575,0.128583890665891
+fragment_70.0275,0.062867112532713
+fragment_116.0325,0.0320441988950276

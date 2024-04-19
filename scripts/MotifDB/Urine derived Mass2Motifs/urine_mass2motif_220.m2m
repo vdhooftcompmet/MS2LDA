@@ -1,0 +1,7 @@
+#NAME urine_mass2motif_220
+#ANNOTATION C2H5NO loss - possibly acetamide (N-acetyl group) - related Mass2Motif
+#SHORT_ANNOTATION C2H5NO loss - possibly acetamide (N-acetyl group) - related Mass2Motif
+#COMMENT Derived from Urine ms2lda experiment id=93
+loss_59.0475,0.968375344996587
+fragment_167.0325,0.00999296273435508
+loss_115.0975,0.00217248772896167

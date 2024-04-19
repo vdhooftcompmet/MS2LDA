@@ -1,0 +1,5 @@
+#NAME mb_motif_27
+#ANNOTATION Loss indicative of carboxylic acid group with 1-carbon attached.
+#SHORT_ANNOTATION Loss indicative of carboxylic acid group with 1-carbon attached.
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+loss_60.0225,1.0

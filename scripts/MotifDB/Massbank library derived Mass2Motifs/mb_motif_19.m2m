@@ -1,0 +1,9 @@
+#NAME mb_motif_19
+#ANNOTATION Fragments indicative for ethylphenol (i.e. resulting from Tyramine in beer) or the structurally related paramethylmethoxybenzene (MassBank) substructure
+#SHORT_ANNOTATION Fragments indicative for ethylphenol (i.e. resulting from Tyramine in beer) or the structurally related paramethylmethoxybenzene (MassBank) substructure
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+fragment_121.0625,0.617444825463818
+fragment_103.0525,0.154066649081157
+fragment_53.0375,0.120478325859492
+fragment_91.0525,0.106409918227381
+fragment_93.0675,0.00160028136815264

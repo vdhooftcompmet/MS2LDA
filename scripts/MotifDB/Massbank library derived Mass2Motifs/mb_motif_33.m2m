@@ -1,0 +1,9 @@
+#NAME mb_motif_33
+#ANNOTATION Fragment ions indicative for guanine (C5H5N5O) based substructure
+#SHORT_ANNOTATION Fragment ions indicative for guanine (C5H5N5O) based substructure
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+fragment_152.0575,0.608179684880992
+fragment_153.0425,0.234730137445525
+fragment_110.0375,0.0738183037210862
+fragment_135.0275,0.0677841099564197
+fragment_55.0275,0.0154877639959772

@@ -1,0 +1,8 @@
+#NAME gnps_motif_45
+#ANNOTATION Fragments indicative of a glycosylation – i.e. indicative for a sugar conjugation (in beer often related to glucose)
+#SHORT_ANNOTATION Fragments indicative of a glycosylation – i.e. indicative for a sugar conjugation (in beer often related to glucose)
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_85.0275,0.7253138844625
+fragment_68.0275,0.134668254329592
+fragment_97.0275,0.112779519148266
+fragment_127.0375,0.0272383420596424

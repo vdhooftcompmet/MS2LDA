@@ -1,0 +1,6 @@
+#NAME gnps_motif_14
+#ANNOTATION Aliphatic amine (NH3 loss indicates free NH2 group coupled to aliphatic chain)
+#SHORT_ANNOTATION Aliphatic amine (NH3 loss indicates free NH2 group coupled to aliphatic chain)
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_72.0825,0.925853740195141
+fragment_55.0525,0.0741462598048594

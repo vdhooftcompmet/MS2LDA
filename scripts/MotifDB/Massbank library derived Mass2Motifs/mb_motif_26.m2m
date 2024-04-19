@@ -1,0 +1,5 @@
+#NAME mb_motif_26
+#ANNOTATION Fragment ion indicative for the presence of a phosphate group (H4O4P)
+#SHORT_ANNOTATION Fragment ion indicative for the presence of a phosphate group (H4O4P)
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+fragment_98.9825,1.0

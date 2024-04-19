@@ -1,0 +1,6 @@
+#NAME gnps_motif_42
+#ANNOTATION Fragments indicative adenine (C5H6N5) substructure – most prevalent in Beer3
+#SHORT_ANNOTATION Fragments indicative adenine (C5H6N5) substructure – most prevalent in Beer3
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_136.0625,0.945871498738882
+fragment_119.0375,0.0541285012611178

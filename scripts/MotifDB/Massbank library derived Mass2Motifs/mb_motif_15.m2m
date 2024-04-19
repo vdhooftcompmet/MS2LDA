@@ -1,0 +1,5 @@
+#NAME mb_motif_15
+#ANNOTATION Combined loss of H2O and CO – indicative for free carboxylic acid group (COOH) – generic substructure in amino acids and organic acids - this is the second of two motifs (see also motif_20)
+#SHORT_ANNOTATION Combined loss of H2O and CO – indicative for free carboxylic acid group (COOH) – generic substructure in amino acids and organic acids - this is the second of two motifs (see also motif_20)
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+loss_46.0075,1.0

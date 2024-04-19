@@ -1,0 +1,8 @@
+#NAME gnps_motif_12
+#ANNOTATION Fragment ions indicative for C6H12NO substructure (in beer related to N-acetylputrescine - MzCloud)
+#SHORT_ANNOTATION Fragment ions indicative for C6H12NO substructure (in beer related to N-acetylputrescine - MzCloud)
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_114.0925,0.589640739448901
+loss_59.0375,0.185036623648413
+fragment_72.0425,0.137949075688873
+fragment_60.0425,0.0873735612138124

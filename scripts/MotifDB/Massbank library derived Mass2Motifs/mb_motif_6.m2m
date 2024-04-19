@@ -1,0 +1,5 @@
+#NAME mb_motif_6
+#ANNOTATION Amine loss - Indicative for free NH2 group in fragmented molecule
+#SHORT_ANNOTATION Amine loss - Indicative for free NH2 group in fragmented molecule
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+loss_17.0275,1.0

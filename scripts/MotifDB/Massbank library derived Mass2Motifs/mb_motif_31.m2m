@@ -1,0 +1,7 @@
+#NAME mb_motif_31
+#ANNOTATION Imidazole group linked to a carboxylgroup through one CH2 group i.e. like in imidazole acetic acid
+#SHORT_ANNOTATION Imidazole group linked to a carboxylgroup through one CH2 group i.e. like in imidazole acetic acid
+#COMMENT Derived from massbank_binned_005 ms2lda experiment id=190
+fragment_83.0625,0.681027966742253
+fragment_129.0675,0.204837490551776
+fragment_56.0475,0.114134542705971

@@ -1,0 +1,5 @@
+#NAME gnps_motif_52
+#ANNOTATION Fragment indicative for aromatic compounds related to methylbenzene substructure (C7H7 fragment)
+#SHORT_ANNOTATION Fragment indicative for aromatic compounds related to methylbenzene substructure (C7H7 fragment)
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+fragment_91.0525,1.0

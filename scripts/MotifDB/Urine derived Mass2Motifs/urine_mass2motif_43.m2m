@@ -1,0 +1,19 @@
+#NAME urine_mass2motif_43
+#ANNOTATION CHOOH loss - indicative for free carboxylic acid group [grouped with other 46 losses - fewer in degrees]
+#SHORT_ANNOTATION CHOOH loss - indicative for free carboxylic acid group [grouped with other 46 losses - fewer in degrees]
+#COMMENT Derived from Urine ms2lda experiment id=93
+loss_46.0375,0.828212134623325
+loss_18.0225,0.0495327885706735
+loss_73.0525,0.0283680604621077
+loss_73.0175,0.0159955073926896
+loss_45.0325,0.00969464026766855
+loss_45.0425,0.00811801833649591
+loss_74.0575,0.00352115417798843
+loss_74.0475,0.00345005027693388
+loss_45.0575,0.00316271219769242
+loss_18.0475,0.00308876850236621
+loss_87.0425,0.0028260746899462
+loss_77.0625,0.00213161862304229
+loss_59.0475,0.0013230912290394
+loss_42.0325,0.00112722550737544
+loss_17.9925,0.00107282563356065

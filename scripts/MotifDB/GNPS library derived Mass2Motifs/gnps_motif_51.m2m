@@ -1,0 +1,7 @@
+#NAME gnps_motif_51
+#ANNOTATION Oxygen-rich losses and fragments also occurring in hexose spectra – related to M2M 211 (hexose [glucose] conjugatation) – possibly hydrated-hexose loss? [ClassyFire - Relevant terms - Substituents: O-glycosyl compound Hexose monosaccharide Polyol]
+#SHORT_ANNOTATION Oxygen-rich losses and fragments also occurring in hexose spectra – related to M2M 211 (hexose [glucose] conjugatation) – possibly hydrated-hexose loss?
+#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
+loss_180.0625,0.831848842842768
+fragment_69.0325,0.0887340215406403
+fragment_81.0325,0.0794171356165915
