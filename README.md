@@ -6,8 +6,10 @@ Structure elucidation is a major bottleneck in analytical chemistry and its prog
 
 ## Installation
 
-## Mechanism
-
+## TODO (Should be moved to the actions canvas)
+- [ ] check tomotopy package and compare with Gensim; maybe ask Joe
+- [ ] add documentary folder
+- [ ] Create documentary (similar to MassQL (https://mwang87.github.io/MassQueryLanguage_Documentation/))
 ## Limitations
  
 ## Cite us
