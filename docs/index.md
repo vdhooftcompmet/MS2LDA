@@ -1,4 +1,4 @@
-![header](../App/assets/MS2LDA_LOGO_white.jpg)
+![header](https://github.com/vdhooftcompmet/MS2LDA/tree/main/App/assets/MS2LDA_LOGO_white.jpg?raw=true)
 
 ## About Topic Modelling in Mass Spec
 
