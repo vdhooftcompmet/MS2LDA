@@ -6,6 +6,9 @@ Structure elucidation is a major bottleneck in analytical chemistry and its prog
 
 ## Installation
 
+## Documentation page
+https://vdhooftcompmet.github.io/MS2LDA/
+
 ## TODO (Should be moved to the actions canvas)
 - [ ] check tomotopy package and compare with Gensim; maybe ask Joe
 - [ ] add documentary folder
