@@ -1,5 +1,4 @@
-![header](https://github.com/vdhooftcompmet/MS2LDA/tree/main/App/assets/MS2LDA_LOGO_white.jpg?raw=true)
-
+![](https://github.com/vdhooftcompmet/MS2LDA/tree/main/App/assets/MS2LDA_LOGO_white.jpg)
 ## About Topic Modelling in Mass Spec
 
 It's really interesting.
