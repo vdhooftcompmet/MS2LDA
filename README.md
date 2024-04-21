@@ -15,3 +15,4 @@ Structure elucidation is a major bottleneck in analytical chemistry and its prog
 
 ## More information about our research group
 [![GitHub Logo](https://github.com/vdhooftcompmet/group-website/blob/main/website/custom/logo/logo.png?raw=true)](https://vdhooftcompmet.github.io)
+[![Github Logo](App/assets/WUR_RGB_standard_2021.png?raw=true)](https://www.wur.nl/en.htm)
