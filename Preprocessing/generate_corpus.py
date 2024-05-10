@@ -1,5 +1,6 @@
 from itertools import chain
 
+
 def features_to_words(spectra, significant_figures=2): #You should write some unittests for this function; seems to be error prone
     """generates a list of lists for fragments and losses for a dataset
 
@@ -19,15 +20,13 @@ def features_to_words(spectra, significant_figures=2): #You should write some un
         frag_with_n_digits = [ ["frag@" + str(round(mz, significant_figures))] for mz in spectrum.peaks.mz] # round mz and add identifier -> frag@
         frag_multiplied_intensities = [frag * int(intensity) for frag, intensity in zip(frag_with_n_digits, intensities_from_0_to_100)] # weight fragments
         frag_flattend = list(chain(*frag_multiplied_intensities)) # flatten lists
+        dataset_frag.append(frag_flattend)
 
-        if frag_flattend not in dataset_frag: # if the exact peaks were already found the spectrum will be removed
-            dataset_frag.append(frag_flattend)
-
-            loss_with_n_digits = [ ["loss@" + str(round(mz, significant_figures))] for mz in spectrum.losses.mz] # round mz and add identifier -> loss@
-            loss_multiplied_intensities = [loss * int(intensity) for loss, intensity in zip(loss_with_n_digits, intensities_from_0_to_100)] # weight losses
-            loss_flattend = list(chain(*loss_multiplied_intensities)) # flatten lists
-            loss_without_zeros = list(filter(lambda loss: float(loss[5:]) > 0.01, loss_flattend)) # removes 0 or negative loss values
-            dataset_loss.append(loss_without_zeros)
+        loss_with_n_digits = [ ["loss@" + str(round(mz, significant_figures))] for mz in spectrum.losses.mz] # round mz and add identifier -> loss@
+        loss_multiplied_intensities = [loss * int(intensity) for loss, intensity in zip(loss_with_n_digits, intensities_from_0_to_100)] # weight losses
+        loss_flattend = list(chain(*loss_multiplied_intensities)) # flatten lists
+        loss_without_zeros = list(filter(lambda loss: float(loss[5:]) > 0.01, loss_flattend)) # removes 0 or negative loss values
+        dataset_loss.append(loss_without_zeros)
 
     return dataset_frag, dataset_loss
 
@@ -49,6 +48,7 @@ def combine_features(dataset_frag, dataset_loss):
         dataset_features.append(spectrum_frag + spectrum_loss)
 
     return dataset_features
+
 
 
 if __name__ == "__main__":
