@@ -21,6 +21,33 @@ def define_model(n_motifs, model_parameters={}):
     return model
 
 
+def emulate_fixed_motifs(model, fixed_motifs):
+    """emulates the fixed motifs option from the original MS2LDA.org implementation by setting prior weight per topic
+
+    ARGS:
+        model: tomotopy LDAModel class
+        fixed_motifs (list): list of matchms spectrum objects
+
+    RETURNS:
+        model: tomotopy LDAModel class (with set prior word weights)
+    """
+
+    for motif_number, motif_spectrum in enumerate(fixed_motifs):
+        fragments_mz, fragments_weights = motif_spectrum.peaks.mz, motif_spectrum.peaks.intensities
+        
+        for mz, weight in zip(fragments_mz, fragments_weights):
+            model.set_word_prior("frag@"+str(mz), {motif_number: weight})
+
+
+        if motif_spectrum.losses:
+            losses_mz, losses_weights = motif_spectrum.losses.mz, motif_spectrum.losses.intensities 
+
+            for mz, weight in zip(losses_mz, losses_weights):
+                model.set_word_prior("loss@"+str(mz), {motif_number: weight})
+
+    return model
+
+
 def train_model(model, documents, iterations=100, train_parameters={}):
     """trains the LDA model on the given documents
     
@@ -86,10 +113,9 @@ def create_motif_spectra(motif_features):
 
         # normalize intensity over fragments and losses
         intensities = list(sorted_fragments_intensities) + list(sorted_losses_intensities)
-        min_intensity, max_intensity = np.min(intensities), np.max(intensities)
-        
-        normalized_intensities = [(intensity - min_intensity) / (max_intensity - min_intensity) for intensity in intensities]
-
+        max_intensity = np.max(intensities)
+        normalized_intensities = np.array(intensities) / max_intensity
+   
         normalized_frag_intensities = normalized_intensities[:len(sorted_fragments)]
         normalized_loss_intensities = normalized_intensities[len(sorted_fragments):]
 
@@ -112,12 +138,37 @@ if __name__ == "__main__":
     documents = [
         ["frag@24.33", "frag@34.23", "loss@18.01", "loss@18.01"],
         ["frag@24.33", "frag@65.87", "loss@121.30", "frag@24.33"],
-        ["frag@74.08", "frag@34.23", "loss@18.01", "loss@18.01", "loss@18.01"]
+        ["frag@74.08", "frag@34.23", "loss@18.01", "loss@18.01", "loss@18.01"],
+        ["frag@74.08", "frag@121.30", "loss@34.01"]
         ] 
     
     model = define_model(2) 
     model = train_model(model, documents)
     motifs = extract_motifs(model)
     motif_spectra = create_motif_spectra(motifs)
-    print(motif_spectra)
+    print(motif_spectra[0])
+    print("simple test")
+
+
+    # example with emulating fixed motifs
+    print()
+
+    fixed_motifs = [
+        Spectrum(mz=np.array([74.08]),
+                intensities=np.array([1.0]),
+                metadata={'id': 'spectrum1',
+                        'precursor_mz': 201.}),
+    ]
+
+    model = define_model(3)
+    model = emulate_fixed_motifs(model, fixed_motifs)
+    model = train_model(model, documents)
+    motifs = extract_motifs(model)
+    motif_spectra = create_motif_spectra(motifs)
+    print(motif_spectra[0].peaks.mz)
+    print(motif_spectra[0].peaks.intensities)
+
+   
+
+
 
