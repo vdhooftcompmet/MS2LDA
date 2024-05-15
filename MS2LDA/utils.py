@@ -3,23 +3,54 @@ from matchms import Spectrum, Fragments
 from matchms.filtering import normalize_intensities
 import numpy as np
 
-def smiles2mols(smiles_per_motif):
-    """convert smiles to rdkit mol object
-    
-    ARGS:
-        smiles_per_motif (list(str)): list of smiles that are associated with one motif
 
-    RETURNS:
-        mols (list(rdkit.mol.objects)): list of rdkit.mol.objects from the smiles
-    
-    !!! Currently only valid smiles are allowed; program could break if invalid smiles are given
-    """
-    mols = []
-    for smiles in smiles_per_motif:
-        mol = Chem.MolFromSmiles(smiles)
-        mols.append(mol)
+from matchms import set_matchms_logger_level; set_matchms_logger_level("ERROR")
 
-    return mols
+
+def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@"):
+
+    # identify slicing start
+    frag_start = len(frag_tag)
+    loss_start = len(loss_tag)
+
+    # extract fragments and losses
+    fragments = [ (float(feature[frag_start:]), float(importance)) for feature, importance in motif_k_features if feature.startswith(frag_tag) ]
+    losses = [ (float(feature[loss_start:]), float(importance)) for feature, importance in motif_k_features if feature.startswith(loss_tag) ]
+
+    # sort features based on mz value
+    sorted_fragments, sorted_fragments_intensities = zip(*sorted(fragments)) if fragments else (np.array([]), np.array([]))
+    sorted_losses, sorted_losses_intensities = zip(*sorted(losses)) if losses else (np.array([]), np.array([]))
+
+    # normalize intensity over fragments and losses
+    intensities = list(sorted_fragments_intensities) + list(sorted_losses_intensities)
+    max_intensity = np.max(intensities)
+    normalized_intensities = np.array(intensities) / max_intensity
+
+    # split fragments and losses
+    normalized_frag_intensities = normalized_intensities[:len(sorted_fragments)]
+    normalized_loss_intensities = normalized_intensities[len(sorted_fragments):]
+
+    # create spectrum object
+    spectrum = Spectrum(
+        mz=np.array(sorted_fragments),
+        intensities=np.array(normalized_frag_intensities),
+        metadata={
+            "id": f"motif_{k}",
+        }
+    )
+    spectrum.losses = Fragments(mz=np.array(sorted_losses), intensities=np.array(normalized_loss_intensities))
+
+    return spectrum
+
+
+
+
+
+
+
+
+
+
 
 
 def match_frags_and_losses(motif_spectrum, analog_spectra):
