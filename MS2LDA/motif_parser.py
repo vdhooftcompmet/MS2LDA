@@ -3,14 +3,31 @@ from utils import create_spectrum
  
 
 def store_m2m_file(motif_spectrum, motif_number, folder):
-    """stores the motif spectra"""
+    """stores one motif spectrum in a .m2m file. It uses the same format as in the original version from MS2LDA.org
+    
+    ARGS:
+        motif_spectrum: matchms spectrum object
+        motif_number (int): number that identifies the motif
+        folder (str): new folder name with relative or absolute path
+    
+    RETURNS:
+        True
+    """
+
     filename = folder.split("\\")[-1].split(" ")[0].lower()
     with open(f"{folder}\{filename}_motif_{motif_number}.m2m", "w") as output:
 
+        # add name
         output.write(f"#NAME {filename}_motif_{motif_number}\n")
-        output.write(f"ANNOTATION \n")
-        output.write(f"SHORT_ANNOTATION \n")
-        output.write(f"COMMENT \n")
+        # add (long) annotation
+        annotation = motif_spectrum.get("annotation")
+        output.write(f"ANNOTATION {annotation}\n")
+        # add (short) annotation
+        short_annotation = motif_spectrum.get("short_annotation")
+        output.write(f"SHORT_ANNOTATION {short_annotation}\n")
+        # add comment
+        comment = motif_spectrum.get("comment")
+        output.write(f"COMMENT {comment}\n")
 
         for fragment_number in range(len(motif_spectrum.peaks.mz)):
             fragment_mz, fragment_importance = motif_spectrum.peaks.mz[fragment_number], motif_spectrum.peaks.intensities[fragment_number]
@@ -24,7 +41,15 @@ def store_m2m_file(motif_spectrum, motif_number, folder):
 
 
 def store_m2m_folder(motif_spectra, folder):
-    """stores motif spectra in a fiven folder"""
+    """stores a bunch of motif spectra in a new folder where each motif is stored in a .m2m file
+    
+    ARGS:
+        motif_spectra (list): list of matchms spectrum objects
+        folder (str): new folder name with relative or absolute path
+    
+    RETURNS:
+        True
+    """
 
     os.makedirs(folder)
 
@@ -32,6 +57,7 @@ def store_m2m_folder(motif_spectra, folder):
         store_m2m_file(motif_spectrum, motif_number, folder)
 
     return True
+
 
 
 def load_m2m_file(file):
