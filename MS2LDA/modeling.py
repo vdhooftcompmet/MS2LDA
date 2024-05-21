@@ -1,5 +1,5 @@
 import tomotopy as tp
-from utils import create_spectrum
+from MS2LDA.utils import create_spectrum
 
 
 def define_model(n_motifs, model_parameters={}):

@@ -1,5 +1,5 @@
 import os
-from utils import create_spectrum
+from MS2LDA.utils import create_spectrum
  
 
 def store_m2m_file(motif_spectrum, motif_number, folder):
