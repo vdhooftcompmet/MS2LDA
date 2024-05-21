@@ -21,13 +21,13 @@ def store_m2m_file(motif_spectrum, motif_number, folder):
         output.write(f"#NAME {filename}_motif_{motif_number}\n")
         # add (long) annotation
         annotation = motif_spectrum.get("annotation")
-        output.write(f"ANNOTATION {annotation}\n")
+        output.write(f"#ANNOTATION {annotation}\n")
         # add (short) annotation
         short_annotation = motif_spectrum.get("short_annotation")
-        output.write(f"SHORT_ANNOTATION {short_annotation}\n")
+        output.write(f"#SHORT_ANNOTATION {short_annotation}\n")
         # add comment
         comment = motif_spectrum.get("comment")
-        output.write(f"COMMENT {comment}\n")
+        output.write(f"#COMMENT {comment}\n")
 
         for fragment_number in range(len(motif_spectrum.peaks.mz)):
             fragment_mz, fragment_importance = motif_spectrum.peaks.mz[fragment_number], motif_spectrum.peaks.intensities[fragment_number]
