@@ -2,4 +2,4 @@ models/
 DS_Store/
 __pycache__/
 *model
-MS2LDA/__pycache__/modeling.cpython-311.pyc
+*.pyc
