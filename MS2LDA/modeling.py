@@ -33,14 +33,14 @@ def emulate_fixed_motifs(model, fixed_motifs):
         fragments_mz, fragments_weights = motif_spectrum.peaks.mz, motif_spectrum.peaks.intensities
         
         for mz, weight in zip(fragments_mz, fragments_weights):
-            model.set_word_prior("frag@"+str(mz), {motif_number: weight})
+            model.set_word_prior("frag@"+str(round(mz,2)), {motif_number: weight})
 
 
         if motif_spectrum.losses:
             losses_mz, losses_weights = motif_spectrum.losses.mz, motif_spectrum.losses.intensities 
 
             for mz, weight in zip(losses_mz, losses_weights):
-                model.set_word_prior("loss@"+str(mz), {motif_number: weight})
+                model.set_word_prior("loss@"+str(round(mz,2)), {motif_number: weight})
 
     return model
 
