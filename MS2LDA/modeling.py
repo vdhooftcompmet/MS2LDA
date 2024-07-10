@@ -1,5 +1,7 @@
 import tomotopy as tp
-from MS2LDA.utils import create_spectrum
+import numpy as np
+#from MS2LDA.utils import create_spectrum
+from utils import create_spectrum
 
 
 def define_model(n_motifs, model_parameters={}):
@@ -15,33 +17,6 @@ def define_model(n_motifs, model_parameters={}):
 
     model = tp.LDAModel(k=n_motifs, **model_parameters)
     
-    return model
-
-
-def emulate_fixed_motifs(model, fixed_motifs):
-    """emulates the fixed motifs option from the original MS2LDA.org implementation by setting prior weight per topic
-
-    ARGS:
-        model: tomotopy LDAModel class
-        fixed_motifs (list): list of matchms spectrum objects
-
-    RETURNS:
-        model: tomotopy LDAModel class (with set prior word weights)
-    """
-
-    for motif_number, motif_spectrum in enumerate(fixed_motifs):
-        fragments_mz, fragments_weights = motif_spectrum.peaks.mz, motif_spectrum.peaks.intensities
-        
-        for mz, weight in zip(fragments_mz, fragments_weights):
-            model.set_word_prior("frag@"+str(round(mz,2)), {motif_number: weight})
-
-
-        if motif_spectrum.losses:
-            losses_mz, losses_weights = motif_spectrum.losses.mz, motif_spectrum.losses.intensities 
-
-            for mz, weight in zip(losses_mz, losses_weights):
-                model.set_word_prior("loss@"+str(round(mz,2)), {motif_number: weight})
-
     return model
 
 
@@ -136,7 +111,6 @@ if __name__ == "__main__":
     ]
 
     model = define_model(3)
-    model = emulate_fixed_motifs(model, fixed_motifs)
     model = train_model(model, documents)
     motifs = extract_motifs(model)
     motif_spectra = create_motif_spectra(motifs)

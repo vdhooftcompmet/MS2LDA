@@ -60,7 +60,7 @@ def store_m2m_folder(motif_spectra, folder):
 
 
 
-def load_m2m_file(file):
+def load_m2m_file(file): # currently it is not supported to change frag/loss tags and significant digits
     """parses mass to motifs by extraction the fragments, losses, names and (short) annotation
 
     ARGS:
@@ -81,11 +81,11 @@ def load_m2m_file(file):
                 features.append( (line.strip().split(",")) )
             elif line.startswith("#NAME"):
                 name = line.split(" ")[1]
-            elif line.startswith("SHORT_ANNOTATION"):
+            elif line.startswith("#SHORT_ANNOTATION"):
                 short_annotation = line.split(" ", 1)[1]
             #...
 
-    motif_spectrum = create_spectrum(features, name, frag_tag="fragment_", loss_tag="loss_")
+    motif_spectrum = create_spectrum(features, name, frag_tag="fragment_", loss_tag="loss_", significant_digits=2)
     motif_spectrum.set("short_annotation", short_annotation)
 
     return motif_spectrum
