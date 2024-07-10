@@ -1,9 +1,9 @@
-from utils import smiles2mols
-
-from FP_calculation.rdkit_fps import *
-from FP_calculation.minhash_fps import *
-from FP_calculation.adaptive_fps import generate_fingerprint
+from Add_On.Fingerprints.FP_calculation.rdkit_fps import *
+#from Add_On.Fingerprints.FP_calculation.minhash_fps import *
+from Add_On.Fingerprints.FP_calculation.adaptive_fps import generate_fingerprint
 from itertools import chain
+from rdkit.Chem import MolFromSmiles
+
 
 def mols2fps(smiles_per_motif, selected_fp_type, smarts=None): 
     """calculates the selected fingerprint for a given list of rdkit mol objects
@@ -90,6 +90,25 @@ def mols2fps(smiles_per_motif, selected_fp_type, smarts=None):
         raise Exception (f"One of the following fingerprint types need to be selected: {fps_type}")
 
     return fps
+
+
+def smiles2mols(smiles):
+    """converts SMILES to rdkit mol objects
+    
+    ARGS:
+        smiles (list): list of SMILES strings
+        
+    RETURNS:
+        mols (list): list of rdkit mol objects
+    """
+    mols = []
+
+    for smi in smiles:
+        mol = MolFromSmiles(smi)
+        if mol:
+            mols.append(mol)
+
+    return mols
         
         
     

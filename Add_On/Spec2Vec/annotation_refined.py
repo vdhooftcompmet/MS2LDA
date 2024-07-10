@@ -7,6 +7,7 @@ from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 
 from Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
 
+from functools import reduce
 import numpy as np
 
 def mask_fragments(spectrum, mask=1.0):
@@ -45,7 +46,7 @@ def mask_fragments(spectrum, mask=1.0):
             intensities=np.array(masked_fragments_intensities),
             metadata={
                 "id": identifier,
-                "precursor_mz": max(fragments_mz)
+                "precursor_mz": None
             }
         )
 
@@ -58,7 +59,7 @@ def mask_fragments(spectrum, mask=1.0):
     return masked_spectra
 
 
-def mask_losses(spectrum, mask=1.0):
+def mask_losses(spectrum, mask=1.0): # manually connecting mask_losses and mask fragments kind of failed when not combining (no frags)
     """masks losses one by one
     
     ARGS:
@@ -94,7 +95,7 @@ def mask_losses(spectrum, mask=1.0):
             intensities=fragments_intensities,
             metadata={
                 "id": identifier,
-                "precursor_mz": max(fragments_mz)
+                "precursor_mz": None
             }
         )
 
@@ -107,7 +108,7 @@ def mask_losses(spectrum, mask=1.0):
     return masked_spectra
 
 
-def mask_spectra(motif_spectra, masks=[1.0,1.0]):
+def mask_spectra(motif_spectra, masks=[1.0,1.0]): #BUG: if there are not fragments it fails!!!
     """mask the fragments and losses for a list of spectra
     1. mask is for fragments
     2. mask is for losses
@@ -131,20 +132,18 @@ def mask_spectra(motif_spectra, masks=[1.0,1.0]):
     return masked_motifs_spectra
 
 
-def hierachical_clustering(s2v_similarity, top_n_spectra, masked_spectra): # threshold adding
+def hierachical_clustering(s2v_similarity, top_n_spectra, top_n_scores, masked_spectra, masked_spectra_similarity=None): # threshold adding
     """recursive function to determine to seperate groups in the found motifs
     
     ARGS:
         s2v_similarity: gensim word2vec based similarity model for Spec2Vec
         top_n_spectra (list): list of matchms spectrum objects
+        top_n_scores (list): list of float representing Spec2Vec similarity scores between a spectrum and motif
         masked_spectra (list): list of matchms spectrum objects
         
     RETURNS:
-        top_spectra (list): list of matchms spectrum objects"""
-
-    # 1. Termination condition: TOO FEW SPECTRA
-    if len(top_n_spectra) < 3:
-        return top_n_spectra
+        top_spectra (list): list of matchms spectrum objects
+    """
     
     # calcuate embeddings
     embeddings_top_n_spectra = calc_embeddings(s2v_similarity, top_n_spectra)
@@ -163,10 +162,16 @@ def hierachical_clustering(s2v_similarity, top_n_spectra, masked_spectra): # thr
     
     similarity_matrix = np.array(similarity_matrix)
 
+    # 1. Termination condition: TOO FEW SPECTRA
+    if len(top_n_spectra) < 2:
+        print("Not Enough Spectra Match!")
+        return top_n_spectra, top_n_scores, masked_spectra_similarity
+    
+
     # 2. Termination condition: SPECTRA ARE VERY SIMILAR
-    print(np.min(similarity_matrix.flatten()))
-    if np.min(similarity_matrix.flatten()) > 0.60:
-        return top_n_spectra
+    if np.min(similarity_matrix.flatten()) > 0.70:
+        print("Similarity Match: ", np.min(similarity_matrix.flatten()))
+        return top_n_spectra, top_n_scores, masked_spectra_similarity
 
     # build clusters
     Z = linkage(similarity_matrix, method='complete')
@@ -174,23 +179,163 @@ def hierachical_clustering(s2v_similarity, top_n_spectra, masked_spectra): # thr
 
     cluster_index = fcluster(Z, num_clusters, criterion='maxclust')
     hierachical_clusters = [list() for _ in range(num_clusters)]
-    for spectrum, index in zip(top_n_spectra, cluster_index):
+    hierachical_cluster_scores = [list() for _ in range(num_clusters)]
+
+    for spectrum, score, index in zip(top_n_spectra, top_n_scores, cluster_index):
         cluster_num = index - 1
         hierachical_clusters[cluster_num].append(spectrum)
+        hierachical_cluster_scores[cluster_num].append(score)
         
-    if len(hierachical_clusters[0]) > len(hierachical_clusters[1]):
+    if not hierachical_cluster_scores[0]:
+        print("Only one cluster: ", np.min(similarity_matrix.flatten()))
+        return top_n_spectra, top_n_scores, masked_spectra_similarity
+    elif not hierachical_cluster_scores[1]:
+        print("Only one cluster: ", np.min(similarity_matrix.flatten()))
+        return top_n_spectra, top_n_scores, masked_spectra_similarity
+    elif np.max(hierachical_cluster_scores[0]) > np.max(hierachical_cluster_scores[1]):
         index = 0
-    elif len(hierachical_clusters[0]) < len(hierachical_clusters[1]):
+    elif np.max(hierachical_cluster_scores[0]) < np.max(hierachical_cluster_scores[1]):
         index = 1
     else:
-        print("clusters have same size")
+        print("matches have same similarity")
         index = 0
-    print(cluster_index)
-    #all_clusters = []
-    #for cluster in hierachical_clusters:
-    #   all_clusters.extend(hierachical_clustering(s2v_similarity, cluster, masked_spectra))
     
-    return hierachical_clustering(s2v_similarity, hierachical_clusters[index], masked_spectra)
+    return hierachical_clustering(s2v_similarity, hierachical_clusters[index], hierachical_cluster_scores[index], masked_spectra, masked_spectra_similarity)
+
+
+def find_important_features(unmasked_spectrum_similarity, masked_spectra_similarity):
+    """returns a motif spectrum for based on something
+    
+    ARGS:
+        unmasked_spectrum_similarity (float): Spec2Vec similarity for compound to unmasked motif spectrum
+        masked_spectra_similarity (list): list of floats with Spec2Vec similarity for compound to each masked spectrum
+
+    RETURNS:
+        important_features (list): list of int values giving the indices of a feature in a motif spectrum
+        importance_features (list): list of float values giving the difference of the Spec2Vec score of masked and unmasked spectra
+    """
+    important_features = []
+    importance_features = []
+
+    for index_feature, masked_spectrum_similarity in enumerate(masked_spectra_similarity):
+        importance_feature = masked_spectrum_similarity - unmasked_spectrum_similarity
+
+        if importance_feature < 0: # < 0 means important
+            important_features.append(index_feature)
+
+        importance_features.append(importance_feature)
+
+    return important_features, importance_features
+
+
+def merge_important_features(unmasked_spectra_similarity, multiple_masked_spectra_similarity):
+    """merges important features
+    
+    ARGS:
+        unmasked_spectra_similarity
+        multiple_masked_spectra_similarity (pd.DataFrame): 
+        
+    RETURNS:
+        ho
+    """
+    multiple_important_features = []
+    multiple_importance_features = []
+
+    for unmasked_spectrum_similarity, (_, masked_spectra_similarity) in zip(unmasked_spectra_similarity, multiple_masked_spectra_similarity.items()):
+        important_features, importance_features = find_important_features(unmasked_spectrum_similarity, masked_spectra_similarity)
+        
+        multiple_important_features.append(important_features)
+        multiple_importance_features.append(importance_features)
+
+    aligned_important_features = list(reduce(np.intersect1d, multiple_important_features))
+    aligned_importance_features =  sum([np.array(importance_features)[aligned_important_features] for importance_features in multiple_importance_features])
+
+    return aligned_important_features, aligned_importance_features
+
+
+def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features, aligned_importance_features):
+    """something
+    
+    ARGS:
+        hello
+        
+    RETURNS: 
+        Bye
+    """
+    fragments_mz = motif_spectrum.peaks.mz
+    fragments_intensities = motif_spectrum.peaks.intensities
+    fragments_range = len(fragments_mz) # to distinguish between fragments and losses
+
+    losses_mz = motif_spectrum.losses.mz
+    losses_intensities = motif_spectrum.losses.intensities
+
+
+    new_fragments_mz = []
+    new_fragments_intensities = []
+
+    new_losses_mz = []
+    new_losses_intensities = []
+    
+    for aligned_important_feature, aligned_importance_feature in zip(aligned_important_features, aligned_importance_features):
+        if aligned_important_feature < fragments_range:
+            # it's a fragment
+            new_fragment_mz = fragments_mz[aligned_important_feature]
+            new_fragment_intensity = fragments_intensities[aligned_important_feature] - aligned_importance_feature
+
+            new_fragments_mz.append(new_fragment_mz)
+            new_fragments_intensities.append(new_fragment_intensity)
+
+        else:
+            # it's a loss
+            new_index = fragments_range - aligned_important_feature
+            new_loss_mz = losses_mz[new_index]
+            new_loss_intensity = losses_intensities[new_index] - aligned_importance_feature
+
+            new_losses_mz.append(new_loss_mz)
+            new_losses_intensities.append(new_loss_intensity)
+
+    max_intensity = max(np.absolute(np.array(new_fragments_intensities + new_losses_intensities)))
+
+    reconstructed_motif_spectrum = Spectrum(
+        mz = np.array(new_fragments_mz),
+        intensities = np.absolute(np.array(new_fragments_intensities))/max_intensity
+    )
+
+    if new_losses_mz: # losses are for some reason not in order
+        losses_mz_intensities = list(zip(new_losses_mz, new_losses_intensities))
+        losses_mz_intensities_sorted = sorted(losses_mz_intensities, key=lambda x: x[0])
+        new_losses_mz, new_losses_intensities = zip(*losses_mz_intensities_sorted)
+
+    reconstructed_motif_spectrum.losses = Fragments(
+        mz=np.array(new_losses_mz),
+        intensities=np.absolute(np.array(new_losses_intensities))/max_intensity
+    )
+
+    return reconstructed_motif_spectrum
+
+
+def refine_annotation(s2v_similarity, library_matches, masked_motif_spectra, motif_spectra):
+
+    optimized_motif_spectra = []
+    optimized_clusters = []
+    smiles_clusters = []
+    for i in range(len(masked_motif_spectra)):
+        cluster, scores, masked_spectra_similarity = hierachical_clustering(s2v_similarity, library_matches[i][1], library_matches[i][2], masked_motif_spectra[i])
+        aligned_important_features, aligned_importance_features = merge_important_features(scores, masked_spectra_similarity)
+        optimized_motif_spectrum = reconstruct_motif_spectrum(motif_spectra[i], aligned_important_features, aligned_importance_features)
+
+        optimized_motif_spectra.append(optimized_motif_spectrum)
+        optimized_clusters.append(cluster)
+        smiles_cluster = []
+        for spectrum in cluster:
+            smiles = spectrum.get("smiles")
+            smiles_cluster.append(smiles)
+
+        smiles_clusters.append(smiles_cluster)
+
+    
+    return optimized_motif_spectra, optimized_clusters, smiles_clusters
+            
 
 if __name__ == "__main__":
     pass
