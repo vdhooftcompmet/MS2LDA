@@ -145,3 +145,12 @@ tests/data/dataset_sweet_3D.sdf
 .pytest_cache
 build
 deepmol.egg-info
+
+*.png
+*.tsv
+*.mgf
+*.npy
+*.db
+*.model
+*.pkl
+*.dict
