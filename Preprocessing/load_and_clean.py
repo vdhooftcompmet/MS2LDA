@@ -45,7 +45,8 @@ def clean_spectra(spectra):
         spectrum = msfilters.require_minimum_number_of_peaks(spectrum, n_required=3)
         spectrum = msfilters.add_losses(spectrum)
 
-        cleaned_spectra.append(spectrum)
+        if spectrum: # why was it without this?
+            cleaned_spectra.append(spectrum)
 
     return cleaned_spectra
 

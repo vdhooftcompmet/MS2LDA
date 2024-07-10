@@ -49,7 +49,7 @@ def screen_score(overlapping_features, motif_dict):
             match_intensity = motif_dict[feature]
             intensity_sum += match_intensity
 
-        if n_features >= 2 and intensity_sum >= 0.9:
+        if n_features >= 3 and intensity_sum >= 0.9:
             level_A.append(idx)
         elif n_features == 1 and intensity_sum >= 0.9:
             level_B.append(idx)
@@ -73,4 +73,4 @@ def run_screen(motif, spectra):
 
 
 if __name__ == "__main__":
-    run_scan() # not working
+    run_screen() # not working

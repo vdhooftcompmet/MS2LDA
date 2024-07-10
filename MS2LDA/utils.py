@@ -7,15 +7,15 @@ import numpy as np
 from matchms import set_matchms_logger_level; set_matchms_logger_level("ERROR")
 
 
-def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@"):
+def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", significant_digits=2):
 
     # identify slicing start
     frag_start = len(frag_tag)
     loss_start = len(loss_tag)
 
     # extract fragments and losses
-    fragments = [ (float(feature[frag_start:]), float(importance)) for feature, importance in motif_k_features if feature.startswith(frag_tag) ]
-    losses = [ (float(feature[loss_start:]), float(importance)) for feature, importance in motif_k_features if feature.startswith(loss_tag) ]
+    fragments = [ ( round(float(feature[frag_start:]),significant_digits), float(importance) ) for feature, importance in motif_k_features if feature.startswith(frag_tag) ]
+    losses = [ ( round(float(feature[loss_start:]),significant_digits), float(importance) ) for feature, importance in motif_k_features if feature.startswith(loss_tag) ]
 
     # sort features based on mz value
     sorted_fragments, sorted_fragments_intensities = zip(*sorted(fragments)) if fragments else (np.array([]), np.array([]))
@@ -41,16 +41,6 @@ def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@"):
     spectrum.losses = Fragments(mz=np.array(sorted_losses), intensities=np.array(normalized_loss_intensities))
 
     return spectrum
-
-
-
-
-
-
-
-
-
-
 
 
 def match_frags_and_losses(motif_spectrum, analog_spectra):

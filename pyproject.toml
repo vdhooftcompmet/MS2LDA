@@ -1,0 +1,72 @@
+[project]
+name = "MS2LDA"
+version = "2.0.0"
+description = "Unsupervised Substructure Discovery using Topic Modelling with Automated Annotation."
+readme = "README.md"
+requires-python = ">=3.8"
+license-files = { paths = ["LICENSE"] }
+authors = [
+    { name = "Jonas Dietrich", email = "jonas.dietrich@wur.nl" },
+    { name = "Rosina Torres Ortega", email = "rosina.torresortega@wur.nl" }
+]
+
+dependencies = [
+    "coloredlogs~=15.0.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+modern_python = "modern_python.main:main"
+
+[project.optional-dependencies]
+dev = [
+    "black~=24.4.2",
+    "pre-commit~=3.4.0",
+    "pytest~=7.4.2",
+    "ruff~=0.5.0"
+]
+
+[tool.hatch.envs.dev]
+features = [
+    "dev"
+]
+
+[tool.ruff.lint]
+select = [
+    # flake8-bugbear
+    "B",
+    # flake8-comprehensions
+    "C4",
+    # flake8-eradicate/eradicate
+    "ERA",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+    # flake8-pie
+    "PIE",
+    # pygrep
+    "PGH",
+    # ruff checks
+    "RUF",
+    # flake8-simplify
+    "SIM",
+    # flake8-type-checking
+    "TCH",
+    # flake8-tidy-imports
+    "TID",
+    # pyupgrade
+    "UP",
+]
+ignore = [
+    # whitespace-before-punctuation
+    "E203",
+]
+
+[tool.mypy]
+exclude= 'tests'
+strict = true
+ignore_missing_imports = true

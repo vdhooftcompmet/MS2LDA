@@ -7,10 +7,14 @@ import numpy as np
 import pandas as pd
 from functools import partial
 
+from rdkit.Chem import MolFromSmiles
+from rdkit.Chem.inchi import MolToInchi
+from rdkit.Chem.inchi import InchiToInchiKey
 
 
 
-def load_s2v_and_library(path):
+
+def load_s2v_and_library(path_model, path_library):
     """load spec2vec model and library embeddings, SMILES and spectra
     
     ARGS:
@@ -21,8 +25,8 @@ def load_s2v_and_library(path):
         library (pd.dataframe): dataframe with embeddings, SMILES and spectra
     """
 
-    s2v = Word2Vec.load(path + "\spec2vec_AllPositive_ratio05_filtered_201101_iter_15.model")
-    library = pd.read_pickle(path + "\library.pkl")
+    s2v = Word2Vec.load(path_model)
+    library = pd.read_pickle(path_library)
 
     s2v_similarity = Spec2Vec(
         model=s2v,
@@ -76,7 +80,7 @@ def calc_similarity(embeddings_A, embeddings_B):
 
 
 
-def get_library_matches_per_motif(similarity_matrix, library, top_n=10, motif_number=0): 
+def get_library_matches_per_motif(similarity_matrix, library, top_n=10, unique_mols=False, motif_number=0): 
     """returns similarity scores, SMILES and spectra for top n matches for ONE motif
     
     ARGS:
@@ -91,16 +95,34 @@ def get_library_matches_per_motif(similarity_matrix, library, top_n=10, motif_nu
         top_scores (list): list of floats (Spec2Vec scores)
     """
 
-    top_n_rows = similarity_matrix.nlargest(top_n, motif_number).index.to_list()
+    top_n_rows = similarity_matrix.nlargest(1000, motif_number).index.to_list() # 1000 is arbitrary should be possible to set another value
     
     top_smiles = []
     top_spectra = []
     top_scores = []
 
-    for row in top_n_rows:
-        score = similarity_matrix.iat[row, motif_number]
-        smi = library.iat[row, 1]
-        spectrum = library.iat[row, 2]
+    top_inchikeys = []
+
+    i = 0
+    while len(top_smiles) < top_n:
+    
+        score = similarity_matrix.iat[top_n_rows[i], motif_number]
+        smi = library.iat[top_n_rows[i], 1]
+        spectrum = library.iat[top_n_rows[i], 2]
+        i += 1
+
+        if unique_mols == True: # for finding only unique entries
+            mol = MolFromSmiles(smi)
+            inchi = MolToInchi(mol)
+            inchikey = InchiToInchiKey(inchi)
+            if inchikey in top_inchikeys:
+                continue
+            else:
+                top_inchikeys.append(inchikey)
+
+        if top_scores:
+            if top_scores[0] - score > 0.2: # this score should be adjustable
+                break 
 
         top_scores.append(score)
         top_smiles.append(smi)
@@ -126,8 +148,13 @@ def get_library_matches(matching_settings):
     similarity_matrix = matching_settings["similarity_matrix"]
     library = matching_settings["library"]
     top_n = matching_settings["top_n"]
+    unique_mols = matching_settings["unique_mols"]
 
-    preset_get_library_matches_per_motif = partial(get_library_matches_per_motif, similarity_matrix=similarity_matrix, library=library, top_n=top_n)
+    preset_get_library_matches_per_motif = partial(get_library_matches_per_motif,
+                                                    similarity_matrix=similarity_matrix, 
+                                                    library=library, 
+                                                    top_n=top_n, 
+                                                    unique_mols=unique_mols)
     
     n_motifs = similarity_matrix.shape[1]
 
@@ -137,8 +164,6 @@ def get_library_matches(matching_settings):
         library_matches.append(library_match)
 
     return library_matches
-
-
 
 
 
