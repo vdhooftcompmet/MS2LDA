@@ -212,55 +212,50 @@ def find_important_features(unmasked_spectrum_similarity, masked_spectra_similar
 
     RETURNS:
         important_features (list): list of int values giving the indices of a feature in a motif spectrum
-        importance_features (list): list of float values giving the difference of the Spec2Vec score of masked and unmasked spectra
     """
     important_features = []
-    importance_features = []
 
     for index_feature, masked_spectrum_similarity in enumerate(masked_spectra_similarity):
-        importance_feature = masked_spectrum_similarity - unmasked_spectrum_similarity
+        feature_importance = masked_spectrum_similarity - unmasked_spectrum_similarity
 
-        if importance_feature < 0: # < 0 means important
+        if feature_importance <= 0: 
             important_features.append(index_feature)
 
-        importance_features.append(importance_feature)
 
-    return important_features, importance_features
+    return important_features
 
 
 def merge_important_features(unmasked_spectra_similarity, multiple_masked_spectra_similarity):
     """merges important features
     
     ARGS:
-        unmasked_spectra_similarity
-        multiple_masked_spectra_similarity (pd.DataFrame): 
+        unmasked_spectra_similarity (float): Spec2Vec similarity for compound to unmasked motif spectrum
+        multiple_masked_spectra_similarity (pd.DataFrame): dataframe of floats with Spec2Vec similarity for all compounds to each masked spectrum
         
     RETURNS:
-        ho
+        aligned_important_features (list): intersection of feature sets that have when masked no or a positive effect across all sets
     """
     multiple_important_features = []
-    multiple_importance_features = []
 
     for unmasked_spectrum_similarity, (_, masked_spectra_similarity) in zip(unmasked_spectra_similarity, multiple_masked_spectra_similarity.items()):
-        important_features, importance_features = find_important_features(unmasked_spectrum_similarity, masked_spectra_similarity)
+        important_features = find_important_features(unmasked_spectrum_similarity, masked_spectra_similarity)
         
         multiple_important_features.append(important_features)
-        multiple_importance_features.append(importance_features)
 
     aligned_important_features = list(reduce(np.intersect1d, multiple_important_features))
-    aligned_importance_features =  sum([np.array(importance_features)[aligned_important_features] for importance_features in multiple_importance_features])
 
-    return aligned_important_features, aligned_importance_features
+    return aligned_important_features
 
 
-def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features, aligned_importance_features):
+def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features):
     """something
     
     ARGS:
-        hello
+        motif_spectrum: matchms spectrum object
+        aligned_important_features (list): intersection of feature sets that have when masked no or a positive effect across all sets
         
     RETURNS: 
-        Bye
+        reconstructed_motif_spectrum: matchms spectrum object
     """
     fragments_mz = motif_spectrum.peaks.mz
     fragments_intensities = motif_spectrum.peaks.intensities
@@ -276,29 +271,22 @@ def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features, align
     new_losses_mz = []
     new_losses_intensities = []
     
-    for aligned_important_feature, aligned_importance_feature in zip(aligned_important_features, aligned_importance_features):
+    for aligned_important_feature in aligned_important_features:
         if aligned_important_feature < fragments_range:
             # it's a fragment
-            new_fragment_mz = fragments_mz[aligned_important_feature]
-            new_fragment_intensity = fragments_intensities[aligned_important_feature] - aligned_importance_feature
-
-            new_fragments_mz.append(new_fragment_mz)
-            new_fragments_intensities.append(new_fragment_intensity)
+            new_fragments_mz.append(fragments_mz[aligned_important_feature])
+            new_fragments_intensities.append(fragments_mz[aligned_important_feature])
 
         else:
             # it's a loss
             new_index = fragments_range - aligned_important_feature
-            new_loss_mz = losses_mz[new_index]
-            new_loss_intensity = losses_intensities[new_index] - aligned_importance_feature
+            new_losses_mz.append(losses_mz[new_index])
+            new_losses_intensities.append(losses_intensities[new_index])
 
-            new_losses_mz.append(new_loss_mz)
-            new_losses_intensities.append(new_loss_intensity)
-
-    max_intensity = max(np.absolute(np.array(new_fragments_intensities + new_losses_intensities)))
 
     reconstructed_motif_spectrum = Spectrum(
         mz = np.array(new_fragments_mz),
-        intensities = np.absolute(np.array(new_fragments_intensities))/max_intensity
+        intensities = np.array(new_fragments_intensities)
     )
 
     if new_losses_mz: # losses are for some reason not in order
@@ -308,21 +296,34 @@ def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features, align
 
     reconstructed_motif_spectrum.losses = Fragments(
         mz=np.array(new_losses_mz),
-        intensities=np.absolute(np.array(new_losses_intensities))/max_intensity
+        intensities=np.array(new_losses_intensities)
     )
 
     return reconstructed_motif_spectrum
 
 
-def refine_annotation(s2v_similarity, library_matches, masked_motif_spectra, motif_spectra):
+def refine_annotation(s2v_similarity, library_matches, masked_motifs_spectra, motif_spectra):
+    """runs the refined annotation from hierachical clustering to removing features based on it's importance for the found compounds
+    
+    ARGS:
+        s2v_similarity: gensim word2vec based similarity model for Spec2Vec
+        library_matches (list): list of lists, where each motif contains of three lists with spectra, SMILES and s2v scores
+        masked_motifs_spectra (list): list of lists of matchms spectrum objects; every list is for one motif
+        motif_spectra (list): list of matchms spectrum objects
+        
+    RETURNS:
+        optimized_motif_spectra (list): list of matchms spectrum objects which can contain the same or less features than the original one
+        optimized_clusters (list): list of lists with the compound spectra found by the annotation and seperated by hierachical clustering
+        smiles_clusters (list): list of lists with the compound SMILES found by the annotation and seperated by hierachical clustering
+    """
 
     optimized_motif_spectra = []
     optimized_clusters = []
     smiles_clusters = []
-    for i in range(len(masked_motif_spectra)):
-        cluster, scores, masked_spectra_similarity = hierachical_clustering(s2v_similarity, library_matches[i][1], library_matches[i][2], masked_motif_spectra[i])
-        aligned_important_features, aligned_importance_features = merge_important_features(scores, masked_spectra_similarity)
-        optimized_motif_spectrum = reconstruct_motif_spectrum(motif_spectra[i], aligned_important_features, aligned_importance_features)
+    for i in range(len(masked_motifs_spectra)):
+        cluster, scores, masked_spectra_similarity = hierachical_clustering(s2v_similarity, library_matches[i][1], library_matches[i][2], masked_motifs_spectra[i])
+        aligned_important_features = merge_important_features(scores, masked_spectra_similarity)
+        optimized_motif_spectrum = reconstruct_motif_spectrum(motif_spectra[i], aligned_important_features)
 
         optimized_motif_spectra.append(optimized_motif_spectrum)
         optimized_clusters.append(cluster)

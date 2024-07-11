@@ -1,7 +1,14 @@
 import matchms.filtering as msfilters
 
 def spec2mzWords(spectra):
-    "converts a spectrum into frag@ loss@ spectra"
+    """converts a spectra into list of frag@xxx loss@xxx spectra
+
+    ARGS:
+        spectra (list): list of matchms spectra objects
+
+    RETURNS:
+        spectra_set (list): list of lists of strings --> frag@123.45, frag@67.89, ...
+    """
     spectra_set = []
     for spectrum in spectra:
         spectrum = msfilters.add_losses(spectrum)
@@ -17,7 +24,15 @@ def spec2mzWords(spectra):
 
 
 def screen(motif, spectra_set):
-    """scan for overlap of a motif"""
+    """finds intersections of query spectra and motif spectra 
+    
+    ARGS:
+        motif: matchms spectrum object
+        
+    RETURNS:
+        overlapping_features (list): list of lists with frag@xxx and loss@ features
+        motif_dict (dictionary): dictionary with mz and intensity of motif features
+    """
 
     motif_fragments = ["frag@"+str(mz) for mz in motif.peaks.mz]
     motif_losses = ["loss@"+str(mz) for mz in motif.losses.mz]
@@ -34,7 +49,18 @@ def screen(motif, spectra_set):
 
 
 def screen_score(overlapping_features, motif_dict):
-    """gives a score to the match"""
+    """based on degree of query spectra-motif spectra overlapp the spectrum gets assigned to a certain level of similarity
+    
+    ARGS:
+        overlapping_features (list): list of lists with frag@xxx and loss@ features
+        motif_dict (dictionary): dictionary with mz and intensity of motif features
+        
+    RETURNS:
+        level_A (list): list of indices for 1. best matches
+        level_B (list): list of indices for 2. best matches
+        level_C (list): list of indices for 3. best matches
+        level_D (list): list of indices for 4. best matches
+    """
 
     level_A = []
     level_B = []
@@ -63,10 +89,25 @@ def screen_score(overlapping_features, motif_dict):
           
     
 def run_screen(motif, spectra):
+    """runs the screening for a given set of spectra against a motif spectrum
+    
+    ARGS:
+        motif: matchms spectrum object
+        spectra (list): list of matchms spectrum objects
+        
+    RETURNS:
+        level_A (list): list of indices for 1. best matches
+        level_B (list): list of indices for 2. best matches
+        level_C (list): list of indices for 3. best matches
+        level_D (list): list of indices for 4. best matches
+    """
+
     spectra_set = spec2mzWords(spectra)
     overlapping_features, motif_dict = screen(motif, spectra_set)
     level_A, level_B, level_C, level_D = screen_score(overlapping_features, motif_dict)
 
+    # things to implement: store as csv file; add retention time; sample run number; compare to mass of analog compound and give suggestions for modifications 
+    # maybe there is a more efficient way to do that?
     return level_A, level_B, level_C, level_D
 
     

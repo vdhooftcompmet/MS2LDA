@@ -8,6 +8,18 @@ from matchms import set_matchms_logger_level; set_matchms_logger_level("ERROR")
 
 
 def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", significant_digits=2):
+    """creates a spectrum from fragments and losses text representations like frag@123.45 or fragment_67.89
+    
+    ARGS:
+        motif_k_features (list): for motif number k all features in a unified representation
+        k (int): motif id
+        frag_tag (str): unified pre-fragments tag
+        loss_tag (str): unified pre-loss tag
+        significant_digits (int): number of significant digits that should be used for each fragment and loss
+        
+    RETURNS:
+        spectrum: matchms spectrum object
+    """
 
     # identify slicing start
     frag_start = len(frag_tag)
