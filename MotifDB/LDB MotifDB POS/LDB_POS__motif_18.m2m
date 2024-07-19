@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_18
 #ANNOTATION 7 spectra, 5 molecules, 3 classes: 60.0% Chromanes and Chromones, 20.0% Acids, 20.0% Cleavage Products of Depsides and Depsidones
 #SHORT_ANNOTATION No short annotation available

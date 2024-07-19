@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Rhamnaceae_Plant_Mass2Motifs
+#CHARGE -1
 #NAME motif_64
 #ANNOTATION Norrubrofusarin-related
 #SHORT_ANNOTATION Norrubrofusarin-related

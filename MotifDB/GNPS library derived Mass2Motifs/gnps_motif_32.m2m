@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET GNPS_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME gnps_motif_32
 #ANNOTATION Pregn-4 or 5-ene-3-dione substructure
 #SHORT_ANNOTATION Pregn-4 or 5-ene-3-dione substructure

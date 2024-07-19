@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Planomonospora_associated_Mass2Motifs
+#CHARGE 1
 #NAME motif_434
 #ANNOTATION Salinichelin-like motif
 #SHORT_ANNOTATION Salinichelin-like motif

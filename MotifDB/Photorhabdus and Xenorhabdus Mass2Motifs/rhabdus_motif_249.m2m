@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_249
 #ANNOTATION Interesting motif - peptidic nature - small fragments with 177 and 133 most abundant
 #SHORT_ANNOTATION Interesting motif - peptidic nature - small fragments

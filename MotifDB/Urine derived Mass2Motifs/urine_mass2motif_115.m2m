@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_115
 #ANNOTATION CHOOH loss - indicative for free carboxylic acid group
 #SHORT_ANNOTATION CHOOH loss - indicative for free carboxylic acid group

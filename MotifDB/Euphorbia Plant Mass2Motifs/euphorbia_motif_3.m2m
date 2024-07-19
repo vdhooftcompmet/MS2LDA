@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_3
 #ANNOTATION Loss of hexadienoic acid
 #SHORT_ANNOTATION Loss of hexadienoic acid and its fragment / difference of 18 corresponds to the loss of-NH3 adduct

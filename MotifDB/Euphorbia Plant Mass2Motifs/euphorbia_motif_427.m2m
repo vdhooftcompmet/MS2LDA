@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_427
 #ANNOTATION DSF phorbol ester (PE) 367 311 293 265 263
 #SHORT_ANNOTATION DSF phorbol ester (PE) 367 311 293 265 263

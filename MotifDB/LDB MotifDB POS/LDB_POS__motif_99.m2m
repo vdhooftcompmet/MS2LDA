@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_99
 #ANNOTATION 14 spectra, 6 molecules, 5 classes: 33.3% N-Containing Compounds, 16.7% Chromanes and Chromones, 16.7% Xanthones and bis-Xanthones, 16.7% Quinones, 16.7% Depsidones
 #SHORT_ANNOTATION No short annotation available

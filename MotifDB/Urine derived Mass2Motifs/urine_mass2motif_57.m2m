@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_57
 #ANNOTATION Double water loss i.e. 2*H20 – Generic feature for metabolites containing several free OH groups attached to a aliphatic chain like sugars.
 #SHORT_ANNOTATION Double water loss i.e. 2*H20 – Generic feature for metabolites containing several free OH groups attached to a aliphatic chain like sugars.

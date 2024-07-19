@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_36
 #ANNOTATION Fragments indicative for asparagine substructure (MzCloud) – prevalent in Beer 3
 #SHORT_ANNOTATION Fragments indicative for asparagine substructure (MzCloud) – prevalent in Beer 3

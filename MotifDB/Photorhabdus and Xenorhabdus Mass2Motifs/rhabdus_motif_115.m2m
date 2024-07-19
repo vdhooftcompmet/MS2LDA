@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_115
 #ANNOTATION Interesting motif - small substructure [141, 112 and 98]
 #SHORT_ANNOTATION No short annotation available

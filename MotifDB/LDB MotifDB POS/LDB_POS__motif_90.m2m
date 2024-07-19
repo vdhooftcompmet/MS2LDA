@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_90
 #ANNOTATION 11 spectra, 9 molecules, 6 classes: 44.4% Paraconic acids, 11.1% Xanthones and bis-Xanthones, 11.1% Depsides (Didepsides), 11.1% Quinones, 11.1% Pulvinic Acid Derivatives, 11.1% Depsidones
 #SHORT_ANNOTATION No short annotation available

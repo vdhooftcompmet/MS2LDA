@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_54
 #ANNOTATION 12 spectra, 8 molecules, 6 classes: 25.0% N-Containing Compounds, 25.0% Chromanes and Chromones, 12.5% Mycosporines, 12.5% Paraconic acids, 12.5% Quinones, 12.5% Pulvinic Acid Derivatives
 #SHORT_ANNOTATION No short annotation available

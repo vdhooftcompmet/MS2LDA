@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Streptomyces_S29
+#CHARGE 1
 #NAME motif_1
 #ANNOTATION acyl DFO-Ds (loss of ([N-hydroxy-succinylcadaverine]+[N-hydroxy-acetylcadaverine]))
 #SHORT_ANNOTATION [HSC+HAC]

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_286
 #ANNOTATION C4H8N based Mass2Motif - indicative for proline arginine ornitine citrulline and N-containing ring structures
 #SHORT_ANNOTATION C4H8N based Mass2Motif - indicative for proline arginine ornitine citrulline and N-containing ring structures

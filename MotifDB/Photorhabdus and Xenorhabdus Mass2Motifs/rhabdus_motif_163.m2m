@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_163
 #ANNOTATION Leucine-Leucine peptidic fragment Mass2Motif (i.e., in Xenobovid peptides)
 #SHORT_ANNOTATION Leu-Leu peptidic Mass2Motif

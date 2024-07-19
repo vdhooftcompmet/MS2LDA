@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_151
 #ANNOTATION Xenocoumacin related Mass2Motif - with m/z 250 ( 3,4-dihydro-8-hydroxy-1H-2-benzopyran-1-one related) and m/z 158 (remaining fragment that includes pyrrolidine) mass fragments
 #SHORT_ANNOTATION Xenocoumacin related Mass2Motif

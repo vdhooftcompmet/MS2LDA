@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_NEG_MotifDB_02
+#CHARGE -1
 #NAME motif_45
 #ANNOTATION long alkyl chain in Pertusaric acid-like compounds
 #SHORT_ANNOTATION long alkyl chain

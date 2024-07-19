@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_11
 #ANNOTATION Atenolol related fragments and losses
 #SHORT_ANNOTATION Atenolol related fragments and losses

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_88
 #ANNOTATION 36 spectra, 23 molecules, 6 classes: 56.5% Terpenoids : Triterpenes, 21.7% Paraconic acids, 8.7% Terpenoids : Diterpenes, 4.3% Acids, 4.3% Xanthones and bis-Xanthones, 4.3% Depsides (Didepsides)
 #SHORT_ANNOTATION No short annotation available

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.1
+#MOTIFSET Streptomyces_and_Salinispora_Mass2Motifs
+#CHARGE 1
 #NAME motif_119
 #ANNOTATION N,N-dimethyl amino sugar related motif - i.e., dimethylamino-b-D -xylo-hexopyranoside (Rosamicin) or  N,N-dimethyl-pyrrolosamine (Lomaivicitin)
 #SHORT_ANNOTATION N,N-dimethyl amino sugar related motif

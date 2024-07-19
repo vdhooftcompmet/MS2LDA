@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_69
 #ANNOTATION 6 spectra, 4 molecules, 4 classes: 25.0% Mycosporines, 25.0% Chromanes and Chromones, 25.0% Depsides (Didepsides), 25.0% Quinones
 #SHORT_ANNOTATION No short annotation available

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_44
 #ANNOTATION Unknown DSF side chain?
 #SHORT_ANNOTATION 351 263 164 162 176 104 102 loss 134 loss 74 loss 116

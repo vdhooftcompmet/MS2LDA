@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_75
 #ANNOTATION Unknown side chain?
 #SHORT_ANNOTATION 247 259 123 109 229 loss 178 loss 196 loss 166 loss 184

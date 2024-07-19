@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_207
 #ANNOTATION Glutamine related Mass2Motif (smaller degrees very similar fragments to M2M 133)
 #SHORT_ANNOTATION Glutamine related Mass2Motif (smaller degrees very similar fragments to M2M 133)

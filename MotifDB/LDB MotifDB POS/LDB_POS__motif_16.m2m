@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_16
 #ANNOTATION 16 spectra, 9 molecules, 4 classes: 55.6% Depsidones, 22.2% Quinones, 11.1% Acids, 11.1% Paraconic acids
 #SHORT_ANNOTATION No short annotation available

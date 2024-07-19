@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_183
 #ANNOTATION guanidino group related Mass2Motif (CH6N3 fragment)
 #SHORT_ANNOTATION guanidino group related Mass2Motif (CH6N3 fragment)

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Streptomyces_S29
+#CHARGE 1
 #NAME motif_167
 #ANNOTATION acyl DFO-D motif [(N-hydroxycadaverine)+(N-hydroxy-acetylcadaverine)]
 #SHORT_ANNOTATION [N-hydroxycadaverine + HAC]

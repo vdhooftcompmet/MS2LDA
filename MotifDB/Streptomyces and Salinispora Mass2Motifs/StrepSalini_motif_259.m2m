@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.1
+#MOTIFSET Streptomyces_and_Salinispora_Mass2Motifs
+#CHARGE 1
 #NAME motif_259
 #ANNOTATION Loss of 60 - Streptomyces and related block of species - Loss of O-Acetylgroup (C2H4O2)
 #SHORT_ANNOTATION Loss of O-Acetylgroup (C2H4O2) - Streptomyces related

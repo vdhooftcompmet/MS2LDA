@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_432
 #ANNOTATION DSF; 480 297 279 269 251; Side chain (Nic Nic + H20) 106 124
 #SHORT_ANNOTATION jatrophane 582 459 399 339 279 251 Nic + H20 124 Nic -H20 106

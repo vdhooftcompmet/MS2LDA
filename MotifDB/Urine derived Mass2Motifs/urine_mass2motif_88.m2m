@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_88
 #ANNOTATION Alkylamine related Mass2Motif (C4H10N and C3H8N fragments)
 #SHORT_ANNOTATION Alkylamine (C4H10N and C3H8N fragments)

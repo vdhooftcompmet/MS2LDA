@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET MIADB_pos_60
+#CHARGE 1
 #NAME motif_6
 #ANNOTATION decorated_indole_mostly_type1_MIAskeleton
 #SHORT_ANNOTATION decorated_indole_mostly_type1_MIAskeleton

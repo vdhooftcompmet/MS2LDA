@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Streptomyces_S29
+#CHARGE 1
 #NAME motif_26
 #ANNOTATION Legonoxamines (loss of N-hydroxyl phenylacetyl cadaverine)
 #SHORT_ANNOTATION [N-hydroxyl phenylacetyl cadaverine]

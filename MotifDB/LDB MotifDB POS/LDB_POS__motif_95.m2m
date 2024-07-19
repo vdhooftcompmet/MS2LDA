@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_95
 #ANNOTATION 14 spectra, 10 molecules, 4 classes: 50.0% Quinones, 30.0% Depsidones, 10.0% Diphenylethers, 10.0% Acids
 #SHORT_ANNOTATION No short annotation available

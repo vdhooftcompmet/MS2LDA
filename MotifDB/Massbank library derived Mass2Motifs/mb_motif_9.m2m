@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_9
 #ANNOTATION Loss of [hexose-H2O] – indication of hexose conjugation (for example glucose)
 #SHORT_ANNOTATION Loss of [hexose-H2O] – indication of hexose conjugation (for example glucose)

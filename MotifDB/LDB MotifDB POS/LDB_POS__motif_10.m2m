@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_10
 #ANNOTATION 10 spectra, 5 molecules, 5 classes: 20.0% Terpenoids : Triterpenes, 20.0% Aliphatic and Cycloaliphatic Compounds, 20.0% Chromanes and Chromones, 20.0% Quinones, 20.0% Depsidones
 #SHORT_ANNOTATION No short annotation available

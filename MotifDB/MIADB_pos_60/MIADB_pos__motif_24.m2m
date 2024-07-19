@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET MIADB_pos_60
+#CHARGE 1
 #NAME motif_24
 #ANNOTATION Indole_in_mostly_corynanthean_series
 #SHORT_ANNOTATION Indole_in_mostly_corynanthean_series

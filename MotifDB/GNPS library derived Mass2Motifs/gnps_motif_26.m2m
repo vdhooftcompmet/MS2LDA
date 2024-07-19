@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET GNPS_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME gnps_motif_26
 #ANNOTATION 6-oxo-7 11-diazatricyclo[7.3.1.0~2 7~]trideca-2 4-diene-11-carboxamide substructure
 #SHORT_ANNOTATION 6-oxo-7 11-diazatricyclo[7.3.1.0~2 7~]trideca-2 4-diene-11-carboxamide substructure

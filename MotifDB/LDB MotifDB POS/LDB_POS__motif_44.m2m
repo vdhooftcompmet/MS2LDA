@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_44
 #ANNOTATION 20 spectra, 18 molecules, 5 classes: 55.6% Depsidones, 16.7% Terpenoids : Triterpenes, 16.7% Pulvinic Acid Derivatives, 5.6% Aliphatic and Cycloaliphatic Compounds, 5.6% Xanthones and bis-Xanthones
 #SHORT_ANNOTATION No short annotation available

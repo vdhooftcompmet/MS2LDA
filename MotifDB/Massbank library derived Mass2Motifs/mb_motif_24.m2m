@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_24
 #ANNOTATION Fragments indicative of a glycosylation – i.e. indicative for a sugar conjugation (in beer often related to glucose)
 #SHORT_ANNOTATION Fragments indicative of a glycosylation – i.e. indicative for a sugar conjugation (in beer often related to glucose)

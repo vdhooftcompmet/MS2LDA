@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_35
 #ANNOTATION 14 spectra, 4 molecules, 3 classes: 50.0% Pulvinic Acid Derivatives, 25.0% Cleavage Products of Depsides and Depsidones, 25.0% Depsidones
 #SHORT_ANNOTATION No short annotation available

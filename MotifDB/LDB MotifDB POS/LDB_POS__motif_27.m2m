@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_27
 #ANNOTATION 9 spectra, 3 molecules, 3 classes: 33.3% Terpenoids : Diterpenes, 33.3% Xanthones and bis-Xanthones, 33.3% Pulvinic Acid Derivatives
 #SHORT_ANNOTATION No short annotation available

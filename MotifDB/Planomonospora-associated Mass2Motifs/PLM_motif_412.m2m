@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Planomonospora_associated_Mass2Motifs
+#CHARGE 1
 #NAME motif_412
 #ANNOTATION Desferrioxamine-like motif
 #SHORT_ANNOTATION No short annotation available

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_128
 #ANNOTATION Mostly proline betaine C13 isotope related Mass2Motif
 #SHORT_ANNOTATION Mostly proline betaine C13 isotope related Mass2Motif

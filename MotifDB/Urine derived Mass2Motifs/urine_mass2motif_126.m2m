@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_126
 #ANNOTATION C7H7 and C5H5 fragments - indicative of methylbenzene substructure (aromatic)
 #SHORT_ANNOTATION C7H7 and C5H5 fragments - indicative of methylbenzene substructure (aromatic)

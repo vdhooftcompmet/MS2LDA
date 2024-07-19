@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_187
 #ANNOTATION Mass2Motif related to Imidazole group linked to a carboxylgroup through one CH2 group i.e. like in imidazole acetic acid
 #SHORT_ANNOTATION Mass2Motif related to Imidazole group linked to a carboxylgroup through one CH2 group i.e. like in imidazole acetic acid

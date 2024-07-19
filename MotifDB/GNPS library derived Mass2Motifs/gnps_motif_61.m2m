@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET GNPS_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME gnps_motif_61
 #ANNOTATION Theophylline substructure
 #SHORT_ANNOTATION Theophylline substructure

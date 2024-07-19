@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_122
 #ANNOTATION Paracetamol mercapturate related (i.e. metabolites containing N-acetylcysteine adduct with paracetamol)
 #SHORT_ANNOTATION Paracetamol mercapturate related (i.e. metabolites containing N-acetylcysteine adduct with paracetamol)

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_43
 #ANNOTATION Fragments indicative for histidine (C6H10N3O2) substructure (MzCloud)
 #SHORT_ANNOTATION Fragments indicative for histidine (C6H10N3O2) substructure (MzCloud)

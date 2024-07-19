@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_94
 #ANNOTATION 7 spectra, 4 molecules, 3 classes: 50.0% Depsidones, 25.0% Xanthones and bis-Xanthones, 25.0% Quinones
 #SHORT_ANNOTATION No short annotation available

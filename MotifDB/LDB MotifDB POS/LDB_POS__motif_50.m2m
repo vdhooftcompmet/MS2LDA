@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_50
 #ANNOTATION 22 spectra, 9 molecules, 2 classes: 88.9% Pulvinic Acid Derivatives, 11.1% Chromanes and Chromones
 #SHORT_ANNOTATION No short annotation available

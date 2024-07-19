@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_130
 #ANNOTATION Polyethylene glycol related Mass2Motif – C6H13O3 fragment and smaller fragments present in PEG related compounds
 #SHORT_ANNOTATION Polyethylene glycol related Mass2Motif – C6H13O3 fragment and smaller fragments present in PEG related compounds

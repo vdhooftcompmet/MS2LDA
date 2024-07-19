@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET MIADB_pos_60
+#CHARGE 1
 #NAME motif_51
 #ANNOTATION Indole_in_Sarpagine_skeleton
 #SHORT_ANNOTATION Indole_in_Sarpagine_skeleton

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_6
 #ANNOTATION 16 spectra, 15 molecules, 7 classes: 33.3% Depsidones, 20.0% Depsides (Didepsides), 13.3% Terpenoids : Triterpenes, 13.3% Cleavage Products of Depsides and Depsidones, 6.7% Aliphatic and Cycloaliphatic Compounds, 6.7% Paraconic acids, 6.7% Xanthones and bi
 #SHORT_ANNOTATION No short annotation available

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET MIADB_pos_100
+#CHARGE 1
 #NAME motif_5
 #ANNOTATION Indole_in_Sarpagine_Corynanthean_skeleton
 #SHORT_ANNOTATION Indole_in_Sarpagine_Corynanthean_skeleton

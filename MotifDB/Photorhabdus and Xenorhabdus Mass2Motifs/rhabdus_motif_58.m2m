@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_58
 #ANNOTATION interesting motif - peptidic nature - 8 core fragments between 144 and 232
 #SHORT_ANNOTATION Interesting motif - peptidic nature

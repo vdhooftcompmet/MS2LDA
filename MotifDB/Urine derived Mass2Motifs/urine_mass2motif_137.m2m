@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_137
 #ANNOTATION Steroid core related (including C8H11O C7H9 and C6H9 fragments)
 #SHORT_ANNOTATION Steroid related (including C8H11O fragment)

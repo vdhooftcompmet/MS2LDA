@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_159
 #ANNOTATION C6H10O3 metabolite with C3H7O fragment - check - interesting!
 #SHORT_ANNOTATION C6H10O3 metabolite with C3H7O fragment - check - interesting!

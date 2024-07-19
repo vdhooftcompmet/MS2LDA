@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET MIADB_pos_60
+#CHARGE 1
 #NAME motif_13
 #ANNOTATION Corynanthean_skeleton
 #SHORT_ANNOTATION Corynanthean_skeleton

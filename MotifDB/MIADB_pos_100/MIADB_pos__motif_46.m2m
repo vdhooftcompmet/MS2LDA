@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET MIADB_pos_100
+#CHARGE 1
 #NAME motif_46
 #ANNOTATION Indole_in_Yohimbane_Corynanthean_series
 #SHORT_ANNOTATION Indole_in_Yohimbane_Corynanthean_series

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_180
 #ANNOTATION 124 106 418 538 728 277 478 598 468 loss 120
 #SHORT_ANNOTATION Unknown Nic and Nic + H20 (106 124)

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_19
 #ANNOTATION 8 spectra, 4 molecules, 1 class: 100.0% Xanthones and bis-Xanthones
 #SHORT_ANNOTATION No short annotation available

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_48
 #ANNOTATION 14 spectra, 12 molecules, 5 classes: 50.0% Depsidones, 16.7% Terpenoids : Triterpenes, 16.7% Quinones, 8.3% Cleavage Products of Depsides and Depsidones, 8.3% Chromanes and Chromones
 #SHORT_ANNOTATION No short annotation available
