@@ -1,7 +1,7 @@
 ![](MS2LDA_LOGO_white.jpg)
 ## About Topic Modelling in Mass Spec
 
-It's really interesting.
+The first ...
 
 
 ## Overview 
