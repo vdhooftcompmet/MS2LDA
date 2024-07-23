@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_14
 #ANNOTATION Combination of small losses (i.e. NH3 and CH2O2)
 #SHORT_ANNOTATION Combination of small losses (i.e. NH3 and CH2O2)

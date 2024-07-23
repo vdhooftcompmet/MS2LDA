@@ -17,6 +17,9 @@ def store_m2m_file(motif_spectrum, motif_number, folder):
     filename = folder.split("\\")[-1].split(" ")[0].lower()
     with open(f"{folder}\{filename}_motif_{motif_number}.m2m", "w") as output:
 
+        output.write(f"#MS2ACCURACY 0.005\n") # number should be adjustable
+        output.write(f"#MOTIFSET {folder.replace(' ', '_')}\n")
+        output.write(f"#CHARGE 1\n") # number should be adjustable
         # add name
         output.write(f"#NAME {filename}_motif_{motif_number}\n")
         # add (long) annotation
@@ -73,20 +76,34 @@ def load_m2m_file(file): # currently it is not supported to change frag/loss tag
     features = []
     name = None
     short_annotation = None
-    #...
+    ms2accuracy = None
+    motifset = None
+    charge = None
+    annotation = None
 
     with open(file, "r") as motif_file:
         for line in motif_file:
             if line.startswith("frag") or line.startswith("loss"):
                 features.append( (line.strip().split(",")) )
             elif line.startswith("#NAME"):
-                name = line.split(" ")[1]
+                name = line.split("motif_")[1]
             elif line.startswith("#SHORT_ANNOTATION"):
                 short_annotation = line.split(" ", 1)[1]
-            #...
+            elif line.startswith("#MS2ACCURACY"):
+                ms2accuracy = line.split(" ")[1]
+            elif line.startswith("#MOTIFSET"):
+                motifset = line.split(" ")[1]
+            elif line.startswith("#CHARGE"):
+                charge = line.split(" ")[1]
+            elif line.startswith("#ANNOTATION"):
+                annotation = line.split(" ", 1)[1]
 
     motif_spectrum = create_spectrum(features, name, frag_tag="fragment_", loss_tag="loss_", significant_digits=2)
-    motif_spectrum.set("short_annotation", short_annotation)
+    motif_spectrum.set("short_annotation", short_annotation.strip())
+    motif_spectrum.set("charge", charge.strip())
+    motif_spectrum.set("ms2accuracy", ms2accuracy.strip())
+    motif_spectrum.set("motifset", motifset.strip())
+    motif_spectrum.set("annotation", annotation.strip())
 
     return motif_spectrum
 

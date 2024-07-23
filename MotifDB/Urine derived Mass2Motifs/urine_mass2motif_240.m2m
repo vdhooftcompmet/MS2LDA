@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_240
 #ANNOTATION (E)-N5-(1-Aminoethylidene)-L-ornithine related mass2motif
 #SHORT_ANNOTATION (E)-N5-(1-Aminoethylidene)-L-ornithine related mass2motif

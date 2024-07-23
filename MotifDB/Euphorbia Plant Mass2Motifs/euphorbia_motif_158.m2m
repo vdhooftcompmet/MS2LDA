@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_158
 #ANNOTATION Loss of NH3 adducts in DSF
 #SHORT_ANNOTATION loss 17 loss 16

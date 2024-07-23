@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_19
 #ANNOTATION Fragments indicative for ethylphenol (i.e. resulting from Tyramine in beer) or the structurally related paramethylmethoxybenzene (MassBank) substructure
 #SHORT_ANNOTATION Fragments indicative for ethylphenol (i.e. resulting from Tyramine in beer) or the structurally related paramethylmethoxybenzene (MassBank) substructure

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_37
 #ANNOTATION 17 spectra, 9 molecules, 5 classes: 55.6% Quinones, 11.1% Naphthopyranes, 11.1% Cleavage Products of Depsides and Depsidones, 11.1% N-Containing Compounds, 11.1% Pulvinic Acid Derivatives
 #SHORT_ANNOTATION No short annotation available

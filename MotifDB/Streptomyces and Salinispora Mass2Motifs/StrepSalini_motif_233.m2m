@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.1
+#MOTIFSET Streptomyces_and_Salinispora_Mass2Motifs
+#CHARGE 1
 #NAME motif_233
 #ANNOTATION C9H20N and C6H14N fragments (142/100) related Mass2Motif - Streptomyces sp related
 #SHORT_ANNOTATION N-alkyl chain 142 and 100 fragments polyamine-like motif

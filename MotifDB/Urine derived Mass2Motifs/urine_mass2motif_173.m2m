@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_173
 #ANNOTATION Cytoplex (citric acid based) plasticer related losses
 #SHORT_ANNOTATION Cytoplex (citric acid based) plasticer related losses

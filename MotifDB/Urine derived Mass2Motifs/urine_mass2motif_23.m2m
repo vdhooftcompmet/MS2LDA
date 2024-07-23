@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_23
 #ANNOTATION Glycine and glycine-C=O related [loss based] Mass2Motif - could contain 'acylglycines'
 #SHORT_ANNOTATION Glycine

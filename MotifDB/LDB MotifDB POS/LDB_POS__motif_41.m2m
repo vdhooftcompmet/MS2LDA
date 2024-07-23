@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_41
 #ANNOTATION 10 spectra, 4 molecules, 1 class: 100.0% Depsidones
 #SHORT_ANNOTATION No short annotation available

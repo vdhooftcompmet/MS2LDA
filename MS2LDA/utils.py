@@ -7,7 +7,7 @@ import numpy as np
 from matchms import set_matchms_logger_level; set_matchms_logger_level("ERROR")
 
 
-def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", significant_digits=2):
+def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", significant_digits=2, charge=1, motifset="unknown"):
     """creates a spectrum from fragments and losses text representations like frag@123.45 or fragment_67.89
     
     ARGS:
@@ -47,7 +47,10 @@ def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", sig
         mz=np.array(sorted_fragments),
         intensities=np.array(normalized_frag_intensities),
         metadata={
-            "id": f"motif_{k}",
+            "id": f"motif_{k}".strip(),
+            "charge": charge,
+            "ms2accuracy": (1 / (10 ** significant_digits)) / 2 ,
+            "motifset": motifset,
         }
     )
     spectrum.losses = Fragments(mz=np.array(sorted_losses), intensities=np.array(normalized_loss_intensities))

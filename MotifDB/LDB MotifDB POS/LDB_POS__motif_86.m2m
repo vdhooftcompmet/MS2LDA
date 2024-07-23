@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_86
 #ANNOTATION 16 spectra, 7 molecules, 5 classes: 28.6% Cleavage Products of Depsides and Depsidones, 28.6% Depsidones, 14.3% Depsides (Tridepsides), 14.3% Dibenzofuranes, 14.3% Pulvinic Acid Derivatives
 #SHORT_ANNOTATION No short annotation available

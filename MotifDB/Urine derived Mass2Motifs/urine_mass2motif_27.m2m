@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_27
 #ANNOTATION C5H10NO and C3H6N fragments - most likely N-methyl-morpholine substructure
 #SHORT_ANNOTATION N-methyl-morpholine fragment

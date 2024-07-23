@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_213
 #ANNOTATION C4H7O3 fragment with CO2 loss - likely indicative of fatty acid substructure (1/2-OH-propionic acid?)
 #SHORT_ANNOTATION C4H7O3 fragment with CO2 loss - likely indicative of fatty acid substructure (1/2-OH-propionic acid?)

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_30
 #ANNOTATION 22 spectra, 20 molecules, 10 classes: 35.0% Quinones, 10.0% Dibenzofuranes, 10.0% Terpenoids : Triterpenes, 10.0% Xanthones and bis-Xanthones, 10.0% Depsidones, 5.0% Acids, 5.0% Mycosporines, 5.0% Cleavage Products of Depsides and Depsidones, 5.0% Paraconi
 #SHORT_ANNOTATION No short annotation available

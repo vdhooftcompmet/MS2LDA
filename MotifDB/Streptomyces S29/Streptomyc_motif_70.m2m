@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Streptomyces_S29
+#CHARGE 1
 #NAME motif_70
 #ANNOTATION General desferrioxamine backbone fragment [(Succinate + N-hydroxy-succinylcadaverine)]
 #SHORT_ANNOTATION (Succinate + HSC)

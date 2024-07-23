@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Streptomyces_S29
+#CHARGE 1
 #NAME motif_151
 #ANNOTATION General desferrioxamine terminal backbone fragment [(Succinic acid]
 #SHORT_ANNOTATION Succinate (Terminus)

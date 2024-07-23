@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET GNPS_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME gnps_motif_44
 #ANNOTATION [Pentose (C5-sugar)-H2O] related loss – indicative for conjugated pentose sugar - EF fits
 #SHORT_ANNOTATION [Pentose (C5-sugar)-H2O] related loss – indicative for conjugated pentose sugar - EF fits

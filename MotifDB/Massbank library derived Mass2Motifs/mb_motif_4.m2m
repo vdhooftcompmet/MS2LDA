@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_4
 #ANNOTATION Loss of methyl group – indicative for presence of methoxy [O-CH3] methylsulfyl [S-CH3] or methylgroup connected to aromatic ring system
 #SHORT_ANNOTATION Loss of methyl group – indicative for presence of methoxy [O-CH3] methylsulfyl [S-CH3] or methylgroup connected to aromatic ring system

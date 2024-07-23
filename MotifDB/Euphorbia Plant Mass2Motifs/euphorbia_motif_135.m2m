@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_135
 #ANNOTATION Unknown
 #SHORT_ANNOTATION 431 167 171 432 loss 53 loss 52 loss 71 loss 81 loss 18

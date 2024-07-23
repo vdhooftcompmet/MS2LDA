@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_72
 #ANNOTATION 4 spectra, 3 molecules, 3 classes: 33.3% Mycosporines, 33.3% Terpenoids : Triterpenes, 33.3% Depsidones
 #SHORT_ANNOTATION No short annotation available

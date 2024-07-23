@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_134
 #ANNOTATION Cyclic peptide related Mass2Motif - Proline-Glutamine-Tyrosine-Valine like motif
 #SHORT_ANNOTATION Cyclic peptide related Mass2Motif

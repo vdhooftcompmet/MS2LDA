@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_209
 #ANNOTATION Ethylphenyl related mass fragment (m/z 105) - present in phenylethylamides, dialkylresorcinols, and cyclohexanedions
 #SHORT_ANNOTATION Ethylphenyl related mass fragment (m/z 105)

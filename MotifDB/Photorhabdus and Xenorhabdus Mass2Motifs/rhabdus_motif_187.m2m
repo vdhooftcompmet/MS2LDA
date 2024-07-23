@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_187
 #ANNOTATION Interesting motif - cyclic peptide related
 #SHORT_ANNOTATION Interesting motif - cyclic peptide related

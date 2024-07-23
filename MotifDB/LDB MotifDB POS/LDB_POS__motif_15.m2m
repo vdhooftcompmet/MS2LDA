@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_15
 #ANNOTATION 10 spectra, 5 molecules, 3 classes: 60.0% Paraconic acids, 20.0% Dibenzofuranes, 20.0% Cleavage Products of Depsides and Depsidones
 #SHORT_ANNOTATION No short annotation available

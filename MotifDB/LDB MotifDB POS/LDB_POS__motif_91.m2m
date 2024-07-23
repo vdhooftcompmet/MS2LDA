@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_91
 #ANNOTATION 10 spectra, 2 molecules, 1 class: 100.0% Pulvinic Acid Derivatives
 #SHORT_ANNOTATION No short annotation available

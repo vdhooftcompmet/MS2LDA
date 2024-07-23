@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_57
 #ANNOTATION 9 spectra, 2 molecules, 2 classes: 50.0% N-Containing Compounds, 50.0% Paraconic acids
 #SHORT_ANNOTATION No short annotation available

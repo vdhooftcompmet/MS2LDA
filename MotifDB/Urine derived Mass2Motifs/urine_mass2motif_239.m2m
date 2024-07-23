@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_239
 #ANNOTATION Paracetamol related Mass2Motif (C13 isotope features and fragments)
 #SHORT_ANNOTATION Paracetamol related Mass2Motif (C13 isotope features and fragments)

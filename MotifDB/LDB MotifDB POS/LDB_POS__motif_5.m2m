@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_5
 #ANNOTATION 15 spectra, 6 molecules, 2 classes: 83.3% Quinones, 16.7% Chromanes and Chromones
 #SHORT_ANNOTATION No short annotation available

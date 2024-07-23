@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_400
 #ANNOTATION DSF (dPE/IE or JE Group B) loss of CO (42)
 #SHORT_ANNOTATION 355 356 295 267 loss 42

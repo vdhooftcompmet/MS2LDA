@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_120
 #ANNOTATION Guanidinosuccinic acid related Mass2Motif (fragments relate to guanidino and coupled CH2-COOH group)
 #SHORT_ANNOTATION Guanidinosuccinic acid related Mass2Motif (fragments relate to guanidino and coupled CH2-COOH group)

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_297
 #ANNOTATION Unknown aliphatic side chain?
 #SHORT_ANNOTATION 227 161 237 187 175 239 337 211 201 197

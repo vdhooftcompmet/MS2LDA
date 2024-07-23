@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_40
 #ANNOTATION Xenoamicin related Mass2Motif - peptidic ring
 #SHORT_ANNOTATION Xenoamicin peptidic ring related Mass2Motif

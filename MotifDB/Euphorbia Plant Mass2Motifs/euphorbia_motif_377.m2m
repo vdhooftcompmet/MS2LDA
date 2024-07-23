@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_377
 #ANNOTATION diterpene dPE/IE 331 313 285 277 267 with benzoyl cation 105
 #SHORT_ANNOTATION diterpene dPE/IE 331 313 285 277 267 with benzoyl cation 105

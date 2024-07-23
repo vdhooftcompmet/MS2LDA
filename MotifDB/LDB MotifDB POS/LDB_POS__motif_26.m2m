@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_26
 #ANNOTATION 4 spectra, 3 molecules, 3 classes: 33.3% N-Containing Compounds, 33.3% Quinones, 33.3% Pulvinic Acid Derivatives
 #SHORT_ANNOTATION No short annotation available

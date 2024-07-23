@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_12
 #ANNOTATION 8 spectra, 4 molecules, 3 classes: 50.0% Quinones, 25.0% Depsides (Didepsides), 25.0% Depsidones
 #SHORT_ANNOTATION No short annotation available

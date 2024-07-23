@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.1
+#MOTIFSET Streptomyces_and_Salinispora_Mass2Motifs
+#CHARGE 1
 #NAME motif_270
 #ANNOTATION Streptomyces related Mass2Motif - likely terpene related with strong 115 fragment peak
 #SHORT_ANNOTATION No short annotation available

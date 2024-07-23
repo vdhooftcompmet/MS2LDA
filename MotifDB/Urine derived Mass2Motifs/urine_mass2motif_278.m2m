@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_278
 #ANNOTATION Dimethylated guanidino group related
 #SHORT_ANNOTATION Dimethylated guanidino group related

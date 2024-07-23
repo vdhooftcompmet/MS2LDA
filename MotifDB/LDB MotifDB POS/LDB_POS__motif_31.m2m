@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_31
 #ANNOTATION 32 spectra, 27 molecules, 9 classes: 29.6% Paraconic acids, 22.2% Pulvinic Acid Derivatives, 18.5% Depsidones, 7.4% Terpenoids : Triterpenes, 7.4% Quinones, 3.7% Dibenzofuranes, 3.7% N-Containing Compounds, 3.7% Aliphatic and Cycloaliphatic Compounds, 3.7%
 #SHORT_ANNOTATION No short annotation available

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_68
 #ANNOTATION Alkyl aromatic substructure – indicative for aromatic ring with 2-carbon alkyl chain attached i.e. phenylethene fragment
 #SHORT_ANNOTATION Alkyl aromatic substructure – indicative for aromatic ring with 2-carbon alkyl chain attached i.e. phenylethene fragment

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_51
 #ANNOTATION small peptidic substructure (m/z 105, 230, 123)
 #SHORT_ANNOTATION small peptidic substructure

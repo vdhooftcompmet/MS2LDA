@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_62
 #ANNOTATION 267 169 373 538 355 loss 183 loss 123 loss 141 loss 76 loss 182
 #SHORT_ANNOTATION DSF (dPE/IE or JE Group B)

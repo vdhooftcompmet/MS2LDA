@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_89
 #ANNOTATION 5 spectra, 4 molecules, 3 classes: 50.0% Quinones, 25.0% N-Containing Compounds, 25.0% Paraconic acids
 #SHORT_ANNOTATION No short annotation available

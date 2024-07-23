@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_7
 #ANNOTATION 22 spectra, 11 molecules, 5 classes: 54.5% Depsides (Didepsides), 18.2% Chromanes and Chromones, 9.1% Diphenylethers, 9.1% Paraconic acids, 9.1% Xanthones and bis-Xanthones
 #SHORT_ANNOTATION No short annotation available

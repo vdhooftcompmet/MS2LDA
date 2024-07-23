@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_52
 #ANNOTATION Clear distinct pattern - Mass2Motif possibly related to 3-(3-methyl-5-oxo-1 4-dihydropyrazol-4-yl)propanoic acid
 #SHORT_ANNOTATION Clear distinct pattern - Mass2Motif possibly related to 3-(3-methyl-5-oxo-1 4-dihydropyrazol-4-yl)propanoic acid

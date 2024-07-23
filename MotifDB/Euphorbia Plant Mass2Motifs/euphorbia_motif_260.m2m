@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_260
 #ANNOTATION Diterp 327 299 281 - 105
 #SHORT_ANNOTATION Diterp 327 299 281 - 105

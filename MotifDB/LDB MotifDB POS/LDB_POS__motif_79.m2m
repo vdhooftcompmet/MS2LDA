@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_79
 #ANNOTATION 49 spectra, 32 molecules, 7 classes: 50.0% Depsidones, 12.5% Quinones, 12.5% Pulvinic Acid Derivatives, 9.4% Dibenzofuranes, 6.2% Acids, 6.2% Cleavage Products of Depsides and Depsidones, 3.1% Chromanes and Chromones
 #SHORT_ANNOTATION No short annotation available

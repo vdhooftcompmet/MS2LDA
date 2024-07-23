@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_49
 #ANNOTATION 38 spectra, 16 molecules, 3 classes: 75.0% Paraconic acids, 18.8% Acids, 6.2% Terpenoids : Triterpenes
 #SHORT_ANNOTATION No short annotation available

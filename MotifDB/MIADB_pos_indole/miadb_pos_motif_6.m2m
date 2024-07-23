@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET MIADB_pos_indole
+#CHARGE 1
 #NAME motif_6
 #ANNOTATION Decorated indole related Mass2Motif
 #SHORT_ANNOTATION Decorated indole related Mass2Motif

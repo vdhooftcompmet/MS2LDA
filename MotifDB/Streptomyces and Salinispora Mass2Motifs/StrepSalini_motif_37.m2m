@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.1
+#MOTIFSET Streptomyces_and_Salinispora_Mass2Motifs
+#CHARGE 1
 #NAME motif_37
 #ANNOTATION C11H24NO and C11H22N fragments - 186/168 - related Mass2Motif
 #SHORT_ANNOTATION C11H24NO/C11H22N polyamine-like motif

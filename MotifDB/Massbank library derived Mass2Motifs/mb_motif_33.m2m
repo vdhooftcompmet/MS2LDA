@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_33
 #ANNOTATION Fragment ions indicative for guanine (C5H5N5O) based substructure
 #SHORT_ANNOTATION Fragment ions indicative for guanine (C5H5N5O) based substructure

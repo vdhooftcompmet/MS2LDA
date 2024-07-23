@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_285
 #ANNOTATION Peptidic loss of 113 - related to presence of Leucine or Methylvaline [in Rhabdopeptides or related peptides]
 #SHORT_ANNOTATION Peptidic loss of 113

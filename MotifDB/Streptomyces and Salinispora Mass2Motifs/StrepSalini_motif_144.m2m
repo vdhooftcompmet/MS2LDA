@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.1
+#MOTIFSET Streptomyces_and_Salinispora_Mass2Motifs
+#CHARGE 1
 #NAME motif_144
 #ANNOTATION Losses 139, 140 - subset of Streptomyces sp. and S. arenicola related
 #SHORT_ANNOTATION Losses 139, 140 - subset of Streptomyces sp. and S. arenicola related

@@ -1,0 +1,16 @@
+site_name: MS2LDA Documentation
+site_url: https://vdhooftcompmet.github.io/MS2LDA/
+edit_uri: https://github.com/vdhooftcompmet/MS2LDA/docs/pages/
+repo_name: vdhooftcompmet/MS2LDA
+repo_url: https://github.com/vdhooftcompmet/MS2LDA
+
+nav:
+- MS2LDA Introduction: index.md
+- MS2LDA Annotation: annotation.md
+- MS2LDA Modeling: modeling.md
+- MS2LDA MotifDB: motifDB.md
+- MS2LDA Motifs: motifs.md
+- MS2LDA Screening: screening.md
+
+theme:
+name: readthedocs

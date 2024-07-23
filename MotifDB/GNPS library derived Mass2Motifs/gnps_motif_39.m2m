@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET GNPS_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME gnps_motif_39
 #ANNOTATION Hydroxy-Pregnenolone related fragments (not very specific - indicative for presence of steroid backbone)
 #SHORT_ANNOTATION Hydroxy-Pregnenolone related fragments (not very specific - indicative for presence of steroid backbone)

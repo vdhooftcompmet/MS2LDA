@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_22
 #ANNOTATION Water loss - indicative of a free hydroxyl group – (in beer often seen in sugary structures)
 #SHORT_ANNOTATION Water loss - indicative of a free hydroxyl group – (in beer often seen in sugary structures)

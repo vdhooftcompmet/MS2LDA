@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET MIADB_pos_100
+#CHARGE 1
 #NAME motif_13
 #ANNOTATION Glycosylated_MIA_strictosidine_like
 #SHORT_ANNOTATION Glycosylated_MIA_strictosidine_like

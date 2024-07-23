@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_190
 #ANNOTATION Loss based Mass2Motif - different losses combined in 147 and 105 losses - including glutamic acid (glutamate) related loss
 #SHORT_ANNOTATION Loss based Mass2Motif - different losses combined in 147 and 105 losses - including glutamic acid (glutamate) related loss

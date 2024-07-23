@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_93
 #ANNOTATION Mass2Motif related to [glucoronate-H2O] indicative for glucuronidation
 #SHORT_ANNOTATION Mass2Motif related to [glucoronate-H2O] indicative for glucuronidation

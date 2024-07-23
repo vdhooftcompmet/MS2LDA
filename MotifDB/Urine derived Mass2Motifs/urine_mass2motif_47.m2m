@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_47
 #ANNOTATION Mixed motif of drug possibly methoxamine related in urine 51 and other cores spread over the other urines
 #SHORT_ANNOTATION Mixed motif of drug possibly methoxamine related in urine 51 and other cores spread over the other urines

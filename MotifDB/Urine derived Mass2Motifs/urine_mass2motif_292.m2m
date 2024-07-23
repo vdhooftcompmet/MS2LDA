@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_292
 #ANNOTATION Mixed motif of Diltiazem (urine 51) and citric acid (from citroplex plasticizer) related Mass2Motif (co-fragmentation in urine 51)
 #SHORT_ANNOTATION Mixed motif of Diltiazem (urine 51) and citric acid (from citroplex plasticizer) related Mass2Motif (co-fragmentation in urine 51)

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_413
 #ANNOTATION DSF (dPE/IE or JE Group B)
 #SHORT_ANNOTATION 313 314 285

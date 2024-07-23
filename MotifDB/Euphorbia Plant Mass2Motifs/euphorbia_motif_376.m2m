@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_376
 #ANNOTATION jatrophane 337 285 277 Nic + H20 124 Nic -H20 106
 #SHORT_ANNOTATION jatrophane 337 285 277 Nic + H20 124 Nic -H20 106

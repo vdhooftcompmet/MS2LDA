@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_202
 #ANNOTATION Acylcarnitine subset of C10 and longer acyl conjugates related Mass2Motif
 #SHORT_ANNOTATION Acylcarnitine subset of C10 and longer acyl conjugates related Mass2Motif

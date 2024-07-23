@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_208
 #ANNOTATION Unclear what it can be - loss related to features containing 80.9479 fragment
 #SHORT_ANNOTATION Unclear what it can be - loss related to features containing 80.9479 fragment

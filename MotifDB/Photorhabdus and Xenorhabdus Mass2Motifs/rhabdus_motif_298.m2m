@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_298
 #ANNOTATION Amino group loss - indicative for presence of free NH2 (amino) group
 #SHORT_ANNOTATION Amino group loss

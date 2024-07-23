@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_90
 #ANNOTATION Xenoamicin related Mass2Motif - peptidic tail
 #SHORT_ANNOTATION Xenoamicin tail related Mass2Motif

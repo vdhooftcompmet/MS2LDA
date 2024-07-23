@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_360
 #ANNOTATION Loss of NH3 adducts + H2O in diterpene
 #SHORT_ANNOTATION Loss of NH3 adducts + H2O in diterpene

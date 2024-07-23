@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET GNPS_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME gnps_motif_2
 #ANNOTATION Benzenesulfonylamide related fragments and losses [ClassyFire - Relevant terms - Substituents: Aminobenzenesulfonamide Benzenesulfonyl group - Taxa: Aminobenzenesulfonamides Benzenesulfonamides]
 #SHORT_ANNOTATION Benzenesulfonylamide related fragments and losses

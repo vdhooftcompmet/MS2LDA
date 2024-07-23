@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET GNPS_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME gnps_motif_20
 #ANNOTATION 4-keto-chlorobenzene substructure
 #SHORT_ANNOTATION 4-keto-chlorobenzene substructure

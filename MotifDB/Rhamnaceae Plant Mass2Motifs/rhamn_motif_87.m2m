@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Rhamnaceae_Plant_Mass2Motifs
+#CHARGE -1
 #NAME motif_87
 #ANNOTATION (epi)ceanothic acid-related
 #SHORT_ANNOTATION (epi)ceanothic acid-related

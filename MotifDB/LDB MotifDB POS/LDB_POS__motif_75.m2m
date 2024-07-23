@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_75
 #ANNOTATION 10 spectra, 5 molecules, 3 classes: 60.0% Depsidones, 20.0% Dibenzofuranes, 20.0% Depsides (Didepsides)
 #SHORT_ANNOTATION No short annotation available

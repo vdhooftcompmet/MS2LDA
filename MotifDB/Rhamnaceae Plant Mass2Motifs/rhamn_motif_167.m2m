@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Rhamnaceae_Plant_Mass2Motifs
+#CHARGE -1
 #NAME motif_167
 #ANNOTATION Flavonoid core fragment (m/z 152)
 #SHORT_ANNOTATION Flavonoid core fragment (m/z 152)

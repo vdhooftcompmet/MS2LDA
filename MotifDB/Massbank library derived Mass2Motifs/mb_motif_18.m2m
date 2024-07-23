@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_18
 #ANNOTATION CO loss - indicative for presence of ketone/aldehyde/lactone group (C=O)
 #SHORT_ANNOTATION CO loss - indicative for presence of ketone/aldehyde/lactone group (C=O)

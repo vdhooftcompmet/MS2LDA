@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Photorhabdus_and_Xenorhabdus_Mass2Motifs
+#CHARGE 1
 #NAME motif_118
 #ANNOTATION interesting motif - peptidic nature - cyclic fragments 473, 474, 342 and 376
 #SHORT_ANNOTATION interesting motif - peptidic nature - cyclic fragments

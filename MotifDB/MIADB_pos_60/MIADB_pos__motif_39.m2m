@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET MIADB_pos_60
+#CHARGE 1
 #NAME motif_39
 #ANNOTATION Vobasane_skeleton
 #SHORT_ANNOTATION Vobasane_skeleton

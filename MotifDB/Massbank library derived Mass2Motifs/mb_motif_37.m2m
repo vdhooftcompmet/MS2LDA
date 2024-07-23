@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_37
 #ANNOTATION Fragments indicative for [phenylalanine-CHOOH] based substructure
 #SHORT_ANNOTATION Fragments indicative for [phenylalanine-CHOOH] based substructure

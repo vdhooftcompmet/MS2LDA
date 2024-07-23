@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_238
 #ANNOTATION Pyroglutamate (pyroglutamic acid) or glutamine related Mass2Motif
 #SHORT_ANNOTATION Pyroglutamate (pyroglutamic acid) or glutamine related Mass2Motif

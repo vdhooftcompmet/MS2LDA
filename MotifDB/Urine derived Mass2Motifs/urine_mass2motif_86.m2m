@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_86
 #ANNOTATION Combined loss of NH3 and CH2O2 - with loss of NH3 group more often present than the loss of CH2O2 (if at all present....) - any structural feature? amino acid/peptide related?
 #SHORT_ANNOTATION Combined loss of NH3 and CH2O2 - with loss of NH3 group more often present than the loss of CH2O2 (if at all present....) - any structural feature? amino acid/peptide related?

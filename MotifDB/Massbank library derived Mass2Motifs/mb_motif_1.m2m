@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_1
 #ANNOTATION Fragment of C5H10NO2 and loss of C5H9NO2 (in beer likely to be [proline-H2O] - indicative for conjugated proline)
 #SHORT_ANNOTATION Fragment of C5H10NO2 and loss of C5H9NO2 (in beer likely to be [proline-H2O] - indicative for conjugated proline)

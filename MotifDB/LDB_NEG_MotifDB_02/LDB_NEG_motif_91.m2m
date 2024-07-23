@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_NEG_MotifDB_02
+#CHARGE -1
 #NAME motif_91
 #ANNOTATION No annotation available
 #SHORT_ANNOTATION No short annotation available

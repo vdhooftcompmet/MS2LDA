@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Massbank_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME mb_motif_27
 #ANNOTATION Loss indicative of carboxylic acid group with 1-carbon attached.
 #SHORT_ANNOTATION Loss indicative of carboxylic acid group with 1-carbon attached.

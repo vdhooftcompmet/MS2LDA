@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_MotifDB_POS
+#CHARGE 1
 #NAME motif_83
 #ANNOTATION 14 spectra, 6 molecules, 5 classes: 33.3% Paraconic acids, 16.7% Acids, 16.7% Chromanes and Chromones, 16.7% Pulvinic Acid Derivatives, 16.7% Depsidones
 #SHORT_ANNOTATION No short annotation available

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.01
+#MOTIFSET LDB_NEG_MotifDB_02
+#CHARGE -1
 #NAME motif_94
 #ANNOTATION Loss of two CO2 molecules
 #SHORT_ANNOTATION Loss of two CO2 molecules

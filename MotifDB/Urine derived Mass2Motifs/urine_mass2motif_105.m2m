@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Urine_derived_Mass2Motifs
+#CHARGE 1
 #NAME urine_mass2motif_105
 #ANNOTATION Unclear what it can be - 164.9304 fragment and more related fragments and losses
 #SHORT_ANNOTATION 164.9304 fragment (unknown core)

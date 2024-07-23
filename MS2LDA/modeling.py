@@ -1,7 +1,7 @@
 import tomotopy as tp
 import numpy as np
-#from MS2LDA.utils import create_spectrum
-from utils import create_spectrum
+from MS2LDA.utils import create_spectrum
+#from utils import create_spectrum
 
 
 def define_model(n_motifs, model_parameters={}):
@@ -61,7 +61,7 @@ def extract_motifs(model, top_n=3):
     return motif_features
 
 
-def create_motif_spectra(motif_features):
+def create_motif_spectra(motif_features, charge=1, motifset_name="unknown"):
     """creates a matchms spectrum object for the found motifs
     
     ARGS:
@@ -74,7 +74,7 @@ def create_motif_spectra(motif_features):
     motif_spectra = []
         
     for k, motif_k_features in enumerate(motif_features):
-        motif_spectrum = create_spectrum(motif_k_features, k)
+        motif_spectrum = create_spectrum(motif_k_features, k, charge=charge, motifset=motifset_name)
         motif_spectra.append(motif_spectrum)
 
     return motif_spectra

@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET GNPS_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME gnps_motif_14
 #ANNOTATION Aliphatic amine (NH3 loss indicates free NH2 group coupled to aliphatic chain)
 #SHORT_ANNOTATION Aliphatic amine (NH3 loss indicates free NH2 group coupled to aliphatic chain)

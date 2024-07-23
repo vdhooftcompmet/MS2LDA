@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Euphorbia_Plant_Mass2Motifs
+#CHARGE 1
 #NAME euphorbia_motif_254
 #ANNOTATION DSF (JE Group A) benzoyl cation (105)
 #SHORT_ANNOTATION 281 253 299 211 197 105 225 282 239 263

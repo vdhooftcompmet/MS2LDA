@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET Streptomyces_S29
+#CHARGE 1
 #NAME motif_85
 #ANNOTATION loss of N-hydroxy-succinylcadaverine
 #SHORT_ANNOTATION [HSC]

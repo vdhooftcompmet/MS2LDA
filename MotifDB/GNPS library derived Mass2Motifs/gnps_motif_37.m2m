@@ -1,3 +1,6 @@
+#MS2ACCURACY 0.005
+#MOTIFSET GNPS_library_derived_Mass2Motifs
+#CHARGE 1
 #NAME gnps_motif_37
 #ANNOTATION Fragments indicative for cinnamic/hydroxycinnamic acid substructure
 #SHORT_ANNOTATION Fragments indicative for cinnamic/hydroxycinnamic acid substructure
