@@ -1,13 +1,21 @@
-# Contributing to `modern_python`
+# Contributing to MS2LDA
 
-Thank you for your interest in contributing to `modern_python`! Please take a moment to
-read this document to understand how you can contribute.
+Thank you for your interest in contributing to MS2LDA! Please take a moment to read this document to understand how you can contribute.
 
-## Preamble
+## What to Contribute?
 
-When contributing to this repository, please first discuss the change you wish to
-make via issue, email, or any other method with the owners of this repository
-before making a change. Please note we have a [Code of Conduct](CODE_OF_CONDUCT.md),
-please follow it in all your interactions with the project.
+- Share Mass2Motifs to MotifDB
+- Bug fixes and documentation
 
-TODO: ADD YOUR CONDITIONS HERE
+### Mass2Motifs
+
+Mass2Motifs can be added to the online MotifDB by raising an issue following the Mass2Motifs template. After we check the minimum required information, we will add it to the online MotifDB.
+	
+### Bug Fixes and Documentation
+
+We welcome small patches related to bug fixes and documentation at any time. All submissions require review. We use GitHub pull requests for this purpose.
+	
+### I Have an Idea for a Bigger Improvement
+
+If you are a student, we welcome B.Sc. and M.Sc. students to work during an internship or thesis on MS2LDA under our supervision. Otherwise, we are also open to cooperating with everyone else. Please contact one of the maintainers (Rosina Torres Ortega, Jonas Dietrich) or Justin van der Hooft in both cases.
+
