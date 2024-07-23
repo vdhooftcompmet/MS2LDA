@@ -294,7 +294,6 @@ def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features, smile
             "motifset": motif_spectrum.get("motifset"),
             "annotation": None,
             "id": motif_spectrum.get("id")
-
             }
     )
 
