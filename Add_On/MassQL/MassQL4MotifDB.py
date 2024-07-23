@@ -121,7 +121,7 @@ def motifDB2motifs(motifDB_ms2, result_feature_table):
             mz=fragments_mz,
             intensities=fragments_intensities,
             metadata = {
-                "name": name,
+                "id": name,
                 "charge": charge,
                 "short_annotation": short_annotation,
                 "annotation": annotation,
