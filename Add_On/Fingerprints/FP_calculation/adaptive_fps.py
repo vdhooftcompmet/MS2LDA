@@ -1,4 +1,4 @@
-from FP_calculation.rdkit_fps import efficient_array
+from Add_On.Fingerprints.FP_calculation.rdkit_fps import efficient_array
 
 from rdkit import DataStructs
 from rdkit import Chem
