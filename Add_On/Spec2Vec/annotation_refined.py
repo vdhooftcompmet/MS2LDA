@@ -3,7 +3,7 @@
 from matchms import Spectrum, Fragments
 
 from scipy.stats import spearmanr
-from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+from scipy.cluster.hierarchy import linkage, fcluster
 
 from Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
 
@@ -164,20 +164,21 @@ def hierachical_clustering(s2v_similarity, top_n_spectra, top_n_scores, masked_s
 
     # 1. Termination condition: TOO FEW SPECTRA
     if len(top_n_spectra) < 2:
-        print("Not Enough Spectra Match!")
-        return top_n_spectra, top_n_scores, masked_spectra_similarity
+        print("One compound cluster!")
+        return top_n_spectra, top_n_scores, masked_spectra_similarity, "?"
     
 
     # 2. Termination condition: SPECTRA ARE VERY SIMILAR
     if np.min(similarity_matrix.flatten()) > 0.70:
         print("Similarity Match: ", np.min(similarity_matrix.flatten()))
-        return top_n_spectra, top_n_scores, masked_spectra_similarity
+        return top_n_spectra, top_n_scores, masked_spectra_similarity, np.min(similarity_matrix.flatten())
 
     # build clusters
     Z = linkage(similarity_matrix, method='complete')
     num_clusters = 2  
 
     cluster_index = fcluster(Z, num_clusters, criterion='maxclust')
+    #cluster_index = fcluster(Z, num_clusters, criterion='distance')
     hierachical_clusters = [list() for _ in range(num_clusters)]
     hierachical_cluster_scores = [list() for _ in range(num_clusters)]
 
@@ -188,10 +189,10 @@ def hierachical_clustering(s2v_similarity, top_n_spectra, top_n_scores, masked_s
         
     if not hierachical_cluster_scores[0]:
         print("Only one cluster: ", np.min(similarity_matrix.flatten()))
-        return top_n_spectra, top_n_scores, masked_spectra_similarity
+        return top_n_spectra, top_n_scores, masked_spectra_similarity, np.min(similarity_matrix.flatten())
     elif not hierachical_cluster_scores[1]:
         print("Only one cluster: ", np.min(similarity_matrix.flatten()))
-        return top_n_spectra, top_n_scores, masked_spectra_similarity
+        return top_n_spectra, top_n_scores, masked_spectra_similarity, np.min(similarity_matrix.flatten())
     elif np.max(hierachical_cluster_scores[0]) > np.max(hierachical_cluster_scores[1]):
         index = 0
     elif np.max(hierachical_cluster_scores[0]) < np.max(hierachical_cluster_scores[1]):
@@ -218,7 +219,7 @@ def find_important_features(unmasked_spectrum_similarity, masked_spectra_similar
     for index_feature, masked_spectrum_similarity in enumerate(masked_spectra_similarity):
         feature_importance = masked_spectrum_similarity - unmasked_spectrum_similarity
 
-        if feature_importance <= 0: 
+        if feature_importance < 0: 
             important_features.append(index_feature)
 
 
@@ -247,7 +248,7 @@ def merge_important_features(unmasked_spectra_similarity, multiple_masked_spectr
     return aligned_important_features
 
 
-def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features):
+def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features, smiles_cluster):
     """something
     
     ARGS:
@@ -264,7 +265,6 @@ def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features):
     losses_mz = motif_spectrum.losses.mz
     losses_intensities = motif_spectrum.losses.intensities
 
-
     new_fragments_mz = []
     new_fragments_intensities = []
 
@@ -275,7 +275,7 @@ def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features):
         if aligned_important_feature < fragments_range:
             # it's a fragment
             new_fragments_mz.append(fragments_mz[aligned_important_feature])
-            new_fragments_intensities.append(fragments_mz[aligned_important_feature])
+            new_fragments_intensities.append(fragments_intensities[aligned_important_feature])
 
         else:
             # it's a loss
@@ -286,7 +286,16 @@ def reconstruct_motif_spectrum(motif_spectrum, aligned_important_features):
 
     reconstructed_motif_spectrum = Spectrum(
         mz = np.array(new_fragments_mz),
-        intensities = np.array(new_fragments_intensities)
+        intensities = np.array(new_fragments_intensities),
+        metadata={
+            "short_annotation": smiles_cluster,
+            "charge": motif_spectrum.get("charge"),
+            "ms2accuracy": motif_spectrum.get("ms2accuracy"),
+            "motifset": motif_spectrum.get("motifset"),
+            "annotation": None,
+            "id": motif_spectrum.get("id")
+
+            }
     )
 
     if new_losses_mz: # losses are for some reason not in order
@@ -320,13 +329,12 @@ def refine_annotation(s2v_similarity, library_matches, masked_motifs_spectra, mo
     optimized_motif_spectra = []
     optimized_clusters = []
     smiles_clusters = []
+    clusters_similarity = []
     for i in range(len(masked_motifs_spectra)):
-        cluster, scores, masked_spectra_similarity = hierachical_clustering(s2v_similarity, library_matches[i][1], library_matches[i][2], masked_motifs_spectra[i])
-        aligned_important_features = merge_important_features(scores, masked_spectra_similarity)
-        optimized_motif_spectrum = reconstruct_motif_spectrum(motif_spectra[i], aligned_important_features)
-
-        optimized_motif_spectra.append(optimized_motif_spectrum)
+        cluster, scores, masked_spectra_similarity, cluster_similarity = hierachical_clustering(s2v_similarity, library_matches[i][1], library_matches[i][2], masked_motifs_spectra[i])
+        
         optimized_clusters.append(cluster)
+        clusters_similarity.append(cluster_similarity)
         smiles_cluster = []
         for spectrum in cluster:
             smiles = spectrum.get("smiles")
@@ -334,8 +342,13 @@ def refine_annotation(s2v_similarity, library_matches, masked_motifs_spectra, mo
 
         smiles_clusters.append(smiles_cluster)
 
+        aligned_important_features = merge_important_features(scores, masked_spectra_similarity)
+        optimized_motif_spectrum = reconstruct_motif_spectrum(motif_spectra[i], aligned_important_features, smiles_cluster)
+
+        optimized_motif_spectra.append(optimized_motif_spectrum)
+
     
-    return optimized_motif_spectra, optimized_clusters, smiles_clusters
+    return optimized_motif_spectra, optimized_clusters, smiles_clusters, clusters_similarity
             
 
 if __name__ == "__main__":
