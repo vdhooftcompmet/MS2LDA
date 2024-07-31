@@ -1,6 +1,7 @@
 import os
 from MS2LDA.utils import create_spectrum
- 
+
+import os
 
 def store_m2m_file(motif_spectrum, motif_number, folder):
     """stores one motif spectrum in a .m2m file. It uses the same format as in the original version from MS2LDA.org
@@ -14,14 +15,19 @@ def store_m2m_file(motif_spectrum, motif_number, folder):
         True
     """
 
-    filename = folder.split("\\")[-1].split(" ")[0].lower()
-    with open(f"{folder}\{filename}_motif_{motif_number}.m2m", "w") as output:
+    # Use os.path.basename to get the folder name
+    folder_name = os.path.basename(folder).split(" ")[0].lower()
+    
+    # Construct the filename using os.path.join
+    filename = os.path.join(folder, f"{folder_name}_motif_{motif_number}.m2m")
+
+    with open(filename, "w") as output:
 
         output.write(f"#MS2ACCURACY 0.005\n") # number should be adjustable
         output.write(f"#MOTIFSET {folder.replace(' ', '_')}\n")
         output.write(f"#CHARGE 1\n") # number should be adjustable
         # add name
-        output.write(f"#NAME {filename}_motif_{motif_number}\n")
+        output.write(f"#NAME {folder_name}_motif_{motif_number}\n")
         # add (long) annotation
         annotation = motif_spectrum.get("annotation")
         output.write(f"#ANNOTATION {annotation}\n")
@@ -41,6 +47,7 @@ def store_m2m_file(motif_spectrum, motif_number, folder):
             output.write(f"loss_{loss_mz},{loss_importance}\n")
 
     return True
+
 
 
 def store_m2m_folder(motif_spectra, folder):
