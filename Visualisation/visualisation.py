@@ -5,10 +5,6 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
-
-import networkx as nx
-import matplotlib.pyplot as plt
-
 def create_network(spectra, motif_sizes=None):
     """
     Generates a network for the LDA output

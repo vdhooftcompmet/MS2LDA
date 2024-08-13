@@ -1,8 +1,6 @@
 import os
 from MS2LDA.utils import create_spectrum
 
-import os
-
 def store_m2m_file(motif_spectrum, motif_number, folder):
     """stores one motif spectrum in a .m2m file. It uses the same format as in the original version from MS2LDA.org
     
