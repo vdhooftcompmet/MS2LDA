@@ -17,7 +17,8 @@ def create_network(spectra, significant_figures=2, motif_sizes=None):
     RETURNS:
         network (nx.Graph): network with nodes and edges
     """
-    motif_sizes_filtered = list(map(lambda x: 0.7 if x == '?' else x, motif_sizes)) #filtering ? 
+    if motif_sizes is not None:
+        motif_sizes_filtered = list(map(lambda x: 0.7 if x == '?' else x, motif_sizes)) #filtering ? 
 
     G = nx.Graph()
 
@@ -64,10 +65,11 @@ def create_network(spectra, significant_figures=2, motif_sizes=None):
     label_options = {"ec": "k", "fc": "white", "alpha": 0.7}
     nx.draw_networkx_labels(G, pos, font_size=10, bbox=label_options)
     
-    ax.margins(0.1, 0.05)
-    fig.tight_layout()
-    plt.axis("off")
-    plt.show()
+    #ax.margins(0.1, 0.05)
+    #fig.tight_layout()
+    #plt.axis("off")
+    #plt.show()
+    return G
 
 
 if __name__ == "__main__":
