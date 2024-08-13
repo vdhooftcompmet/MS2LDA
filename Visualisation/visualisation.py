@@ -5,9 +5,10 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
-def create_network(spectra, motif_sizes=None):
+def create_network(spectra, significant_figures=2, motif_sizes=None):
     """
-    Generates a network for the LDA output
+    Generates a network for the motifs spectra, where the nodes are the motifs (output of LDA model)
+    and the edges are the peaks and losses of the spectra. The size of the nodes can be adjusted with the motif_sizes refined annotation
 
     ARGS:
         spectra (list): list of matchms.Spectrum.objects; after LDA modelling
@@ -16,40 +17,41 @@ def create_network(spectra, motif_sizes=None):
     RETURNS:
         network (nx.Graph): network with nodes and edges
     """
+    motif_sizes_filtered = list(map(lambda x: 0.7 if x == '?' else x, motif_sizes)) #filtering ? 
+
     G = nx.Graph()
 
     if motif_sizes is not None and len(motif_sizes) != len(spectra):
         raise ValueError("Length of motif_sizes must match the number of spectra")
 
-    for i, spectrum in enumerate(spectra, start=1):
+    for i, spectrum in enumerate(spectra, start=0):
         motif_node = f'motif_{i}'
         G.add_node(motif_node)
         
         peak_list = spectrum.peaks.mz
-        rounded_peak_list = [round(x, 2) for x in peak_list]
+        rounded_peak_list = [round(x, significant_figures) for x in peak_list]
         loss_list = spectrum.losses.mz
-        rounded_loss_list = [round(x, 2) for x in loss_list]
+        rounded_loss_list = [round(x, significant_figures) for x in loss_list]
         int_peak_list = spectrum.peaks.intensities
-        rounded_int_peak_list = [round(x, 2) for x in int_peak_list]
         int_losses_list = spectrum.losses.intensities
-        rounded_int_losses_list = [round(x, 2) for x in int_losses_list]
         
-        for edge, weight in zip(rounded_peak_list, rounded_int_peak_list):
+        for edge, weight in zip(rounded_peak_list, int_peak_list):
             G.add_edge(motif_node, edge, weight=weight, color='red')
-        for edge, weight in zip(rounded_loss_list, rounded_int_losses_list):
+        for edge, weight in zip(rounded_loss_list, int_losses_list):
             G.add_edge(motif_node, edge, weight=weight, color='blue')
     
     #Arranging node size - motifs
     node_sizes = {}
     if motif_sizes is None:
         default_size = 1000  
-        for i in range(1, len(spectra) + 1):
+        for i in range(1, len(spectra)):
             node_sizes[f'motif_{i}'] = default_size
+
     else:
-        for i in range(1, len(spectra) + 1):
-            node_sizes[f'motif_{i}'] = motif_sizes[i-1] * 5000
+        for i in range(1, len(spectra)):
+            node_sizes[f'motif_{i}'] = ((motif_sizes_filtered[i] * 100) ** 2)/2
     
-    fig, ax = plt.subplots(figsize=(50, 50))  # Adjust size if needed
+    fig, ax = plt.subplots(figsize=(50, 50))  
     edges = G.edges(data=True)
     weights = [d['weight'] * 10 for (u, v, d) in edges]  
     edge_colors = [d['color'] for (u, v, d) in edges]    
