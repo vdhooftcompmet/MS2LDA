@@ -3,41 +3,55 @@ import sys
 import os
 import tomotopy as tp
 
-
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../MS2LDA/')))
 from modeling import define_model
 from modeling import train_model
-
+from modeling import extract_motifs
+from modeling import create_motif_spectra
 
 class TestModeling(unittest.TestCase):
-    def test_define_model_default_parameters(self):
-        n_motifs = 5
-        model = define_model(n_motifs)
-        self.assertIsInstance(model, tp.LDAModel)
-        self.assertEqual(model.k, n_motifs)
-    
-    def test_define_model_invalid_parameters(self):
-        n_motifs = 5
-        invalid_params = {
-            'invalid_param': 6
-        }
-        with self.assertRaises(TypeError):
-            define_model(n_motifs, **invalid_params)
-
-    def test_train_model(self):
-        documents = [
+    def setUp(self):
+        self.n_motifs = 5
+        self.documents =  [
         ["frag@24.33", "frag@34.23", "loss@18.01", "loss@18.01"],
         ["frag@24.33", "frag@65.87", "loss@121.30", "frag@24.33"],
         ["frag@74.08", "frag@34.23", "loss@18.01", "loss@18.01", "loss@18.01"],
         ["frag@74.08", "frag@121.30", "loss@34.01"]
         ]
-        model = define_model(2) 
-        model = train_model(model, documents)
-        self.assertEqual(self.model.add_doc.call_count, len(self.documents))
-        #for doc in self.documents:
-#            self.model.add_doc.assert_any_call(doc)
+        self.documents_emtpy =  [
+        ]  
+        self.model= define_model(self.n_motifs)
 
-        
+    def test_define_model_default_parameters(self):
+        self.assertIsInstance(self.model, tp.LDAModel)
+        self.assertEqual(self.model.k, self.n_motifs)
+    
+    def test_define_model_invalid_parameters(self):
+        invalid_params = {
+            'invalid_param': 6
+        }
+        with self.assertRaises(TypeError):
+            define_model(self.n_motifs, **invalid_params)
+
+    def test_documents_added_to_model(self):
+        model = train_model(self.model, self.documents, iterations=10)
+        self.assertEqual(len(model.docs), len(self.documents), "Not all documents were added to the model")
+
+    def test_model_training(self):
+        model = train_model(self.model, self.documents, iterations=10)
+        self.assertTrue(model.num_words > 0, "Model training did not increase the number of words in the model")
+
+    def test_extract_motifs(self):
+        model = train_model(self.model, self.documents, iterations=10)
+        motifs = extract_motifs(model, top_n=3)
+        self.assertIsInstance(motifs, list)
+        self.assertEqual(len(motifs), 5)
+
+    def test_create_motif_spectra(self):
+        model = train_model(self.model, self.documents, iterations=10)
+        motifs = extract_motifs(model, top_n=3)
+        motif_spectra = create_motif_spectra(motifs)
+        self.assertEqual(len(list(motif_spectra)), 5)
 
 
 if __name__ == '__main__':
