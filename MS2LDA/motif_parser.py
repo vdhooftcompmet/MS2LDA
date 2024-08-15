@@ -113,8 +113,10 @@ def load_m2m_file(file): # currently it is not supported to change frag/loss tag
     return motif_spectrum
 
 
+import os
+
 def load_m2m_folder(folder):
-    """parses an entire folder with m2m files in it
+    """Parses an entire folder with m2m files in it.
      
     ARGS:
         folder (str): path to m2m folder
@@ -128,10 +130,12 @@ def load_m2m_folder(folder):
     motif_spectra = []
     for file in files_in_folder:
         if file.endswith(".m2m"):
-            motif_spectrum = load_m2m_file(folder+"\\"+file)
+            file_path = os.path.join(folder, file)
+            motif_spectrum = load_m2m_file(file_path)
             motif_spectra.append(motif_spectrum)
 
     return motif_spectra
+
 
     
 
