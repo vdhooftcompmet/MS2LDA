@@ -1,9 +1,0 @@
-#MS2ACCURACY 0.005
-#MOTIFSET GNPS_library_derived_Mass2Motifs
-#CHARGE 1
-#NAME gnps_motif_3
-#ANNOTATION nitrogen containing substructure [C5H12N] (in beer related to Leucine)
-#SHORT_ANNOTATION nitrogen containing substructure [C5H12N] (in beer related to Leucine)
-#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
-fragment_86.0975,0.942535719546325
-fragment_132.1025,0.0574642804536751
