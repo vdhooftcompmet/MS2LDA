@@ -144,8 +144,7 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
                 if isinstance(node, str):  # Check if the node is a string and matches "motif_x"
                     print(f"Node {node} clicked!")
                     node_number = int(node.split('_')[1])
-                    first_elements = [sublist[0] for sublist in smiles_clusters]
-                    mols = [MolFromSmiles(first_elements[node_number])]
+                    mols = [MolFromSmiles(smi) for smi in smiles_clusters[node_number]]
                     img = MolsToGridImage(mols)
 
                     spectra[node_number].plot()
