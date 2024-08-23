@@ -5,7 +5,9 @@ from matchms import Spectrum, Fragments
 from scipy.stats import spearmanr
 from scipy.cluster.hierarchy import linkage, fcluster
 
-from Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
+from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
+#from Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
+
 
 from functools import reduce
 import numpy as np

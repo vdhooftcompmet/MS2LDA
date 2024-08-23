@@ -117,12 +117,24 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
     
     node_sizes = {}
     if motif_sizes is None:
-        default_size = 1000  
+        default_size = 800  
         for i in range(1, len(spectra)):
             node_sizes[f'motif_{i}'] = default_size
     else:
+        n_smiles_cluster=[]
+        for i in smiles_clusters:
+            n_smiles_cluster.append(len(i))
+        max_n_smiles_cluster= max(n_smiles_cluster)
+
+        n_frags_cluster=[]
+        for i in spectra:
+            n_frags_cluster.append(len(i.peaks.mz))
+        max_n_frags_cluster = max(n_frags_cluster)
+
         for i in range(1, len(spectra)):
-            node_sizes[f'motif_{i}'] = ((motif_sizes_filtered[i] * 100) ** 2) / 2
+            node_sizes[f'motif_{i}'] = ((motif_sizes_filtered[i] * 10) ** 2) + \
+                ((n_smiles_cluster[i]/max_n_smiles_cluster)*10)**2 + \
+                    ((n_frags_cluster[i]/max_n_frags_cluster)*10)**2
     
     pos = nx.spring_layout(G)  
     fig, ax = plt.subplots(figsize=(10, 50)) 
@@ -142,8 +154,11 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
             dist = (x - event.xdata)**2 + (y - event.ydata)**2
             if dist < 0.00025:  
                 if isinstance(node, str):  # Check if the node is a string and matches "motif_x"
-                    print(f"Node {node} clicked!")
                     node_number = int(node.split('_')[1])
+                    print(f"Node {node} clicked!\n"
+                    f"Cluster similarity: {motif_sizes_filtered[node_number]*100}%\n"
+                    f"Fragments: {spectra[node_number].peaks.mz}\n"
+                    f"Losses: {spectra[node_number].losses.mz}")
                     mols = [MolFromSmiles(smi) for smi in smiles_clusters[node_number]]
                     img = MolsToGridImage(mols)
 
