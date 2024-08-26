@@ -1,4 +1,8 @@
 from matchms.importing import load_from_mgf
+from matchms.importing import load_from_mzml
+from matchms.importing import load_from_msp
+
+
 import matchms.filtering as msfilters
 
 import ms_entropy
@@ -16,6 +20,34 @@ def load_mgf(spectra_path):
     """
     
     spectra = load_from_mgf(spectra_path)
+    
+    return spectra
+
+def load_mzml(spectra_path):
+    """loads spectra from a mzml file
+
+    ARGS:
+        spectra_path (str): path to the spectra.mgf file
+
+    RETURNS:
+        spectra (generator): matchms generator object with the loaded spectra
+    """
+    
+    spectra = load_from_mzml(spectra_path)
+    
+    return spectra
+
+def load_msp(spectra_path):
+    """loads spectra from a mzml file
+
+    ARGS:
+        spectra_path (str): path to the spectra.mgf file
+
+    RETURNS:
+        spectra (generator): matchms generator object with the loaded spectra
+    """
+    
+    spectra = load_from_msp(spectra_path)
     
     return spectra
 
