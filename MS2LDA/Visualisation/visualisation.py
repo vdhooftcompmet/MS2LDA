@@ -68,7 +68,7 @@ def create_network(spectra, significant_figures=2, motif_sizes=None):
     nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color="#210070", alpha=0.9)
     
     label_options = {"ec": "k", "fc": "white", "alpha": 0.7}
-    nx.draw_networkx_labels(G, pos, font_size=10, bbox=label_options)
+    nx.draw_networkx_labels(G, pos, font_size=14, bbox=label_options)
     
     #ax.margins(0.1, 0.05)
     #fig.tight_layout()
@@ -147,7 +147,7 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
     nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color="#210070", alpha=0.9)
     
     label_options = {"ec": "k", "fc": "white", "alpha": 0.7}
-    nx.draw_networkx_labels(G, pos, font_size=4, bbox=label_options)
+    nx.draw_networkx_labels(G, pos, font_size=8, bbox=label_options)
     
     def on_click(event):
         for node, (x, y) in pos.items():
@@ -156,7 +156,7 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
                 if isinstance(node, str):  # Check if the node is a string and matches "motif_x"
                     node_number = int(node.split('_')[1])
                     print(f"Node {node} clicked!\n"
-                    f"Cluster similarity: {motif_sizes_filtered[node_number]*100}%\n"
+                    #f"Cluster similarity: {motif_sizes_filtered[node_number]*100}%\n"
                     f"Fragments: {spectra[node_number].peaks.mz}\n"
                     f"Losses: {spectra[node_number].losses.mz}")
                     mols = [MolFromSmiles(smi) for smi in smiles_clusters[node_number]]
