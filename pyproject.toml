@@ -4,7 +4,7 @@ version = "2.0.0"
 description = "Unsupervised Substructure Discovery using Topic Modelling with Automated Annotation."
 readme = "README.md"
 requires-python = ">=3.8"
-license-files = { paths = ["LICENSE"] }
+#license-files = { paths = ["LICENSE"] }
 authors = [
     { name = "Jonas Dietrich", email = "jonas.dietrich@wur.nl" },
     { name = "Rosina Torres Ortega", email = "rosina.torresortega@wur.nl" }
