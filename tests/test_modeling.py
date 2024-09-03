@@ -3,11 +3,13 @@ import sys
 import os
 import tomotopy as tp
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../MS2LDA/')))
-from modeling import define_model
-from modeling import train_model
-from modeling import extract_motifs
-from modeling import create_motif_spectra
+from MS2LDA.modeling import define_model
+from MS2LDA.modeling import train_model
+from MS2LDA.modeling import extract_motifs
+from MS2LDA.modeling import create_motif_spectra
+from MS2LDA.modeling import define_model
+
+from MS2LDA.Visualisation import create_network
 
 class TestModeling(unittest.TestCase):
     def setUp(self):
