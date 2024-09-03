@@ -132,9 +132,9 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
         max_n_frags_cluster = max(n_frags_cluster)
 
         for i in range(1, len(spectra)):
-            node_sizes[f'motif_{i}'] = ((motif_sizes_filtered[i] * 10) ** 2) + \
-                ((n_smiles_cluster[i]/max_n_smiles_cluster)*10)**2 + \
-                    ((n_frags_cluster[i]/max_n_frags_cluster)*10)**2
+            node_sizes[f'motif_{i}'] = ((motif_sizes_filtered[i] * 25) ** 2) + \
+                ((n_smiles_cluster[i]/max_n_smiles_cluster)*25)**2 + \
+                    ((n_frags_cluster[i]/max_n_frags_cluster)*25)**2
     
     pos = nx.spring_layout(G)  
     fig, ax = plt.subplots(figsize=(10, 50)) 
@@ -147,7 +147,7 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
     nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color="#210070", alpha=0.9)
     
     label_options = {"ec": "k", "fc": "white", "alpha": 0.7}
-    nx.draw_networkx_labels(G, pos, font_size=8, bbox=label_options)
+    nx.draw_networkx_labels(G, pos, font_size=6, bbox=label_options)
     
     def on_click(event):
         for node, (x, y) in pos.items():
