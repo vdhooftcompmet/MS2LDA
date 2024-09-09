@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Copyright (c) WUR
 # This software may be used and distributed in accordance with the terms of the MS2LDA Community License Agreement.
 from .__version__ import __version__
