@@ -78,7 +78,7 @@ def create_network(spectra, significant_figures=2, motif_sizes=None):
 
 
 
-def create_interactive_motif_network(spectra, significant_figures, motif_sizes, smiles_clusters):
+def create_interactive_motif_network(spectra, significant_figures, motif_sizes, smiles_clusters, spectra_cluster, motif_colors): #spectra-cluster added motif_colors
     """
     Generates a network for the annotated optimized spectra, after running Spec2Vec annotation, if clicking in a node
     it will shot the spectrum and the molecule associated with it.
@@ -91,6 +91,7 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
     RETURNS:
         network (nx.Graph): network with nodes and edges, spectra and structures
     """
+
     if motif_sizes is not None:
         motif_sizes_filtered = list(map(lambda x: 0.7 if x == '?' else x, motif_sizes))  # filtering '?'
 
@@ -118,7 +119,7 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
     node_sizes = {}
     if motif_sizes is None:
         default_size = 800  
-        for i in range(1, len(spectra)):
+        for i in range(1, len(spectra)): # error here!?
             node_sizes[f'motif_{i}'] = default_size
     else:
         n_smiles_cluster=[]
@@ -132,9 +133,21 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
         max_n_frags_cluster = max(n_frags_cluster)
 
         for i in range(1, len(spectra)):
-            node_sizes[f'motif_{i}'] = ((motif_sizes_filtered[i] * 10) ** 2) + \
-                ((n_smiles_cluster[i]/max_n_smiles_cluster)*10)**2 + \
-                    ((n_frags_cluster[i]/max_n_frags_cluster)*10)**2
+            node_sizes[f'motif_{i}'] = ((motif_sizes_filtered[i] * 10) **3)/3 + \
+                (((n_smiles_cluster[i]/max_n_smiles_cluster)*10)**3)/3 + \
+                    (((n_frags_cluster[i]/max_n_frags_cluster)*10)**3)/3
+            
+    # new; for tox
+    node_colors = {}
+    if motif_colors is None:
+        default_color = "#210070"
+        for i in range(1, len(spectra)):
+            node_colors[f'motif_{i}'] = default_color
+    else:
+        for i in range(1, len(spectra)):
+            node_colors[f'motif_{i}'] = motif_colors[i]
+    #--------------------------
+
     
     pos = nx.spring_layout(G)  
     fig, ax = plt.subplots(figsize=(10, 50)) 
@@ -144,10 +157,14 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
     edge_colors = [d['color'] for (u, v, d) in edges]    
     nx.draw_networkx_edges(G, pos, alpha=0.3, width=weights, edge_color=edge_colors)
     node_size_list = [node_sizes.get(node, 100) for node in G.nodes]
-    nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color="#210070", alpha=0.9)
+    node_color_list = [node_colors.get(node, "green") for node in G.nodes]
+    #node_color_list_flat = [color for sublist in node_color_list for color in (sublist if isinstance(sublist, list) else [sublist])]
+    
+    #nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color="#210070", alpha=0.9) 
+    nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color=node_color_list, alpha=0.9) 
     
     label_options = {"ec": "k", "fc": "white", "alpha": 0.7}
-    nx.draw_networkx_labels(G, pos, font_size=4, bbox=label_options)
+    nx.draw_networkx_labels(G, pos, font_size=6, bbox=label_options)
     
     def on_click(event):
         for node, (x, y) in pos.items():
@@ -157,17 +174,22 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
                     node_number = int(node.split('_')[1])
                     print(f"Node {node} clicked!\n"
                     f"Cluster similarity: {motif_sizes_filtered[node_number]*100}%\n"
+                    f"N of compounds: {(n_smiles_cluster[node_number]/max_n_smiles_cluster)*100}"
+                    f"N of features: {(n_frags_cluster[node_number]/max_n_frags_cluster)*100}"
                     f"Fragments: {spectra[node_number].peaks.mz}\n"
                     f"Losses: {spectra[node_number].losses.mz}")
                     mols = [MolFromSmiles(smi) for smi in smiles_clusters[node_number]]
                     img = MolsToGridImage(mols)
 
-                    spectra[node_number].plot()
+                    #spectra[node_number].plot()
                     
                     pil_img = Image.open(io.BytesIO(img.data))
                     
                     # Display new window
                     pil_img.show()
+
+                    for spec in spectra_cluster[node_number]: # also added
+                        spectra[node_number].plot_against(spec)
                 
                 break
 

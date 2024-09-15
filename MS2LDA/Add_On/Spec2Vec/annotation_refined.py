@@ -61,7 +61,7 @@ def mask_fragments(spectrum, mask=1.0):
     return masked_spectra
 
 
-def mask_losses(spectrum, mask=1.0): # manually connecting mask_losses and mask fragments kind of failed when not combining (no frags)
+def mask_losses(spectrum, mask=0.0): # manually connecting mask_losses and mask fragments kind of failed when not combining (no frags)
     """masks losses one by one
     
     ARGS:
@@ -166,13 +166,13 @@ def hierachical_clustering(s2v_similarity, top_n_spectra, top_n_scores, masked_s
 
     # 1. Termination condition: TOO FEW SPECTRA
     if len(top_n_spectra) < 2:
-        print("One compound cluster!")
+        #print("One compound cluster!")
         return top_n_spectra, top_n_scores, masked_spectra_similarity, "?"
     
 
     # 2. Termination condition: SPECTRA ARE VERY SIMILAR
     if np.min(similarity_matrix.flatten()) > 0.70:
-        print("Similarity Match: ", np.min(similarity_matrix.flatten()))
+        #print("Similarity Match: ", np.min(similarity_matrix.flatten()))
         return top_n_spectra, top_n_scores, masked_spectra_similarity, np.min(similarity_matrix.flatten())
 
     # build clusters
@@ -190,17 +190,17 @@ def hierachical_clustering(s2v_similarity, top_n_spectra, top_n_scores, masked_s
         hierachical_cluster_scores[cluster_num].append(score)
         
     if not hierachical_cluster_scores[0]:
-        print("Only one cluster: ", np.min(similarity_matrix.flatten()))
+        #print("Only one cluster: ", np.min(similarity_matrix.flatten()))
         return top_n_spectra, top_n_scores, masked_spectra_similarity, np.min(similarity_matrix.flatten())
     elif not hierachical_cluster_scores[1]:
-        print("Only one cluster: ", np.min(similarity_matrix.flatten()))
+        #print("Only one cluster: ", np.min(similarity_matrix.flatten()))
         return top_n_spectra, top_n_scores, masked_spectra_similarity, np.min(similarity_matrix.flatten())
     elif np.max(hierachical_cluster_scores[0]) > np.max(hierachical_cluster_scores[1]):
         index = 0
     elif np.max(hierachical_cluster_scores[0]) < np.max(hierachical_cluster_scores[1]):
         index = 1
     else:
-        print("matches have same similarity")
+        #print("matches have same similarity")
         index = 0
     
     return hierachical_clustering(s2v_similarity, hierachical_clusters[index], hierachical_cluster_scores[index], masked_spectra, masked_spectra_similarity)
