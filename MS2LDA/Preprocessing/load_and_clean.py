@@ -52,6 +52,21 @@ def load_msp(spectra_path):
     return spectra
 
 
+def load_mzml(spectra_path):
+    """loads spectra from a mzml file
+
+    ARGS:
+        spectra_path (str): path to the spectra.mgf file
+
+    RETURNS:
+        spectra (generator): matchms generator object with the loaded spectra
+    """
+    
+    spectra = load_from_mzml(spectra_path)
+    
+    return spectra
+
+
 def clean_spectra(spectra, entropy_threshold=3.):
     """uses matchms to normalize intensities, add information and add losses to the spectra
     
@@ -80,12 +95,13 @@ def clean_spectra(spectra, entropy_threshold=3.):
         spectrum = msfilters.add_losses(spectrum)
 
 
-        if spectrum: # why was it without this?
-            spectral_entropy = ms_entropy.calculate_spectral_entropy(list(zip(spectrum.peaks.mz, spectrum.peaks.intensities)),
-                                                            clean_spectrum = True,
-                                                            min_ms2_difference_in_da = 0.05)
-            if spectral_entropy < entropy_threshold:
-                cleaned_spectra.append(spectrum)
+        if spectrum: # why was it without this? This did exclude an important compound!!!
+            cleaned_spectra.append(spectrum)
+        #    spectral_entropy = ms_entropy.calculate_spectral_entropy(list(zip(spectrum.peaks.mz, spectrum.peaks.intensities)),
+        #                                                    clean_spectrum = True,
+        #                                                    min_ms2_difference_in_da = 0.05)
+        #    if spectral_entropy < entropy_threshold:
+        #        cleaned_spectra.append(spectrum)
 
     return cleaned_spectra
 
