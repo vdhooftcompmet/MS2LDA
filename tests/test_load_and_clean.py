@@ -1,18 +1,16 @@
 import unittest
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../Preprocessing')))
-from load_and_clean import load_mgf
-from load_and_clean import clean_spectra
+from MS2LDA.Preprocessing.load_and_clean import load_mgf
+from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 
-TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestLoadAndClean(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.spectra_path = os.path.join(TEST_DIR, "test_data/pos_ache_inhibitors_pesticides.mgf")
-        self.empty_spectra_path = os.path.join(TEST_DIR, "test_data/empty_spectra.mgf")
+        self.spectra_path = os.path.join(TEST_DIR, "datasets/pos_ache_inhibitors_pesticides.mgf")
+        self.empty_spectra_path = os.path.join(TEST_DIR, "datasets/empty_spectra.mgf")
 
     def test_load_mgf(self):
         self.assertTrue(os.path.exists(self.spectra_path))

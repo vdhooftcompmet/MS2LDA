@@ -1,13 +1,12 @@
 import unittest
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../Preprocessing')))
 from matchms import Spectrum
 from matchms.filtering import add_losses
 import numpy as np
 
-from generate_corpus import features_to_words
-from generate_corpus import combine_features
+from MS2LDA.Preprocessing.generate_corpus import features_to_words
+from MS2LDA.Preprocessing.generate_corpus import combine_features
 
 class TestGenerateCorpus(unittest.TestCase):
     def test_features_to_words(self):

@@ -9,7 +9,7 @@ from MS2LDA.modeling import extract_motifs
 from MS2LDA.modeling import create_motif_spectra
 from MS2LDA.modeling import define_model
 
-from MS2LDA.Visualisation import create_network
+from MS2LDA.Visualisation.visualisation import create_network
 
 class TestModeling(unittest.TestCase):
     def setUp(self):

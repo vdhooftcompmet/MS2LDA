@@ -58,11 +58,13 @@ def store_m2m_folder(motif_spectra, folder):
     RETURNS:
         True
     """
-
-    os.makedirs(folder)
-
-    for motif_number, motif_spectrum in enumerate(motif_spectra):
-        store_m2m_file(motif_spectrum, motif_number, folder)
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+        for motif_number, motif_spectrum in enumerate(motif_spectra):
+            store_m2m_file(motif_spectrum, motif_number, folder)
+    
+    elif os.path.exists(folder):
+        raise Exception("Folder already exists. Please choose a different folder name.")
 
     return True
 
