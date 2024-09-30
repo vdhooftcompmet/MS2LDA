@@ -104,18 +104,23 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
         motif_node = f'motif_{i}'
         G.add_node(motif_node)
         
-        peak_list = spectrum.peaks.mz
-        rounded_peak_list = [round(x, significant_figures) for x in peak_list]
-        loss_list = spectrum.losses.mz
-        rounded_loss_list = [round(x, significant_figures) for x in loss_list]
-        int_peak_list = spectrum.peaks.intensities
-        int_losses_list = spectrum.losses.intensities
+        if spectrum.peaks:
+            peak_list = spectrum.peaks.mz
+            rounded_peak_list = [round(x, significant_figures) for x in peak_list]
+            int_peak_list = spectrum.peaks.intensities
+
+            for edge, weight in zip(rounded_peak_list, int_peak_list):
+                G.add_edge(motif_node, edge, weight=weight, color='red')
+
+        if spectrum.losses:
+            loss_list = spectrum.losses.mz
+            rounded_loss_list = [round(x, significant_figures) for x in loss_list]
+            int_losses_list = spectrum.losses.intensities
         
-        for edge, weight in zip(rounded_peak_list, int_peak_list):
-            G.add_edge(motif_node, edge, weight=weight, color='red')
-        for edge, weight in zip(rounded_loss_list, int_losses_list):
-            G.add_edge(motif_node, edge, weight=weight, color='blue')
+            for edge, weight in zip(rounded_loss_list, int_losses_list):
+                G.add_edge(motif_node, edge, weight=weight, color='blue')
     
+
     node_sizes = {}
     if motif_sizes is None:
         default_size = 800  
@@ -172,12 +177,12 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
             if dist < 0.00025:  
                 if isinstance(node, str):  # Check if the node is a string and matches "motif_x"
                     node_number = int(node.split('_')[1])
-                    print(f"Node {node} clicked!\n"
-                    f"Cluster similarity: {motif_sizes_filtered[node_number]*100}%\n"
-                    f"N of compounds: {(n_smiles_cluster[node_number]/max_n_smiles_cluster)*100}"
-                    f"N of features: {(n_frags_cluster[node_number]/max_n_frags_cluster)*100}"
-                    f"Fragments: {spectra[node_number].peaks.mz}\n"
-                    f"Losses: {spectra[node_number].losses.mz}")
+                    #print(f"Node {node} clicked!\n"
+                    #f"Cluster similarity: {motif_sizes_filtered[node_number]*100}%\n"
+                    #f"N of compounds: {(n_smiles_cluster[node_number]/max_n_smiles_cluster)*100}"
+                    #f"N of features: {(n_frags_cluster[node_number]/max_n_frags_cluster)*100}"
+                    #f"Fragments: {spectra[node_number].peaks.mz}\n"
+                    #f"Losses: {spectra[node_number].losses.mz}")
                     mols = [MolFromSmiles(smi) for smi in smiles_clusters[node_number]]
                     img = MolsToGridImage(mols)
 

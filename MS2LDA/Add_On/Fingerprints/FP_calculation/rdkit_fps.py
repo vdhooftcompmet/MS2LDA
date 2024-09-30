@@ -21,7 +21,7 @@ def efficient_array(fp_function):
     sparse bit vectors into arrays.
     """
     def wrapper(*args):
-        print(f"[FP]: Executing {fp_function.__name__}")
+        #print(f"[FP]: Executing {fp_function.__name__}")
 
         #get fps, number of molecules and FP size
         fps, n_mols, n_bits = fp_function(*args)
