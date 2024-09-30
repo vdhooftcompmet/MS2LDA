@@ -27,7 +27,7 @@ def efficient_array(fp_function):
     rdkit mols and return numpy arrays
     """
     def wrapper(*args):
-        print(f"[FP]: Executing {fp_function.__name__}")
+        #print(f"[FP]: Executing {fp_function.__name__}")
         raw_fps = fp_function(*args)
 
         #have to store in double precision due to large integers in FPs

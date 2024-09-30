@@ -1,5 +1,6 @@
 from MS2LDA.Preprocessing.load_and_clean import load_mgf
 from MS2LDA.Preprocessing.load_and_clean import load_mzml
+from MS2LDA.Preprocessing.load_and_clean import load_msp
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 
 from MS2LDA.Preprocessing.generate_corpus import features_to_words
@@ -15,7 +16,7 @@ from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
 from MS2LDA.Add_On.Spec2Vec.annotation import get_library_matches
 
 from MS2LDA.Add_On.Spec2Vec.annotation_refined import mask_spectra
-from MS2LDA.Add_On.Spec2Vec.annotation_refined import refine_annotation
+#from MS2LDA.Add_On.Spec2Vec.annotation_refined import refine_annotation
 
 from MS2LDA.Add_On.Fingerprints.FP_annotation import annotate_motifs as calc_fingerprints
 from MS2LDA.Visualisation.visualisation import create_interactive_motif_network
@@ -51,8 +52,12 @@ def generate_motifs(mgf_path,
         motif_spectra (list): list of matchms spectrum objects (no precursor ion) 
     """
     # Preprocessing
-    loaded_spectra = load_mzml(mgf_path)
-    #loaded_spectra = load_mgf(mgf_path)
+    if mgf_path.endswith(".mgf"):
+        loaded_spectra = load_mgf(mgf_path)
+    elif mgf_path.endswith(".mzml") or mgf_path.endswith(".mzML"):
+        loaded_spectra = load_mzml(mgf_path)
+    elif mgf_path.endswith(".msp"):
+        loaded_spectra = load_msp(mgf_path)
     cleaned_spectra = clean_spectra(loaded_spectra)
     print(len(cleaned_spectra))
 

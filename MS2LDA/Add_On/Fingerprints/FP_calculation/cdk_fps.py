@@ -106,7 +106,7 @@ def efficient_array(fp_function):
     a list of SMILES and output a numpy array.
     """
     def wrapper(*args):
-        print(f"[FP]: Executing {fp_function.__name__}")
+        #print(f"[FP]: Executing {fp_function.__name__}")
         
         #convert SMILES in CDK objects
         parsed_smiles = parse_smiles(*args)
