@@ -8,8 +8,10 @@ from rdkit.Chem.Draw import MolsToGridImage
 from PIL import Image
 import random
 import io
+import networkx as nx
 
-def create_network(spectra, significant_figures=2, motif_sizes=None):
+
+def create_network(spectra, significant_figures=2, motif_sizes=None, file_generation=False):
     """
     Generates a network for the motifs spectra, where the nodes are the motifs (output of LDA model)
     and the edges are the peaks and losses of the spectra. The size of the nodes can be adjusted with the motif_sizes refined annotation
@@ -74,11 +76,13 @@ def create_network(spectra, significant_figures=2, motif_sizes=None):
     #fig.tight_layout()
     #plt.axis("off")
     #plt.show()
+    if file_generation:
+        nx.write_graphml(G, "lda_model_output.graphml")
     return G
 
 
 
-def create_interactive_motif_network(spectra, significant_figures, motif_sizes, smiles_clusters, spectra_cluster, motif_colors): #spectra-cluster added motif_colors
+def create_interactive_motif_network(spectra, significant_figures, motif_sizes, smiles_clusters, spectra_cluster, motif_colors, file_generation=False): #spectra-cluster added motif_colors
     """
     Generates a network for the annotated optimized spectra, after running Spec2Vec annotation, if clicking in a node
     it will shot the spectrum and the molecule associated with it.
@@ -197,8 +201,17 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
     fig.canvas.mpl_connect('button_press_event', on_click)
 
     plt.show()
+    if file_generation:
+        nx.write_graphml(G, "lda_model_output.graphml")
+
+    
 
     return G
+
+
+
+
+
 
 
 
