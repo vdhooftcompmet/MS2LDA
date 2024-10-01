@@ -21,6 +21,16 @@ from MS2LDA.Add_On.Spec2Vec.annotation_refined import mask_spectra
 from MS2LDA.Add_On.Fingerprints.FP_annotation import annotate_motifs as calc_fingerprints
 from MS2LDA.Visualisation.visualisation import create_interactive_motif_network
 
+# MotifDB
+from MS2LDA.Add_On.MassQL.MassQL4MotifDB import motifDB2motifs
+from MS2LDA.Add_On.MassQL.MassQL4MotifDB import motifs2motifDB
+
+# Screening
+from matchms.similarity import CosineGreedy
+from MS2LDA.Add_On.NTS.Screening import run_screen
+import pandas as pd
+
+
 
 def generate_motifs(mgf_path, 
                     n_motifs = 50,
@@ -38,7 +48,9 @@ def generate_motifs(mgf_path,
                     }, 
                     motif_parameter = 20,
                     charge=1,
-                    motifset_name="unknown"):
+                    motifset_name="unknown",
+                    ref_query=None,
+                    postscreen_threshold=0.8):
     
     """generates the motif spectra based on a given mgf file
     
@@ -47,6 +59,7 @@ def generate_motifs(mgf_path,
         model_parameters (dict): model parameters that can be set for a tomotopy LDA model
         train_parameters (dict): train parameters that can be set for a tomotopy training of an LDA model
         motif_parameter (int): number of top n most important features per motif
+        ref_query (tuple): [0] is the motifDB and [1] is the query result from motifDB
         
     RETURNS:
         motif_spectra (list): list of matchms spectrum objects (no precursor ion) 
@@ -73,8 +86,59 @@ def generate_motifs(mgf_path,
     motifs = extract_motifs(trained_ms2lda, top_n=motif_parameter)
     motif_spectra = create_motif_spectra(motifs, charge, motifset_name)
 
-    return motif_spectra
+    # Screening
+    screening_results = []
+    if ref_query:
+        ref_motifs = motifDB2motifs(ref_query[0], ref_query[1]) # what is result_feature_table
+        cosine_greedy = CosineGreedy(tolerance=0.1)
+        for ref_motif in ref_motifs:
+            # Pre-screening
+            A,B,C,D = run_screen(ref_motif, cleaned_spectra)
+            print('screen')
+            for spectrum in A:
+                screening_results.append({
+                        "hit_id": spectrum.get("id"),
+                        "screen_type": "pre",
+                        "score": "A",
+                        "ref_motifset": ref_motif.get("motifset"),
+                        "ref_motif_id": ref_motif.get("id"),
+                        "ref_short_annotation": ref_motif.get("short_annotation"),
+                        "ref_annotation": ref_motif.get("annotation"),
+                        "ref_charge": ref_motif.get("charge"),   
+                    })
+            for spectrum in B:
+                screening_results.append({
+                        "hit_id": spectrum.get("id"),
+                        "screen_type": "pre",
+                        "score": "B",
+                        "ref_motifset": ref_motif.get("motifset"),
+                        "ref_motif_id": ref_motif.get("id"),
+                        "ref_short_annotation": ref_motif.get("short_annotation"),
+                        "ref_annotation": ref_motif.get("annotation"),
+                        "ref_charge": ref_motif.get("charge"),   
+                    })
 
+
+            # Post-Screening
+            for motif_spectrum in motif_spectra:
+                cosine_score = cosine_greedy.pair(ref_motif, motif_spectrum)
+                if float(cosine_score["score"]) >= postscreen_threshold:
+                    screening_results.append({
+                        "hit_id": motif_spectrum.get("id"),
+                        "screen_type": "post",
+                        "score": round(float(cosine_score["score"]), 2),
+                        "ref_motifset": ref_motif.get("motifset"),
+                        "ref_motif_id": ref_motif.get("id"),
+                        "ref_short_annotation": ref_motif.get("short_annotation"),
+                        "ref_annotation": ref_motif.get("annotation"),
+                        "ref_charge": ref_motif.get("charge"),   
+                    })
+
+        screening_results_df = pd.DataFrame(screening_results)
+        return motif_spectra, screening_results_df
+        
+    
+    return motif_spectra
 
 
 def annotate_motifs(motif_spectra, 

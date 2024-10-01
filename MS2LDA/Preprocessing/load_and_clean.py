@@ -79,7 +79,7 @@ def clean_spectra(spectra, entropy_threshold=3.):
     """
     cleaned_spectra = []
 
-    for spectrum in spectra:
+    for i, spectrum in enumerate(spectra):
         # metadata filters
         spectrum = msfilters.default_filters(spectrum)
         spectrum = msfilters.add_retention_index(spectrum)
@@ -96,6 +96,7 @@ def clean_spectra(spectra, entropy_threshold=3.):
 
 
         if spectrum: # why was it without this? This did exclude an important compound!!!
+            spectrum.set("id", f"spec_{i}")
             cleaned_spectra.append(spectrum)
         #    spectral_entropy = ms_entropy.calculate_spectral_entropy(list(zip(spectrum.peaks.mz, spectrum.peaks.intensities)),
         #                                                    clean_spectrum = True,
