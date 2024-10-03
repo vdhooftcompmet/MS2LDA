@@ -130,14 +130,6 @@ def reconstruct_motif_spectrum(opt_motif_fragments_mz, opt_motif_fragments_inten
     opt_motif_spectrum = Spectrum(
         mz = np.array(opt_motif_fragments_mz),
         intensities = np.array(opt_motif_fragments_intensities),
-        metadata={
-            #"short_annotation": smiles_cluster, # and add metadata function would be useful
-            #"charge": motif_spectrum.get("charge"),
-            #"ms2accuracy": motif_spectrum.get("ms2accuracy"),
-            #"motifset": motif_spectrum.get("motifset"),
-            "annotation": None,
-            #"id": motif_spectrum.get("id")
-            }
     )
 
     if opt_motif_losses_mz:
@@ -152,7 +144,7 @@ def reconstruct_motif_spectrum(opt_motif_fragments_mz, opt_motif_fragments_inten
     return opt_motif_spectrum
 
 
-def optimize_motif_spectrum(motif_spectrum, hit_spectra, frag_err=2, loss_err=2):
+def optimize_motif_spectrum(motif_spectrum, hit_spectra, smiles_cluster, frag_err=2, loss_err=2):
     """runs all scripts from extracting features to overlapping them and creating an optimized motif
     
     ARGS:
@@ -171,9 +163,15 @@ def optimize_motif_spectrum(motif_spectrum, hit_spectra, frag_err=2, loss_err=2)
     
     common_losses = hits_intersection(losses_mz)    
     opt_motif_losses_mz, opt_motif_losses_intensities = motif_intersection_losses(motif_spectrum, common_losses, loss_err)
-    
-    opt_motif_spectrum = reconstruct_motif_spectrum(opt_motif_fragments_mz, opt_motif_fragments_intensities, opt_motif_losses_mz, opt_motif_losses_intensities)
 
+    opt_motif_spectrum = reconstruct_motif_spectrum(opt_motif_fragments_mz, opt_motif_fragments_intensities, opt_motif_losses_mz, opt_motif_losses_intensities)
+    opt_motif_spectrum.set("short_annotation", smiles_cluster)
+    opt_motif_spectrum.set("charge", motif_spectrum.get("charge"))
+    opt_motif_spectrum.set("ms2accuracy", motif_spectrum.get("ms2accuracy"))
+    opt_motif_spectrum.set("motifset", motif_spectrum.get("motifset"))
+    opt_motif_spectrum.set("annotation", None)
+    opt_motif_spectrum.set("id", motif_spectrum.get("id")) 
+        
     return opt_motif_spectrum
 
 #-------------------------------------------------cluster motif hits---------------------------------------#
@@ -332,7 +330,7 @@ def agglomerative_clustering(masked_spectra_similarity, cosine_similarity=0.6):
 
 #-------------------------------------summary functions---------------------#
 
-def hit_clustering(s2v_similarity, motif_spectra, library_matches, criterium="best"):
+def hit_clustering(s2v_similarity, motif_spectra, library_matches, criterium="best", cosine_similarity=0.6):
     masked_spectra = mask_spectra(motif_spectra)
 
     clustered_spec = []
@@ -344,7 +342,7 @@ def hit_clustering(s2v_similarity, motif_spectra, library_matches, criterium="be
         top_n_scores = library_match[2]
 
         s2v_similarity4masked_motifs = calc_similarity_matrix(s2v_similarity, top_n_spectra, masked_spec)
-        labels = agglomerative_clustering(s2v_similarity4masked_motifs)
+        labels = agglomerative_clustering(s2v_similarity4masked_motifs, cosine_similarity)
 
         spectra_same_label = []
         smiles_same_label = []
