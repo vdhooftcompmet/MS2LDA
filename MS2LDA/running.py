@@ -34,6 +34,7 @@ import pandas as pd
 
 def generate_motifs(mgf_path, 
                     n_motifs = 50,
+                    iterations = 100,
                     model_parameters = {
                         "rm_top": 0,
                         "min_cf": 0,
@@ -50,7 +51,8 @@ def generate_motifs(mgf_path,
                     charge=1,
                     motifset_name="unknown",
                     ref_query=None,
-                    postscreen_threshold=0.8):
+                    postscreen_threshold=0.8,
+                    acquisition_type="DDA"):
     
     """generates the motif spectra based on a given mgf file
     
@@ -72,11 +74,14 @@ def generate_motifs(mgf_path,
     elif mgf_path.endswith(".msp"):
         loaded_spectra = load_msp(mgf_path)
     cleaned_spectra = clean_spectra(loaded_spectra)
-    print(len(cleaned_spectra))
+    print("Number of cleaned spectra: ", len(cleaned_spectra))
 
     # Corpus Generation
-    fragment_words, loss_words = features_to_words(cleaned_spectra)
-    feature_words = combine_features(fragment_words, loss_words)
+    if acquisition_type == "DDA":
+        fragment_words, loss_words = features_to_words(cleaned_spectra)
+        feature_words = combine_features(fragment_words, loss_words)
+    elif acquisition_type == "DIA":
+        feature_words = features_to_words(cleaned_spectra, acquisition_type=acquisition_type)
 
     # Modeling
     ms2lda = define_model(n_motifs=n_motifs, model_parameters=model_parameters)
@@ -88,13 +93,13 @@ def generate_motifs(mgf_path,
 
     # Screening
     screening_results = []
+    screening_hits = []
     if ref_query:
         ref_motifs = motifDB2motifs(ref_query[0], ref_query[1]) # what is result_feature_table
         cosine_greedy = CosineGreedy(tolerance=0.1)
         for ref_motif in ref_motifs:
             # Pre-screening
             A,B,C,D = run_screen(ref_motif, cleaned_spectra)
-            print('screen')
             for spectrum in A:
                 screening_results.append({
                         "hit_id": spectrum.get("id"),
@@ -106,17 +111,19 @@ def generate_motifs(mgf_path,
                         "ref_annotation": ref_motif.get("annotation"),
                         "ref_charge": ref_motif.get("charge"),   
                     })
-            for spectrum in B:
-                screening_results.append({
-                        "hit_id": spectrum.get("id"),
-                        "screen_type": "pre",
-                        "score": "B",
-                        "ref_motifset": ref_motif.get("motifset"),
-                        "ref_motif_id": ref_motif.get("id"),
-                        "ref_short_annotation": ref_motif.get("short_annotation"),
-                        "ref_annotation": ref_motif.get("annotation"),
-                        "ref_charge": ref_motif.get("charge"),   
-                    })
+
+                screening_hits.append(spectrum)
+            #for spectrum in B:
+            #    screening_results.append({
+            #            "hit_id": spectrum.get("id"),
+            #            "screen_type": "pre",
+            #            "score": "B",
+            #            "ref_motifset": ref_motif.get("motifset"),
+            #            "ref_motif_id": ref_motif.get("id"),
+            #            "ref_short_annotation": ref_motif.get("short_annotation"),
+            #            "ref_annotation": ref_motif.get("annotation"),
+            #            "ref_charge": ref_motif.get("charge"),   
+            #        })
 
 
             # Post-Screening
@@ -135,7 +142,7 @@ def generate_motifs(mgf_path,
                     })
 
         screening_results_df = pd.DataFrame(screening_results)
-        return motif_spectra, screening_results_df
+        return motif_spectra, screening_results_df, screening_hits
         
     
     return motif_spectra

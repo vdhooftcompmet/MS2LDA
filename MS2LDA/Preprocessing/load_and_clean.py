@@ -67,7 +67,7 @@ def load_mzml(spectra_path):
     return spectra
 
 
-def clean_spectra(spectra, entropy_threshold=3.):
+def clean_spectra(spectra):
     """uses matchms to normalize intensities, add information and add losses to the spectra
     
     ARGS:
@@ -95,14 +95,9 @@ def clean_spectra(spectra, entropy_threshold=3.):
         spectrum = msfilters.add_losses(spectrum)
 
 
-        if spectrum: # why was it without this? This did exclude an important compound!!!
+        if spectrum:
             spectrum.set("id", f"spec_{i}")
             cleaned_spectra.append(spectrum)
-        #    spectral_entropy = ms_entropy.calculate_spectral_entropy(list(zip(spectrum.peaks.mz, spectrum.peaks.intensities)),
-        #                                                    clean_spectrum = True,
-        #                                                    min_ms2_difference_in_da = 0.05)
-        #    if spectral_entropy < entropy_threshold:
-        #        cleaned_spectra.append(spectrum)
 
     return cleaned_spectra
 
