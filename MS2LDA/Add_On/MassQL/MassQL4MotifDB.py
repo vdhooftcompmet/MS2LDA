@@ -44,7 +44,7 @@ def motifs2motifDB(spectra):
     ms2mz_list = []
     for spectrum in spectra:
 
-        if len(spectrum.peaks.mz) != 0:    
+        if spectrum.peaks:    
                 
             fragments_mz = list(spectrum.peaks.mz)
             fragments_intensities = list(spectrum.peaks.intensities)
@@ -64,7 +64,7 @@ def motifs2motifDB(spectra):
                 ms2mz_list.append(feature_dict)
 
         
-        if len(spectrum.losses.mz) != 0:
+        if spectrum.losses:
     
             losses_mz = list(spectrum.losses.mz)
             losses_intensities = list(spectrum.losses.intensities)
@@ -84,10 +84,10 @@ def motifs2motifDB(spectra):
                 ms2mz_list.append(feature_dict)
 
     
-    ms1_df = pd.DataFrame([feature_dict])
+    #ms1_df = pd.DataFrame([feature_dict])
     ms2_df = pd.DataFrame(ms2mz_list)
 
-    return ms1_df, ms2_df
+    return ms2_df
 
 def motifDB2motifs(motifDB_ms2, result_feature_table):
     """converts a (filtered) MotifDB to motif spectra objects
