@@ -15,7 +15,6 @@ import numpy as np
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics.pairwise import cosine_similarity
 
-from ordered_set import OrderedSet
 
 #-------------------------------------------------reconstruct motif spectrum---------------------------------------#
 
@@ -274,7 +273,7 @@ def mask_losses(spectrum, mask=0.0): # manually connecting mask_losses and mask 
     return masked_spectra
 
 
-def mask_spectra(motif_spectra, masks=[1.0,1.0]): #BUG: if there are not fragments it fails!!!
+def mask_spectra(motif_spectra, masks=[-1.0,-1.0]): #BUG: if there are not fragments it fails!!!
     """mask the fragments and losses for a list of spectra
     1. mask is for fragments
     2. mask is for losses
@@ -298,17 +297,47 @@ def mask_spectra(motif_spectra, masks=[1.0,1.0]): #BUG: if there are not fragmen
     return masked_motifs_spectra
 
 
+
+import warnings
+import logging
+
 def calc_similarity_matrix(s2v_similarity, top_n_spectra, masked_spectra):
+    """Calculates a similarity matrix between top hits."""
+    
+    # Suppress the specific warning from spec2vec
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message=".*Spectrum without peaks known by the used model.*")
+
+        # Suppress logging warnings from spec2vec
+        spec2vec_logger = logging.getLogger('spec2vec')
+        spec2vec_logger.setLevel(logging.ERROR)  # Set logging level to ERROR to suppress warnings
+
+        # Calculate embeddings
+        embeddings_top_n_spectra = calc_embeddings(s2v_similarity, top_n_spectra)
+        embeddings_masked_spectra = calc_embeddings(s2v_similarity, masked_spectra)
+
+        # Calculate similarity
+        masked_spectra_similarity = calc_similarity(embeddings_top_n_spectra, embeddings_masked_spectra)
+
+    return masked_spectra_similarity.T
+
+
+
+
+#def calc_similarity_matrix(s2v_similarity, top_n_spectra, masked_spectra):
     """calculates a similarity matrix between top hits 
     """
     # calcuate embeddings
-    embeddings_top_n_spectra = calc_embeddings(s2v_similarity, top_n_spectra)
-    embeddings_masked_spectra = calc_embeddings(s2v_similarity, masked_spectra)
+ #   embeddings_top_n_spectra = calc_embeddings(s2v_similarity, top_n_spectra)
+  #  embeddings_masked_spectra = calc_embeddings(s2v_similarity, masked_spectra)
+    # if there is a spec2vec warning (don't know how to catch thi s warning)
+    # --> write a warning that motif X couldn't be refined; because of spec2vec
 
-    # calculate similarity
-    masked_spectra_similarity = calc_similarity(embeddings_top_n_spectra, embeddings_masked_spectra)
+    #calculate similarity
+    #masked_spectra_similarity = calc_similarity(embeddings_top_n_spectra, embeddings_masked_spectra)
 
-    return masked_spectra_similarity.T
+    #return masked_spectra_similarity.T
+
 
 
 def agglomerative_clustering(masked_spectra_similarity, cosine_similarity=0.6):
@@ -342,8 +371,8 @@ def hit_clustering(s2v_similarity, motif_spectra, library_matches, criterium="be
         top_n_scores = library_match[2]
 
         s2v_similarity4masked_motifs = calc_similarity_matrix(s2v_similarity, top_n_spectra, masked_spec)
-        labels = agglomerative_clustering(s2v_similarity4masked_motifs, cosine_similarity)
-
+        s2v_similarity4masked_motifs_filtered = s2v_similarity4masked_motifs.dropna()
+        labels = agglomerative_clustering(s2v_similarity4masked_motifs_filtered, cosine_similarity)
         spectra_same_label = []
         smiles_same_label = []
         scores_same_label = []

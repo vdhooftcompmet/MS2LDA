@@ -31,7 +31,7 @@ def load_s2v_and_library(path_model, path_library):
     s2v_similarity = Spec2Vec(
         model=s2v,
         intensity_weighting_power=0.5,
-        allowed_missing_percentage=100
+        allowed_missing_percentage=100.0
     )
 
     return s2v_similarity, library
