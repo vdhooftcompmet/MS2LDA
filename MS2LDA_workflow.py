@@ -1,0 +1,432 @@
+import dash
+import dash_bootstrap_components as dbc
+from dash import html, dcc, Input, Output, State
+import dash_cytoscape as cyto
+import base64
+import tempfile
+import os
+import io
+from PIL import Image
+from rdkit.Chem import MolFromSmiles
+from rdkit.Chem.Draw import MolsToGridImage
+
+# Import your MS2LDA modules
+from MS2LDA.running import generate_motifs
+from MS2LDA.Add_On.Spec2Vec.annotation import (
+    load_s2v_and_library,
+    get_library_matches,
+    calc_embeddings,
+    calc_similarity,
+)
+from MS2LDA.Add_On.Spec2Vec.annotation_refined import hit_clustering, optimize_motif_spectrum
+from MS2LDA.Visualisation.visualisation import create_interactive_motif_network
+
+# Initialize the Dash app with suppress_callback_exceptions=True
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    suppress_callback_exceptions=True
+)
+app.title = "MS2LDA Interactive Dashboard"
+
+# Include Cytoscape extra layouts (if needed)
+cyto.load_extra_layouts()
+
+# Define the layout
+app.layout = dbc.Container(
+    [
+        html.H1("MS2LDA Interactive Dashboard", style={"textAlign": "center", "marginTop": 20}),
+        dbc.Tabs(
+            [
+                dbc.Tab(label="Parameters", tab_id="params-tab"),
+                dbc.Tab(label="Results", tab_id="results-tab"),
+            ],
+            id="tabs",
+            active_tab="params-tab",
+            className="mt-3",
+        ),
+        html.Div(id="tab-content"),
+        # Include the components in the initial layout (even if empty)
+        html.Div(id="cytoscape-network-container", children=[], style={"display": "none"}),
+        html.Div(id="molecule-images", children=[], style={"display": "none"}),
+        html.Div(id="run-status", children=[], style={"display": "none"}),
+        html.Div(id="file-upload-info", children=[], style={"display": "none"}),
+        # Hidden storage for data to be accessed by callbacks
+        dcc.Store(id="clustered-smiles-store"),
+        dcc.Store(id="optimized-motifs-store"),
+    ],
+    fluid=True,
+)
+
+
+# Callback to render tab content
+@app.callback(Output("tab-content", "children"), Input("tabs", "active_tab"))
+def render_tab_content(active_tab):
+    if active_tab == "params-tab":
+        return dbc.Container(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                dcc.Upload(
+                                    id="upload-data",
+                                    children=html.Div(
+                                        ["Drag and Drop or ", html.A("Select Files")]
+                                    ),
+                                    style={
+                                        "width": "100%",
+                                        "height": "60px",
+                                        "lineHeight": "60px",
+                                        "borderWidth": "1px",
+                                        "borderStyle": "dashed",
+                                        "borderRadius": "5px",
+                                        "textAlign": "center",
+                                        "margin": "10px",
+                                    },
+                                    multiple=False,
+                                ),
+                                html.Div(id="file-upload-info", style={"marginBottom": "20px"}),
+                                dbc.InputGroup(
+                                    [
+                                        dbc.InputGroupText("Number of Motifs"),
+                                        dbc.Input(
+                                            id="n-motifs", type="number", value=50, min=1
+                                        ),
+                                    ],
+                                    className="mb-3",
+                                ),
+                                dbc.InputGroup(
+                                    [
+                                        dbc.InputGroupText("Top N Matches"),
+                                        dbc.Input(id="top-n", type="number", value=5, min=1),
+                                    ],
+                                    className="mb-3",
+                                ),
+                                html.Div(
+                                    [
+                                        dbc.Label("Unique Molecules"),
+                                        dbc.RadioItems(
+                                            options=[
+                                                {"label": "Yes", "value": True},
+                                                {"label": "No", "value": False},
+                                            ],
+                                            value=True,
+                                            id="unique-mols",
+                                            inline=True,
+                                        ),
+                                    ],
+                                    className="mb-3",
+                                ),
+                                html.Div(
+                                    [
+                                        dbc.Label("Polarity"),
+                                        dbc.RadioItems(
+                                            options=[
+                                                {"label": "Positive", "value": "positive"},
+                                                {"label": "Negative", "value": "negative"},
+                                            ],
+                                            value="positive",
+                                            id="polarity",
+                                            inline=True,
+                                        ),
+                                    ],
+                                    className="mb-3",
+                                ),
+                                html.Div(
+                                    [
+                                        dbc.Button(
+                                            "Run Analysis", id="run-button", color="primary"
+                                        ),
+                                    ],
+                                    className="d-grid gap-2",
+                                ),
+                                html.Div(id="run-status", style={"marginTop": "20px"}),
+                            ],
+                            width=6,
+                        )
+                    ],
+                    justify="center",
+                )
+            ]
+        )
+    elif active_tab == "results-tab":
+        return dbc.Container(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [html.Div(id="cytoscape-network-container")],
+                            width=12,
+                        )
+                    ]
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                html.Div(
+                                    id="molecule-images",
+                                    style={"textAlign": "center", "marginTop": "20px"},
+                                ),
+                            ],
+                            width=12,
+                        )
+                    ]
+                ),
+            ]
+        )
+    else:
+        return html.Div("Unknown tab selected.")
+
+
+# Callback to display uploaded file info
+@app.callback(
+    Output("file-upload-info", "children"),
+    Input("upload-data", "contents"),
+    State("upload-data", "filename"),
+)
+def update_output(contents, filename):
+    if contents:
+        return html.Div([html.H5(f"Uploaded File: {filename}")])
+    else:
+        return html.Div([html.H5("No file uploaded yet.")])
+
+
+# Callback to run analysis
+@app.callback(
+    Output("run-status", "children"),
+    Output("cytoscape-network-container", "children"),
+    Output("clustered-smiles-store", "data"),
+    Output("optimized-motifs-store", "data"),
+    Input("run-button", "n_clicks"),
+    State("upload-data", "contents"),
+    State("upload-data", "filename"),
+    State("n-motifs", "value"),
+    State("top-n", "value"),
+    State("unique-mols", "value"),
+    State("polarity", "value"),
+    prevent_initial_call=True,
+)
+def run_analysis(
+    n_clicks, contents, filename, n_motifs, top_n, unique_mols, polarity
+):
+    if not n_clicks:
+        return "", "", None, None
+
+    if not contents:
+        return (
+            dbc.Alert(
+                "Please upload a mass spectrometry data file.", color="danger"
+            ),
+            "",
+            None,
+            None,
+        )
+
+    # Decode the uploaded file
+    content_type, content_string = contents.split(",")
+    decoded = base64.b64decode(content_string)
+
+    # Save the uploaded file to a temporary file
+    with tempfile.NamedTemporaryFile(
+        delete=False, suffix=os.path.splitext(filename)[1]
+    ) as tmp_file:
+        tmp_file.write(decoded)
+        tmp_file_path = tmp_file.name
+
+    try:
+        # Generate motifs
+        motifs = generate_motifs(tmp_file_path, n_motifs=n_motifs)
+
+        # Load Spec2Vec model and library based on polarity
+        if polarity == "positive":
+            path_model = (
+                "MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model"
+            )
+            path_library = (
+                "MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
+            )
+        else:
+            path_model = (
+                "MS2LDA/Add_On/Spec2Vec/model_negative_mode/150724_Spec2Vec_neg_CleanedLibraries.model"
+            )
+            path_library = (
+                "MS2LDA/Add_On/Spec2Vec/model_negative_mode/negative_s2v_library.pkl"
+            )
+
+        # Annotate motifs
+        s2v_similarity, library = load_s2v_and_library(path_model, path_library)
+
+        # Calculate embeddings and similarity matrix
+        motif_embeddings = calc_embeddings(s2v_similarity, motifs)
+        similarity_matrix = calc_similarity(motif_embeddings, library.embeddings)
+
+        matching_settings = {
+            "similarity_matrix": similarity_matrix,
+            "library": library,
+            "top_n": top_n,
+            "unique_mols": unique_mols,
+        }
+
+        library_matches = get_library_matches(matching_settings)
+
+        # Refine Annotation
+        clustered_spectra, clustered_smiles, clustered_scores = hit_clustering(
+            s2v_similarity, motifs, library_matches, criterium="best"
+        )
+
+        # Optimize motifs
+        optimized_motifs = []
+        for motif_spec, spec_list, smiles_list in zip(
+            motifs, clustered_spectra, clustered_smiles
+        ):
+            opt_motif = optimize_motif_spectrum(motif_spec, spec_list, smiles_list)
+            optimized_motifs.append(opt_motif)
+
+        # Store data in dcc.Store components
+        clustered_smiles_data = clustered_smiles  # list of lists
+        optimized_motifs_data = [spectrum_to_dict(s) for s in optimized_motifs]
+
+        # Create Cytoscape elements
+        elements = create_cytoscape_elements(optimized_motifs, clustered_smiles)
+
+        # Return success message, network visualization, and store data
+        status_message = dbc.Alert("Analysis Completed Successfully!", color="success")
+
+        cytoscape_component = cyto.Cytoscape(
+            id="cytoscape-network",
+            elements=elements,
+            style={"width": "100%", "height": "600px"},
+            layout={"name": "cose"},
+            stylesheet=[
+                {
+                    "selector": "node",
+                    "style": {
+                        "label": "data(label)",
+                        "width": "mapData(size, 0, 10, 20, 50)",
+                        "height": "mapData(size, 0, 10, 20, 50)",
+                        "background-color": "data(color)",
+                        "font-size": "10px",
+                    },
+                },
+                {
+                    "selector": "edge",
+                    "style": {
+                        "width": 2,
+                        "line-color": "data(color)",
+                        "target-arrow-color": "data(color)",
+                        "target-arrow-shape": "triangle",
+                        "curve-style": "bezier",
+                    },
+                },
+            ],
+        )
+
+        return status_message, cytoscape_component, clustered_smiles_data, optimized_motifs_data
+
+    except Exception as e:
+        return (
+            dbc.Alert(f"An error occurred: {str(e)}", color="danger"),
+            "",
+            None,
+            None,
+        )
+
+
+# Helper function to create Cytoscape elements
+def create_cytoscape_elements(spectra, smiles_clusters):
+    elements = []
+    colors = [
+        "#FF5733",
+        "#33FF57",
+        "#3357FF",
+        "#F333FF",
+        "#FF33A8",
+        "#33FFF5",
+        "#F5FF33",
+        "#A833FF",
+        "#FF8633",
+        "#33FF86",
+    ]  # Add more colors if needed
+
+    for i, spectrum in enumerate(spectra):
+        motif_node = f"motif_{i}"
+        color = colors[i % len(colors)]
+        elements.append(
+            {"data": {"id": motif_node, "label": motif_node, "size": 5, "color": color}}
+        )
+
+        # Add fragment nodes and edges
+        for mz in spectrum.peaks.mz:
+            frag_node = f"frag_{round(mz, 2)}"
+            elements.append({"data": {"id": frag_node, "label": str(round(mz, 2))}})
+            elements.append(
+                {"data": {"source": motif_node, "target": frag_node, "color": "red"}}
+            )
+
+        # Add loss nodes and edges
+        if spectrum.losses is not None:
+            for mz in spectrum.losses.mz:
+                loss_node = f"loss_{round(mz, 2)}"
+                elements.append({"data": {"id": loss_node, "label": str(round(mz, 2))}})
+                elements.append(
+                    {"data": {"source": motif_node, "target": loss_node, "color": "blue"}}
+                )
+
+    return elements
+
+
+# Function to convert Spectrum to dict (for serialization)
+def spectrum_to_dict(spectrum):
+    return {
+        "metadata": spectrum.metadata,
+        "mz": spectrum.peaks.mz.tolist(),
+        "intensities": spectrum.peaks.intensities.tolist(),
+        "losses_mz": spectrum.losses.mz.tolist() if spectrum.losses else [],
+        "losses_intensities": spectrum.losses.intensities.tolist()
+        if spectrum.losses
+        else [],
+    }
+
+
+# Callback for Cytoscape node clicks to display molecule images
+@app.callback(
+    Output("molecule-images", "children"),
+    Input("cytoscape-network", "tapNodeData"),
+    State("clustered-smiles-store", "data"),
+)
+def display_molecule_images(nodeData, clustered_smiles_data):
+    if nodeData and nodeData["id"].startswith("motif_"):
+        motif_number = int(nodeData["id"].split("_")[1])
+        if motif_number < len(clustered_smiles_data):
+            smiles_list = clustered_smiles_data[motif_number]
+            mols = [MolFromSmiles(smi) for smi in smiles_list if MolFromSmiles(smi)]
+            if mols:
+                img = MolsToGridImage(mols, molsPerRow=5, subImgSize=(200, 200))
+                buf = io.BytesIO()
+                img.save(buf, format="PNG")
+                buf.seek(0)
+                encoded = base64.b64encode(buf.read()).decode("utf-8")
+                return html.Div(
+                    [
+                        html.H5(f"Molecules for Motif {motif_number}"),
+                        html.Img(
+                            src="data:image/png;base64,{}".format(encoded),
+                            style={"margin": "10px"},
+                        ),
+                    ]
+                )
+            else:
+                return dbc.Alert(
+                    "No valid SMILES strings to display.", color="warning"
+                )
+        else:
+            return dbc.Alert("Motif number out of range.", color="danger")
+    else:
+        return ""
+
+
+# Run the Dash app
+if __name__ == "__main__":
+    app.run_server(debug=True)
