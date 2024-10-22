@@ -1,5 +1,4 @@
 import base64
-import io
 import os
 import tempfile
 
@@ -10,7 +9,6 @@ import numpy as np
 from dash import html, dcc, Input, Output, State
 from matchms import Spectrum, Fragments
 from rdkit.Chem import MolFromSmiles
-from rdkit.Chem.Draw import MolsToGridImage
 
 from MS2LDA.Add_On.Spec2Vec.annotation import (
     load_s2v_and_library,
@@ -399,7 +397,8 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
     return cytoscape_component
 
 
-# Helper function to create Cytoscape elements
+# Revised create_cytoscape_elements function in Visualisation/visualisation.py
+
 def create_cytoscape_elements(spectra, smiles_clusters):
     elements = []
     colors = [
@@ -414,6 +413,10 @@ def create_cytoscape_elements(spectra, smiles_clusters):
         "#FF8633",
         "#33FF86",
     ]  # Add more colors if needed
+
+    # Sets to keep track of created fragment and loss nodes
+    created_fragments = set()
+    created_losses = set()
 
     for i, spectrum in enumerate(spectra):
         motif_node = f"motif_{i}"
@@ -431,16 +434,19 @@ def create_cytoscape_elements(spectra, smiles_clusters):
 
         # Add fragment nodes and edges
         for mz in spectrum.peaks.mz:
-            frag_node = f"frag_{round(mz, 2)}_{i}"
-            elements.append(
-                {
-                    "data": {
-                        "id": frag_node,
-                        "label": str(round(mz, 2)),
-                        "color": "red",
+            rounded_mz = round(mz, 2)
+            frag_node = f"frag_{rounded_mz}"
+            if frag_node not in created_fragments:
+                elements.append(
+                    {
+                        "data": {
+                            "id": frag_node,
+                            "label": str(rounded_mz),
+                            "color": "red",
+                        }
                     }
-                }
-            )
+                )
+                created_fragments.add(frag_node)
             elements.append(
                 {
                     "data": {
@@ -454,16 +460,19 @@ def create_cytoscape_elements(spectra, smiles_clusters):
         # Add loss nodes and edges
         if spectrum.losses is not None:
             for mz in spectrum.losses.mz:
-                loss_node = f"loss_{round(mz, 2)}_{i}"
-                elements.append(
-                    {
-                        "data": {
-                            "id": loss_node,
-                            "label": str(round(mz, 2)),
-                            "color": "blue",
+                rounded_mz = round(mz, 2)
+                loss_node = f"loss_{rounded_mz}"
+                if loss_node not in created_losses:
+                    elements.append(
+                        {
+                            "data": {
+                                "id": loss_node,
+                                "label": str(rounded_mz),
+                                "color": "blue",
+                            }
                         }
-                    }
-                )
+                    )
+                    created_losses.add(loss_node)
                 elements.append(
                     {
                         "data": {
@@ -539,7 +548,6 @@ def display_molecule_images(nodeData, clustered_smiles_data):
         return dbc.Alert("Motif number out of range.", color="danger")
 
     return ""  # Return empty for non-motif nodes
-
 
 
 # Run the Dash app
