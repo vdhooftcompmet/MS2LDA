@@ -54,11 +54,11 @@ app.layout = dbc.Container(
         # Include all components in the initial layout
         html.Div(id="cytoscape-network-container", style={"display": "none"}),
         html.Div(id="molecule-images", style={"display": "none"}),
-        html.Div(id="run-status", style={"display": "none"}),
-        html.Div(id="file-upload-info", style={"display": "none"}),
         # Hidden storage for data to be accessed by callbacks
         dcc.Store(id="clustered-smiles-store"),
         dcc.Store(id="optimized-motifs-store"),
+        # Include Download component
+        dcc.Download(id="download-results"),
     ],
     fluid=True,
 )
@@ -156,6 +156,37 @@ def render_tab_content(active_tab):
                                     className="d-grid gap-2",
                                 ),
                                 html.Div(id="run-status", style={"marginTop": "20px"}),
+                                html.Div(
+                                    [
+                                        dbc.Button(
+                                            "Save Results",
+                                            id="save-results-button",
+                                            color="secondary",
+                                        ),
+                                    ],
+                                    className="d-grid gap-2 mt-3",
+                                ),
+                                html.Div(id="save-status", style={"marginTop": "20px"}),
+                                html.Hr(),
+                                html.H4("Load Previous Results"),
+                                dcc.Upload(
+                                    id="upload-results",
+                                    children=html.Div(
+                                        ["Drag and Drop or ", html.A("Select Results File")]
+                                    ),
+                                    style={
+                                        "width": "100%",
+                                        "height": "60px",
+                                        "lineHeight": "60px",
+                                        "borderWidth": "1px",
+                                        "borderStyle": "dashed",
+                                        "borderRadius": "5px",
+                                        "textAlign": "center",
+                                        "margin": "10px",
+                                    },
+                                    multiple=False,
+                                ),
+                                html.Div(id="load-status", style={"marginTop": "20px"}),
                             ],
                             width=6,
                         )
@@ -212,112 +243,149 @@ def update_output(contents, filename):
         return html.Div([html.H5("No file uploaded yet.")])
 
 
-# Callback to run analysis
+# Combined callback to handle Run Analysis and Load Results
 @app.callback(
     Output("run-status", "children"),
+    Output("load-status", "children"),
     Output("clustered-smiles-store", "data"),
     Output("optimized-motifs-store", "data"),
     Input("run-button", "n_clicks"),
+    Input("upload-results", "contents"),
     State("upload-data", "contents"),
     State("upload-data", "filename"),
     State("n-motifs", "value"),
     State("top-n", "value"),
     State("unique-mols", "value"),
     State("polarity", "value"),
+    State("upload-results", "filename"),
     prevent_initial_call=True,
 )
-def run_analysis(
-        n_clicks, contents, filename, n_motifs, top_n, unique_mols, polarity
+def handle_run_or_load(
+    run_clicks, upload_contents,
+    data_contents, data_filename,
+    n_motifs, top_n, unique_mols, polarity,
+    results_filename
 ):
-    if not n_clicks:
+    ctx = dash.callback_context
+    if not ctx.triggered:
         raise dash.exceptions.PreventUpdate
+    else:
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-    if not contents:
-        return (
-            dbc.Alert(
-                "Please upload a mass spectrometry data file.", color="danger"
-            ),
-            None,
-            None,
-        )
-
-    # Decode the uploaded file
-    content_type, content_string = contents.split(",")
-    decoded = base64.b64decode(content_string)
-
-    # Save the uploaded file to a temporary file
-    with tempfile.NamedTemporaryFile(
-            delete=False, suffix=os.path.splitext(filename)[1]
-    ) as tmp_file:
-        tmp_file.write(decoded)
-        tmp_file_path = tmp_file.name
-
-    try:
-        # Generate motifs
-        motifs = generate_motifs(tmp_file_path, n_motifs=n_motifs, iterations=100)
-
-        # Load Spec2Vec model and library based on polarity
-        if polarity == "positive":
-            path_model = (
-                "MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model"
+    if triggered_id == 'run-button':
+        # Handle Run Analysis
+        if not data_contents:
+            return (
+                dbc.Alert(
+                    "Please upload a mass spectrometry data file.", color="danger"
+                ),
+                dash.no_update,  # load-status remains the same
+                None,
+                None,
             )
-            path_library = (
-                "MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
+
+        # Decode the uploaded file
+        content_type, content_string = data_contents.split(",")
+        decoded = base64.b64decode(content_string)
+
+        # Save the uploaded file to a temporary file
+        with tempfile.NamedTemporaryFile(
+                delete=False, suffix=os.path.splitext(data_filename)[1]
+        ) as tmp_file:
+            tmp_file.write(decoded)
+            tmp_file_path = tmp_file.name
+
+        try:
+            # Generate motifs
+            motifs = generate_motifs(tmp_file_path, n_motifs=n_motifs, iterations=100)
+
+            # Load Spec2Vec model and library based on polarity
+            if polarity == "positive":
+                path_model = (
+                    "MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model"
+                )
+                path_library = (
+                    "MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
+                )
+            else:
+                path_model = (
+                    "MS2LDA/Add_On/Spec2Vec/model_negative_mode/150724_Spec2Vec_neg_CleanedLibraries.model"
+                )
+                path_library = (
+                    "MS2LDA/Add_On/Spec2Vec/model_negative_mode/negative_s2v_library.pkl"
+                )
+
+            # Annotate motifs
+            s2v_similarity, library = load_s2v_and_library(path_model, path_library)
+
+            # Calculate embeddings and similarity matrix
+            motif_embeddings = calc_embeddings(s2v_similarity, motifs)
+            similarity_matrix = calc_similarity(motif_embeddings, library.embeddings)
+
+            matching_settings = {
+                "similarity_matrix": similarity_matrix,
+                "library": library,
+                "top_n": top_n,
+                "unique_mols": unique_mols,
+            }
+
+            library_matches = get_library_matches(matching_settings)
+
+            # Refine Annotation
+            clustered_spectra, clustered_smiles, clustered_scores = hit_clustering(
+                s2v_similarity, motifs, library_matches, criterium="best"
             )
+
+            # Optimize motifs
+            optimized_motifs = []
+            for motif_spec, spec_list, smiles_list in zip(
+                    motifs, clustered_spectra, clustered_smiles
+            ):
+                opt_motif = optimize_motif_spectrum(motif_spec, spec_list, smiles_list)
+                optimized_motifs.append(opt_motif)
+
+            # Store data in dcc.Store components
+            clustered_smiles_data = clustered_smiles  # list of lists
+            optimized_motifs_data = [spectrum_to_dict(s) for s in optimized_motifs]
+
+            status_message = dbc.Alert(
+                "Analysis Completed Successfully! Switch to the 'Results' tab to view.",
+                color="success",
+            )
+
+            return status_message, dash.no_update, clustered_smiles_data, optimized_motifs_data
+
+        except Exception as e:
+            return (
+                dbc.Alert(f"An error occurred: {str(e)}", color="danger"),
+                dash.no_update,
+                None,
+                None,
+            )
+    elif triggered_id == 'upload-results':
+        # Handle Load Results
+        if upload_contents is not None:
+            content_type, content_string = upload_contents.split(',')
+            decoded = base64.b64decode(content_string)
+            import json
+            try:
+                data = json.loads(decoded)
+                clustered_smiles_data = data['clustered_smiles_data']
+                optimized_motifs_data = data['optimized_motifs_data']
+                status_message = dbc.Alert(
+                    "Results loaded successfully! Switch to the 'Results' tab to view.",
+                    color="success",
+                )
+                return dash.no_update, status_message, clustered_smiles_data, optimized_motifs_data
+            except Exception as e:
+                status_message = dbc.Alert(
+                    f"An error occurred while loading the results: {str(e)}", color="danger"
+                )
+                return dash.no_update, status_message, None, None
         else:
-            path_model = (
-                "MS2LDA/Add_On/Spec2Vec/model_negative_mode/150724_Spec2Vec_neg_CleanedLibraries.model"
-            )
-            path_library = (
-                "MS2LDA/Add_On/Spec2Vec/model_negative_mode/negative_s2v_library.pkl"
-            )
-
-        # Annotate motifs
-        s2v_similarity, library = load_s2v_and_library(path_model, path_library)
-
-        # Calculate embeddings and similarity matrix
-        motif_embeddings = calc_embeddings(s2v_similarity, motifs)
-        similarity_matrix = calc_similarity(motif_embeddings, library.embeddings)
-
-        matching_settings = {
-            "similarity_matrix": similarity_matrix,
-            "library": library,
-            "top_n": top_n,
-            "unique_mols": unique_mols,
-        }
-
-        library_matches = get_library_matches(matching_settings)
-
-        # Refine Annotation
-        clustered_spectra, clustered_smiles, clustered_scores = hit_clustering(
-            s2v_similarity, motifs, library_matches, criterium="best"
-        )
-
-        # Optimize motifs
-        optimized_motifs = []
-        for motif_spec, spec_list, smiles_list in zip(
-                motifs, clustered_spectra, clustered_smiles
-        ):
-            opt_motif = optimize_motif_spectrum(motif_spec, spec_list, smiles_list)
-            optimized_motifs.append(opt_motif)
-
-        # Store data in dcc.Store components
-        clustered_smiles_data = clustered_smiles  # list of lists
-        optimized_motifs_data = [spectrum_to_dict(s) for s in optimized_motifs]
-
-        status_message = dbc.Alert(
-            "Analysis Completed Successfully! Switch to the 'Results' tab to view.",
-            color="success",
-        )
-
-        return status_message, clustered_smiles_data, optimized_motifs_data
-
-    except Exception as e:
-        return (
-            dbc.Alert(f"An error occurred: {str(e)}", color="danger"),
-            None,
-            None,
-        )
+            raise dash.exceptions.PreventUpdate
+    else:
+        raise dash.exceptions.PreventUpdate
 
 
 # Helper function to convert Spectrum to dict (for serialization)
@@ -329,6 +397,26 @@ def spectrum_to_dict(spectrum):
         "losses_mz": [float(m) for m in spectrum.losses.mz.tolist()] if spectrum.losses else [],
         "losses_intensities": [float(i) for i in spectrum.losses.intensities.tolist()] if spectrum.losses else [],
     }
+
+
+# Callback to handle Save Results
+@app.callback(
+    Output("download-results", "data"),
+    Input("save-results-button", "n_clicks"),
+    State("clustered-smiles-store", "data"),
+    State("optimized-motifs-store", "data"),
+    prevent_initial_call=True,
+)
+def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data):
+    if n_clicks:
+        import json
+        data = {
+            'clustered_smiles_data': clustered_smiles_data,
+            'optimized_motifs_data': optimized_motifs_data,
+        }
+        return dcc.send_string(json.dumps(data), filename="ms2lda_results.json")
+    else:
+        raise dash.exceptions.PreventUpdate
 
 
 # Callback to create Cytoscape elements
