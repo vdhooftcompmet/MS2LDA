@@ -1,4 +1,5 @@
 import base64
+import json
 import os
 import tempfile
 
@@ -43,33 +44,19 @@ app.layout = dbc.Container(
         ),
         dbc.Tabs(
             [
-                dbc.Tab(label="Parameters", tab_id="params-tab"),
-                dbc.Tab(label="Results", tab_id="results-tab"),
+                dbc.Tab(label="Run Analysis", tab_id="run-analysis-tab"),
+                dbc.Tab(label="Load Results", tab_id="load-results-tab"),
+                dbc.Tab(label="View Results", tab_id="results-tab"),
             ],
             id="tabs",
-            active_tab="params-tab",
+            active_tab="run-analysis-tab",
             className="mt-3",
         ),
-        html.Div(id="tab-content"),
-        # Include all components in the initial layout
-        html.Div(id="cytoscape-network-container", style={"display": "none"}),
-        html.Div(id="molecule-images", style={"display": "none"}),
-        # Hidden storage for data to be accessed by callbacks
-        dcc.Store(id="clustered-smiles-store"),
-        dcc.Store(id="optimized-motifs-store"),
-        # Include Download component
-        dcc.Download(id="download-results"),
-    ],
-    fluid=True,
-)
-
-
-# Callback to render tab content
-@app.callback(Output("tab-content", "children"), Input("tabs", "active_tab"))
-def render_tab_content(active_tab):
-    if active_tab == "params-tab":
-        return dbc.Container(
-            [
+        # Include all components in the main layout
+        # Group components for each tab in a Div
+        html.Div(
+            id="run-analysis-tab-content",
+            children=[
                 dbc.Row(
                     [
                         dbc.Col(
@@ -167,8 +154,22 @@ def render_tab_content(active_tab):
                                     className="d-grid gap-2 mt-3",
                                 ),
                                 html.Div(id="save-status", style={"marginTop": "20px"}),
-                                html.Hr(),
-                                html.H4("Load Previous Results"),
+                            ],
+                            width=6,
+                        )
+                    ],
+                    justify="center",
+                )
+            ],
+            style={"display": "block"},  # Initially visible
+        ),
+        html.Div(
+            id="load-results-tab-content",
+            children=[
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
                                 dcc.Upload(
                                     id="upload-results",
                                     children=html.Div(
@@ -186,18 +187,31 @@ def render_tab_content(active_tab):
                                     },
                                     multiple=False,
                                 ),
-                                html.Div(id="load-status", style={"marginTop": "20px"}),
+                                html.Div(
+                                    id="load-status", style={"marginTop": "20px"}
+                                ),
+                                html.Div(
+                                    [
+                                        dbc.Button(
+                                            "Load Results",
+                                            id="load-results-button",
+                                            color="primary",
+                                        ),
+                                    ],
+                                    className="d-grid gap-2 mt-3",
+                                ),
                             ],
                             width=6,
                         )
                     ],
                     justify="center",
                 )
-            ]
-        )
-    elif active_tab == "results-tab":
-        return dbc.Container(
-            [
+            ],
+            style={"display": "none"},  # Initially hidden
+        ),
+        html.Div(
+            id="results-tab-content",
+            children=[
                 dbc.Row(
                     [
                         dbc.Col(
@@ -224,13 +238,42 @@ def render_tab_content(active_tab):
                         )
                     ]
                 ),
-            ]
-        )
-    else:
-        return html.Div("Unknown tab selected.")
+            ],
+            style={"display": "none"},  # Initially hidden
+        ),
+        # Hidden storage for data to be accessed by callbacks
+        dcc.Store(id="clustered-smiles-store"),
+        dcc.Store(id="optimized-motifs-store"),
+        # Include Download component
+        dcc.Download(id="download-results"),
+    ],
+    fluid=False,  # Change to fixed-width container
+)
 
 
-# Callback to display uploaded file info
+# Callback to show/hide tab contents based on active tab
+@app.callback(
+    Output("run-analysis-tab-content", "style"),
+    Output("load-results-tab-content", "style"),
+    Output("results-tab-content", "style"),
+    Input("tabs", "active_tab"),
+)
+def toggle_tab_content(active_tab):
+    run_style = {"display": "none"}
+    load_style = {"display": "none"}
+    results_style = {"display": "none"}
+
+    if active_tab == "run-analysis-tab":
+        run_style = {"display": "block"}
+    elif active_tab == "load-results-tab":
+        load_style = {"display": "block"}
+    elif active_tab == "results-tab":
+        results_style = {"display": "block"}
+
+    return run_style, load_style, results_style
+
+
+# Callback to display uploaded data file info
 @app.callback(
     Output("file-upload-info", "children"),
     Input("upload-data", "contents"),
@@ -243,57 +286,79 @@ def update_output(contents, filename):
         return html.Div([html.H5("No file uploaded yet.")])
 
 
-# Combined callback to handle Run Analysis and Load Results
+# Callback to handle Run Analysis and Load Results
 @app.callback(
     Output("run-status", "children"),
     Output("load-status", "children"),
     Output("clustered-smiles-store", "data"),
     Output("optimized-motifs-store", "data"),
     Input("run-button", "n_clicks"),
-    Input("upload-results", "contents"),
+    Input("load-results-button", "n_clicks"),
     State("upload-data", "contents"),
     State("upload-data", "filename"),
     State("n-motifs", "value"),
     State("top-n", "value"),
     State("unique-mols", "value"),
     State("polarity", "value"),
+    State("upload-results", "contents"),
     State("upload-results", "filename"),
     prevent_initial_call=True,
 )
 def handle_run_or_load(
-    run_clicks, upload_contents,
-    data_contents, data_filename,
-    n_motifs, top_n, unique_mols, polarity,
-    results_filename
+    run_clicks,
+    load_clicks,
+    data_contents,
+    data_filename,
+    n_motifs,
+    top_n,
+    unique_mols,
+    polarity,
+    results_contents,
+    results_filename,
 ):
     ctx = dash.callback_context
+
     if not ctx.triggered:
         raise dash.exceptions.PreventUpdate
     else:
         triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
+    # Initialize outputs
+    run_status = dash.no_update
+    load_status = dash.no_update
+    clustered_smiles_data = dash.no_update
+    optimized_motifs_data = dash.no_update
+
     if triggered_id == 'run-button':
         # Handle Run Analysis
         if not data_contents:
-            return (
-                dbc.Alert(
-                    "Please upload a mass spectrometry data file.", color="danger"
-                ),
-                dash.no_update,  # load-status remains the same
-                None,
-                None,
+            run_status = dbc.Alert(
+                "Please upload a mass spectrometry data file.", color="danger"
             )
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
 
         # Decode the uploaded file
-        content_type, content_string = data_contents.split(",")
-        decoded = base64.b64decode(content_string)
+        try:
+            content_type, content_string = data_contents.split(",")
+            decoded = base64.b64decode(content_string)
+        except Exception as e:
+            run_status = dbc.Alert(
+                f"Error decoding the uploaded file: {str(e)}", color="danger"
+            )
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
 
         # Save the uploaded file to a temporary file
-        with tempfile.NamedTemporaryFile(
-                delete=False, suffix=os.path.splitext(data_filename)[1]
-        ) as tmp_file:
-            tmp_file.write(decoded)
-            tmp_file_path = tmp_file.name
+        try:
+            with tempfile.NamedTemporaryFile(
+                    delete=False, suffix=os.path.splitext(data_filename)[1]
+            ) as tmp_file:
+                tmp_file.write(decoded)
+                tmp_file_path = tmp_file.name
+        except Exception as e:
+            run_status = dbc.Alert(
+                f"Error saving the uploaded file: {str(e)}", color="danger"
+            )
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
 
         try:
             # Generate motifs
@@ -348,44 +413,100 @@ def handle_run_or_load(
             clustered_smiles_data = clustered_smiles  # list of lists
             optimized_motifs_data = [spectrum_to_dict(s) for s in optimized_motifs]
 
-            status_message = dbc.Alert(
-                "Analysis Completed Successfully! Switch to the 'Results' tab to view.",
+            run_status = dbc.Alert(
+                "Analysis Completed Successfully! Switch to the 'View Results' tab to view.",
                 color="success",
             )
 
-            return status_message, dash.no_update, clustered_smiles_data, optimized_motifs_data
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
 
         except Exception as e:
-            return (
-                dbc.Alert(f"An error occurred: {str(e)}", color="danger"),
-                dash.no_update,
-                None,
-                None,
-            )
-    elif triggered_id == 'upload-results':
+            run_status = dbc.Alert(f"An error occurred during analysis: {str(e)}", color="danger")
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+
+    elif triggered_id == 'load-results-button':
         # Handle Load Results
-        if upload_contents is not None:
-            content_type, content_string = upload_contents.split(',')
+        if not results_contents:
+            load_status = dbc.Alert(
+                "Please upload a results JSON file.", color="danger"
+            )
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+
+        # Decode the uploaded file
+        try:
+            content_type, content_string = results_contents.split(',')
             decoded = base64.b64decode(content_string)
-            import json
-            try:
-                data = json.loads(decoded)
-                clustered_smiles_data = data['clustered_smiles_data']
-                optimized_motifs_data = data['optimized_motifs_data']
-                status_message = dbc.Alert(
-                    "Results loaded successfully! Switch to the 'Results' tab to view.",
-                    color="success",
-                )
-                return dash.no_update, status_message, clustered_smiles_data, optimized_motifs_data
-            except Exception as e:
-                status_message = dbc.Alert(
-                    f"An error occurred while loading the results: {str(e)}", color="danger"
-                )
-                return dash.no_update, status_message, None, None
-        else:
-            raise dash.exceptions.PreventUpdate
+            data = json.loads(decoded)
+        except Exception as e:
+            load_status = dbc.Alert(
+                f"Error decoding or parsing the uploaded file: {str(e)}", color="danger"
+            )
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+
+        # Validate the presence of required keys
+        if 'clustered_smiles_data' not in data or 'optimized_motifs_data' not in data:
+            load_status = dbc.Alert(
+                "Invalid file format. Missing required data.", color="danger"
+            )
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+
+        try:
+            clustered_smiles_data = data['clustered_smiles_data']
+            optimized_motifs_data = data['optimized_motifs_data']
+        except Exception as e:
+            load_status = dbc.Alert(
+                f"Error extracting data from the file: {str(e)}", color="danger"
+            )
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+
+        load_status = dbc.Alert(
+            "Results loaded successfully! Switch to the 'Results' tab to view.",
+            color="success",
+        )
+
+        return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+
     else:
         raise dash.exceptions.PreventUpdate
+
+
+# Callback to handle Save Results
+@app.callback(
+    Output("download-results", "data"),
+    Output("save-status", "children"),
+    Input("save-results-button", "n_clicks"),
+    State("clustered-smiles-store", "data"),
+    State("optimized-motifs-store", "data"),
+    prevent_initial_call=True,
+)
+def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data):
+    if not n_clicks:
+        raise dash.exceptions.PreventUpdate
+
+    if not clustered_smiles_data or not optimized_motifs_data:
+        return (
+            dash.no_update,
+            dbc.Alert(
+                "No analysis results to save. Please run an analysis first.", color="warning"
+            ),
+        )
+
+    try:
+        data = {
+            'clustered_smiles_data': clustered_smiles_data,
+            'optimized_motifs_data': optimized_motifs_data,
+        }
+        json_data = json.dumps(data)
+        return dcc.send_string(json_data, filename="ms2lda_results.json"), dbc.Alert(
+            "Results saved successfully!", color="success"
+        )
+    except Exception as e:
+        return (
+            dash.no_update,
+            dbc.Alert(
+                f"An error occurred while saving the results: {str(e)}", color="danger"
+            ),
+        )
 
 
 # Helper function to convert Spectrum to dict (for serialization)
@@ -397,26 +518,6 @@ def spectrum_to_dict(spectrum):
         "losses_mz": [float(m) for m in spectrum.losses.mz.tolist()] if spectrum.losses else [],
         "losses_intensities": [float(i) for i in spectrum.losses.intensities.tolist()] if spectrum.losses else [],
     }
-
-
-# Callback to handle Save Results
-@app.callback(
-    Output("download-results", "data"),
-    Input("save-results-button", "n_clicks"),
-    State("clustered-smiles-store", "data"),
-    State("optimized-motifs-store", "data"),
-    prevent_initial_call=True,
-)
-def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data):
-    if n_clicks:
-        import json
-        data = {
-            'clustered_smiles_data': clustered_smiles_data,
-            'optimized_motifs_data': optimized_motifs_data,
-        }
-        return dcc.send_string(json.dumps(data), filename="ms2lda_results.json")
-    else:
-        raise dash.exceptions.PreventUpdate
 
 
 # Callback to create Cytoscape elements
@@ -485,8 +586,7 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
     return cytoscape_component
 
 
-# Revised create_cytoscape_elements function in Visualisation/visualisation.py
-
+# Revised create_cytoscape_elements function
 def create_cytoscape_elements(spectra, smiles_clusters):
     elements = []
     colors = [
@@ -574,6 +674,7 @@ def create_cytoscape_elements(spectra, smiles_clusters):
     return elements
 
 
+# Callback to display molecule images
 @app.callback(
     Output("molecule-images", "children"),
     Input("cytoscape-network", "tapNodeData"),
