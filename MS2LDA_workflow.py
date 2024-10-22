@@ -523,7 +523,7 @@ def spectrum_to_dict(spectrum):
         "losses_intensities": [float(i) for i in spectrum.losses.intensities.tolist()] if spectrum.losses else [],
     }
 
-# Callback to create Cytoscape elements
+# Updated Callback to create Cytoscape elements
 @app.callback(
     Output("cytoscape-network-container", "children"),
     Input("optimized-motifs-store", "data"),
@@ -560,120 +560,66 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
         id="cytoscape-network",
         elements=elements,
         style={"width": "100%", "height": "100%"},  # Full height of the column
-        layout={"name": "cose",
-                "animate": False},  # Set animate to False for faster rendering
+        layout={"name": "cose", "animate": False},  # Set animate to False for faster rendering
         stylesheet=[
+            # Motif Nodes
             {
-                "selector": "node",
+                "selector": 'node[type="motif"]',
                 "style": {
+                    "background-color": "#00008B",  # Dark Blue
                     "label": "data(label)",
-                    "width": "mapData(size, 0, 10, 20, 50)",
-                    "height": "mapData(size, 0, 10, 20, 50)",
-                    "background-color": "data(color)",
+                    "text-background-color": "white",
+                    "text-background-opacity": 0.7,
+                    "text-background-padding": "3px",
+                    "text-background-shape": "roundrectangle",
+                    "text-border-color": "black",
+                    "text-border-width": 1,
+                    "text-valign": "top",
+                    "text-halign": "center",
+                    "color": "black",  # Text color
                     "font-size": "10px",
                 },
             },
+            # Fragment and Loss Nodes
+            {
+                "selector": 'node[type="fragment"]',
+                "style": {
+                    "background-color": "#008000",  # Green
+                    "label": "data(label)",
+                    "text-background-color": "white",
+                    "text-background-opacity": 0.7,
+                    "text-background-padding": "3px",
+                    "text-background-shape": "roundrectangle",
+                    "text-border-color": "black",
+                    "text-border-width": 1,
+                    "text-valign": "top",
+                    "text-halign": "center",
+                    "color": "black",  # Text color
+                    "font-size": "8px",
+                },
+            },
+            # Edges
             {
                 "selector": "edge",
                 "style": {
-                    "width": 2,
-                    "line-color": "data(color)",
-                    "target-arrow-color": "data(color)",
-                    "target-arrow-shape": "triangle",
+                    "line-color": "red",
+                    "opacity": 0.5,
+                    "width": "mapData(weight, 0, 1, 1, 10)",  # Adjust based on actual weight range
+                    "target-arrow-shape": "none",
                     "curve-style": "bezier",
+                },
+            },
+            # General Node Style (if needed)
+            {
+                "selector": "node",
+                "style": {
+                    "shape": "ellipse",
                 },
             },
         ],
     )
 
     return cytoscape_component
-
-# Revised create_cytoscape_elements function
-def create_cytoscape_elements(spectra, smiles_clusters):
-    elements = []
-    colors = [
-        "#FF5733",
-        "#33FF57",
-        "#3357FF",
-        "#F333FF",
-        "#FF33A8",
-        "#33FFF5",
-        "#F5FF33",
-        "#A833FF",
-        "#FF8633",
-        "#33FF86",
-    ]  # Add more colors if needed
-
-    # Sets to keep track of created fragment and loss nodes
-    created_fragments = set()
-    created_losses = set()
-
-    for i, spectrum in enumerate(spectra):
-        motif_node = f"motif_{i}"
-        color = colors[i % len(colors)]
-        elements.append(
-            {
-                "data": {
-                    "id": motif_node,
-                    "label": motif_node,
-                    "size": 5,
-                    "color": color,
-                }
-            }
-        )
-
-        # Add fragment nodes and edges
-        for mz in spectrum.peaks.mz:
-            rounded_mz = round(mz, 2)
-            frag_node = f"frag_{rounded_mz}"
-            if frag_node not in created_fragments:
-                elements.append(
-                    {
-                        "data": {
-                            "id": frag_node,
-                            "label": str(rounded_mz),
-                            "color": "red",
-                        }
-                    }
-                )
-                created_fragments.add(frag_node)
-            elements.append(
-                {
-                    "data": {
-                        "source": motif_node,
-                        "target": frag_node,
-                        "color": "red",
-                    }
-                }
-            )
-
-        # Add loss nodes and edges
-        if spectrum.losses is not None:
-            for mz in spectrum.losses.mz:
-                rounded_mz = round(mz, 2)
-                loss_node = f"loss_{rounded_mz}"
-                if loss_node not in created_losses:
-                    elements.append(
-                        {
-                            "data": {
-                                "id": loss_node,
-                                "label": str(rounded_mz),
-                                "color": "blue",
-                            }
-                        }
-                    )
-                    created_losses.add(loss_node)
-                elements.append(
-                    {
-                        "data": {
-                            "source": motif_node,
-                            "target": loss_node,
-                            "color": "blue",
-                        }
-                    }
-                )
-
-    return elements
 
 # Callback to display molecule images
 @app.callback(
@@ -711,7 +657,7 @@ def display_molecule_images(nodeData, clustered_smiles_data):
                 from rdkit.Chem import Draw
                 img = Draw.MolsToGridImage(
                     mols,
-                    molsPerRow=5,
+                    molsPerRow=1,  # Set to 1 for vertical stacking
                     subImgSize=(200, 200),
                     legends=legends,
                     returnPNG=True  # This is important!
@@ -738,6 +684,92 @@ def display_molecule_images(nodeData, clustered_smiles_data):
         return dbc.Alert("Motif number out of range.", color="danger")
 
     return ""  # Return empty for non-motif nodes
+
+
+def create_cytoscape_elements(spectra, smiles_clusters):
+    elements = []
+    colors = [
+        "#FF5733",
+        "#33FF57",
+        "#3357FF",
+        "#F333FF",
+        "#FF33A8",
+        "#33FFF5",
+        "#F5FF33",
+        "#A833FF",
+        "#FF8633",
+        "#33FF86",
+    ]  # Add more colors if needed
+
+    # Sets to keep track of created fragment and loss nodes
+    created_fragments = set()
+    created_losses = set()
+
+    for i, spectrum in enumerate(spectra):
+        motif_node = f"motif_{i}"
+        elements.append(
+            {
+                "data": {
+                    "id": motif_node,
+                    "label": motif_node,
+                    "type": "motif",
+                }
+            }
+        )
+
+        # Add fragment nodes and edges
+        for mz, intensity in zip(spectrum.peaks.mz, spectrum.peaks.intensities):
+            rounded_mz = round(mz, 2)
+            frag_node = f"frag_{rounded_mz}"
+            if frag_node not in created_fragments:
+                elements.append(
+                    {
+                        "data": {
+                            "id": frag_node,
+                            "label": str(rounded_mz),
+                            "type": "fragment",
+                        }
+                    }
+                )
+                created_fragments.add(frag_node)
+            elements.append(
+                {
+                    "data": {
+                        "source": motif_node,
+                        "target": frag_node,
+                        "weight": intensity,  # Use intensity as weight
+                    }
+                }
+            )
+
+        # Add loss nodes and edges
+        if spectrum.losses is not None:
+            for mz, intensity in zip(spectrum.losses.mz, spectrum.losses.intensities):
+                rounded_mz = round(mz, 2)
+                loss_node = f"loss_{rounded_mz}"
+                if loss_node not in created_losses:
+                    elements.append(
+                        {
+                            "data": {
+                                "id": loss_node,
+                                "label": str(rounded_mz),
+                                "type": "fragment",
+                            }
+                        }
+                    )
+                    created_losses.add(loss_node)
+                elements.append(
+                    {
+                        "data": {
+                            "source": motif_node,
+                            "target": loss_node,
+                            "weight": intensity,  # Use intensity as weight
+                        }
+                    }
+                )
+
+    return elements
+
 
 # Run the Dash app
 if __name__ == "__main__":
