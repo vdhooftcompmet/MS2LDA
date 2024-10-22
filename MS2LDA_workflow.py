@@ -218,26 +218,35 @@ app.layout = dbc.Container(
                             [
                                 html.Div(
                                     id="cytoscape-network-container",
-                                    style={"marginTop": "20px"},
+                                    style={
+                                        "marginTop": "20px",
+                                        "height": "600px",  # Fixed height for the network
+                                    },
                                 )
                             ],
-                            width=12,
-                        )
-                    ]
-                ),
-                dbc.Row(
-                    [
+                            width=8,  # Wider column for the network
+                        ),
                         dbc.Col(
                             [
                                 html.Div(
                                     id="molecule-images",
-                                    style={"textAlign": "center", "marginTop": "20px"},
+                                    style={
+                                        "textAlign": "center",
+                                        "marginTop": "20px",
+                                        "overflowY": "auto",  # Scrollbar if content overflows
+                                        "height": "600px",  # Match network height
+                                        "padding": "10px",
+                                        "backgroundColor": "#f8f9fa",  # Light background
+                                        "borderRadius": "5px",
+                                    },
                                 ),
                             ],
-                            width=12,
-                        )
-                    ]
-                ),
+                            width=4,  # Narrower column for chem diagrams
+                        ),
+                    ],
+                    align="start",  # Align items to the top
+                    className="g-3",  # Gap between columns
+                )
             ],
             style={"display": "none"},  # Initially hidden
         ),
@@ -247,9 +256,8 @@ app.layout = dbc.Container(
         # Include Download component
         dcc.Download(id="download-results"),
     ],
-    fluid=False,  # Change to fixed-width container
+    fluid=False,  # Fixed-width container
 )
-
 
 # Callback to show/hide tab contents based on active tab
 @app.callback(
@@ -272,7 +280,6 @@ def toggle_tab_content(active_tab):
 
     return run_style, load_style, results_style
 
-
 # Callback to display uploaded data file info
 @app.callback(
     Output("file-upload-info", "children"),
@@ -284,7 +291,6 @@ def update_output(contents, filename):
         return html.Div([html.H5(f"Uploaded File: {filename}")])
     else:
         return html.Div([html.H5("No file uploaded yet.")])
-
 
 # Callback to handle Run Analysis and Load Results
 @app.callback(
@@ -469,7 +475,6 @@ def handle_run_or_load(
     else:
         raise dash.exceptions.PreventUpdate
 
-
 # Callback to handle Save Results
 @app.callback(
     Output("download-results", "data"),
@@ -508,7 +513,6 @@ def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data):
             ),
         )
 
-
 # Helper function to convert Spectrum to dict (for serialization)
 def spectrum_to_dict(spectrum):
     return {
@@ -518,7 +522,6 @@ def spectrum_to_dict(spectrum):
         "losses_mz": [float(m) for m in spectrum.losses.mz.tolist()] if spectrum.losses else [],
         "losses_intensities": [float(i) for i in spectrum.losses.intensities.tolist()] if spectrum.losses else [],
     }
-
 
 # Callback to create Cytoscape elements
 @app.callback(
@@ -556,7 +559,7 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
     cytoscape_component = cyto.Cytoscape(
         id="cytoscape-network",
         elements=elements,
-        style={"width": "100%", "height": "600px"},
+        style={"width": "100%", "height": "100%"},  # Full height of the column
         layout={"name": "cose",
                 "animate": False},  # Set animate to False for faster rendering
         stylesheet=[
@@ -584,7 +587,6 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
     )
 
     return cytoscape_component
-
 
 # Revised create_cytoscape_elements function
 def create_cytoscape_elements(spectra, smiles_clusters):
@@ -673,7 +675,6 @@ def create_cytoscape_elements(spectra, smiles_clusters):
 
     return elements
 
-
 # Callback to display molecule images
 @app.callback(
     Output("molecule-images", "children"),
@@ -737,7 +738,6 @@ def display_molecule_images(nodeData, clustered_smiles_data):
         return dbc.Alert("Motif number out of range.", color="danger")
 
     return ""  # Return empty for non-motif nodes
-
 
 # Run the Dash app
 if __name__ == "__main__":
