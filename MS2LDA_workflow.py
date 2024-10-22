@@ -477,7 +477,6 @@ def create_cytoscape_elements(spectra, smiles_clusters):
     return elements
 
 
-# Callback for Cytoscape node clicks to display molecule images
 @app.callback(
     Output("molecule-images", "children"),
     Input("cytoscape-network", "tapNodeData"),
@@ -488,32 +487,59 @@ def display_molecule_images(nodeData, clustered_smiles_data):
         motif_number = int(nodeData["id"].split("_")[1])
         if motif_number < len(clustered_smiles_data):
             smiles_list = clustered_smiles_data[motif_number]
-            mols = [MolFromSmiles(smi) for smi in smiles_list if MolFromSmiles(smi)]
-            if mols:
-                img = MolsToGridImage(
-                    mols, molsPerRow=5, subImgSize=(200, 200), maxMols=300
-                )
-                buf = io.BytesIO()
-                img.save(buf, format="PNG")
-                buf.seek(0)
-                encoded = base64.b64encode(buf.read()).decode("utf-8")
-                return html.Div(
-                    [
-                        html.H5(f"Molecules for Motif {motif_number}"),
-                        html.Img(
-                            src="data:image/png;base64,{}".format(encoded),
-                            style={"margin": "10px"},
-                        ),
-                    ]
-                )
-            else:
+
+            # Create molecules, making sure to filter out None results
+            mols = []
+            for smi in smiles_list:
+                try:
+                    mol = MolFromSmiles(smi)
+                    if mol is not None:
+                        mols.append(mol)
+                except Exception as e:
+                    print(f"Error converting SMILES {smi}: {str(e)}")
+
+            if not mols:
                 return dbc.Alert(
-                    "No valid SMILES strings to display.", color="warning"
+                    "No valid molecules could be created from SMILES.",
+                    color="warning"
                 )
-        else:
-            return dbc.Alert("Motif number out of range.", color="danger")
-    else:
-        return ""
+
+            try:
+                # Create grid image with legends
+                legends = [f"Match {i + 1}" for i in range(len(mols))]
+                from rdkit.Chem.Draw import MolDraw2DCairo
+                drawer = MolDraw2DCairo(1000, 200)  # Total width x height
+                from rdkit.Chem import Draw
+                img = Draw.MolsToGridImage(
+                    mols,
+                    molsPerRow=5,
+                    subImgSize=(200, 200),
+                    legends=legends,
+                    returnPNG=True  # This is important!
+                )
+
+                # Image is already in PNG format, just need to encode
+                encoded = base64.b64encode(img).decode("utf-8")
+
+                return html.Div([
+                    html.H5(f"Molecules for Motif {motif_number}"),
+                    html.Img(
+                        src=f"data:image/png;base64,{encoded}",
+                        style={"margin": "10px"},
+                    ),
+                ])
+
+            except Exception as e:
+                print(f"Error creating grid image: {str(e)}")
+                return dbc.Alert(
+                    f"Error creating molecular grid image: {str(e)}",
+                    color="danger"
+                )
+
+        return dbc.Alert("Motif number out of range.", color="danger")
+
+    return ""  # Return empty for non-motif nodes
+
 
 
 # Run the Dash app
