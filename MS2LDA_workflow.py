@@ -1,41 +1,48 @@
+import base64
+import io
+import os
+import tempfile
+
 import dash
 import dash_bootstrap_components as dbc
-from dash import html, dcc, Input, Output, State
 import dash_cytoscape as cyto
-import base64
-import tempfile
-import os
-import io
-from PIL import Image
+import numpy as np
+from dash import html, dcc, Input, Output, State
+from matchms import Spectrum, Fragments
 from rdkit.Chem import MolFromSmiles
 from rdkit.Chem.Draw import MolsToGridImage
 
-# Import your MS2LDA modules
-from MS2LDA.running import generate_motifs
 from MS2LDA.Add_On.Spec2Vec.annotation import (
     load_s2v_and_library,
     get_library_matches,
     calc_embeddings,
     calc_similarity,
 )
-from MS2LDA.Add_On.Spec2Vec.annotation_refined import hit_clustering, optimize_motif_spectrum
-from MS2LDA.Visualisation.visualisation import create_interactive_motif_network
+from MS2LDA.Add_On.Spec2Vec.annotation_refined import (
+    hit_clustering,
+    optimize_motif_spectrum,
+)
+# Import your MS2LDA modules
+from MS2LDA.running import generate_motifs
 
-# Initialize the Dash app with suppress_callback_exceptions=True
+# Initialize the Dash app
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
-    suppress_callback_exceptions=True
+    suppress_callback_exceptions=True,
 )
 app.title = "MS2LDA Interactive Dashboard"
 
-# Include Cytoscape extra layouts (if needed)
+# Include Cytoscape extra layouts
 cyto.load_extra_layouts()
 
 # Define the layout
 app.layout = dbc.Container(
     [
-        html.H1("MS2LDA Interactive Dashboard", style={"textAlign": "center", "marginTop": 20}),
+        html.H1(
+            "MS2LDA Interactive Dashboard",
+            style={"textAlign": "center", "marginTop": 20},
+        ),
         dbc.Tabs(
             [
                 dbc.Tab(label="Parameters", tab_id="params-tab"),
@@ -46,11 +53,11 @@ app.layout = dbc.Container(
             className="mt-3",
         ),
         html.Div(id="tab-content"),
-        # Include the components in the initial layout (even if empty)
-        html.Div(id="cytoscape-network-container", children=[], style={"display": "none"}),
-        html.Div(id="molecule-images", children=[], style={"display": "none"}),
-        html.Div(id="run-status", children=[], style={"display": "none"}),
-        html.Div(id="file-upload-info", children=[], style={"display": "none"}),
+        # Include all components in the initial layout
+        html.Div(id="cytoscape-network-container", style={"display": "none"}),
+        html.Div(id="molecule-images", style={"display": "none"}),
+        html.Div(id="run-status", style={"display": "none"}),
+        html.Div(id="file-upload-info", style={"display": "none"}),
         # Hidden storage for data to be accessed by callbacks
         dcc.Store(id="clustered-smiles-store"),
         dcc.Store(id="optimized-motifs-store"),
@@ -86,12 +93,17 @@ def render_tab_content(active_tab):
                                     },
                                     multiple=False,
                                 ),
-                                html.Div(id="file-upload-info", style={"marginBottom": "20px"}),
+                                html.Div(
+                                    id="file-upload-info", style={"marginBottom": "20px"}
+                                ),
                                 dbc.InputGroup(
                                     [
                                         dbc.InputGroupText("Number of Motifs"),
                                         dbc.Input(
-                                            id="n-motifs", type="number", value=50, min=1
+                                            id="n-motifs",
+                                            type="number",
+                                            value=50,
+                                            min=1,
                                         ),
                                     ],
                                     className="mb-3",
@@ -99,7 +111,9 @@ def render_tab_content(active_tab):
                                 dbc.InputGroup(
                                     [
                                         dbc.InputGroupText("Top N Matches"),
-                                        dbc.Input(id="top-n", type="number", value=5, min=1),
+                                        dbc.Input(
+                                            id="top-n", type="number", value=5, min=1
+                                        ),
                                     ],
                                     className="mb-3",
                                 ),
@@ -136,7 +150,9 @@ def render_tab_content(active_tab):
                                 html.Div(
                                     [
                                         dbc.Button(
-                                            "Run Analysis", id="run-button", color="primary"
+                                            "Run Analysis",
+                                            id="run-button",
+                                            color="primary",
                                         ),
                                     ],
                                     className="d-grid gap-2",
@@ -156,7 +172,12 @@ def render_tab_content(active_tab):
                 dbc.Row(
                     [
                         dbc.Col(
-                            [html.Div(id="cytoscape-network-container")],
+                            [
+                                html.Div(
+                                    id="cytoscape-network-container",
+                                    style={"marginTop": "20px"},
+                                )
+                            ],
                             width=12,
                         )
                     ]
@@ -196,7 +217,6 @@ def update_output(contents, filename):
 # Callback to run analysis
 @app.callback(
     Output("run-status", "children"),
-    Output("cytoscape-network-container", "children"),
     Output("clustered-smiles-store", "data"),
     Output("optimized-motifs-store", "data"),
     Input("run-button", "n_clicks"),
@@ -209,17 +229,16 @@ def update_output(contents, filename):
     prevent_initial_call=True,
 )
 def run_analysis(
-    n_clicks, contents, filename, n_motifs, top_n, unique_mols, polarity
+        n_clicks, contents, filename, n_motifs, top_n, unique_mols, polarity
 ):
     if not n_clicks:
-        return "", "", None, None
+        raise dash.exceptions.PreventUpdate
 
     if not contents:
         return (
             dbc.Alert(
                 "Please upload a mass spectrometry data file.", color="danger"
             ),
-            "",
             None,
             None,
         )
@@ -230,14 +249,14 @@ def run_analysis(
 
     # Save the uploaded file to a temporary file
     with tempfile.NamedTemporaryFile(
-        delete=False, suffix=os.path.splitext(filename)[1]
+            delete=False, suffix=os.path.splitext(filename)[1]
     ) as tmp_file:
         tmp_file.write(decoded)
         tmp_file_path = tmp_file.name
 
     try:
         # Generate motifs
-        motifs = generate_motifs(tmp_file_path, n_motifs=n_motifs)
+        motifs = generate_motifs(tmp_file_path, n_motifs=n_motifs, iterations=100)
 
         # Load Spec2Vec model and library based on polarity
         if polarity == "positive":
@@ -279,7 +298,7 @@ def run_analysis(
         # Optimize motifs
         optimized_motifs = []
         for motif_spec, spec_list, smiles_list in zip(
-            motifs, clustered_spectra, clustered_smiles
+                motifs, clustered_spectra, clustered_smiles
         ):
             opt_motif = optimize_motif_spectrum(motif_spec, spec_list, smiles_list)
             optimized_motifs.append(opt_motif)
@@ -288,50 +307,96 @@ def run_analysis(
         clustered_smiles_data = clustered_smiles  # list of lists
         optimized_motifs_data = [spectrum_to_dict(s) for s in optimized_motifs]
 
-        # Create Cytoscape elements
-        elements = create_cytoscape_elements(optimized_motifs, clustered_smiles)
-
-        # Return success message, network visualization, and store data
-        status_message = dbc.Alert("Analysis Completed Successfully!", color="success")
-
-        cytoscape_component = cyto.Cytoscape(
-            id="cytoscape-network",
-            elements=elements,
-            style={"width": "100%", "height": "600px"},
-            layout={"name": "cose"},
-            stylesheet=[
-                {
-                    "selector": "node",
-                    "style": {
-                        "label": "data(label)",
-                        "width": "mapData(size, 0, 10, 20, 50)",
-                        "height": "mapData(size, 0, 10, 20, 50)",
-                        "background-color": "data(color)",
-                        "font-size": "10px",
-                    },
-                },
-                {
-                    "selector": "edge",
-                    "style": {
-                        "width": 2,
-                        "line-color": "data(color)",
-                        "target-arrow-color": "data(color)",
-                        "target-arrow-shape": "triangle",
-                        "curve-style": "bezier",
-                    },
-                },
-            ],
+        status_message = dbc.Alert(
+            "Analysis Completed Successfully! Switch to the 'Results' tab to view.",
+            color="success",
         )
 
-        return status_message, cytoscape_component, clustered_smiles_data, optimized_motifs_data
+        return status_message, clustered_smiles_data, optimized_motifs_data
 
     except Exception as e:
         return (
             dbc.Alert(f"An error occurred: {str(e)}", color="danger"),
-            "",
             None,
             None,
         )
+
+
+# Helper function to convert Spectrum to dict (for serialization)
+def spectrum_to_dict(spectrum):
+    return {
+        "metadata": spectrum.metadata,
+        "mz": [float(m) for m in spectrum.peaks.mz.tolist()],
+        "intensities": [float(i) for i in spectrum.peaks.intensities.tolist()],
+        "losses_mz": [float(m) for m in spectrum.losses.mz.tolist()] if spectrum.losses else [],
+        "losses_intensities": [float(i) for i in spectrum.losses.intensities.tolist()] if spectrum.losses else [],
+    }
+
+
+# Callback to create Cytoscape elements
+@app.callback(
+    Output("cytoscape-network-container", "children"),
+    Input("optimized-motifs-store", "data"),
+    Input("clustered-smiles-store", "data"),
+    Input("tabs", "active_tab"),
+)
+def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
+    if active_tab != "results-tab" or not optimized_motifs_data:
+        # Hide the Cytoscape component when not on the results tab or no data
+        return ""
+
+    # Reconstruct spectra from stored data
+    spectra = []
+    for s in optimized_motifs_data:
+        spectrum = Spectrum(
+            mz=np.array(s["mz"], dtype=float),
+            intensities=np.array(s["intensities"], dtype=float),
+            metadata=s["metadata"],
+        )
+        if s["losses_mz"]:
+            spectrum.losses = Fragments(
+                mz=np.array(s["losses_mz"], dtype=float),
+                intensities=np.array(s["losses_intensities"], dtype=float),
+            )
+        else:
+            spectrum.losses = None
+        spectra.append(spectrum)
+
+    smiles_clusters = clustered_smiles_data
+
+    elements = create_cytoscape_elements(spectra, smiles_clusters)
+
+    cytoscape_component = cyto.Cytoscape(
+        id="cytoscape-network",
+        elements=elements,
+        style={"width": "100%", "height": "600px"},
+        layout={"name": "cose",
+                "animate": False},  # Set animate to False for faster rendering
+        stylesheet=[
+            {
+                "selector": "node",
+                "style": {
+                    "label": "data(label)",
+                    "width": "mapData(size, 0, 10, 20, 50)",
+                    "height": "mapData(size, 0, 10, 20, 50)",
+                    "background-color": "data(color)",
+                    "font-size": "10px",
+                },
+            },
+            {
+                "selector": "edge",
+                "style": {
+                    "width": 2,
+                    "line-color": "data(color)",
+                    "target-arrow-color": "data(color)",
+                    "target-arrow-shape": "triangle",
+                    "curve-style": "bezier",
+                },
+            },
+        ],
+    )
+
+    return cytoscape_component
 
 
 # Helper function to create Cytoscape elements
@@ -354,40 +419,62 @@ def create_cytoscape_elements(spectra, smiles_clusters):
         motif_node = f"motif_{i}"
         color = colors[i % len(colors)]
         elements.append(
-            {"data": {"id": motif_node, "label": motif_node, "size": 5, "color": color}}
+            {
+                "data": {
+                    "id": motif_node,
+                    "label": motif_node,
+                    "size": 5,
+                    "color": color,
+                }
+            }
         )
 
         # Add fragment nodes and edges
         for mz in spectrum.peaks.mz:
-            frag_node = f"frag_{round(mz, 2)}"
-            elements.append({"data": {"id": frag_node, "label": str(round(mz, 2))}})
+            frag_node = f"frag_{round(mz, 2)}_{i}"
             elements.append(
-                {"data": {"source": motif_node, "target": frag_node, "color": "red"}}
+                {
+                    "data": {
+                        "id": frag_node,
+                        "label": str(round(mz, 2)),
+                        "color": "red",
+                    }
+                }
+            )
+            elements.append(
+                {
+                    "data": {
+                        "source": motif_node,
+                        "target": frag_node,
+                        "color": "red",
+                    }
+                }
             )
 
         # Add loss nodes and edges
         if spectrum.losses is not None:
             for mz in spectrum.losses.mz:
-                loss_node = f"loss_{round(mz, 2)}"
-                elements.append({"data": {"id": loss_node, "label": str(round(mz, 2))}})
+                loss_node = f"loss_{round(mz, 2)}_{i}"
                 elements.append(
-                    {"data": {"source": motif_node, "target": loss_node, "color": "blue"}}
+                    {
+                        "data": {
+                            "id": loss_node,
+                            "label": str(round(mz, 2)),
+                            "color": "blue",
+                        }
+                    }
+                )
+                elements.append(
+                    {
+                        "data": {
+                            "source": motif_node,
+                            "target": loss_node,
+                            "color": "blue",
+                        }
+                    }
                 )
 
     return elements
-
-
-# Function to convert Spectrum to dict (for serialization)
-def spectrum_to_dict(spectrum):
-    return {
-        "metadata": spectrum.metadata,
-        "mz": spectrum.peaks.mz.tolist(),
-        "intensities": spectrum.peaks.intensities.tolist(),
-        "losses_mz": spectrum.losses.mz.tolist() if spectrum.losses else [],
-        "losses_intensities": spectrum.losses.intensities.tolist()
-        if spectrum.losses
-        else [],
-    }
 
 
 # Callback for Cytoscape node clicks to display molecule images
@@ -403,7 +490,9 @@ def display_molecule_images(nodeData, clustered_smiles_data):
             smiles_list = clustered_smiles_data[motif_number]
             mols = [MolFromSmiles(smi) for smi in smiles_list if MolFromSmiles(smi)]
             if mols:
-                img = MolsToGridImage(mols, molsPerRow=5, subImgSize=(200, 200))
+                img = MolsToGridImage(
+                    mols, molsPerRow=5, subImgSize=(200, 200), maxMols=300
+                )
                 buf = io.BytesIO()
                 img.save(buf, format="PNG")
                 buf.seek(0)
