@@ -38,9 +38,12 @@ def motifs2motifDB(spectra):
         feature_dict["scan"] = hash_id
         feature_dict["ms1scan"] = 0
 
-        return feature_dict
+        return feature_dict # here jsonschema would be nice
+# jsonschema for submitting to MotifDB
+# add more columns: instrument, dda or dia, author, publication?
+# how to push to a public motifDB, pull request on github?
 
-    
+   
     ms2mz_list = []
     for spectrum in spectra:
 
