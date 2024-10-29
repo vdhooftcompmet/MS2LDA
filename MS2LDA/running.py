@@ -34,7 +34,7 @@ import pandas as pd
 
 def generate_motifs(mgf_path, 
                     n_motifs = 50,
-                    iterations = 100,
+                    iterations = 1000,
                     model_parameters = {
                         "rm_top": 0,
                         "min_cf": 0,
@@ -85,7 +85,7 @@ def generate_motifs(mgf_path,
 
     # Modeling
     ms2lda = define_model(n_motifs=n_motifs, model_parameters=model_parameters)
-    trained_ms2lda = train_model(ms2lda, feature_words, iterations=100, train_parameters=train_parameters)
+    trained_ms2lda = train_model(ms2lda, feature_words, iterations=iterations, train_parameters=train_parameters)
 
     # Motif Generation
     motifs = extract_motifs(trained_ms2lda, top_n=motif_parameter)
