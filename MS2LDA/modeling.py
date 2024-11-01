@@ -1,7 +1,8 @@
 import tomotopy as tp
 import numpy as np
 from MS2LDA.utils import create_spectrum
-#from utils import create_spectrum
+import warnings
+from tqdm import tqdm
 
 
 def define_model(n_motifs, model_parameters={}):
@@ -20,7 +21,7 @@ def define_model(n_motifs, model_parameters={}):
     return model
 
 
-def train_model(model, documents, iterations=100, train_parameters={}):
+def train_model(model, documents, iterations=100, step_size=10, train_parameters={}):
     """trains the LDA model on the given documents
     
     ARGS:
@@ -31,14 +32,24 @@ def train_model(model, documents, iterations=100, train_parameters={}):
         
     RETURNS:
         model: tomotopy LDAModel class
+        convergence_curve (list): list containing the model perplexity values for after every 10 iterations
     """
 
     for doc in documents:
         model.add_doc(doc)
 
-    model.train(iterations, **train_parameters)
+    convergence_curve = []
+    for i in tqdm(range(0, iterations, step_size)):
+        model.train(step_size, **train_parameters)
 
-    return model
+        perplexity = model.perplexity
+        convergence_curve.append(perplexity)
+
+    #perplexity_diff = abs(convergence_curve[-1] - convergence[-2])
+    #if  perplexity_diff > 1:
+    #    warnings.warn(f"Perplexity is {perplexity_diff}. Model is probably not converged and the results may be not optimal.")
+
+    return model, convergence_curve
 
 
 def extract_motifs(model, top_n=3):
@@ -74,7 +85,8 @@ def create_motif_spectra(motif_features, charge=1, motifset_name="unknown"):
     motif_spectra = []
         
     for k, motif_k_features in enumerate(motif_features):
-        if any("frag" in feature[0] for feature in motif_k_features) and any("loss" in feature[0] for feature in motif_k_features):
+        #if any("frag" in feature[0] for feature in motif_k_features) and any("loss" in feature[0] for feature in motif_k_features):
+        if any("frag" in feature[0] for feature in motif_k_features):
             motif_spectrum = create_spectrum(motif_k_features, k, charge=charge, motifset=motifset_name)
             motif_spectra.append(motif_spectrum)
 

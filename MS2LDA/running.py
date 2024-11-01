@@ -47,6 +47,7 @@ def generate_motifs(mgf_path,
                         "parallel": 1, 
                         "workers": 1
                     }, 
+                    step_size = 10,
                     motif_parameter = 20,
                     charge=1,
                     motifset_name="unknown",
@@ -85,7 +86,7 @@ def generate_motifs(mgf_path,
 
     # Modeling
     ms2lda = define_model(n_motifs=n_motifs, model_parameters=model_parameters)
-    trained_ms2lda = train_model(ms2lda, feature_words, iterations=iterations, train_parameters=train_parameters)
+    trained_ms2lda, convergence_curve = train_model(ms2lda, feature_words, iterations=iterations, step_size=step_size, train_parameters=train_parameters)
 
     # Motif Generation
     motifs = extract_motifs(trained_ms2lda, top_n=motif_parameter)
@@ -145,7 +146,7 @@ def generate_motifs(mgf_path,
         return motif_spectra, screening_results_df, screening_hits
         
     
-    return motif_spectra
+    return motif_spectra, convergence_curve, trained_ms2lda
 
 
 def annotate_motifs(motif_spectra, 
