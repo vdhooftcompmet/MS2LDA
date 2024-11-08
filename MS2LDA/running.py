@@ -30,6 +30,8 @@ from matchms.similarity import CosineGreedy
 from MS2LDA.Add_On.NTS.Screening import run_screen
 import pandas as pd
 
+from tqdm import tqdm
+
 
 
 def generate_motifs(mgf_path, 
@@ -98,7 +100,7 @@ def generate_motifs(mgf_path,
     if ref_query:
         ref_motifs = motifDB2motifs(ref_query[0], ref_query[1]) # what is result_feature_table
         cosine_greedy = CosineGreedy(tolerance=0.1)
-        for ref_motif in ref_motifs:
+        for ref_motif in tqdm(ref_motifs, desc="Pre-Screening"):
             # Pre-screening
             A,B,C,D = run_screen(ref_motif, cleaned_spectra)
             for spectrum in A:
@@ -128,7 +130,7 @@ def generate_motifs(mgf_path,
 
 
             # Post-Screening
-            for motif_spectrum in motif_spectra:
+            for motif_spectrum in tqdm(motif_spectra, desc="Post-Screening"):
                 cosine_score = cosine_greedy.pair(ref_motif, motif_spectrum)
                 if float(cosine_score["score"]) >= postscreen_threshold:
                     screening_results.append({
@@ -141,7 +143,7 @@ def generate_motifs(mgf_path,
                         "ref_annotation": ref_motif.get("annotation"),
                         "ref_charge": ref_motif.get("charge"),   
                     })
-
+                    
         screening_results_df = pd.DataFrame(screening_results)
         return motif_spectra, screening_results_df, screening_hits
         

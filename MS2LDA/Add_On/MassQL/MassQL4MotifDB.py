@@ -87,10 +87,10 @@ def motifs2motifDB(spectra):
                 ms2mz_list.append(feature_dict)
 
     
-    #ms1_df = pd.DataFrame([feature_dict])
+    ms1_df = pd.DataFrame([feature_dict])
     ms2_df = pd.DataFrame(ms2mz_list)
 
-    return ms2_df
+    return ms1_df, ms2_df
 
 def motifDB2motifs(motifDB_ms2, result_feature_table):
     """converts a (filtered) MotifDB to motif spectra objects
