@@ -2,6 +2,7 @@ import base64
 import json
 import os
 import tempfile
+from itertools import chain
 
 import dash
 import dash_bootstrap_components as dbc
@@ -21,8 +22,9 @@ from MS2LDA.Add_On.Spec2Vec.annotation_refined import (
     hit_clustering,
     optimize_motif_spectrum,
 )
-# Import your MS2LDA modules
 from MS2LDA.running import generate_motifs
+from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
+from MS2LDA.Preprocessing.generate_corpus import features_to_words, combine_features
 
 # Initialize the Dash app
 app = dash.Dash(
@@ -253,6 +255,7 @@ app.layout = dbc.Container(
         # Hidden storage for data to be accessed by callbacks
         dcc.Store(id="clustered-smiles-store"),
         dcc.Store(id="optimized-motifs-store"),
+        dcc.Store(id="lda-dict-store"),
         # Include Download component
         dcc.Download(id="download-results"),
     ],
@@ -298,6 +301,7 @@ def update_output(contents, filename):
     Output("load-status", "children"),
     Output("clustered-smiles-store", "data"),
     Output("optimized-motifs-store", "data"),
+    Output("lda-dict-store", "data"),
     Input("run-button", "n_clicks"),
     Input("load-results-button", "n_clicks"),
     State("upload-data", "contents"),
@@ -334,6 +338,7 @@ def handle_run_or_load(
     load_status = dash.no_update
     clustered_smiles_data = dash.no_update
     optimized_motifs_data = dash.no_update
+    lda_dict_data = dash.no_update
 
     if triggered_id == 'run-button':
         # Handle Run Analysis
@@ -341,7 +346,7 @@ def handle_run_or_load(
             run_status = dbc.Alert(
                 "Please upload a mass spectrometry data file.", color="danger"
             )
-            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data, lda_dict_data
 
         # Decode the uploaded file
         try:
@@ -351,7 +356,7 @@ def handle_run_or_load(
             run_status = dbc.Alert(
                 f"Error decoding the uploaded file: {str(e)}", color="danger"
             )
-            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data, lda_dict_data
 
         # Save the uploaded file to a temporary file
         try:
@@ -364,71 +369,92 @@ def handle_run_or_load(
             run_status = dbc.Alert(
                 f"Error saving the uploaded file: {str(e)}", color="danger"
             )
-            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data, lda_dict_data
 
-        try:
-            # Generate motifs
-            motifs = generate_motifs(tmp_file_path, n_motifs=n_motifs, iterations=100)
+        # try:
+        # Generate motifs
+        # Adjust the function call to get all necessary outputs
+        motif_spectra, convergence_curve, trained_ms2lda, feature_words, cleaned_spectra = generate_motifs(
+            tmp_file_path, n_motifs=n_motifs, iterations=100
+        )
 
-            # Load Spec2Vec model and library based on polarity
-            if polarity == "positive":
-                path_model = (
-                    "MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model"
-                )
-                path_library = (
-                    "MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
-                )
-            else:
-                path_model = (
-                    "MS2LDA/Add_On/Spec2Vec/model_negative_mode/150724_Spec2Vec_neg_CleanedLibraries.model"
-                )
-                path_library = (
-                    "MS2LDA/Add_On/Spec2Vec/model_negative_mode/negative_s2v_library.pkl"
-                )
+        # Generate lda_dict using the tomotopy model
+        # Construct doc_metadata
+        doc_metadata = {}
+        for spectrum in cleaned_spectra:
+            doc_name = spectrum.get("id")
+            metadata = spectrum.metadata.copy()
+            doc_metadata[doc_name] = metadata
 
-            # Annotate motifs
-            s2v_similarity, library = load_s2v_and_library(path_model, path_library)
+        # Generate lda_dict
+        lda_dict = generate_corpusjson_from_tomotopy(
+            model=trained_ms2lda,
+            documents=feature_words,
+            spectra=cleaned_spectra,
+            doc_metadata=doc_metadata,
+            filename=None  # Not saving to file here
+        )
 
-            # Calculate embeddings and similarity matrix
-            motif_embeddings = calc_embeddings(s2v_similarity, motifs)
-            similarity_matrix = calc_similarity(motif_embeddings, library.embeddings)
-
-            matching_settings = {
-                "similarity_matrix": similarity_matrix,
-                "library": library,
-                "top_n": top_n,
-                "unique_mols": unique_mols,
-            }
-
-            library_matches = get_library_matches(matching_settings)
-
-            # Refine Annotation
-            clustered_spectra, clustered_smiles, clustered_scores = hit_clustering(
-                s2v_similarity, motifs, library_matches, criterium="best"
+        # Load Spec2Vec model and library based on polarity
+        if polarity == "positive":
+            path_model = (
+                "MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model"
+            )
+            path_library = (
+                "MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
+            )
+        else:
+            path_model = (
+                "MS2LDA/Add_On/Spec2Vec/model_negative_mode/150724_Spec2Vec_neg_CleanedLibraries.model"
+            )
+            path_library = (
+                "MS2LDA/Add_On/Spec2Vec/model_negative_mode/negative_s2v_library.pkl"
             )
 
-            # Optimize motifs
-            optimized_motifs = []
-            for motif_spec, spec_list, smiles_list in zip(
-                    motifs, clustered_spectra, clustered_smiles
-            ):
-                opt_motif = optimize_motif_spectrum(motif_spec, spec_list, smiles_list)
-                optimized_motifs.append(opt_motif)
+        # Annotate motifs
+        s2v_similarity, library = load_s2v_and_library(path_model, path_library)
 
-            # Store data in dcc.Store components
-            clustered_smiles_data = clustered_smiles  # list of lists
-            optimized_motifs_data = [spectrum_to_dict(s) for s in optimized_motifs]
+        # Calculate embeddings and similarity matrix
+        motif_embeddings = calc_embeddings(s2v_similarity, motif_spectra)
+        similarity_matrix = calc_similarity(motif_embeddings, library.embeddings)
 
-            run_status = dbc.Alert(
-                "Analysis Completed Successfully! Switch to the 'View Results' tab to view.",
-                color="success",
-            )
+        matching_settings = {
+            "similarity_matrix": similarity_matrix,
+            "library": library,
+            "top_n": top_n,
+            "unique_mols": unique_mols,
+        }
 
-            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+        library_matches = get_library_matches(matching_settings)
 
-        except Exception as e:
-            run_status = dbc.Alert(f"An error occurred during analysis: {str(e)}", color="danger")
-            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+        # Refine Annotation
+        clustered_spectra, clustered_smiles, clustered_scores = hit_clustering(
+            s2v_similarity, motif_spectra, library_matches, criterium="best"
+        )
+
+        # Optimize motifs
+        optimized_motifs = []
+        for motif_spec, spec_list, smiles_list in zip(
+                motif_spectra, clustered_spectra, clustered_smiles
+        ):
+            opt_motif = optimize_motif_spectrum(motif_spec, spec_list, smiles_list)
+            optimized_motifs.append(opt_motif)
+
+        # Store data in dcc.Store components
+        clustered_smiles_data = clustered_smiles  # list of lists
+        optimized_motifs_data = [spectrum_to_dict(s) for s in optimized_motifs]
+        lda_dict_data = lda_dict  # Store lda_dict
+
+        run_status = dbc.Alert(
+            "Analysis Completed Successfully! Switch to the 'View Results' tab to view.",
+            color="success",
+        )
+
+        return run_status, load_status, clustered_smiles_data, optimized_motifs_data, lda_dict_data
+
+        # except Exception as e:
+        #     run_status = dbc.Alert(f"An error occurred during analysis: {str(e)}", color="danger")
+        #     return run_status, load_status, clustered_smiles_data, optimized_motifs_data, lda_dict_data
 
     elif triggered_id == 'load-results-button':
         # Handle Load Results
@@ -436,7 +462,7 @@ def handle_run_or_load(
             load_status = dbc.Alert(
                 "Please upload a results JSON file.", color="danger"
             )
-            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data, lda_dict_data
 
         # Decode the uploaded file
         try:
@@ -447,30 +473,31 @@ def handle_run_or_load(
             load_status = dbc.Alert(
                 f"Error decoding or parsing the uploaded file: {str(e)}", color="danger"
             )
-            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data, lda_dict_data
 
         # Validate the presence of required keys
-        if 'clustered_smiles_data' not in data or 'optimized_motifs_data' not in data:
+        if 'clustered_smiles_data' not in data or 'optimized_motifs_data' not in data or 'lda_dict' not in data:
             load_status = dbc.Alert(
                 "Invalid file format. Missing required data.", color="danger"
             )
-            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data, lda_dict_data
 
         try:
             clustered_smiles_data = data['clustered_smiles_data']
             optimized_motifs_data = data['optimized_motifs_data']
+            lda_dict_data = data['lda_dict']
         except Exception as e:
             load_status = dbc.Alert(
                 f"Error extracting data from the file: {str(e)}", color="danger"
             )
-            return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+            return run_status, load_status, clustered_smiles_data, optimized_motifs_data, lda_dict_data
 
         load_status = dbc.Alert(
             "Results loaded successfully! Switch to the 'Results' tab to view.",
             color="success",
         )
 
-        return run_status, load_status, clustered_smiles_data, optimized_motifs_data
+        return run_status, load_status, clustered_smiles_data, optimized_motifs_data, lda_dict_data
 
     else:
         raise dash.exceptions.PreventUpdate
@@ -482,13 +509,14 @@ def handle_run_or_load(
     Input("save-results-button", "n_clicks"),
     State("clustered-smiles-store", "data"),
     State("optimized-motifs-store", "data"),
+    State("lda-dict-store", "data"),
     prevent_initial_call=True,
 )
-def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data):
+def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data, lda_dict):
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
 
-    if not clustered_smiles_data or not optimized_motifs_data:
+    if not clustered_smiles_data or not optimized_motifs_data or not lda_dict:
         return (
             dash.no_update,
             dbc.Alert(
@@ -500,6 +528,7 @@ def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data):
         data = {
             'clustered_smiles_data': clustered_smiles_data,
             'optimized_motifs_data': optimized_motifs_data,
+            'lda_dict': lda_dict,
         }
         json_data = json.dumps(data)
         return dcc.send_string(json_data, filename="ms2lda_results.json"), dbc.Alert(
