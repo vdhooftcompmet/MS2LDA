@@ -21,7 +21,7 @@ def define_model(n_motifs, model_parameters={}):
     return model
 
 
-def train_model(model, documents, iterations=100, step_size=10, train_parameters={}):
+def train_model(model, documents, iterations=100, step_size=10, train_parameters={}, epsilon=0.01, window_size=3):
     """trains the LDA model on the given documents
     
     ARGS:
@@ -38,18 +38,75 @@ def train_model(model, documents, iterations=100, step_size=10, train_parameters
     for doc in documents:
         model.add_doc(doc)
 
-    convergence_curve = []
+    entropy_history_doc = []
+    entropy_history_topic = []
+    perplexity_history = []
+    log_likelihood_history = []
     for i in tqdm(range(0, iterations, step_size)):
         model.train(step_size, **train_parameters)
 
         perplexity = model.perplexity
-        convergence_curve.append(perplexity)
+        perplexity_history.append(perplexity)
 
-    #perplexity_diff = abs(convergence_curve[-1] - convergence[-2])
-    #if  perplexity_diff > 1:
-    #    warnings.warn(f"Perplexity is {perplexity_diff}. Model is probably not converged and the results may be not optimal.")
+        log_likelihood = model.ll_per_word
+        log_likelihood_history.append(log_likelihood)
 
-    return model, convergence_curve
+        current_doc_entropy = calculate_document_entropy(model)
+        current_topic_entropy = calculate_topic_entropy(model)
+
+        entropy_history_doc.append(current_doc_entropy)
+        entropy_history_topic.append(current_topic_entropy)
+        
+        # Check for convergence based on both entropies
+        doc_converged = (len(entropy_history_doc) > window_size and 
+                        check_convergence(entropy_history_doc, epsilon=epsilon, n=window_size))
+        
+        #topic_converged = (len(entropy_history_topic) > n and 
+        #                check_convergence(entropy_history_topic, epsilon=epsilon, n=window_size))
+        
+        if doc_converged: # and topic_converged:
+            print("Model has converged based on both Document-Topic entropy!")
+            return model, [perplexity_history, entropy_history_topic, entropy_history_doc, log_likelihood_history]
+        
+    else:
+        print("model did not converge")
+        return model, [perplexity_history, entropy_history_topic, entropy_history_doc, log_likelihood_history]
+
+
+# check if model converged 
+def calculate_document_entropy(model):
+    """Entropy for Document-Topic Distribution"""
+    entropy_values = []
+
+    for doc in model.docs:
+        topic_dist = doc.get_topic_dist()
+        topic_dist = np.where(np.array(topic_dist) == 0, 1e-12, topic_dist)
+
+        entropy = -np.sum(topic_dist * np.log(topic_dist))
+        entropy_values.append(entropy)
+
+    return np.mean(entropy_values)
+
+def calculate_topic_entropy(model):
+    """Entropy for Topic-Word Distribution"""
+    entropy_values = []
+
+    for k in range(model.k):
+        word_dist = model.get_topic_word_dist(k)
+        word_dist = np.where(np.array(word_dist) == 0, 1e-12, word_dist)
+
+        entropy = -np.sum(word_dist * np.log(word_dist))
+        entropy_values.append(entropy)
+
+    return np.mean(entropy_values)
+
+
+def check_convergence(entropy_history, epsilon=0.001, n=3):
+    """no"""
+    changes = [abs(entropy_history[i] - entropy_history[i-1]) / entropy_history[i-1] for i in range(1, len(entropy_history))]
+
+    return all(change < epsilon for change in changes[-n:])
+
 
 
 def extract_motifs(model, top_n=3):
