@@ -428,3 +428,4 @@ def plot_convergence(convergence_curve):
     plt.tight_layout() 
     plt.savefig("ms2lda_onvergence.png", dpi=300) 
     plt.show()
+    return fig
