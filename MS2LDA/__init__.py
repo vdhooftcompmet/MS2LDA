@@ -3,3 +3,4 @@
 
 #from .MS2LDA_core import run_lda
 # make it similar to llama3 init https://github.com/meta-llama/llama3/blob/main/llama/__init__.py
+from run import run
