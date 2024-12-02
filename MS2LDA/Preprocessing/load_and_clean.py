@@ -5,7 +5,6 @@ from matchms.importing import load_from_msp
 
 import matchms.filtering as msfilters
 
-import ms_entropy
 import numpy as np
 
 

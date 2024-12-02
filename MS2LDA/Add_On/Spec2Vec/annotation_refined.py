@@ -405,7 +405,14 @@ def hit_clustering(s2v_similarity, motif_spectra, library_matches, criterium="be
     return clustered_spec, clustered_smiles, clustered_scores
             
 
+#-------------------------------------optimization---------------------#
 
+def motif_optimization(motif_spectra, clustered_spectra, clustered_smiles, loss_err=1):
+    #This generates a spectrum object where the fragments/losses present are the ones that are present in all hits
+    opt_motif_spectra = []
+    for motif_spec, spec, smiles_cluster in zip(motif_spectra, clustered_spectra, clustered_smiles):
+        opt_motif_spec = optimize_motif_spectrum(motif_spec, spec, smiles_cluster, loss_err=1)
+    opt_motif_spectra.append(opt_motif_spec)
 
 
 

@@ -55,7 +55,9 @@ def generate_motifs(mgf_path,
                     motifset_name="unknown",
                     ref_query=None,
                     postscreen_threshold=0.8,
-                    acquisition_type="DDA"):
+                    acquisition_type="DDA",
+                    epsilon=0.01,
+                    window_size=3):
     
     """generates the motif spectra based on a given mgf file
     
@@ -88,7 +90,7 @@ def generate_motifs(mgf_path,
 
     # Modeling
     ms2lda = define_model(n_motifs=n_motifs, model_parameters=model_parameters)
-    trained_ms2lda, convergence_curve = train_model(ms2lda, feature_words, iterations=iterations, step_size=step_size, train_parameters=train_parameters)
+    trained_ms2lda, convergence_curve = train_model(ms2lda, feature_words, iterations=iterations, step_size=step_size, train_parameters=train_parameters, epsilon=epsilon, window_size=window_size)
 
     # Motif Generation
     motifs = extract_motifs(trained_ms2lda, top_n=motif_parameter)

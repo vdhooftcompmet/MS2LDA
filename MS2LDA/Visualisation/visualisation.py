@@ -243,3 +243,189 @@ if __name__ == "__main__":
     
     spectra = [add_losses(spectrum_1), add_losses(spectrum_2), add_losses(spectrum_3), add_losses(spectrum_4)]
     create_network(spectra)
+
+
+import matplotlib.pyplot as plt
+from PIL import Image
+from io import BytesIO
+
+from rdkit.Chem import MolFromSmiles
+from rdkit.Chem.Draw import MolsToGridImage
+from rdkit.Chem.Draw import MolToImage
+
+def show_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, savefig=None):
+
+    assert len(opt_motif_spectra) == len(motif_spectra)
+
+    for m in range(len(motif_spectra)):
+
+        mass_to_charge_opt = opt_motif_spectra[m].peaks.mz
+        intensities_opt = opt_motif_spectra[m].peaks.intensities
+        mass_to_charge = motif_spectra[m].peaks.mz
+        intensities = motif_spectra[m].peaks.intensities
+
+
+        img = MolsToGridImage([MolFromSmiles(smi) for smi in clustered_smiles[m]], molsPerRow=len(clustered_smiles[m]), subImgSize=(400, 400))
+        img = Image.open(BytesIO(img.data))
+
+        fig = plt.figure(figsize=(10,6), facecolor='none', edgecolor='none')
+        ax2 = fig.add_subplot(2, 1, 1)
+        ax2.imshow(img) 
+        ax2.axis("off")
+        pos = ax2.get_position()  # Get current position
+        ax2.set_position([pos.x0, pos.y0 - 0.1, pos.width, pos.height])
+
+        ax1 = fig.add_subplot(2, 1, 2)
+        ax1.stem(mass_to_charge, intensities, basefmt="k-", markerfmt="", linefmt="black", label=f"motif_{m}")
+        if mass_to_charge_opt.any():
+            ax1.stem(mass_to_charge_opt, intensities_opt, basefmt="k-", markerfmt="", linefmt="red", label=f"opt motif_{m}")
+        ax1.set_ylim(0,)
+        ax1.set_xlabel('m/z', fontsize=12)
+        ax1.set_ylabel('Intensity', fontsize=12)
+
+        # Customize the axes (remove top and right spines)
+        #ax = plt.gca()  # Get current axis
+        ax1.spines['right'].set_visible(False)
+        ax1.spines['top'].set_visible(False)
+
+        # Optionally change color and width of remaining spines
+        ax1.spines['left'].set_color('black')
+        ax1.spines['bottom'].set_color('black')
+        ax1.spines['left'].set_linewidth(1.5)
+        ax1.spines['bottom'].set_linewidth(1.5)
+
+        # Customize the ticks
+        ax1.tick_params(axis='both', which='major', direction='out', length=6, width=1.5, color='black')
+        plt.legend(loc="best")
+
+        if savefig:
+            plt.savefig(f"{savefig}/motif_{m}.png", format="png", dpi=400)
+        # Show the plot
+        plt.show()
+
+def compare_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, valid_spectra, valid_mols, savefig=None):
+
+    for m in range(len(motif_spectra)):
+        mass_to_charge_0 = motif_spectra[m].peaks.mz
+        intensities_0 = motif_spectra[m].intensities
+        mass_to_charge_1 = opt_motif_spectra[m].peaks.mz
+        intensities_1 = opt_motif_spectra[m].intensities
+        mass_to_charge_2 = valid_spectra[m].peaks.mz
+        intensities_2 = valid_spectra[m].intensities
+
+        img_1 = MolToImage(valid_mols[m], size=(400, 400))
+        img_2 = MolsToGridImage([MolFromSmiles(smi) for smi in clustered_smiles[m]], molsPerRow=len(clustered_smiles[m]), subImgSize=(400, 400))
+        img_2 = Image.open(BytesIO(img_2.data))
+
+        fig = plt.figure(figsize=(10,12), facecolor='none', edgecolor='none')
+        ax3 = fig.add_subplot(3, 1, 3)
+        ax3.imshow(img_2) 
+        ax3.axis("off")
+        pos = ax3.get_position()  # Get current position
+        ax3.set_position([pos.x0, pos.y0 + 0.05, pos.width, pos.height])  # Move it down by 0.05
+
+
+        ax2 = fig.add_subplot(3, 1, 2)
+        ax2.stem(mass_to_charge_2, intensities_2, basefmt="k-", markerfmt="", linefmt="black", label=f"{valid_spectra[m].get('id')}")
+
+        # Stem plot for the second set (negative intensities for mirror effect)
+        ax2.stem(mass_to_charge_0, [-i for i in intensities_0], basefmt="k-", markerfmt="", linefmt="grey", label=f"{opt_motif_spectra[m].get('id')}")
+        #if mass_to_charge_1:
+        ax2.stem(mass_to_charge_1, [-i for i in intensities_1], basefmt="k-", markerfmt="", linefmt="red", label=f"opt {opt_motif_spectra[m].get('id')}")
+
+        # Set plot limits
+        #plt.ylim(-max(intensities_2) - 10, max(intensities_1) + 10)
+        ax2.set_yticks([-1, -0.75,-0.5,-0.25, 0,0.25,0.5,0.75, 1], ["1", "0.75","0.5","0.25", "0","0.25","0.5","0.75", "1"])
+        # Add labels
+        ax2.set_xlabel('m/z', fontsize=12)
+        ax2.set_ylabel('Intensity', fontsize=12)
+
+        # Add legend
+        ax2.legend(loc='best', fontsize=12)
+
+        # Customize the axes (remove top and right spines)
+        ###ax = plt.gca()  # Get current axis
+        ax2.spines['right'].set_visible(False)
+        ax2.spines['top'].set_visible(False)
+
+        # Optionally change color and width of remaining spines
+        ax2.spines['left'].set_color('black')
+        ax2.spines['bottom'].set_color('black')
+        ax2.spines['left'].set_linewidth(1.5)
+        ax2.spines['bottom'].set_linewidth(1.5)
+
+
+        # Customize the ticks
+        ax2.tick_params(axis='both', which='major', direction='out', length=6, width=1.5, color='black')
+
+
+        ax1 = fig.add_subplot(3, 1, 1)
+        ax1.imshow(img_1) 
+        ax1.axis("off")
+        pos = ax1.get_position()  # Get current position
+        ax1.set_position([pos.x0, pos.y0 - 0.05, pos.width, pos.height])  # Move it down by 0.05
+
+
+        #plt.tight_layout()
+        # Show the plot
+        if savefig:
+            plt.savefig(f"savefig/motif_{m}_spec_{m}.png", format="png", dpi=400)
+        plt.show()
+
+
+def plot_convergence(convergence_curve):
+    fig, ax = plt.subplots(figsize=(15, 5), nrows=1, ncols=1, sharey=True, sharex=False)
+    
+    # --- Helper function to filter out non-integer ticks ---
+    def set_integer_xticks(ax, step_size):
+        # Get current x-ticks and filter out non-integer values
+        xticks = ax.get_xticks()
+        xticks_int = xticks[xticks % 1 == 0].astype(int)  # Only keep whole numbers
+        ax.set_xticks(xticks_int)
+        ax.set_xticklabels(xticks_int)
+        
+        # Set iterations on the secondary x-axis (below the plot)
+        ax_x = ax.secondary_xaxis(-0.15)
+        ax_x.set_xticks(xticks_int)
+        ax_x.set_xticklabels((xticks_int * step_size).astype(int))
+        ax_x.set_xlabel("Iterations")
+    
+    # --- Plot for the first subplot (left side) ---
+    c1_1, = ax.plot(convergence_curve[0], label="Perplexity Score", color="black")
+    ax1_2 = ax.twinx()
+    c1_2, = ax1_2.plot(convergence_curve[1], label="Topic Entropy", color="blue")
+    ax1_3 = ax.twinx()
+    ax1_3.spines['right'].set_position(('outward', 60))
+    c1_3, = ax1_3.plot(convergence_curve[2], label="Document Entropy", color="orange")
+    ax1_4 = ax.twinx()
+    ax1_4.spines['right'].set_position(('outward', 120))
+    c1_4, = ax1_4.plot(convergence_curve[3], label="Log Likelihood", color="green")
+    ax.set_xlabel("Checkpoints")
+    
+    # Apply integer ticks
+    set_integer_xticks(ax, 50)
+
+    ax.set_xlim(0, len(convergence_curve[0]))
+    
+    ax.set_ylabel("Perplexity")
+    ax1_2.set_ylabel("Topic Entropy")
+    ax1_3.set_ylabel("Document Entropy")
+    ax1_4.set_ylabel("Log Likelihood")
+
+    # Coloring the axes to match the lines for the third subplot
+    ax1_2.tick_params(axis='y', colors=c1_2.get_color())
+    ax1_3.tick_params(axis='y', colors=c1_3.get_color())
+    ax1_4.tick_params(axis='y', colors=c1_4.get_color())
+    ax1_2.yaxis.label.set_color(c1_2.get_color())
+    ax1_3.yaxis.label.set_color(c1_3.get_color())
+    ax1_4.yaxis.label.set_color(c1_4.get_color())
+
+    # Adding legends
+    #ax.legend(handles=[c1_1, c1_2, c1_3], loc='best')
+    
+    # Add a shared header for all three plots
+    fig.suptitle('Different Convergence Curves', fontsize=16)
+    plt.tight_layout() 
+    plt.savefig("ms2lda_onvergence.png", dpi=300) 
+    plt.show()
+    return fig
