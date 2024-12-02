@@ -21,7 +21,7 @@ def define_model(n_motifs, model_parameters={}):
     return model
 
 
-def train_model(model, documents, iterations=100, step_size=10, train_parameters={}, convergence_parameters = {"type": "entropy_history_doc", "epsilon": 0.01, "window_size":3}):
+def train_model(model, documents, iterations=100, train_parameters={}, convergence_parameters = {"type": "entropy_history_doc", "threshold": 0.01, "window_size":3, "step_size":10}):
     """trains the LDA model on the given documents
     
     ARGS:
@@ -50,8 +50,8 @@ def train_model(model, documents, iterations=100, step_size=10, train_parameters
     #perplexity_history = []
     #log_likelihood_history = []
 
-    for _ in tqdm(range(0, iterations, step_size)):
-        model.train(step_size, **train_parameters)
+    for _ in tqdm(range(0, iterations, convergence_parameters["step_size"])):
+        model.train(convergence_parameters["step_size"], **train_parameters)
 
         # calculate perplexity score and saves it
         perplexity = model.perplexity
@@ -71,8 +71,8 @@ def train_model(model, documents, iterations=100, step_size=10, train_parameters
         convergence_history["entropy_history_topic"].append(current_topic_entropy)
         
         # Check convergence criteria
-        model_converged = (len(convergence_history["entropy_history_doc"]) > convergence_parameters["window_size"] and 
-                           check_convergence(convergence_parameters["type"], epsilon=convergence_parameters["epsilon"], n=convergence_parameters["window_size"]))
+        model_converged = (len(convergence_history[convergence_parameters["type"]]) > convergence_parameters["window_size"] and 
+                           check_convergence(convergence_history[convergence_parameters["type"]], epsilon=convergence_parameters["threshold"], n=convergence_parameters["window_size"]))
         
         # early stopping
         if model_converged:
@@ -120,7 +120,7 @@ def check_convergence(entropy_history, epsilon=0.001, n=3):
 
 
 
-def extract_motifs(model, top_n=3):
+def extract_motifs(model, top_n=50):
     """extract motifs from the trained LDA model
     
     ARGS:
@@ -153,9 +153,9 @@ def create_motif_spectra(motif_features, charge=1, motifset_name="unknown"):
     motif_spectra = []
         
     for k, motif_k_features in enumerate(motif_features):
-        #if any("frag" in feature[0] for feature in motif_k_features):
-        motif_spectrum = create_spectrum(motif_k_features, k, charge=charge, motifset=motifset_name)
-        motif_spectra.append(motif_spectrum)
+        if any("frag" in feature[0] for feature in motif_k_features):
+            motif_spectrum = create_spectrum(motif_k_features, k, charge=charge, motifset=motifset_name)
+            motif_spectra.append(motif_spectrum)
 
     return motif_spectra
 

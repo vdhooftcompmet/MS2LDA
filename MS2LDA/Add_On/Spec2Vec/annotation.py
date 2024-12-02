@@ -11,6 +11,8 @@ from rdkit.Chem import MolFromSmiles
 from rdkit.Chem.inchi import MolToInchi
 from rdkit.Chem.inchi import InchiToInchiKey
 
+from tqdm import tqdm
+
 
 
 
@@ -159,7 +161,7 @@ def get_library_matches(matching_settings):
     n_motifs = similarity_matrix.shape[1]
 
     library_matches = []
-    for motif_number in range(n_motifs):
+    for motif_number in tqdm(range(n_motifs)):
         library_match = preset_get_library_matches_per_motif(motif_number=motif_number)
         library_matches.append(library_match)
 

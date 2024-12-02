@@ -195,6 +195,51 @@ def annotate_motifs(smiles_per_motifs, fp_type="maccs", threshold=0.8): # can be
     return fps_motifs
 
 
+def tanimoto_similarity(fps_1, fps_2):
+    """
+    Compute Tanimoto similarity for two sets of fingerprints using NumPy.
+    
+    Args:
+    pair1_maccs_fps: List[List[int]] - The first set of binary fingerprints.
+    pair2_maccs_fps: List[List[int]] - The second set of binary fingerprints.
+    
+    Returns:
+    np.ndarray: A 2D array where the element at (i, j) represents the Tanimoto similarity
+                between `pair1_maccs_fps[i]` and `pair2_maccs_fps[j]`.
+    """
+    # Convert to NumPy arrays
+    pair1 = np.array(fps_1, dtype=np.int32)
+    pair2 = np.array(fps_2, dtype=np.int32)
+    
+    # Compute intersection and union for each pair of fingerprints
+    intersection = np.dot(pair1, pair2.T)  # Dot product gives pairwise |A ∩ B|
+    sum1 = pair1.sum(axis=1, keepdims=True)  # Row-wise sums (|A|)
+    sum2 = pair2.sum(axis=1, keepdims=True)  # Row-wise sums (|B|)
+    union = sum1 + sum2.T - intersection  # Pairwise |A ∪ B|
+    
+    # Handle cases where union is zero (to avoid division by zero)
+    tanimoto_scores = np.divide(
+        intersection, 
+        union, 
+        out=np.zeros_like(intersection, dtype=float), 
+        where=(union != 0)
+    )
+    
+    return tanimoto_scores
+
+def check_and_find_substructures(suspect_fp, motif_fps, threshold=0.7):
+    sub_fp_sum = np.sum(suspect_fp)
+    
+    subs = []
+    for i, fp in enumerate(motif_fps):
+        fp = np.array(fp)  # Convert motif fingerprint to NumPy array
+        sub_fp_intersection = np.sum(np.logical_and(suspect_fp, fp))
+        sub = sub_fp_intersection / sub_fp_sum
+        subs.append(sub)
+        if sub > threshold:
+            print(i, sub)
+    return subs
+
 
 if __name__ == "__main__":
 

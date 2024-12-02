@@ -145,5 +145,38 @@ def motifDB2motifs(motifDB_ms2, result_feature_table):
 
 
 
+def store_motifDB(ms1_df, ms2_df):
+    ms1_df["ms_level"] = "ms1"
+    ms2_df["ms_level"] = "ms2"
+
+    motifDB = pd.concat([ms1_df, ms2_df], keys=["ms1", "ms2"])
+    
+    return motifDB
+
+def load_motifDB(motifDB_filename): # doesn't work
+    motifDB = pd.read_feather(motifDB_filename)
+    ms1_df = motifDB[motifDB['ms_level'] == 'ms1']
+    ms2_df = motifDB[motifDB['ms_level'] == 'ms2']
+
+    return ms1_df, ms2_df
+
+
+def store_motifDB_excel(ms1_df, ms2_df):
+    with pd.ExcelWriter("motifDB.xlsx") as writer:
+        ms1_df.to_excel(writer, sheet_name="ms1")
+        ms2_df.to_excel(writer, sheet_name="ms2")
+
+    return True
+
+def load_motifDB_excel(motifDB_filename):
+    ms1_df = pd.read_excel(motifDB_filename, sheet_name='ms1')
+    ms2_df = pd.read_excel(motifDB_filename, sheet_name='ms2')
+
+    return ms1_df, ms2_df
+
+
+
+
+
 
 

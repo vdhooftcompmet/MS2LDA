@@ -215,35 +215,61 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
 
 
 
-
-
-
-
-
-if __name__ == "__main__":
-    from matchms import Spectrum
-    from matchms.filtering import add_losses
-    import numpy as np
-    spectrum_1 = Spectrum(mz=np.array([100, 150, 200.]),
-                      intensities=np.array([0.7, 0.2, 0.1]),
-                      metadata={'id': 'spectrum1',
-                                'precursor_mz': 201.})
-    spectrum_2 = Spectrum(mz=np.array([100, 140, 190.]),
-                        intensities=np.array([0.4, 0.2, 0.1]),
-                        metadata={'id': 'spectrum2',
-                                  'precursor_mz': 233.})
-    spectrum_3 = Spectrum(mz=np.array([110, 140, 195.]),
-                        intensities=np.array([0.6, 0.2, 0.1]),
-                        metadata={'id': 'spectrum3',
-                                  'precursor_mz': 214.})
-    spectrum_4 = Spectrum(mz=np.array([100, 150, 200.]),
-                        intensities=np.array([0.6, 0.1, 0.6]),
-                        metadata={'id': 'spectrum4',
-                                  'precursor_mz': 265.})
+def plot_convergence(convergence_curve):
+    fig, ax = plt.subplots(figsize=(15, 5), nrows=1, ncols=1, sharey=True, sharex=False)
     
-    spectra = [add_losses(spectrum_1), add_losses(spectrum_2), add_losses(spectrum_3), add_losses(spectrum_4)]
-    create_network(spectra)
+    # --- Helper function to filter out non-integer ticks ---
+    def set_integer_xticks(ax, step_size):
+        # Get current x-ticks and filter out non-integer values
+        xticks = ax.get_xticks()
+        xticks_int = xticks[xticks % 1 == 0].astype(int)  # Only keep whole numbers
+        ax.set_xticks(xticks_int)
+        ax.set_xticklabels(xticks_int)
+        
+        # Set iterations on the secondary x-axis (below the plot)
+        ax_x = ax.secondary_xaxis(-0.15)
+        ax_x.set_xticks(xticks_int)
+        ax_x.set_xticklabels((xticks_int * step_size).astype(int))
+        ax_x.set_xlabel("Iterations")
+    
+    # --- Plot for the first subplot (left side) ---
+    c1_1, = ax.plot(convergence_curve["perplexity_history"], label="Perplexity Score", color="black")
+    ax1_2 = ax.twinx()
+    c1_2, = ax1_2.plot(convergence_curve["entropy_history_topic"], label="Topic Entropy", color="blue")
+    ax1_3 = ax.twinx()
+    ax1_3.spines['right'].set_position(('outward', 60))
+    c1_3, = ax1_3.plot(convergence_curve["entropy_history_doc"], label="Document Entropy", color="orange")
+    ax1_4 = ax.twinx()
+    ax1_4.spines['right'].set_position(('outward', 120))
+    c1_4, = ax1_4.plot(convergence_curve["log_likelihood_history"], label="Log Likelihood", color="green")
+    ax.set_xlabel("Checkpoints")
+    
+    # Apply integer ticks
+    set_integer_xticks(ax, 50)
 
+    ax.set_xlim(0, len(convergence_curve["perplexity_history"]))
+    
+    ax.set_ylabel("Perplexity")
+    ax1_2.set_ylabel("Topic Entropy")
+    ax1_3.set_ylabel("Document Entropy")
+    ax1_4.set_ylabel("Log Likelihood")
+
+    # Coloring the axes to match the lines for the third subplot
+    ax1_2.tick_params(axis='y', colors=c1_2.get_color())
+    ax1_3.tick_params(axis='y', colors=c1_3.get_color())
+    ax1_4.tick_params(axis='y', colors=c1_4.get_color())
+    ax1_2.yaxis.label.set_color(c1_2.get_color())
+    ax1_3.yaxis.label.set_color(c1_3.get_color())
+    ax1_4.yaxis.label.set_color(c1_4.get_color())
+
+    # Adding legends
+    #ax.legend(handles=[c1_1, c1_2, c1_3], loc='best')
+    
+    # Add a shared header for all three plots
+    fig.suptitle('Different Convergence Curves', fontsize=16)
+    fig.subplots_adjust(top=0.85, bottom=0.2)
+    #plt.tight_layout() 
+    return fig
 
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -300,8 +326,10 @@ def show_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, sa
 
         if savefig:
             plt.savefig(f"{savefig}/motif_{m}.png", format="png", dpi=400)
+            plt.close()
         # Show the plot
-        plt.show()
+    
+
 
 def compare_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, valid_spectra, valid_mols, savefig=None):
 
@@ -373,59 +401,26 @@ def compare_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles,
         plt.show()
 
 
-def plot_convergence(convergence_curve):
-    fig, ax = plt.subplots(figsize=(15, 5), nrows=1, ncols=1, sharey=True, sharex=False)
+if __name__ == "__main__":
+    from matchms import Spectrum
+    from matchms.filtering import add_losses
+    import numpy as np
+    spectrum_1 = Spectrum(mz=np.array([100, 150, 200.]),
+                      intensities=np.array([0.7, 0.2, 0.1]),
+                      metadata={'id': 'spectrum1',
+                                'precursor_mz': 201.})
+    spectrum_2 = Spectrum(mz=np.array([100, 140, 190.]),
+                        intensities=np.array([0.4, 0.2, 0.1]),
+                        metadata={'id': 'spectrum2',
+                                  'precursor_mz': 233.})
+    spectrum_3 = Spectrum(mz=np.array([110, 140, 195.]),
+                        intensities=np.array([0.6, 0.2, 0.1]),
+                        metadata={'id': 'spectrum3',
+                                  'precursor_mz': 214.})
+    spectrum_4 = Spectrum(mz=np.array([100, 150, 200.]),
+                        intensities=np.array([0.6, 0.1, 0.6]),
+                        metadata={'id': 'spectrum4',
+                                  'precursor_mz': 265.})
     
-    # --- Helper function to filter out non-integer ticks ---
-    def set_integer_xticks(ax, step_size):
-        # Get current x-ticks and filter out non-integer values
-        xticks = ax.get_xticks()
-        xticks_int = xticks[xticks % 1 == 0].astype(int)  # Only keep whole numbers
-        ax.set_xticks(xticks_int)
-        ax.set_xticklabels(xticks_int)
-        
-        # Set iterations on the secondary x-axis (below the plot)
-        ax_x = ax.secondary_xaxis(-0.15)
-        ax_x.set_xticks(xticks_int)
-        ax_x.set_xticklabels((xticks_int * step_size).astype(int))
-        ax_x.set_xlabel("Iterations")
-    
-    # --- Plot for the first subplot (left side) ---
-    c1_1, = ax.plot(convergence_curve[0], label="Perplexity Score", color="black")
-    ax1_2 = ax.twinx()
-    c1_2, = ax1_2.plot(convergence_curve[1], label="Topic Entropy", color="blue")
-    ax1_3 = ax.twinx()
-    ax1_3.spines['right'].set_position(('outward', 60))
-    c1_3, = ax1_3.plot(convergence_curve[2], label="Document Entropy", color="orange")
-    ax1_4 = ax.twinx()
-    ax1_4.spines['right'].set_position(('outward', 120))
-    c1_4, = ax1_4.plot(convergence_curve[3], label="Log Likelihood", color="green")
-    ax.set_xlabel("Checkpoints")
-    
-    # Apply integer ticks
-    set_integer_xticks(ax, 50)
-
-    ax.set_xlim(0, len(convergence_curve[0]))
-    
-    ax.set_ylabel("Perplexity")
-    ax1_2.set_ylabel("Topic Entropy")
-    ax1_3.set_ylabel("Document Entropy")
-    ax1_4.set_ylabel("Log Likelihood")
-
-    # Coloring the axes to match the lines for the third subplot
-    ax1_2.tick_params(axis='y', colors=c1_2.get_color())
-    ax1_3.tick_params(axis='y', colors=c1_3.get_color())
-    ax1_4.tick_params(axis='y', colors=c1_4.get_color())
-    ax1_2.yaxis.label.set_color(c1_2.get_color())
-    ax1_3.yaxis.label.set_color(c1_3.get_color())
-    ax1_4.yaxis.label.set_color(c1_4.get_color())
-
-    # Adding legends
-    #ax.legend(handles=[c1_1, c1_2, c1_3], loc='best')
-    
-    # Add a shared header for all three plots
-    fig.suptitle('Different Convergence Curves', fontsize=16)
-    plt.tight_layout() 
-    plt.savefig("ms2lda_onvergence.png", dpi=300) 
-    plt.show()
-    return fig
+    spectra = [add_losses(spectrum_1), add_losses(spectrum_2), add_losses(spectrum_3), add_losses(spectrum_4)]
+    create_network(spectra)

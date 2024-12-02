@@ -412,7 +412,9 @@ def motif_optimization(motif_spectra, clustered_spectra, clustered_smiles, loss_
     opt_motif_spectra = []
     for motif_spec, spec, smiles_cluster in zip(motif_spectra, clustered_spectra, clustered_smiles):
         opt_motif_spec = optimize_motif_spectrum(motif_spec, spec, smiles_cluster, loss_err=1)
-    opt_motif_spectra.append(opt_motif_spec)
+        opt_motif_spectra.append(opt_motif_spec)
+
+    return opt_motif_spectra
 
 
 
