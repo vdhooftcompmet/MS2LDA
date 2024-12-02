@@ -28,6 +28,11 @@ from MS2LDA.running import generate_motifs
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
 from MS2LDA.Preprocessing.generate_corpus import features_to_words, combine_features
 
+import plotly.express as px
+import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+import io
+
 # Initialize the Dash app
 app = dash.Dash(
     __name__,
@@ -52,7 +57,7 @@ app.layout = dbc.Container(
             children=[
                 dcc.Tab(label="Run Analysis", value="run-analysis-tab", id="run-analysis-tab"),
                 dcc.Tab(label="Load Results", value="load-results-tab", id="load-results-tab"),
-                dcc.Tab(label="View Results", value="results-tab", id="results-tab"),
+                dcc.Tab(label="View Network", value="results-tab", id="results-tab"),
                 dcc.Tab(label="Motif Rankings", value="motif-rankings-tab", id="motif-rankings-tab"),
                 dcc.Tab(label="Motif Details", value="motif-details-tab", id="motif-details-tab"),
             ],
@@ -311,6 +316,25 @@ app.layout = dbc.Container(
             children=[
                 html.H3(id='motif-details-title'),
                 html.Div(id='motif-details-content'),
+                dcc.Store(id='motif-spectra-ids-store'),
+                dcc.Store(id='selected-spectrum-index', data=0),
+                html.Div(id='spectrum-plot'),
+                # Placeholder for spectra-table
+                dash_table.DataTable(
+                    id='spectra-table',
+                    data=[],  # Empty data
+                    columns=[],
+                    style_table={'overflowX': 'auto'},
+                    style_cell={'textAlign': 'left'},
+                    page_size=10,
+                    row_selectable='single',
+                    selected_rows=[0],
+                ),
+                # Next and Previous buttons
+                html.Div([
+                    dbc.Button('Previous', id='prev-spectrum', n_clicks=0),
+                    dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ml-2'),
+                ], className='mb-2'),
             ],
             style={"display": "none"},  # Initially hidden
         ),
@@ -319,6 +343,7 @@ app.layout = dbc.Container(
         dcc.Store(id="optimized-motifs-store"),
         dcc.Store(id="lda-dict-store"),
         dcc.Store(id='selected-motif-store'),
+        dcc.Store(id='spectra-store'),
         # Include Download component
         dcc.Download(id="download-results"),
     ],
@@ -373,6 +398,7 @@ def update_output(contents, filename):
     Output("clustered-smiles-store", "data"),
     Output("optimized-motifs-store", "data"),
     Output("lda-dict-store", "data"),
+    Output('spectra-store', 'data'),
     Input("run-button", "n_clicks"),
     Input("load-results-button", "n_clicks"),
     State("upload-data", "contents"),
@@ -410,6 +436,7 @@ def handle_run_or_load(
     clustered_smiles_data = dash.no_update
     optimized_motifs_data = dash.no_update
     lda_dict_data = dash.no_update
+    spectra_data = dash.no_update
 
     if triggered_id == 'run-button':
         # Handle Run Analysis
@@ -423,6 +450,7 @@ def handle_run_or_load(
                 clustered_smiles_data,
                 optimized_motifs_data,
                 lda_dict_data,
+                spectra_data,
             )
 
         # Decode the uploaded file
@@ -439,6 +467,7 @@ def handle_run_or_load(
                 clustered_smiles_data,
                 optimized_motifs_data,
                 lda_dict_data,
+                spectra_data,
             )
 
         # Save the uploaded file to a temporary file
@@ -458,6 +487,7 @@ def handle_run_or_load(
                 clustered_smiles_data,
                 optimized_motifs_data,
                 lda_dict_data,
+                spectra_data,
             )
 
         try:
@@ -532,9 +562,10 @@ def handle_run_or_load(
             clustered_smiles_data = clustered_smiles  # list of lists
             optimized_motifs_data = [spectrum_to_dict(s) for s in optimized_motifs]
             lda_dict_data = lda_dict  # Store lda_dict
+            spectra_data = [spectrum_to_dict(s) for s in cleaned_spectra]
 
             run_status = dbc.Alert(
-                "Analysis Completed Successfully! Switch to the 'View Results', 'Motif Rankings', or 'Motif Details' tab to view.",
+                "Analysis Completed Successfully! Switch to the 'View Network' or 'Motif Rankings' to view.",
                 color="success",
             )
 
@@ -544,6 +575,7 @@ def handle_run_or_load(
                 clustered_smiles_data,
                 optimized_motifs_data,
                 lda_dict_data,
+                spectra_data,
             )
 
         except Exception as e:
@@ -554,6 +586,7 @@ def handle_run_or_load(
                 clustered_smiles_data,
                 optimized_motifs_data,
                 lda_dict_data,
+                spectra_data,
             )
 
     elif triggered_id == 'load-results-button':
@@ -568,6 +601,7 @@ def handle_run_or_load(
                 clustered_smiles_data,
                 optimized_motifs_data,
                 lda_dict_data,
+                spectra_data,
             )
 
         # Decode the uploaded file
@@ -585,10 +619,11 @@ def handle_run_or_load(
                 clustered_smiles_data,
                 optimized_motifs_data,
                 lda_dict_data,
+                spectra_data,
             )
 
         # Validate the presence of required keys
-        if 'clustered_smiles_data' not in data or 'optimized_motifs_data' not in data or 'lda_dict' not in data:
+        if 'clustered_smiles_data' not in data or 'optimized_motifs_data' not in data or 'lda_dict' not in data or 'spectra_data' not in data:
             load_status = dbc.Alert(
                 "Invalid file format. Missing required data.", color="danger"
             )
@@ -598,12 +633,14 @@ def handle_run_or_load(
                 clustered_smiles_data,
                 optimized_motifs_data,
                 lda_dict_data,
+                spectra_data,
             )
 
         try:
             clustered_smiles_data = data['clustered_smiles_data']
             optimized_motifs_data = data['optimized_motifs_data']
             lda_dict_data = data['lda_dict']
+            spectra_data = data['spectra_data']
         except Exception as e:
             load_status = dbc.Alert(
                 f"Error extracting data from the file: {str(e)}", color="danger"
@@ -614,6 +651,7 @@ def handle_run_or_load(
                 clustered_smiles_data,
                 optimized_motifs_data,
                 lda_dict_data,
+                spectra_data,
             )
 
         load_status = dbc.Alert(
@@ -627,6 +665,7 @@ def handle_run_or_load(
             clustered_smiles_data,
             optimized_motifs_data,
             lda_dict_data,
+            spectra_data,
         )
 
     else:
@@ -640,13 +679,14 @@ def handle_run_or_load(
     State("clustered-smiles-store", "data"),
     State("optimized-motifs-store", "data"),
     State("lda-dict-store", "data"),
+    State('spectra-store', "data"),
     prevent_initial_call=True,
 )
-def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data, lda_dict):
+def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data, lda_dict, spectra_data):
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
 
-    if not clustered_smiles_data or not optimized_motifs_data or not lda_dict:
+    if not clustered_smiles_data or not optimized_motifs_data or not lda_dict or not spectra_data:
         return (
             dash.no_update,
             dbc.Alert(
@@ -659,6 +699,7 @@ def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data, lda_dic
             'clustered_smiles_data': clustered_smiles_data,
             'optimized_motifs_data': optimized_motifs_data,
             'lda_dict': lda_dict,
+            'spectra_data': spectra_data,
         }
         json_data = json.dumps(data)
         return dcc.send_string(json_data, filename="ms2lda_results.json"), dbc.Alert(
@@ -1031,22 +1072,30 @@ def activate_motif_details_tab(selected_motif):
     else:
         return dash.no_update
 
+
 # Callback to populate Motif Details tab
 @app.callback(
     Output('motif-details-title', 'children'),
     Output('motif-details-content', 'children'),
+    Output('motif-spectra-ids-store', 'data'),
+    Output('spectra-table', 'data'),
+    Output('spectra-table', 'columns'),
     Input('selected-motif-store', 'data'),
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
+    State('spectra-store', 'data'),
     prevent_initial_call=True,
 )
-def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data):
+def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, spectra_data):
     if not selected_motif or not lda_dict_data:
-        return '', ''
+        # Return empty placeholders
+        return '', [], [], [], []
     motif_name = selected_motif
     motif_data = lda_dict_data['beta'].get(motif_name, {})
     total_prob = sum(motif_data.values())
     content = []
+
+    # Features table
     feature_table = pd.DataFrame({
         'Feature': motif_data.keys(),
         'Probability': motif_data.values(),
@@ -1059,35 +1108,111 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data):
         ],
         style_table={'overflowX': 'auto'},
         style_cell={'textAlign': 'left'},
-        page_size=20,
+        page_size=10,
     )
     content.append(html.H5('Features Explained by This Motif'))
     content.append(feature_table_component)
     content.append(html.P(f'Total Probability in this Motif: {total_prob:.4f}'))
-    spectra_data = []
+
+    # Prepare spectra data
+    spectra_data_list = []
     for doc, topics in lda_dict_data['theta'].items():
         prob = topics.get(motif_name, 0)
         if prob > 0:
             overlap = lda_dict_data['overlap_scores'][doc].get(motif_name, 0)
-            spectra_data.append({
+            spectra_data_list.append({
                 'Spectrum': doc,
                 'Probability': prob,
                 'Overlap Score': overlap,
             })
-    spectra_df = pd.DataFrame(spectra_data).sort_values(by='Probability', ascending=False)
-    spectra_table_component = dash_table.DataTable(
-        data=spectra_df.to_dict('records'),
-        columns=[
-            {'name': 'Spectrum', 'id': 'Spectrum'},
-            {'name': 'Probability', 'id': 'Probability', 'type': 'numeric', 'format': {'specifier': '.4f'}},
-            {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
-        ],
-        style_table={'overflowX': 'auto'},
-        style_cell={'textAlign': 'left'},
-        page_size=20,
+    spectra_df = pd.DataFrame(spectra_data_list).sort_values(by='Probability', ascending=False)
+
+    # Prepare data and columns for spectra-table
+    spectra_table_data = spectra_df.to_dict('records')
+    spectra_table_columns = [
+        {'name': 'Spectrum', 'id': 'Spectrum'},
+        {'name': 'Probability', 'id': 'Probability', 'type': 'numeric', 'format': {'specifier': '.4f'}},
+        {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
+    ]
+
+    # Compute data for bar plots
+    features_in_motif = list(motif_data.keys())
+    total_feature_probs = {feature: 0.0 for feature in features_in_motif}
+    for motif, feature_probs in lda_dict_data['beta'].items():
+        for feature, prob in feature_probs.items():
+            if feature in total_feature_probs:
+                total_feature_probs[feature] += prob
+
+    barplot1_df = pd.DataFrame({
+        'Feature': features_in_motif,
+        'Probability in Motif': [motif_data[feature] for feature in features_in_motif],
+        'Total Probability': [total_feature_probs[feature] for feature in features_in_motif],
+    })
+
+    # Limit to top 10 items based on 'Probability in Motif'
+    barplot1_df = barplot1_df.sort_values(by='Probability in Motif', ascending=False).head(10)
+
+    # Melt the dataframe to long format for grouped bar chart
+    barplot1_df_long = pd.melt(
+        barplot1_df,
+        id_vars='Feature',
+        value_vars=['Total Probability', 'Probability in Motif'],
+        var_name='Type',
+        value_name='Probability'
     )
-    content.append(html.H5('Spectra Explained by This Motif'))
-    content.append(spectra_table_component)
+
+    # Create horizontal bar plot
+    barplot1_fig = px.bar(
+        barplot1_df_long,
+        x='Probability',
+        y='Feature',
+        color='Type',
+        orientation='h',
+        barmode='group',
+        title='Proportion of Total Intensity Explained by This Motif (Top 10 Features)',
+    )
+    barplot1_fig.update_layout(
+        yaxis={'categoryorder': 'total ascending'},
+        xaxis_title='Probability',
+        yaxis_title='Feature',
+        legend_title='',
+    )
+
+    # Second bar plot data
+    feature_counts = {feature: 0 for feature in features_in_motif}
+    for doc in spectra_df['Spectrum']:
+        doc_features = lda_dict_data['corpus'].get(doc, {}).keys()
+        for feature in features_in_motif:
+            if feature in doc_features:
+                feature_counts[feature] += 1
+
+    barplot2_df = pd.DataFrame({
+        'Feature': features_in_motif,
+        'Count': [feature_counts[feature] for feature in features_in_motif],
+    })
+
+    # Limit to top 10 items based on 'Count'
+    barplot2_df = barplot2_df.sort_values(by='Count', ascending=False).head(10)
+
+    # Create horizontal bar plot
+    barplot2_fig = px.bar(
+        barplot2_df,
+        x='Count',
+        y='Feature',
+        orientation='h',
+        title='Counts of Features in Documents Associated with This Motif (Top 10 Features)',
+    )
+    barplot2_fig.update_layout(
+        yaxis={'categoryorder': 'total ascending'},
+        xaxis_title='Count',
+        yaxis_title='Feature',
+    )
+
+    content.append(html.H5('Counts of Mass2Motif Features'))
+    content.append(dcc.Graph(figure=barplot1_fig))
+    content.append(dcc.Graph(figure=barplot2_fig))
+
+    # Spec2Vec Matching Results
     motif_index = int(motif_name.replace('motif_', ''))
     if clustered_smiles_data and motif_index < len(clustered_smiles_data):
         smiles_list = clustered_smiles_data[motif_index]
@@ -1116,7 +1241,110 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data):
                     src=f"data:image/png;base64,{encoded}",
                     style={"margin": "10px"},
                 ))
-    return f"Motif Details: {motif_name}", content
+    # Get spectra IDs
+    spectra_ids = spectra_df['Spectrum'].tolist()
+    return f"Motif Details: {motif_name}", content, spectra_ids, spectra_table_data, spectra_table_columns
+
+
+# Combined callback to update selected spectrum index
+@app.callback(
+    Output('selected-spectrum-index', 'data'),
+    Input('spectra-table', 'selected_rows'),
+    Input('next-spectrum', 'n_clicks'),
+    Input('prev-spectrum', 'n_clicks'),
+    Input('selected-motif-store', 'data'),
+    State('selected-spectrum-index', 'data'),
+    State('motif-spectra-ids-store', 'data'),
+    prevent_initial_call=True,
+)
+def update_selected_spectrum_index(selected_rows, next_clicks, prev_clicks, selected_motif, current_index, spectra_ids):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise dash.exceptions.PreventUpdate
+
+    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    if triggered_id == 'spectra-table':
+        if selected_rows:
+            return selected_rows[0]
+        else:
+            return current_index
+    elif triggered_id == 'next-spectrum':
+        if current_index < len(spectra_ids) - 1:
+            return current_index + 1
+        else:
+            return current_index  # Already at last spectrum
+    elif triggered_id == 'prev-spectrum':
+        if current_index > 0:
+            return current_index - 1
+        else:
+            return current_index  # Already at first spectrum
+    elif triggered_id == 'selected-motif-store':
+        # Reset index when motif changes
+        return 0
+    else:
+        return current_index
+
+@app.callback(
+    Output('spectrum-plot', 'children'),
+    Input('selected-spectrum-index', 'data'),
+    State('motif-spectra-ids-store', 'data'),
+    State('spectra-store', 'data'),
+    State('lda-dict-store', 'data'),
+    State('selected-motif-store', 'data'),
+)
+def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_data, selected_motif):
+    if spectra_ids and spectra_data and lda_dict_data and selected_motif:
+        if selected_index is None:
+            selected_index = 0
+        spectrum_id = spectra_ids[selected_index]
+        # Find the spectrum data for this spectrum_id
+        spectrum_dict = next((s for s in spectra_data if s['metadata']['id'] == spectrum_id), None)
+        if not spectrum_dict:
+            return html.Div("Spectrum data not found.")
+        # Reconstruct the Spectrum object
+        spectrum = Spectrum(
+            mz=np.array(spectrum_dict['mz']),
+            intensities=np.array(spectrum_dict['intensities']),
+            metadata=spectrum_dict['metadata'],
+        )
+        # Get the features explained by the motif
+        motif_features = lda_dict_data['beta'][selected_motif].keys()
+        # Identify the peaks explained by the motif
+        motif_mz_values = []
+        for feature in motif_features:
+            if feature.startswith('fragment_') or feature.startswith('frag@'):
+                mz_value = float(feature.replace('fragment_', '').replace('frag@', ''))
+                motif_mz_values.append(mz_value)
+        # Create DataFrame for plotting
+        spectrum_df = pd.DataFrame({
+            'mz': spectrum.peaks.mz,
+            'intensity': spectrum.peaks.intensities,
+        })
+        spectrum_df['color'] = 'grey'
+        spectrum_df.loc[spectrum_df['mz'].isin(motif_mz_values), 'color'] = 'red'
+        # Add parent ion
+        precursor_mz = spectrum.get('precursor_mz', None)
+        if precursor_mz:
+            parent_ion_row = pd.DataFrame({'mz': [precursor_mz],
+                                           'intensity': [max(spectrum_df['intensity'])],
+                                           'color': ['blue']})
+            spectrum_df = pd.concat([spectrum_df, parent_ion_row], ignore_index=True)
+        # Create plot
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=spectrum_df['mz'],
+            y=spectrum_df['intensity'],
+            marker_color=spectrum_df['color'],
+            width=1,
+        ))
+        fig.update_layout(
+            title=f"Spectrum: {spectrum_id}",
+            xaxis_title='m/z',
+            yaxis_title='Intensity',
+        )
+        return dcc.Graph(figure=fig)
+    else:
+        return html.Div("No spectrum selected.")
 
 # Run the Dash app
 if __name__ == "__main__":
