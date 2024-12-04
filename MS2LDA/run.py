@@ -84,7 +84,7 @@ def run(dataset, n_motifs, n_iterations,
 
 
 
-def screen_spectra(motifs_stored=None, dataset=None, motif_spectra=None, motifDB=None, motifDB_query=None, s2v_similarity=None, output_folder="MS2LDA_Results"):
+def screen_spectra(motifs_stored=None, dataset=None, motif_spectra=None, motifDB=None, motifDB_query=None, s2v_similarity=None, output_folder="MS2LDA_Results", threshold=0.5):
 
     if not s2v_similarity:
         print("Loading Spec2Vec model ...")
@@ -111,10 +111,10 @@ def screen_spectra(motifs_stored=None, dataset=None, motif_spectra=None, motifDB
     screening_hits_spectra = []
     screening_hits_motifs = []
     if dataset:
-        screening_hits_spectra = spectrum_screening(dataset, motifs_stored, s2v_similarity)
+        screening_hits_spectra = spectrum_screening(dataset, motifs_stored, s2v_similarity, threshold=threshold)
     
     if motif_spectra:
-        screening_hits_motifs = motif_screening(motif_spectra, motifs_stored, s2v_similarity)
+        screening_hits_motifs = motif_screening(motif_spectra, motifs_stored, s2v_similarity, threshold=threshold)
 
     screening_hits = pd.DataFrame(screening_hits_spectra + screening_hits_motifs)
 
@@ -128,7 +128,7 @@ def screen_spectra(motifs_stored=None, dataset=None, motif_spectra=None, motifDB
     return screening_hits
 
 
-def screen_structure(motif_fps, motif_spectra, structure_query, fp_type="rdkit", threshold=0.7, output_folder="MS2LDA_Results"):
+def screen_structure(motif_fps, motif_spectra, structure_query, fp_type="rdkit", output_folder="MS2LDA_Results", threshold=0.7):
     query_fps = []
     for smiles in structure_query:
         query_fp = calc_fingerprints([[smiles]], fp_type=fp_type)
@@ -167,14 +167,6 @@ def generate_output(matching_motif_idx, motif_spectra, tanimoto_scores, structur
         results["Query_Smiles"].append(structure_query[query_idx])
 
     return results
-
-
-
-    
-    
-
-
-    
 
 
 #---------------------------------------------------------------------------------------------#
