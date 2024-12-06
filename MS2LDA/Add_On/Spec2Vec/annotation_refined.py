@@ -131,7 +131,7 @@ def reconstruct_motif_spectrum(opt_motif_fragments_mz, opt_motif_fragments_inten
         intensities = np.array(opt_motif_fragments_intensities),
     )
 
-    if opt_motif_losses_mz:
+    if opt_motif_losses_mz and opt_motif_losses_intensities: # for some reasons it can be that losses have mz but no intensity for large numbers of extracted compounds
         sorted_losses = sorted(zip(opt_motif_losses_mz, opt_motif_losses_intensities))
         opt_motif_losses_mz, opt_motif_losses_intensities = zip(*sorted_losses)
 
