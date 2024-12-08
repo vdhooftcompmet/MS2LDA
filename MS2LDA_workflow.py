@@ -8,9 +8,11 @@ import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import numpy as np
 import pandas as pd
-from dash import html, dcc, Input, Output, State
+import plotly.express as px
+import plotly.graph_objs as go
+
 from dash import dash_table
-from dash.dash_table.Format import Format
+from dash import html, dcc, Input, Output, State
 from matchms import Spectrum, Fragments
 from rdkit.Chem import MolFromSmiles
 
@@ -24,18 +26,10 @@ from MS2LDA.Add_On.Spec2Vec.annotation_refined import (
     hit_clustering,
     optimize_motif_spectrum,
 )
-from MS2LDA.running import generate_motifs
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
-from MS2LDA.Preprocessing.generate_corpus import features_to_words, combine_features
+from MS2LDA.running import generate_motifs
 
-import plotly.express as px
-import plotly.graph_objs as go
-import matplotlib.pyplot as plt
-import io
-
-# ---------------------
-# App Initialization
-# ---------------------
+# Initialize the Dash app
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
@@ -43,11 +37,10 @@ app = dash.Dash(
 )
 app.title = "MS2LDA Interactive Dashboard"
 
+# Include Cytoscape extra layouts
 cyto.load_extra_layouts()
 
-# ---------------------
-# Layout Definition
-# ---------------------
+# Define the layout
 app.layout = dbc.Container(
     [
         html.H1(
@@ -66,6 +59,8 @@ app.layout = dbc.Container(
             ],
             className="mt-3",
         ),
+        # Include all components in the main layout
+        # Group components for each tab in a Div
         html.Div(
             id="run-analysis-tab-content",
             children=[
@@ -232,7 +227,7 @@ app.layout = dbc.Container(
                                     id="cytoscape-network-container",
                                     style={
                                         "marginTop": "20px",
-                                        "height": "600px",
+                                        "height": "600px", # Network height
                                     },
                                 )
                             ],
@@ -246,7 +241,7 @@ app.layout = dbc.Container(
                                         "textAlign": "center",
                                         "marginTop": "20px",
                                         "overflowY": "auto",
-                                        "height": "600px",
+                                        "height": "600px",  # Match network height
                                         "padding": "10px",
                                         "backgroundColor": "#f8f9fa",
                                         "borderRadius": "5px",
@@ -256,8 +251,8 @@ app.layout = dbc.Container(
                             width=4,
                         ),
                     ],
-                    align="start",
-                    className="g-3",
+                    align="start",  # Align items to the top
+                    className="g-3",  # Gap between columns
                 )
             ],
             style={"display": "none"},
@@ -320,9 +315,10 @@ app.layout = dbc.Container(
                 dcc.Store(id='motif-spectra-ids-store'),
                 dcc.Store(id='selected-spectrum-index', data=0),
                 html.Div(id='spectrum-plot'),
+                # Placeholder for spectra-table
                 dash_table.DataTable(
                     id='spectra-table',
-                    data=[],
+                    data=[],  # Empty data
                     columns=[],
                     style_table={'overflowX': 'auto'},
                     style_cell={'textAlign': 'left'},
@@ -330,28 +326,27 @@ app.layout = dbc.Container(
                     row_selectable='single',
                     selected_rows=[0],
                 ),
+                # Next and Previous buttons
                 html.Div([
                     dbc.Button('Previous', id='prev-spectrum', n_clicks=0),
                     dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ml-2'),
                 ], className='mb-2'),
             ],
-            style={"display": "none"},
+            style={"display": "none"},  # Initially hidden
         ),
+        # Hidden storage for data to be accessed by callbacks
         dcc.Store(id="clustered-smiles-store"),
         dcc.Store(id="optimized-motifs-store"),
         dcc.Store(id="lda-dict-store"),
         dcc.Store(id='selected-motif-store'),
         dcc.Store(id='spectra-store'),
+        # Include Download component
         dcc.Download(id="download-results"),
     ],
-    fluid=False,
+    fluid=False,  # Fixed-width container
 )
 
-
-# ---------------------
-# Callbacks
-# ---------------------
-
+# Callback to show/hide tab contents based on active tab
 @app.callback(
     Output("run-analysis-tab-content", "style"),
     Output("load-results-tab-content", "style"),
@@ -361,27 +356,26 @@ app.layout = dbc.Container(
     Input("tabs", "value"),
 )
 def toggle_tab_content(active_tab):
-    styles = {"display": "none"}.copy()
+    run_style = {"display": "none"}
+    load_style = {"display": "none"}
+    results_style = {"display": "none"}
+    motif_rankings_style = {"display": "none"}
+    motif_details_style = {"display": "none"}
+
     if active_tab == "run-analysis-tab":
-        styles["run_analysis"] = {"display": "block"}
+        run_style = {"display": "block"}
     elif active_tab == "load-results-tab":
-        styles["load_results"] = {"display": "block"}
+        load_style = {"display": "block"}
     elif active_tab == "results-tab":
-        styles["results"] = {"display": "block"}
+        results_style = {"display": "block"}
     elif active_tab == "motif-rankings-tab":
-        styles["motif_rankings"] = {"display": "block"}
+        motif_rankings_style = {"display": "block"}
     elif active_tab == "motif-details-tab":
-        styles["motif_details"] = {"display": "block"}
+        motif_details_style = {"display": "block"}
 
-    return (
-        styles.get("run_analysis", {"display": "none"}),
-        styles.get("load_results", {"display": "none"}),
-        styles.get("results", {"display": "none"}),
-        styles.get("motif_rankings", {"display": "none"}),
-        styles.get("motif_details", {"display": "none"}),
-    )
+    return run_style, load_style, results_style, motif_rankings_style, motif_details_style
 
-
+# Callback to display uploaded data file info
 @app.callback(
     Output("file-upload-info", "children"),
     Input("upload-data", "contents"),
@@ -390,9 +384,10 @@ def toggle_tab_content(active_tab):
 def update_output(contents, filename):
     if contents:
         return html.Div([html.H5(f"Uploaded File: {filename}")])
-    return html.Div([html.H5("No file uploaded yet.")])
+    else:
+        return html.Div([html.H5("No file uploaded yet.")])
 
-
+# Callback to handle Run Analysis and Load Results
 @app.callback(
     Output("run-status", "children"),
     Output("load-status", "children"),
@@ -413,23 +408,25 @@ def update_output(contents, filename):
     prevent_initial_call=True,
 )
 def handle_run_or_load(
-        run_clicks,
-        load_clicks,
-        data_contents,
-        data_filename,
-        n_motifs,
-        top_n,
-        unique_mols,
-        polarity,
-        results_contents,
-        results_filename,
+    run_clicks,
+    load_clicks,
+    data_contents,
+    data_filename,
+    n_motifs,
+    top_n,
+    unique_mols,
+    polarity,
+    results_contents,
+    results_filename,
 ):
     ctx = dash.callback_context
 
     if not ctx.triggered:
         raise dash.exceptions.PreventUpdate
-    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    else:
+        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
+    # Initialize outputs
     run_status = dash.no_update
     load_status = dash.no_update
     clustered_smiles_data = dash.no_update
@@ -438,6 +435,7 @@ def handle_run_or_load(
     spectra_data = dash.no_update
 
     if triggered_id == 'run-button':
+        # Handle Run Analysis
         if not data_contents:
             run_status = dbc.Alert(
                 "Please upload a mass spectrometry data file.", color="danger"
@@ -451,6 +449,7 @@ def handle_run_or_load(
                 spectra_data,
             )
 
+        # Decode the uploaded file
         try:
             content_type, content_string = data_contents.split(",")
             decoded = base64.b64decode(content_string)
@@ -467,6 +466,7 @@ def handle_run_or_load(
                 spectra_data,
             )
 
+        # Save the uploaded file to a temporary file
         try:
             with tempfile.NamedTemporaryFile(
                     delete=False, suffix=os.path.splitext(data_filename)[1]
@@ -487,24 +487,29 @@ def handle_run_or_load(
             )
 
         try:
+            # Generate motifs
             motif_spectra, convergence_curve, trained_ms2lda, feature_words, cleaned_spectra = generate_motifs(
                 tmp_file_path, n_motifs=n_motifs, iterations=100
             )
 
+            # Generate lda_dict using the tomotopy model
+            # Construct doc_metadata
             doc_metadata = {}
             for spectrum in cleaned_spectra:
                 doc_name = spectrum.get("id")
                 metadata = spectrum.metadata.copy()
                 doc_metadata[doc_name] = metadata
 
+            # Generate lda_dict
             lda_dict = generate_corpusjson_from_tomotopy(
                 model=trained_ms2lda,
                 documents=feature_words,
                 spectra=cleaned_spectra,
                 doc_metadata=doc_metadata,
-                filename=None
+                filename=None  # Not saving to file here
             )
 
+            # Load Spec2Vec model and library based on polarity
             if polarity == "positive":
                 path_model = (
                     "MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model"
@@ -520,7 +525,10 @@ def handle_run_or_load(
                     "MS2LDA/Add_On/Spec2Vec/model_negative_mode/negative_s2v_library.pkl"
                 )
 
+            # Annotate motifs
             s2v_similarity, library = load_s2v_and_library(path_model, path_library)
+
+            # Calculate embeddings and similarity matrix
             motif_embeddings = calc_embeddings(s2v_similarity, motif_spectra)
             similarity_matrix = calc_similarity(motif_embeddings, library.embeddings)
 
@@ -533,10 +541,12 @@ def handle_run_or_load(
 
             library_matches = get_library_matches(matching_settings)
 
+            # Refine Annotation
             clustered_spectra, clustered_smiles, clustered_scores = hit_clustering(
                 s2v_similarity, motif_spectra, library_matches, criterium="best"
             )
 
+            # Optimize motifs
             optimized_motifs = []
             for motif_spec, spec_list, smiles_list in zip(
                     motif_spectra, clustered_spectra, clustered_smiles
@@ -544,9 +554,10 @@ def handle_run_or_load(
                 opt_motif = optimize_motif_spectrum(motif_spec, spec_list, smiles_list)
                 optimized_motifs.append(opt_motif)
 
-            clustered_smiles_data = clustered_smiles
+            # Store data in dcc.Store components
+            clustered_smiles_data = clustered_smiles  # list of lists
             optimized_motifs_data = [spectrum_to_dict(s) for s in optimized_motifs]
-            lda_dict_data = lda_dict
+            lda_dict_data = lda_dict  # Store lda_dict
             spectra_data = [spectrum_to_dict(s) for s in cleaned_spectra]
 
             run_status = dbc.Alert(
@@ -575,6 +586,7 @@ def handle_run_or_load(
             )
 
     elif triggered_id == 'load-results-button':
+        # Handle Load Results
         if not results_contents:
             load_status = dbc.Alert(
                 "Please upload a results JSON file.", color="danger"
@@ -588,6 +600,7 @@ def handle_run_or_load(
                 spectra_data,
             )
 
+        # Decode the uploaded file
         try:
             content_type, content_string = results_contents.split(',')
             decoded = base64.b64decode(content_string)
@@ -605,8 +618,8 @@ def handle_run_or_load(
                 spectra_data,
             )
 
-        required_keys = {'clustered_smiles_data', 'optimized_motifs_data', 'lda_dict', 'spectra_data'}
-        if not required_keys.issubset(data.keys()):
+        # Validate the presence of required keys
+        if 'clustered_smiles_data' not in data or 'optimized_motifs_data' not in data or 'lda_dict' not in data or 'spectra_data' not in data:
             load_status = dbc.Alert(
                 "Invalid file format. Missing required data.", color="danger"
             )
@@ -650,10 +663,11 @@ def handle_run_or_load(
             lda_dict_data,
             spectra_data,
         )
+
     else:
         raise dash.exceptions.PreventUpdate
 
-
+# Callback to handle Save Results
 @app.callback(
     Output("download-results", "data"),
     Output("save-status", "children"),
@@ -668,7 +682,7 @@ def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data, lda_dic
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
 
-    if not all([clustered_smiles_data, optimized_motifs_data, lda_dict, spectra_data]):
+    if not clustered_smiles_data or not optimized_motifs_data or not lda_dict or not spectra_data:
         return (
             dash.no_update,
             dbc.Alert(
@@ -695,7 +709,7 @@ def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data, lda_dic
             ),
         )
 
-
+# Helper function to convert Spectrum to dict (for serialization)
 def spectrum_to_dict(spectrum):
     return {
         "metadata": spectrum.metadata,
@@ -705,7 +719,7 @@ def spectrum_to_dict(spectrum):
         "losses_intensities": [float(i) for i in spectrum.losses.intensities.tolist()] if spectrum.losses else [],
     }
 
-
+# Updated Callback to create Cytoscape elements
 @app.callback(
     Output("cytoscape-network-container", "children"),
     Input("optimized-motifs-store", "data"),
@@ -714,8 +728,10 @@ def spectrum_to_dict(spectrum):
 )
 def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
     if active_tab != "results-tab" or not optimized_motifs_data:
+        # Hide the Cytoscape component when not on the results tab or no data
         return ""
 
+    # Reconstruct spectra from stored data
     spectra = []
     for s in optimized_motifs_data:
         spectrum = Spectrum(
@@ -733,18 +749,20 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
         spectra.append(spectrum)
 
     smiles_clusters = clustered_smiles_data
+
     elements = create_cytoscape_elements(spectra, smiles_clusters)
 
     cytoscape_component = cyto.Cytoscape(
         id="cytoscape-network",
         elements=elements,
-        style={"width": "100%", "height": "100%"},
-        layout={"name": "cose", "animate": False},
+        style={"width": "100%", "height": "100%"},  # Full height of the column
+        layout={"name": "cose", "animate": False},  # Set animate to False for faster rendering
         stylesheet=[
+            # Motif Nodes
             {
                 "selector": 'node[type="motif"]',
                 "style": {
-                    "background-color": "#00008B",
+                    "background-color": "#00008B",  # Dark Blue
                     "label": "data(label)",
                     "text-background-color": "white",
                     "text-background-opacity": 0.7,
@@ -754,14 +772,15 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
                     "text-border-width": 1,
                     "text-valign": "top",
                     "text-halign": "center",
-                    "color": "black",
+                    "color": "black",  # Text color
                     "font-size": "10px",
                 },
             },
+            # Fragment and Loss Nodes
             {
                 "selector": 'node[type="fragment"]',
                 "style": {
-                    "background-color": "#008000",
+                    "background-color": "#008000",  # Green
                     "label": "data(label)",
                     "text-background-color": "white",
                     "text-background-opacity": 0.7,
@@ -771,20 +790,22 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
                     "text-border-width": 1,
                     "text-valign": "top",
                     "text-halign": "center",
-                    "color": "black",
+                    "color": "black",  # Text color
                     "font-size": "8px",
                 },
             },
+            # Edges
             {
                 "selector": "edge",
                 "style": {
                     "line-color": "red",
                     "opacity": 0.5,
-                    "width": "mapData(weight, 0, 1, 1, 10)",
+                    "width": "mapData(weight, 0, 1, 1, 10)",  # Adjust based on actual weight range
                     "target-arrow-shape": "none",
                     "curve-style": "bezier",
                 },
             },
+            # General Node Style (if needed)
             {
                 "selector": "node",
                 "style": {
@@ -796,7 +817,7 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
 
     return cytoscape_component
 
-
+# Callback to display molecule images
 @app.callback(
     Output("molecule-images", "children"),
     Input("cytoscape-network", "tapNodeData"),
@@ -808,14 +829,15 @@ def display_molecule_images(nodeData, clustered_smiles_data):
         if motif_number < len(clustered_smiles_data):
             smiles_list = clustered_smiles_data[motif_number]
 
+            # Create molecules, making sure to filter out None results
             mols = []
             for smi in smiles_list:
                 try:
                     mol = MolFromSmiles(smi)
                     if mol is not None:
                         mols.append(mol)
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"Error converting SMILES {smi}: {str(e)}")
 
             if not mols:
                 return dbc.Alert(
@@ -824,15 +846,18 @@ def display_molecule_images(nodeData, clustered_smiles_data):
                 )
 
             try:
+                # Create grid image with legends
                 legends = [f"Match {i + 1}" for i in range(len(mols))]
                 from rdkit.Chem import Draw
                 img = Draw.MolsToGridImage(
                     mols,
-                    molsPerRow=1,
+                    molsPerRow=1,  # Set to 1 for vertical stacking
                     subImgSize=(200, 200),
                     legends=legends,
-                    returnPNG=True
+                    returnPNG=True  # This is important!
                 )
+
+                # Image is already in PNG format, just need to encode
                 encoded = base64.b64encode(img).decode("utf-8")
 
                 return html.Div([
@@ -843,19 +868,34 @@ def display_molecule_images(nodeData, clustered_smiles_data):
                     ),
                 ])
 
-            except Exception:
+            except Exception as e:
+                print(f"Error creating grid image: {str(e)}")
                 return dbc.Alert(
-                    "Error creating molecular grid image.",
+                    f"Error creating molecular grid image: {str(e)}",
                     color="danger"
                 )
 
         return dbc.Alert("Motif number out of range.", color="danger")
 
-    return ""
+    return ""  # Return empty for non-motif nodes
 
 
 def create_cytoscape_elements(spectra, smiles_clusters):
     elements = []
+    colors = [
+        "#FF5733",
+        "#33FF57",
+        "#3357FF",
+        "#F333FF",
+        "#FF33A8",
+        "#33FFF5",
+        "#F5FF33",
+        "#A833FF",
+        "#FF8633",
+        "#33FF86",
+    ]  # Add more colors if needed
+
+    # Sets to keep track of created fragment and loss nodes
     created_fragments = set()
     created_losses = set()
 
@@ -871,6 +911,7 @@ def create_cytoscape_elements(spectra, smiles_clusters):
             }
         )
 
+        # Add fragment nodes and edges
         for mz, intensity in zip(spectrum.peaks.mz, spectrum.peaks.intensities):
             rounded_mz = round(mz, 2)
             frag_node = f"frag_{rounded_mz}"
@@ -890,11 +931,12 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                     "data": {
                         "source": motif_node,
                         "target": frag_node,
-                        "weight": intensity,
+                        "weight": intensity,  # Use intensity as weight
                     }
                 }
             )
 
+        # Add loss nodes and edges
         if spectrum.losses is not None:
             for mz, intensity in zip(spectrum.losses.mz, spectrum.losses.intensities):
                 rounded_mz = round(mz, 2)
@@ -915,14 +957,14 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                         "data": {
                             "source": motif_node,
                             "target": loss_node,
-                            "weight": intensity,
+                            "weight": intensity,  # Use intensity as weight
                         }
                     }
                 )
 
     return elements
 
-
+# Callback to update the Motif Rankings
 @app.callback(
     Output('motif-rankings-content', 'children'),
     Input('lda-dict-store', 'data'),
@@ -934,6 +976,7 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
     if active_tab != 'motif-rankings-tab' or not lda_dict_data:
         return ""
 
+    # Updated compute_motif_degrees function
     def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
         motifs = lda_dict["beta"].keys()
         motif_degrees = {m: 0 for m in motifs}
@@ -954,8 +997,11 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
         return md
 
     motif_degree_list = compute_motif_degrees(lda_dict_data, probability_thresh, overlap_thresh)
+
+    # Prepare DataTable data
     df = pd.DataFrame(motif_degree_list, columns=['Motif', 'Degree', 'Overlap Score'])
 
+    # Add motif annotations if available
     motif_annotations = {}
     if 'topic_metadata' in lda_dict_data:
         for motif, metadata in lda_dict_data['topic_metadata'].items():
@@ -963,7 +1009,8 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
 
     df['Annotation'] = df['Motif'].map(motif_annotations)
 
-    style_data_conditional = [
+    # Style to make the 'Motif' column look clickable
+    style_data_conditional=[
         {
             'if': {'column_id': 'Motif'},
             'cursor': 'pointer',
@@ -972,6 +1019,7 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
         },
     ]
 
+    # Create DataTable
     table = dash_table.DataTable(
         id='motif-rankings-table',
         data=df.to_dict('records'),
@@ -994,7 +1042,7 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
 
     return table
 
-
+# Callback to store selected motif
 @app.callback(
     Output('selected-motif-store', 'data'),
     Input('motif-rankings-table', 'active_cell'),
@@ -1007,7 +1055,7 @@ def on_motif_click(active_cell, table_data):
         return motif
     return dash.no_update
 
-
+# Callback to activate Motif Details tab
 @app.callback(
     Output('tabs', 'value'),
     Input('selected-motif-store', 'data'),
@@ -1016,9 +1064,11 @@ def on_motif_click(active_cell, table_data):
 def activate_motif_details_tab(selected_motif):
     if selected_motif:
         return 'motif-details-tab'
-    return dash.no_update
+    else:
+        return dash.no_update
 
 
+# Callback to populate Motif Details tab
 @app.callback(
     Output('motif-details-title', 'children'),
     Output('motif-details-content', 'children'),
@@ -1033,12 +1083,14 @@ def activate_motif_details_tab(selected_motif):
 )
 def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, spectra_data):
     if not selected_motif or not lda_dict_data:
+        # Return empty placeholders
         return '', [], [], [], []
     motif_name = selected_motif
     motif_data = lda_dict_data['beta'].get(motif_name, {})
     total_prob = sum(motif_data.values())
     content = []
 
+    # Features table
     feature_table = pd.DataFrame({
         'Feature': motif_data.keys(),
         'Probability': motif_data.values(),
@@ -1057,6 +1109,7 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
     content.append(feature_table_component)
     content.append(html.P(f'Total Probability in this Motif: {total_prob:.4f}'))
 
+    # Prepare spectra data
     spectra_data_list = []
     for doc, topics in lda_dict_data['theta'].items():
         prob = topics.get(motif_name, 0)
@@ -1069,6 +1122,7 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
             })
     spectra_df = pd.DataFrame(spectra_data_list).sort_values(by='Probability', ascending=False)
 
+    # Prepare data and columns for spectra-table
     spectra_table_data = spectra_df.to_dict('records')
     spectra_table_columns = [
         {'name': 'Spectrum', 'id': 'Spectrum'},
@@ -1076,6 +1130,7 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
         {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
     ]
 
+    # Compute data for bar plots
     features_in_motif = list(motif_data.keys())
     total_feature_probs = {feature: 0.0 for feature in features_in_motif}
     for motif, feature_probs in lda_dict_data['beta'].items():
@@ -1088,7 +1143,11 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
         'Probability in Motif': [motif_data[feature] for feature in features_in_motif],
         'Total Probability': [total_feature_probs[feature] for feature in features_in_motif],
     })
+
+    # Limit to top 10 items based on 'Probability in Motif'
     barplot1_df = barplot1_df.sort_values(by='Probability in Motif', ascending=False).head(10)
+
+    # Melt the dataframe to long format for grouped bar chart
     barplot1_df_long = pd.melt(
         barplot1_df,
         id_vars='Feature',
@@ -1097,12 +1156,14 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
         value_name='Probability'
     )
 
+    # Create horizontal bar plot
     barplot1_fig = px.bar(
         barplot1_df_long,
         x='Probability',
         y='Feature',
         color='Type',
         orientation='h',
+        barmode='group',
         title='Proportion of Total Intensity Explained by This Motif (Top 10 Features)',
     )
     barplot1_fig.update_layout(
@@ -1112,6 +1173,7 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
         legend_title='',
     )
 
+    # Second bar plot data
     feature_counts = {feature: 0 for feature in features_in_motif}
     for doc in spectra_df['Spectrum']:
         doc_features = lda_dict_data['corpus'].get(doc, {}).keys()
@@ -1123,8 +1185,11 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
         'Feature': features_in_motif,
         'Count': [feature_counts[feature] for feature in features_in_motif],
     })
+
+    # Limit to top 10 items based on 'Count'
     barplot2_df = barplot2_df.sort_values(by='Count', ascending=False).head(10)
 
+    # Create horizontal bar plot
     barplot2_fig = px.bar(
         barplot2_df,
         x='Count',
@@ -1142,6 +1207,7 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
     content.append(dcc.Graph(figure=barplot1_fig))
     content.append(dcc.Graph(figure=barplot2_fig))
 
+    # Spec2Vec Matching Results
     motif_index = int(motif_name.replace('motif_', ''))
     if clustered_smiles_data and motif_index < len(clustered_smiles_data):
         smiles_list = clustered_smiles_data[motif_index]
@@ -1153,8 +1219,8 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
                     mol = MolFromSmiles(smi)
                     if mol is not None:
                         mols.append(mol)
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"Error converting SMILES {smi}: {str(e)}")
             if mols:
                 legends = [f"Match {i + 1}" for i in range(len(mols))]
                 from rdkit.Chem import Draw
@@ -1170,10 +1236,13 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
                     src=f"data:image/png;base64,{encoded}",
                     style={"margin": "10px"},
                 ))
+    # Get spectra IDs
     spectra_ids = spectra_df['Spectrum'].tolist()
     return f"Motif Details: {motif_name}", content, spectra_ids, spectra_table_data, spectra_table_columns
 
 
+# **FIX FOR INITIAL SPECTRUM DISPLAY AND Syncing Selected Rows with Spectrum Index**
+# Combine updating 'selected-spectrum-index' and 'spectra-table.selected_rows' into a single callback to avoid dependency cycles
 @app.callback(
     Output('selected-spectrum-index', 'data'),
     Output('spectra-table', 'selected_rows'),
@@ -1186,8 +1255,7 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
     State('motif-spectra-ids-store', 'data'),
     prevent_initial_call=True,
 )
-def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_motif, motif_spectra_ids, current_index,
-                             spectra_ids):
+def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_motif, motif_spectra_ids, current_index, spectra_ids):
     ctx = dash.callback_context
     if not ctx.triggered:
         raise dash.exceptions.PreventUpdate
@@ -1198,26 +1266,31 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
         if selected_rows:
             new_index = selected_rows[0]
             return new_index, selected_rows
-        return current_index, dash.no_update
+        else:
+            return current_index, dash.no_update
 
     elif triggered_id == 'next-spectrum':
         if spectra_ids and current_index < len(spectra_ids) - 1:
             new_index = current_index + 1
             return new_index, [new_index]
-        return current_index, dash.no_update
+        else:
+            return current_index, dash.no_update  # Already at last spectrum
 
     elif triggered_id == 'prev-spectrum':
         if spectra_ids and current_index > 0:
             new_index = current_index - 1
             return new_index, [new_index]
-        return current_index, dash.no_update
+        else:
+            return current_index, dash.no_update  # Already at first spectrum
 
-    elif triggered_id in ['selected-motif-store', 'motif-spectra-ids-store']:
+    elif triggered_id == 'selected-motif-store' or triggered_id == 'motif-spectra-ids-store':
+        # Reset index when motif changes or spectra IDs are updated
         return 0, [0]
 
-    return current_index, dash.no_update
+    else:
+        return current_index, dash.no_update
 
-
+# Callback to update the spectrum plot based on selected-spectrum-index
 @app.callback(
     Output('spectrum-plot', 'children'),
     Input('selected-spectrum-index', 'data'),
@@ -1228,20 +1301,25 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
 )
 def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_data, selected_motif):
     if spectra_ids and spectra_data and lda_dict_data and selected_motif:
+        # Validate selected_index
         if selected_index is None or selected_index < 0 or selected_index >= len(spectra_ids):
             return html.Div("Selected spectrum index is out of range.")
 
         spectrum_id = spectra_ids[selected_index]
+
+        # Retrieve the spectrum data based on spectrum_id
         spectrum_dict = next((s for s in spectra_data if s['metadata']['id'] == spectrum_id), None)
         if not spectrum_dict:
             return html.Div("Spectrum data not found.")
 
+        # Reconstruct the Spectrum object
         spectrum = Spectrum(
             mz=np.array(spectrum_dict['mz']),
             intensities=np.array(spectrum_dict['intensities']),
             metadata=spectrum_dict['metadata'],
         )
 
+        # Extract motif-associated features
         motif_features = lda_dict_data['beta'].get(selected_motif, {}).keys()
         motif_mz_values = []
         for feature in motif_features:
@@ -1250,117 +1328,115 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
                     mz_value = float(feature.replace('fragment_', '').replace('frag@', ''))
                     motif_mz_values.append(mz_value)
                 except ValueError:
-                    continue
+                    continue  # Skip invalid entries
 
+        # Create DataFrame for plotting
         spectrum_df = pd.DataFrame({
             'mz': spectrum.peaks.mz,
             'intensity': spectrum.peaks.intensities,
         })
-        spectrum_df['color'] = 'grey'
 
-        tolerance = 0.1
-        bright_red = '#FF0000'
+        # Identify motif peaks within a tolerance
+        tolerance = 0.1  # m/z tolerance for matching
+        spectrum_df['is_motif'] = False
         for mz in motif_mz_values:
             mask = np.abs(spectrum_df['mz'] - mz) <= tolerance
-            spectrum_df.loc[mask, 'color'] = bright_red
+            spectrum_df.loc[mask, 'is_motif'] = True
 
+        # Define colors based on whether the peak is a motif peak
+        # Regular Peaks: Light Grey (#B0B0B0)
+        # Motif Peaks: Crimson (#DC143C)
+        # Parent Ion: Bright Blue (#0000FF) as a separate trace
+        colors = ['#DC143C' if is_motif else '#B0B0B0' for is_motif in spectrum_df['is_motif']]
+
+        # Prepare parent ion information
         parent_ion_present = False
         parent_ion_mz = None
         parent_ion_intensity = None
         if 'precursor_mz' in spectrum.metadata:
             try:
                 parent_ion_mz = float(spectrum.metadata['precursor_mz'])
-                parent_ion_intensity = float(spectrum.metadata.get('parent_intensity', max(
-                    spectrum_df['intensity']) if not spectrum_df.empty else 0))
+                # Retrieve parent ion intensity if available
+                if 'parent_intensity' in spectrum.metadata:
+                    parent_ion_intensity = float(spectrum.metadata['parent_intensity'])
+                else:
+                    # Fallback to maximum intensity
+                    parent_ion_intensity = spectrum.intensities.max() if not spectrum.intensities.size == 0 else 0
                 parent_ion_present = True
             except (ValueError, TypeError):
-                parent_ion_present = False
+                parent_ion_present = False  # Invalid precursor_mz
 
+        # Create Plotly figure
         fig = go.Figure()
 
+        # Add a single trace for all peaks with conditional coloring
         fig.add_trace(go.Bar(
             x=spectrum_df['mz'],
             y=spectrum_df['intensity'],
             marker=dict(
-                color=spectrum_df['color'],
-                line=dict(color='black', width=0.5),
-                opacity=1.0
+                color=colors,
+                line=dict(color='white', width=0),  # Remove borders to prevent color blending
             ),
             width=0.2,
+            name='Peaks',
             hoverinfo='text',
             hovertext=[
-                f"m/z: {mz:.2f}<br>Intensity: {intensity}"
-                for mz, intensity in zip(spectrum_df['mz'], spectrum_df['intensity'])
+                f"Motif Peak: {is_motif}<br>m/z: {mz:.2f}<br>Intensity: {intensity}"
+                for mz, intensity, is_motif in zip(spectrum_df['mz'], spectrum_df['intensity'], spectrum_df['is_motif'])
             ],
-            name='Peaks',
-            showlegend=False
+            opacity=0.9,  # Slightly reduced opacity for better layering
         ))
 
+        # Add parent ion as a separate trace if present
         if parent_ion_present and parent_ion_mz is not None and parent_ion_intensity is not None:
             fig.add_trace(go.Bar(
                 x=[parent_ion_mz],
                 y=[parent_ion_intensity],
                 marker=dict(
-                    color='blue',
-                    line=dict(color='black', width=0.5),
-                    opacity=1.0
+                    color='#0000FF',  # Bright Blue for parent ion
+                    line=dict(color='white', width=0),  # Remove borders
                 ),
                 width=0.4,
+                name='Parent Ion',
                 hoverinfo='text',
                 hovertext=[f"Parent Ion<br>m/z: {parent_ion_mz:.2f}<br>Intensity: {parent_ion_intensity}"],
-                name='Parent Ion',
-                showlegend=False
+                opacity=1.0,
             ))
 
-        legend_traces = []
-        legend_labels = {
-            'grey': 'Regular Peaks',
-            bright_red: 'Motif Peaks',
-            'blue': 'Parent Ion'
-        }
-        for color, label in legend_labels.items():
-            legend_traces.append(go.Bar(
-                x=[None],
-                y=[None],
-                marker=dict(color=color),
-                showlegend=True,
-                name=label
-            ))
-
+        # Update layout for better visibility and usability
         fig.update_layout(
             title=f"Spectrum: {spectrum_id}",
             xaxis_title='m/z',
             yaxis_title='Intensity',
             bargap=0.1,
+            barmode='overlay',  # Overlay bars for better visibility
             paper_bgcolor='white',
             plot_bgcolor='white',
             legend=dict(
-                orientation="h",
-                yanchor="bottom",
+                title='Peak Types',
+                orientation='h',
+                yanchor='bottom',
                 y=1.02,
-                xanchor="right",
+                xanchor='right',
                 x=1
             ),
-            margin=dict(l=50, r=50, t=50, b=50),
+            margin=dict(l=50, r=50, t=80, b=50),
+            hovermode='closest',
         )
 
-        fig.add_traces(legend_traces)
-
+        # Ensure the layout is responsive
         graph_component = dcc.Graph(
             figure=fig,
             style={
-                'width': '100%',
-                'height': '600px',
+                'width': '100%',  # Responsive width
+                'height': '600px',  # Fixed height
                 'margin': 'auto'
             }
         )
 
         return graph_component
-    return html.Div("No spectrum selected.")
 
 
-# ---------------------
-# Run the App
-# ---------------------
+# Run the Dash app
 if __name__ == "__main__":
     app.run_server(debug=True)
