@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 
 import numpy as np
 
@@ -73,29 +74,21 @@ def generate_corpusjson_from_tomotopy(model, documents, spectra,
     for d_idx, doc in enumerate(model.docs):
         gamma_matrix[d_idx, :] = doc.get_topic_dist()
 
+    # Revised Phi Matrix Calculation (more aligned with Gensim's approach)
     phi_matrix = {}
     for d_idx, doc in enumerate(model.docs):
         doc_name = doc_names[d_idx]
-        phi_matrix[doc_name] = {}
-        word_topic_dict = {}
-        # Iterate over words and their assigned topics
+        phi_matrix[doc_name] = defaultdict(lambda: np.zeros(K))  # Default zero counts for words
+        # Count word-topic assignments efficiently
         for word_id, topic_id in zip(doc.words, doc.topics):
             word = model.vocabs[word_id]
-            if word not in word_topic_dict:
-                word_topic_dict[word] = np.zeros(K)
-            word_topic_dict[word][topic_id] += 1
-        # For each word in the document, compute phi
-        for word in corpus[doc_name]:
-            phi_values = np.zeros(K)
-            if word in word_topic_dict:
-                phi_values = word_topic_dict[word]
-            # Normalize phi over topics
-            total_phi = phi_values.sum()
-            if total_phi > 0:
-                phi_values = phi_values / total_phi
-            else:
-                phi_values = np.ones(K) / K  # Assign uniform distribution if zero
-            phi_matrix[doc_name][word] = phi_values
+            phi_matrix[doc_name][word][topic_id] += 1  # Increment count directly
+
+        # Normalize phi for each word within the document
+        for word, topic_counts in phi_matrix[doc_name].items():
+            total_count = topic_counts.sum()
+            if total_count > 0:
+                phi_matrix[doc_name][word] = topic_counts / total_count # Correctly normalize per word
 
     # Build topic_index and topic_metadata
     topic_index = {'motif_{0}'.format(k): k for k in range(K)}
