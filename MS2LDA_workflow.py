@@ -1014,30 +1014,55 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
     if active_tab != 'motif-rankings-tab' or not lda_dict_data:
         return ""
 
-    # Updated compute_motif_degrees function
     def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
+        """
+        Computes the degree, average document-to-topic probability, and average overlap score for each motif.
+
+        Parameters:
+        - lda_dict (dict): The LDA dictionary containing 'beta', 'theta', and 'overlap_scores'.
+        - p_thresh (float): The probability threshold.
+        - o_thresh (float): The overlap threshold.
+
+        Returns:
+        - list of tuples: Each tuple contains (motif, degree, average_probability, average_overlap).
+        """
         motifs = lda_dict["beta"].keys()
         motif_degrees = {m: 0 for m in motifs}
+        motif_probabilities = {m: [] for m in motifs}  # Store probabilities for averaging
         motif_overlap_scores = {m: [] for m in motifs}
         docs = lda_dict["theta"].keys()
+
         for doc in docs:
             for motif, p in lda_dict["theta"][doc].items():
-                if p >= p_thresh:
+                if p >= p_thresh:  # Apply probability threshold
                     o = lda_dict["overlap_scores"][doc].get(motif, 0.0)
-                    if o >= o_thresh:
+                    if o >= o_thresh:  # Apply overlap threshold
                         motif_degrees[motif] += 1
+                        motif_probabilities[motif].append(p)  # Store probability
                         motif_overlap_scores[motif].append(o)
+
         md = []
         for motif in motifs:
-            avg_overlap = np.mean(motif_overlap_scores[motif]) if motif_overlap_scores[motif] else 0
-            md.append((motif, motif_degrees[motif], avg_overlap))
-        md.sort(key=lambda x: x[1], reverse=True)
+            avg_probability = np.mean(motif_probabilities[motif]) if motif_probabilities[motif] else 0  # Calculate average probability
+            avg_overlap = np.mean(motif_overlap_scores[motif]) if motif_overlap_scores[motif] else 0  # Calculate average overlap
+            md.append((motif, motif_degrees[motif], avg_probability, avg_overlap))  # Add avg_probability to the tuple
+
+        md.sort(key=lambda x: x[1], reverse=True)  # Sorting to show the most relevant motifs at the top
         return md
 
+    # Compute motif degrees with the provided thresholds
     motif_degree_list = compute_motif_degrees(lda_dict_data, probability_thresh, overlap_thresh)
 
-    # Prepare DataTable data
-    df = pd.DataFrame(motif_degree_list, columns=['Motif', 'Degree', 'Overlap Score'])
+    # Prepare DataFrame with computed degrees and average overlap scores
+    df = pd.DataFrame(motif_degree_list, columns=[
+        'Motif',
+        'Degree',
+        'Average Doc-Topic Probability',
+        'Average Overlap Score'
+    ])
+
+    # Filter out motifs with zero degree after applying thresholds
+    df = df[df['Degree'] > 0]
 
     # Add motif annotations if available
     motif_annotations = {}
@@ -1048,7 +1073,7 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
     df['Annotation'] = df['Motif'].map(motif_annotations)
 
     # Style to make the 'Motif' column look clickable
-    style_data_conditional=[
+    style_data_conditional = [
         {
             'if': {'column_id': 'Motif'},
             'cursor': 'pointer',
@@ -1057,14 +1082,15 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
         },
     ]
 
-    # Create DataTable
+    # Create DataTable with the filtered and sorted data
     table = dash_table.DataTable(
         id='motif-rankings-table',
-        data=df.to_dict('records'),
+        data=df.to_dict('records'),  # Use filtered data
         columns=[
             {'name': 'Motif', 'id': 'Motif'},
             {'name': 'Degree', 'id': 'Degree', 'type': 'numeric', 'format': {'specifier': ''}},
-            {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
+            {'name': 'Average Doc-Topic Probability', 'id': 'Average Doc-Topic Probability', 'type': 'numeric', 'format': {'specifier': '.4f'}},
+            {'name': 'Average Overlap Score', 'id': 'Average Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
             {'name': 'Annotation', 'id': 'Annotation'},
         ],
         sort_action='native',
@@ -1072,13 +1098,19 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
         page_size=20,
         style_table={'overflowX': 'auto'},
         style_cell={
-            'minWidth': '100px', 'width': '150px', 'maxWidth': '300px',
+            'minWidth': '150px', 'width': '200px', 'maxWidth': '350px',
             'whiteSpace': 'normal',
+            'textAlign': 'left',
         },
         style_data_conditional=style_data_conditional,
+        style_header={
+            'backgroundColor': 'rgb(230, 230, 230)',
+            'fontWeight': 'bold'
+        },
     )
 
     return table
+
 
 # Callback to store selected motif
 @app.callback(
