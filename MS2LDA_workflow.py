@@ -227,7 +227,7 @@ app.layout = dbc.Container(
                                     id="cytoscape-network-container",
                                     style={
                                         "marginTop": "20px",
-                                        "height": "600px", # Network height
+                                        "height": "600px",  # Network height
                                     },
                                 )
                             ],
@@ -711,12 +711,18 @@ def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data, lda_dic
 
 # Helper function to convert Spectrum to dict (for serialization)
 def spectrum_to_dict(spectrum):
+    metadata = spectrum.metadata.copy()
+    if spectrum.losses:
+        # Add loss to metadata to link losses to fragments during visualization
+        metadata["losses"] = [
+            {"loss_mz": float(loss_mz), "loss_intensity": float(loss_intensity)}
+            for loss_mz, loss_intensity in zip(spectrum.losses.mz, spectrum.losses.intensities)
+        ]
+
     return {
-        "metadata": spectrum.metadata,
+        "metadata": metadata,
         "mz": [float(m) for m in spectrum.peaks.mz.tolist()],
         "intensities": [float(i) for i in spectrum.peaks.intensities.tolist()],
-        "losses_mz": [float(m) for m in spectrum.losses.mz.tolist()] if spectrum.losses else [],
-        "losses_intensities": [float(i) for i in spectrum.losses.intensities.tolist()] if spectrum.losses else [],
     }
 
 # Updated Callback to create Cytoscape elements
@@ -739,10 +745,13 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
             intensities=np.array(s["intensities"], dtype=float),
             metadata=s["metadata"],
         )
-        if s["losses_mz"]:
+        if "losses" in s["metadata"]:
+            losses = s["metadata"]["losses"]
+            mz = [loss["loss_mz"] for loss in losses]
+            intensities = [loss["loss_intensity"] for loss in losses]
             spectrum.losses = Fragments(
-                mz=np.array(s["losses_mz"], dtype=float),
-                intensities=np.array(s["losses_intensities"], dtype=float),
+                mz=np.array(mz, dtype=float),
+                intensities=np.array(intensities, dtype=float),
             )
         else:
             spectrum.losses = None
@@ -938,15 +947,34 @@ def create_cytoscape_elements(spectra, smiles_clusters):
 
         # Add loss nodes and edges
         if spectrum.losses is not None:
-            for mz, intensity in zip(spectrum.losses.mz, spectrum.losses.intensities):
-                rounded_mz = round(mz, 2)
-                loss_node = f"loss_{rounded_mz}"
+            precursor_mz = float(spectrum.metadata.get('precursor_mz', 0))
+            for loss_data in spectrum.metadata.get("losses", []):
+                loss_mz = loss_data["loss_mz"]
+                loss_intensity = loss_data["loss_intensity"]
+                corresponding_frag_mz = precursor_mz - loss_mz
+                rounded_frag_mz = round(corresponding_frag_mz, 2)
+                frag_node = f"frag_{rounded_frag_mz}"
+
+                # Ensure the corresponding fragment node exists
+                if frag_node not in created_fragments:
+                    elements.append(
+                        {
+                            "data": {
+                                "id": frag_node,
+                                "label": str(rounded_frag_mz),
+                                "type": "fragment",
+                            }
+                        }
+                    )
+                    created_fragments.add(frag_node)
+
+                loss_node = f"loss_{loss_mz}"
                 if loss_node not in created_losses:
                     elements.append(
                         {
                             "data": {
                                 "id": loss_node,
-                                "label": str(rounded_mz),
+                                "label": f"-{loss_mz:.2f}",
                                 "type": "fragment",
                             }
                         }
@@ -957,7 +985,17 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                         "data": {
                             "source": motif_node,
                             "target": loss_node,
-                            "weight": intensity,  # Use intensity as weight
+                            "weight": loss_intensity,  # Use loss intensity as weight
+                        }
+                    }
+                )
+                # Optionally, connect loss to corresponding fragment
+                elements.append(
+                    {
+                        "data": {
+                            "source": loss_node,
+                            "target": frag_node,
+                            "weight": loss_intensity,  # Use loss intensity as weight
                         }
                     }
                 )
@@ -1289,7 +1327,6 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
 
     else:
         return current_index, dash.no_update
-
 # Callback to update the spectrum plot based on selected-spectrum-index
 @app.callback(
     Output('spectrum-plot', 'children'),
@@ -1319,16 +1356,24 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
             metadata=spectrum_dict['metadata'],
         )
 
-        # Extract motif-associated features
+        # Extract motif-associated features, including losses
         motif_features = lda_dict_data['beta'].get(selected_motif, {}).keys()
         motif_mz_values = []
+        motif_loss_values = []  # Store motif loss values
+
         for feature in motif_features:
-            if feature.startswith('fragment_') or feature.startswith('frag@'):
+            if feature.startswith('frag@'):
                 try:
-                    mz_value = float(feature.replace('fragment_', '').replace('frag@', ''))
+                    mz_value = float(feature.replace('frag@', ''))
                     motif_mz_values.append(mz_value)
                 except ValueError:
                     continue  # Skip invalid entries
+            elif feature.startswith('loss@'):
+                try:
+                    loss_value = float(feature.replace('loss@', ''))
+                    motif_loss_values.append(loss_value)
+                except ValueError:
+                    continue
 
         # Create DataFrame for plotting
         spectrum_df = pd.DataFrame({
@@ -1403,6 +1448,57 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
                 opacity=1.0,
             ))
 
+        # Add loss annotations only for motif losses
+        if "losses" in spectrum.metadata and parent_ion_present:
+            precursor_mz = parent_ion_mz
+            for loss_data in spectrum.metadata["losses"]:
+                loss_mz = loss_data["loss_mz"]
+                loss_intensity = loss_data["loss_intensity"]
+
+                # Check if the loss is part of the motif within tolerance
+                if not any(abs(loss_mz - motif_loss) <= tolerance for motif_loss in motif_loss_values):
+                    continue  # Skip losses not in the motif
+
+                # Calculate corresponding fragment m/z
+                frag_mz = precursor_mz - loss_mz
+
+                # Find closest fragment peak within tolerance
+                frag_mask = np.abs(spectrum.peaks.mz - frag_mz) <= tolerance
+                if not np.any(frag_mask):
+                    continue  # No fragment peak found within tolerance
+
+                closest_frag_mz = spectrum.peaks.mz[frag_mask][0]
+                closest_frag_intensity = spectrum.peaks.intensities[frag_mask][0]
+
+                # Add horizontal loss annotation
+                fig.add_shape(
+                    type="line",
+                    x0=closest_frag_mz,
+                    y0=closest_frag_intensity,
+                    x1=precursor_mz,
+                    y1=closest_frag_intensity,
+                    line=dict(
+                        color="green",
+                        width=2,
+                        dash="dash",
+                    ),
+                )
+                fig.add_annotation(
+                    x=(closest_frag_mz + precursor_mz) / 2,
+                    y=closest_frag_intensity,
+                    text=f"-{loss_mz:.2f}",
+                    showarrow=False,
+                    font=dict(
+                        family="Courier New, monospace",
+                        size=12,
+                        color="green"  # Green text for loss values
+                    ),
+                    bgcolor="rgba(255,255,255,0.7)",
+                    xanchor="center",
+                    yanchor="bottom",
+                    standoff=5,
+                )
+
         # Update layout for better visibility and usability
         fig.update_layout(
             title=f"Spectrum: {spectrum_id}",
@@ -1435,6 +1531,7 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
         )
 
         return graph_component
+
 
 
 # Run the Dash app
