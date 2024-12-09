@@ -264,53 +264,70 @@ app.layout = dbc.Container(
                     dbc.Row([
                         dbc.Col([
                             html.H3("Motif Rankings"),
+                            # Row for the sliders and their displays
                             dbc.Row(
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label("Probability Threshold"),
-                                            dbc.Input(
+                                            dbc.Label("Probability Threshold Range"),
+                                            dcc.RangeSlider(
                                                 id="probability-thresh",
-                                                type="number",
-                                                value=0.1,
                                                 min=0,
                                                 max=1,
                                                 step=0.01,
+                                                value=[0.1, 1],  # Initial range: [0.1, 1]
+                                                marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
+                                                tooltip={"always_visible": False, "placement": "top"},
+                                                allowCross=False
                                             ),
+                                            html.Div(id='probability-thresh-display', style={"marginTop": "10px"})
                                         ],
-                                        width=3,
+                                        width=6
                                     ),
                                     dbc.Col(
                                         [
-                                            dbc.Label("Overlap Threshold"),
-                                            dbc.Input(
+                                            dbc.Label("Overlap Threshold Range"),
+                                            dcc.RangeSlider(
                                                 id="overlap-thresh",
-                                                type="number",
-                                                value=0.3,
                                                 min=0,
                                                 max=1,
                                                 step=0.01,
+                                                value=[0.3, 1],  # Initial range: [0.3, 1]
+                                                marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
+                                                tooltip={"always_visible": False, "placement": "top"},
+                                                allowCross=False
                                             ),
+                                            html.Div(id='overlap-thresh-display', style={"marginTop": "10px"})
                                         ],
-                                        width=3,
-                                    ),
-                                ],
-                                className="mb-3",
+                                        width=6
+                                    )
+                                ]
                             ),
-                            html.Div(
-                                id="motif-rankings-content",
-                                style={"marginTop": "20px"},
-                            ),
+                            html.Div(id="motif-rankings-table-container", style={"marginTop": "20px"})  # Container for the table
                         ], width=12),
                     ]),
                 ]),
             ],
-            style={"display": "none"},
+            style={"display": "none"}
         ),
         html.Div(
             id="motif-details-tab-content",
             children=[
                 html.H3(id='motif-details-title'),
+                # Add probability filter slider
+                html.Div([
+                    dbc.Label("Topic-Word Probability Filter:"),
+                    dcc.RangeSlider(
+                        id='probability-filter',
+                        min=0,
+                        max=1,
+                        step=0.01,
+                        value=[0, 1],  # Initial value: show all features
+                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
+                        allowCross=False
+                    ),
+                    html.Div(id='probability-filter-display', style={"marginTop": "10px"})
+                ], className="mb-3"),
                 html.Div(id='motif-details-content'),
                 dcc.Store(id='motif-spectra-ids-store'),
                 dcc.Store(id='selected-spectrum-index', data=0),
@@ -328,9 +345,9 @@ app.layout = dbc.Container(
                 ),
                 # Next and Previous buttons
                 html.Div([
-                    dbc.Button('Previous', id='prev-spectrum', n_clicks=0),
-                    dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ml-2'),
-                ], className='mb-2'),
+                    dbc.Button('Previous', id='prev-spectrum', n_clicks=0, color="info"),
+                    dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ms-2', color="info"),
+                ], className='mt-3'),
             ],
             style={"display": "none"},  # Initially hidden
         ),
@@ -386,6 +403,29 @@ def update_output(contents, filename):
         return html.Div([html.H5(f"Uploaded File: {filename}")])
     else:
         return html.Div([html.H5("No file uploaded yet.")])
+
+# Callbacks to display current RangeSlider values in Motif Rankings Tab
+@app.callback(
+    Output('probability-thresh-display', 'children'),
+    Input('probability-thresh', 'value')
+)
+def display_probability_thresh(prob_thresh_range):
+    return f"Selected Probability Range: {prob_thresh_range[0]:.2f} - {prob_thresh_range[1]:.2f}"
+
+@app.callback(
+    Output('overlap-thresh-display', 'children'),
+    Input('overlap-thresh', 'value')
+)
+def display_overlap_thresh(overlap_thresh_range):
+    return f"Selected Overlap Range: {overlap_thresh_range[0]:.2f} - {overlap_thresh_range[1]:.2f}"
+
+# Callbacks to display current RangeSlider value in Motif Details Tab
+@app.callback(
+    Output('probability-filter-display', 'children'),
+    Input('probability-filter', 'value')
+)
+def display_prob_filter(prob_filter_range):
+    return f"Showing features with probability between {prob_filter_range[0]:.2f} and {prob_filter_range[1]:.2f}"
 
 # Callback to handle Run Analysis and Load Results
 @app.callback(
@@ -619,7 +659,8 @@ def handle_run_or_load(
             )
 
         # Validate the presence of required keys
-        if 'clustered_smiles_data' not in data or 'optimized_motifs_data' not in data or 'lda_dict' not in data or 'spectra_data' not in data:
+        required_keys = {'clustered_smiles_data', 'optimized_motifs_data', 'lda_dict', 'spectra_data'}
+        if not required_keys.issubset(data.keys()):
             load_status = dbc.Alert(
                 "Invalid file format. Missing required data.", color="danger"
             )
@@ -888,7 +929,6 @@ def display_molecule_images(nodeData, clustered_smiles_data):
 
     return ""  # Return empty for non-motif nodes
 
-
 def create_cytoscape_elements(spectra, smiles_clusters):
     elements = []
     colors = [
@@ -1002,58 +1042,77 @@ def create_cytoscape_elements(spectra, smiles_clusters):
 
     return elements
 
-# Callback to update the Motif Rankings
+
+
+# Helper function to compute motif degrees
+def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
+    """
+    Computes the degree, average document-to-topic probability, and average overlap score for each motif.
+
+    Parameters:
+    - lda_dict (dict): The LDA dictionary containing 'beta', 'theta', and 'overlap_scores'.
+    - p_thresh (float): The probability threshold (lower bound).
+    - o_thresh (float): The overlap threshold (lower bound).
+
+    Returns:
+    - list of tuples: Each tuple contains (motif, degree, average_probability, average_overlap).
+    """
+    motifs = lda_dict["beta"].keys()
+    motif_degrees = {m: 0 for m in motifs}
+    motif_probabilities = {m: [] for m in motifs}  # Store probabilities for averaging
+    motif_overlap_scores = {m: [] for m in motifs}
+    docs = lda_dict["theta"].keys()
+
+    for doc in docs:
+        for motif, p in lda_dict["theta"][doc].items():
+            if p >= p_thresh:  # Apply probability threshold
+                o = lda_dict["overlap_scores"][doc].get(motif, 0.0)
+                if o >= o_thresh:  # Apply overlap threshold
+                    motif_degrees[motif] += 1
+                    motif_probabilities[motif].append(p)  # Store probability
+                    motif_overlap_scores[motif].append(o)
+
+    md = []
+    for motif in motifs:
+        avg_probability = np.mean(motif_probabilities[motif]) if motif_probabilities[motif] else 0  # Calculate average probability
+        avg_overlap = np.mean(motif_overlap_scores[motif]) if motif_overlap_scores[motif] else 0  # Calculate average overlap
+        md.append((motif, motif_degrees[motif], avg_probability, avg_overlap))  # Add avg_probability to the tuple
+
+    md.sort(key=lambda x: x[1], reverse=True)  # Sorting to show the most relevant motifs at the top
+    return md
+
+# Callback to update the Motif Rankings TABLE ONLY (Outputs to different container)
 @app.callback(
-    Output('motif-rankings-content', 'children'),
+    Output('motif-rankings-table-container', 'children'),  # Output to a container for the table
     Input('lda-dict-store', 'data'),
     Input('probability-thresh', 'value'),
     Input('overlap-thresh', 'value'),
     Input('tabs', 'value'),
 )
-def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, active_tab):
+def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thresh, active_tab):
+    """
+    Updates the Motif Rankings table based on the provided thresholds and active tab.
+
+    Parameters:
+    - lda_dict_data (dict): The stored LDA dictionary data.
+    - probability_thresh (list or float): The selected probability threshold range.
+    - overlap_thresh (list or float): The selected overlap threshold range.
+    - active_tab (str): The currently active tab.
+
+    Returns:
+    - Dash DataTable component or an empty string.
+    """
     if active_tab != 'motif-rankings-tab' or not lda_dict_data:
         return ""
 
-    def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
-        """
-        Computes the degree, average document-to-topic probability, and average overlap score for each motif.
-
-        Parameters:
-        - lda_dict (dict): The LDA dictionary containing 'beta', 'theta', and 'overlap_scores'.
-        - p_thresh (float): The probability threshold.
-        - o_thresh (float): The overlap threshold.
-
-        Returns:
-        - list of tuples: Each tuple contains (motif, degree, average_probability, average_overlap).
-        """
-        motifs = lda_dict["beta"].keys()
-        motif_degrees = {m: 0 for m in motifs}
-        motif_probabilities = {m: [] for m in motifs}  # Store probabilities for averaging
-        motif_overlap_scores = {m: [] for m in motifs}
-        docs = lda_dict["theta"].keys()
-
-        for doc in docs:
-            for motif, p in lda_dict["theta"][doc].items():
-                if p >= p_thresh:  # Apply probability threshold
-                    o = lda_dict["overlap_scores"][doc].get(motif, 0.0)
-                    if o >= o_thresh:  # Apply overlap threshold
-                        motif_degrees[motif] += 1
-                        motif_probabilities[motif].append(p)  # Store probability
-                        motif_overlap_scores[motif].append(o)
-
-        md = []
-        for motif in motifs:
-            avg_probability = np.mean(motif_probabilities[motif]) if motif_probabilities[motif] else 0  # Calculate average probability
-            avg_overlap = np.mean(motif_overlap_scores[motif]) if motif_overlap_scores[motif] else 0  # Calculate average overlap
-            md.append((motif, motif_degrees[motif], avg_probability, avg_overlap))  # Add avg_probability to the tuple
-
-        md.sort(key=lambda x: x[1], reverse=True)  # Sorting to show the most relevant motifs at the top
-        return md
+    # Correctly extract the lower bound from RangeSliders to use as thresholds
+    p_thresh = probability_thresh[0] if isinstance(probability_thresh, list) else probability_thresh
+    o_thresh = overlap_thresh[0] if isinstance(overlap_thresh, list) else overlap_thresh
 
     # Compute motif degrees with the provided thresholds
-    motif_degree_list = compute_motif_degrees(lda_dict_data, probability_thresh, overlap_thresh)
+    motif_degree_list = compute_motif_degrees(lda_dict_data, p_thresh, o_thresh)
 
-    # Prepare DataFrame with computed degrees and average overlap scores
+    # Prepare DataFrame
     df = pd.DataFrame(motif_degree_list, columns=[
         'Motif',
         'Degree',
@@ -1061,8 +1120,8 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
         'Average Overlap Score'
     ])
 
-    # Filter out motifs with zero degree after applying thresholds
-    df = df[df['Degree'] > 0]
+    # *** Remove the problematic filter ***
+    # df = df[df['Degree'] > 0]  # This line has been removed to include all motifs
 
     # Add motif annotations if available
     motif_annotations = {}
@@ -1085,7 +1144,7 @@ def update_motif_rankings(lda_dict_data, probability_thresh, overlap_thresh, act
     # Create DataTable with the filtered and sorted data
     table = dash_table.DataTable(
         id='motif-rankings-table',
-        data=df.to_dict('records'),  # Use filtered data
+        data=df.to_dict('records'),  # Use the entire DataFrame without filtering out zero-degree motifs
         columns=[
             {'name': 'Motif', 'id': 'Motif'},
             {'name': 'Degree', 'id': 'Degree', 'type': 'numeric', 'format': {'specifier': ''}},
@@ -1137,7 +1196,6 @@ def activate_motif_details_tab(selected_motif):
     else:
         return dash.no_update
 
-
 # Callback to populate Motif Details tab
 @app.callback(
     Output('motif-details-title', 'children'),
@@ -1146,24 +1204,35 @@ def activate_motif_details_tab(selected_motif):
     Output('spectra-table', 'data'),
     Output('spectra-table', 'columns'),
     Input('selected-motif-store', 'data'),
+    Input('probability-filter', 'value'),  # Input for probability filter
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
     prevent_initial_call=True,
 )
-def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, spectra_data):
+def update_motif_details(selected_motif, probability_range, lda_dict_data, clustered_smiles_data, spectra_data):
     if not selected_motif or not lda_dict_data:
         # Return empty placeholders
-        return '', [], [], [], []
+        return '', [], [], [], ''  # Removed 'probability-filter-display' from outputs
+
     motif_name = selected_motif
     motif_data = lda_dict_data['beta'].get(motif_name, {})
-    total_prob = sum(motif_data.values())
+
+    # Apply probability filter to motif_data
+    filtered_motif_data = {
+        feature: prob for feature, prob in motif_data.items()
+        if probability_range[0] <= prob <= probability_range[1]
+    }
+
+    # Display Probability Filter range is handled by its own callback
+
+    total_prob = sum(filtered_motif_data.values())  # Calculate total probability after filtering
     content = []
 
-    # Features table
+    # Features table (updated to use filtered data)
     feature_table = pd.DataFrame({
-        'Feature': motif_data.keys(),
-        'Probability': motif_data.values(),
+        'Feature': filtered_motif_data.keys(),  # Filtered features
+        'Probability': filtered_motif_data.values(),  # Filtered probabilities
     }).sort_values(by='Probability', ascending=False)
     feature_table_component = dash_table.DataTable(
         data=feature_table.to_dict('records'),
@@ -1177,7 +1246,7 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
     )
     content.append(html.H5('Features Explained by This Motif'))
     content.append(feature_table_component)
-    content.append(html.P(f'Total Probability in this Motif: {total_prob:.4f}'))
+    content.append(html.P(f'Total Probability (Filtered): {total_prob:.4f}'))  # Updated label
 
     # Prepare spectra data
     spectra_data_list = []
@@ -1201,7 +1270,7 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
     ]
 
     # Compute data for bar plots
-    features_in_motif = list(motif_data.keys())
+    features_in_motif = list(filtered_motif_data.keys())
     total_feature_probs = {feature: 0.0 for feature in features_in_motif}
     for motif, feature_probs in lda_dict_data['beta'].items():
         for feature, prob in feature_probs.items():
@@ -1210,7 +1279,7 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
 
     barplot1_df = pd.DataFrame({
         'Feature': features_in_motif,
-        'Probability in Motif': [motif_data[feature] for feature in features_in_motif],
+        'Probability in Motif': [filtered_motif_data[feature] for feature in features_in_motif],
         'Total Probability': [total_feature_probs[feature] for feature in features_in_motif],
     })
 
@@ -1246,6 +1315,8 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
     # Second bar plot data
     feature_counts = {feature: 0 for feature in features_in_motif}
     for doc in spectra_df['Spectrum']:
+        # Assuming 'corpus' is a dictionary mapping doc to features
+        # Replace 'corpus' with the actual key if different
         doc_features = lda_dict_data['corpus'].get(doc, {}).keys()
         for feature in features_in_motif:
             if feature in doc_features:
@@ -1310,7 +1381,6 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
     spectra_ids = spectra_df['Spectrum'].tolist()
     return f"Motif Details: {motif_name}", content, spectra_ids, spectra_table_data, spectra_table_columns
 
-
 # **FIX FOR INITIAL SPECTRUM DISPLAY AND Syncing Selected Rows with Spectrum Index**
 # Combine updating 'selected-spectrum-index' and 'spectra-table.selected_rows' into a single callback to avoid dependency cycles
 @app.callback(
@@ -1322,10 +1392,9 @@ def update_motif_details(selected_motif, lda_dict_data, clustered_smiles_data, s
     Input('selected-motif-store', 'data'),
     Input('motif-spectra-ids-store', 'data'),
     State('selected-spectrum-index', 'data'),
-    State('motif-spectra-ids-store', 'data'),
     prevent_initial_call=True,
 )
-def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_motif, motif_spectra_ids, current_index, spectra_ids):
+def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_motif, motif_spectra_ids, current_index):
     ctx = dash.callback_context
     if not ctx.triggered:
         raise dash.exceptions.PreventUpdate
@@ -1340,14 +1409,14 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
             return current_index, dash.no_update
 
     elif triggered_id == 'next-spectrum':
-        if spectra_ids and current_index < len(spectra_ids) - 1:
+        if motif_spectra_ids and current_index < len(motif_spectra_ids) - 1:
             new_index = current_index + 1
             return new_index, [new_index]
         else:
             return current_index, dash.no_update  # Already at last spectrum
 
     elif triggered_id == 'prev-spectrum':
-        if spectra_ids and current_index > 0:
+        if motif_spectra_ids and current_index > 0:
             new_index = current_index - 1
             return new_index, [new_index]
         else:
@@ -1359,6 +1428,7 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
 
     else:
         return current_index, dash.no_update
+
 # Callback to update the spectrum plot based on selected-spectrum-index
 @app.callback(
     Output('spectrum-plot', 'children'),
@@ -1563,8 +1633,6 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
         )
 
         return graph_component
-
-
 
 # Run the Dash app
 if __name__ == "__main__":
