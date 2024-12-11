@@ -278,7 +278,7 @@ def filetype_check(dataset):
         else:
             raise TypeError("File format not supported. Only .mgf, .mzml, and .msp")
 
-    elif type(dataset) == list and type(dataset[0]) == matchms.Spectrum.Spectrum:
+    elif type(dataset) == list: # and type(dataset[0]) == matchms.Spectrum.Spectrum:
         loaded_spectra = dataset
     
     else:
