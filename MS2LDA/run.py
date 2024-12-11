@@ -59,7 +59,7 @@ def run(dataset, n_motifs, n_iterations,
     
     loaded_spectra = filetype_check(dataset=dataset)
     cleaned_spectra = clean_spectra(loaded_spectra, preprocessing_parameters)
-
+    print("Cleaning spectra ...", len(cleaned_spectra), "spectra left")
     feature_words = features_to_words(spectra=cleaned_spectra, significant_figures=2, acquisition_type=dataset_parameters["acquisition_type"])
     
     # Modeling
@@ -258,7 +258,9 @@ def store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_c
 
     trained_ms2lda.save("ms2lda.bin")
 
-    ms1_motifDB, ms2_motifDB = motifs2motifDB(optimized_motifs) # of motif_spectra?
+    ms1_motifDB_opt, ms2_motifDB_opt = motifs2motifDB(optimized_motifs) # of motif_spectra?
+    store_motifDB_excel(ms1_motifDB_opt, ms2_motifDB_opt, name="motifDB_optimized.xlsx")
+    ms1_motifDB, ms2_motifDB = motifs2motifDB(motif_spectra) 
     store_motifDB_excel(ms1_motifDB, ms2_motifDB)
 
     os.chdir(curr_dir)
@@ -308,8 +310,8 @@ def s2v_annotation(motif_spectra, annotation_parameters):
 
 
 def load_s2v(
-        path_model = "../MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model",
-        path_library = "../MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
+        path_model = "/Users/rosinatorres/Documents/PhD/WP1/Project/Code/MS2LDA/MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model",
+        path_library = "/Users/rosinatorres/Documents/PhD/WP1/Project/Code/MS2LDA/MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
         ):
     
     s2v_similarity, library = load_s2v_and_library(path_model, path_library)

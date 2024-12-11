@@ -161,8 +161,8 @@ def load_motifDB(motifDB_filename): # doesn't work
     return ms1_df, ms2_df
 
 
-def store_motifDB_excel(ms1_df, ms2_df):
-    with pd.ExcelWriter("motifDB.xlsx") as writer:
+def store_motifDB_excel(ms1_df, ms2_df, name="motifDB.xlsx"):
+    with pd.ExcelWriter(name) as writer:
         ms1_df.to_excel(writer, sheet_name="ms1")
         ms2_df.to_excel(writer, sheet_name="ms2")
 
