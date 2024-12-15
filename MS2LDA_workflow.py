@@ -1429,16 +1429,17 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
     else:
         return current_index, dash.no_update
 
-# Callback to update the spectrum plot based on selected-spectrum-index
+# Callback to update the spectrum plot based on selected-spectrum-index and probability filter
 @app.callback(
     Output('spectrum-plot', 'children'),
     Input('selected-spectrum-index', 'data'),
+    Input('probability-filter', 'value'),
     State('motif-spectra-ids-store', 'data'),
     State('spectra-store', 'data'),
     State('lda-dict-store', 'data'),
     State('selected-motif-store', 'data'),
 )
-def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_data, selected_motif):
+def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra_data, lda_dict_data, selected_motif):
     if spectra_ids and spectra_data and lda_dict_data and selected_motif:
         # Validate selected_index
         if selected_index is None or selected_index < 0 or selected_index >= len(spectra_ids):
@@ -1458,18 +1459,23 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
             metadata=spectrum_dict['metadata'],
         )
 
-        # Extract motif-associated features, including losses
-        motif_features = lda_dict_data['beta'].get(selected_motif, {}).keys()
-        motif_mz_values = []
-        motif_loss_values = []  # Store motif loss values
+        # Apply probability filtering to motif features
+        motif_data = lda_dict_data['beta'].get(selected_motif, {})
+        filtered_motif_data = {
+            feature: prob for feature, prob in motif_data.items()
+            if probability_range[0] <= prob <= probability_range[1]
+        }
 
-        for feature in motif_features:
+        # Extract motif-associated features (fragments and losses) from filtered data
+        motif_mz_values = []
+        motif_loss_values = []
+        for feature in filtered_motif_data.keys():
             if feature.startswith('frag@'):
                 try:
                     mz_value = float(feature.replace('frag@', ''))
                     motif_mz_values.append(mz_value)
                 except ValueError:
-                    continue  # Skip invalid entries
+                    continue
             elif feature.startswith('loss@'):
                 try:
                     loss_value = float(feature.replace('loss@', ''))
@@ -1483,17 +1489,15 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
             'intensity': spectrum.peaks.intensities,
         })
 
-        # Identify motif peaks within a tolerance
-        tolerance = 0.1  # m/z tolerance for matching
+        # Identify motif peaks within a tolerance only if they appear in the filtered motif data
+        tolerance = 0.1
         spectrum_df['is_motif'] = False
         for mz in motif_mz_values:
             mask = np.abs(spectrum_df['mz'] - mz) <= tolerance
+            # Set is_motif = True only for these peaks
             spectrum_df.loc[mask, 'is_motif'] = True
 
         # Define colors based on whether the peak is a motif peak
-        # Regular Peaks: Light Grey (#B0B0B0)
-        # Motif Peaks: Crimson (#DC143C)
-        # Parent Ion: Bright Blue (#0000FF) as a separate trace
         colors = ['#DC143C' if is_motif else '#B0B0B0' for is_motif in spectrum_df['is_motif']]
 
         # Prepare parent ion information
@@ -1503,26 +1507,25 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
         if 'precursor_mz' in spectrum.metadata:
             try:
                 parent_ion_mz = float(spectrum.metadata['precursor_mz'])
-                # Retrieve parent ion intensity if available
+                # Retrieve parent ion intensity if available, else use max intensity
                 if 'parent_intensity' in spectrum.metadata:
                     parent_ion_intensity = float(spectrum.metadata['parent_intensity'])
                 else:
-                    # Fallback to maximum intensity
-                    parent_ion_intensity = spectrum.intensities.max() if not spectrum.intensities.size == 0 else 0
+                    parent_ion_intensity = spectrum.intensities.max() if spectrum.intensities.size > 0 else 0
                 parent_ion_present = True
             except (ValueError, TypeError):
-                parent_ion_present = False  # Invalid precursor_mz
+                parent_ion_present = False
 
         # Create Plotly figure
         fig = go.Figure()
 
-        # Add a single trace for all peaks with conditional coloring
+        # Add peaks trace
         fig.add_trace(go.Bar(
             x=spectrum_df['mz'],
             y=spectrum_df['intensity'],
             marker=dict(
                 color=colors,
-                line=dict(color='white', width=0),  # Remove borders to prevent color blending
+                line=dict(color='white', width=0),
             ),
             width=0.2,
             name='Peaks',
@@ -1531,17 +1534,17 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
                 f"Motif Peak: {is_motif}<br>m/z: {mz:.2f}<br>Intensity: {intensity}"
                 for mz, intensity, is_motif in zip(spectrum_df['mz'], spectrum_df['intensity'], spectrum_df['is_motif'])
             ],
-            opacity=0.9,  # Slightly reduced opacity for better layering
+            opacity=0.9,
         ))
 
-        # Add parent ion as a separate trace if present
+        # Add parent ion if present
         if parent_ion_present and parent_ion_mz is not None and parent_ion_intensity is not None:
             fig.add_trace(go.Bar(
                 x=[parent_ion_mz],
                 y=[parent_ion_intensity],
                 marker=dict(
-                    color='#0000FF',  # Bright Blue for parent ion
-                    line=dict(color='white', width=0),  # Remove borders
+                    color='#0000FF',  # Parent Ion Blue
+                    line=dict(color='white', width=0),
                 ),
                 width=0.4,
                 name='Parent Ion',
@@ -1550,29 +1553,31 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
                 opacity=1.0,
             ))
 
-        # Add loss annotations only for motif losses
+        # Draw loss annotations only if they are in filtered_motif_data
         if "losses" in spectrum.metadata and parent_ion_present:
             precursor_mz = parent_ion_mz
             for loss_data in spectrum.metadata["losses"]:
                 loss_mz = loss_data["loss_mz"]
                 loss_intensity = loss_data["loss_intensity"]
+                loss_feature = f"loss@{loss_mz:.4f}"  # Create a string like loss@XXX to match format
 
-                # Check if the loss is part of the motif within tolerance
-                if not any(abs(loss_mz - motif_loss) <= tolerance for motif_loss in motif_loss_values):
-                    continue  # Skip losses not in the motif
+                # Check if this loss feature is in filtered_motif_data (and thus above threshold)
+                # We'll allow some tolerance for floating point formatting
+                # Instead of strict match, check by absolute difference
+                # Motif_loss_values are floats from filtered_motif_data, so let's just compare difference:
+                if not any(abs(loss_mz - val) <= tolerance for val in motif_loss_values):
+                    continue
 
                 # Calculate corresponding fragment m/z
                 frag_mz = precursor_mz - loss_mz
-
-                # Find closest fragment peak within tolerance
                 frag_mask = np.abs(spectrum.peaks.mz - frag_mz) <= tolerance
                 if not np.any(frag_mask):
-                    continue  # No fragment peak found within tolerance
+                    continue
 
                 closest_frag_mz = spectrum.peaks.mz[frag_mask][0]
                 closest_frag_intensity = spectrum.peaks.intensities[frag_mask][0]
 
-                # Add horizontal loss annotation
+                # Add horizontal dash line
                 fig.add_shape(
                     type="line",
                     x0=closest_frag_mz,
@@ -1593,7 +1598,7 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
                     font=dict(
                         family="Courier New, monospace",
                         size=12,
-                        color="green"  # Green text for loss values
+                        color="green"
                     ),
                     bgcolor="rgba(255,255,255,0.7)",
                     xanchor="center",
@@ -1601,13 +1606,12 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
                     standoff=5,
                 )
 
-        # Update layout for better visibility and usability
         fig.update_layout(
             title=f"Spectrum: {spectrum_id}",
             xaxis_title='m/z',
             yaxis_title='Intensity',
             bargap=0.1,
-            barmode='overlay',  # Overlay bars for better visibility
+            barmode='overlay',
             paper_bgcolor='white',
             plot_bgcolor='white',
             legend=dict(
@@ -1622,17 +1626,17 @@ def update_spectrum_plot(selected_index, spectra_ids, spectra_data, lda_dict_dat
             hovermode='closest',
         )
 
-        # Ensure the layout is responsive
         graph_component = dcc.Graph(
             figure=fig,
             style={
-                'width': '100%',  # Responsive width
-                'height': '600px',  # Fixed height
+                'width': '100%',
+                'height': '600px',
                 'margin': 'auto'
             }
         )
 
         return graph_component
+
 
 # Run the Dash app
 if __name__ == "__main__":
