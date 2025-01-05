@@ -14,38 +14,32 @@ def features_to_words(spectra, significant_figures=2, acquisition_type="DDA"): #
     dataset_frag = []
     dataset_loss = []
 
-    if acquisition_type == "DDA":
-        for spectrum in spectra:
-            intensities_from_0_to_100 = (spectrum.peaks.intensities * 100).round()
+    
+    for spectrum in spectra:
+        intensities_from_0_to_100 = (spectrum.peaks.intensities * 100).round()
 
-            frag_with_n_digits = [ ["frag@" + str(round(mz, significant_figures))] for mz in spectrum.peaks.mz] # round mz and add identifier -> frag@
-            frag_multiplied_intensities = [frag * int(intensity) for frag, intensity in zip(frag_with_n_digits, intensities_from_0_to_100)] # weight fragments
-            frag_flattend = list(chain(*frag_multiplied_intensities)) # flatten lists
-            dataset_frag.append(frag_flattend)
-        
-        
+        frag_with_n_digits = [ ["frag@" + str(round(mz, significant_figures))] for mz in spectrum.peaks.mz] # round mz and add identifier -> frag@
+        frag_multiplied_intensities = [frag * int(intensity) for frag, intensity in zip(frag_with_n_digits, intensities_from_0_to_100)] # weight fragments
+        frag_flattend = list(chain(*frag_multiplied_intensities)) # flatten lists
+        dataset_frag.append(frag_flattend)
+
+        if acquisition_type == "DIA":
+            continue
+
+        elif acquisition_type == "DDA":
+    
             loss_with_n_digits = [ ["loss@" + str(round(mz, significant_figures))] for mz in spectrum.losses.mz] # round mz and add identifier -> loss@
             loss_multiplied_intensities = [loss * int(intensity) for loss, intensity in zip(loss_with_n_digits, intensities_from_0_to_100)] # weight losses
             loss_flattend = list(chain(*loss_multiplied_intensities)) # flatten lists
             loss_without_zeros = list(filter(lambda loss: float(loss[5:]) > 0.01, loss_flattend)) # removes 0 or negative loss values
             dataset_loss.append(loss_without_zeros)
         
-        return dataset_frag, dataset_loss
-
-    if acquisition_type == "DIA":
-        for spectrum in spectra:
-            intensities_from_0_to_100 = (spectrum.peaks.intensities * 100).round()
-
-            frag_with_n_digits = [ ["frag@" + str(round(mz, significant_figures))] for mz in spectrum.peaks.mz] # round mz and add identifier -> frag@
-            frag_multiplied_intensities = [frag * int(intensity) for frag, intensity in zip(frag_with_n_digits, intensities_from_0_to_100)] # weight fragments
-            frag_flattend = list(chain(*frag_multiplied_intensities)) # flatten lists
-            dataset_frag.append(frag_flattend)
-
+    if dataset_loss:
+        return combine_features(dataset_frag, dataset_loss)
+    elif dataset_frag and not dataset_loss:
         return dataset_frag
-
-    
-        
-
+    else:
+        raise ValueError("Something went wrong! No vocabulary generated!")
 
 
 def combine_features(dataset_frag, dataset_loss):

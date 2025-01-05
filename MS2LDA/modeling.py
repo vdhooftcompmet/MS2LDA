@@ -21,7 +21,7 @@ def define_model(n_motifs, model_parameters={}):
     return model
 
 
-def train_model(model, documents, iterations=100, step_size=10, train_parameters={}, epsilon=0.01, window_size=3):
+def train_model(model, documents, iterations=100, train_parameters={}, convergence_parameters = {"type": "entropy_history_doc", "threshold": 0.01, "window_size":3, "step_size":10}):
     """trains the LDA model on the given documents
     
     ARGS:
@@ -38,39 +38,50 @@ def train_model(model, documents, iterations=100, step_size=10, train_parameters
     for doc in documents:
         model.add_doc(doc)
 
-    entropy_history_doc = []
-    entropy_history_topic = []
-    perplexity_history = []
-    log_likelihood_history = []
-    for i in tqdm(range(0, iterations, step_size)):
-        model.train(step_size, **train_parameters)
+    convergence_history = {
+        "entropy_history_doc": [],
+        "entropy_history_topic": [],
+        "perplexity_history": [],
+        "log_likelihood_history": [],
+    }
+    
+    #entropy_history_doc = []
+    #entropy_history_topic = []
+    #perplexity_history = []
+    #log_likelihood_history = []
 
+    for _ in tqdm(range(0, iterations, convergence_parameters["step_size"])):
+        model.train(convergence_parameters["step_size"], **train_parameters)
+
+        # calculate perplexity score and saves it
         perplexity = model.perplexity
-        perplexity_history.append(perplexity)
+        convergence_history["perplexity_history"].append(perplexity)
 
+        # calculates log likelihood score and save it
         log_likelihood = model.ll_per_word
-        log_likelihood_history.append(log_likelihood)
+        convergence_history["log_likelihood_history"].append(log_likelihood)
 
+        # calculates the document topic entropy and saves it
         current_doc_entropy = calculate_document_entropy(model)
-        current_topic_entropy = calculate_topic_entropy(model)
+        convergence_history["entropy_history_doc"].append(current_doc_entropy)
+        
 
-        entropy_history_doc.append(current_doc_entropy)
-        entropy_history_topic.append(current_topic_entropy)
+        # calculates the topic word entropy and saves it
+        current_topic_entropy = calculate_topic_entropy(model)
+        convergence_history["entropy_history_topic"].append(current_topic_entropy)
         
-        # Check for convergence based on both entropies
-        doc_converged = (len(entropy_history_doc) > window_size and 
-                        check_convergence(entropy_history_doc, epsilon=epsilon, n=window_size))
+        # Check convergence criteria
+        model_converged = (len(convergence_history[convergence_parameters["type"]]) > convergence_parameters["window_size"] and 
+                           check_convergence(convergence_history[convergence_parameters["type"]], epsilon=convergence_parameters["threshold"], n=convergence_parameters["window_size"]))
         
-        #topic_converged = (len(entropy_history_topic) > n and 
-        #                check_convergence(entropy_history_topic, epsilon=epsilon, n=window_size))
-        
-        if doc_converged: # and topic_converged:
-            print("Model has converged based on both Document-Topic entropy!")
-            return model, [perplexity_history, entropy_history_topic, entropy_history_doc, log_likelihood_history]
+        # early stopping
+        if model_converged:
+            print("Model has converged")
+            return model, convergence_history
         
     else:
         print("model did not converge")
-        return model, [perplexity_history, entropy_history_topic, entropy_history_doc, log_likelihood_history]
+        return model, convergence_history
 
 
 # check if model converged 
@@ -109,7 +120,7 @@ def check_convergence(entropy_history, epsilon=0.001, n=3):
 
 
 
-def extract_motifs(model, top_n=3):
+def extract_motifs(model, top_n=50):
     """extract motifs from the trained LDA model
     
     ARGS:
@@ -142,7 +153,6 @@ def create_motif_spectra(motif_features, charge=1, motifset_name="unknown"):
     motif_spectra = []
         
     for k, motif_k_features in enumerate(motif_features):
-        #if any("frag" in feature[0] for feature in motif_k_features) and any("loss" in feature[0] for feature in motif_k_features):
         if any("frag" in feature[0] for feature in motif_k_features):
             motif_spectrum = create_spectrum(motif_k_features, k, charge=charge, motifset=motifset_name)
             motif_spectra.append(motif_spectrum)
