@@ -25,7 +25,7 @@ def create_network(spectra, significant_figures=2, motif_sizes=None, file_genera
         network (nx.Graph): network with nodes and edges
     """
     if motif_sizes is not None:
-        motif_sizes_filtered = list(map(lambda x: 0.7 if x == '?' else x, motif_sizes)) #filtering ? 
+        motif_sizes_filtered = list(map(lambda x: 0.7 if x == '?' else x, motif_sizes)) #filtering ?
 
     G = nx.Graph()
 
@@ -35,43 +35,43 @@ def create_network(spectra, significant_figures=2, motif_sizes=None, file_genera
     for i, spectrum in enumerate(spectra, start=0):
         motif_node = f'motif_{i}'
         G.add_node(motif_node)
-        
+
         peak_list = spectrum.peaks.mz
         rounded_peak_list = [round(x, significant_figures) for x in peak_list]
         loss_list = spectrum.losses.mz
         rounded_loss_list = [round(x, significant_figures) for x in loss_list]
         int_peak_list = spectrum.peaks.intensities
         int_losses_list = spectrum.losses.intensities
-        
+
         for edge, weight in zip(rounded_peak_list, int_peak_list):
             G.add_edge(motif_node, edge, weight=weight, color='red')
         for edge, weight in zip(rounded_loss_list, int_losses_list):
             G.add_edge(motif_node, edge, weight=weight, color='blue')
-    
+
     #Arranging node size - motifs
     node_sizes = {}
     if motif_sizes is None:
-        default_size = 1000  
+        default_size = 1000
         for i in range(1, len(spectra)):
             node_sizes[f'motif_{i}'] = default_size
 
     else:
         for i in range(1, len(spectra)):
             node_sizes[f'motif_{i}'] = ((motif_sizes_filtered[i] * 100) ** 2)/2
-    
-    fig, ax = plt.subplots(figsize=(50, 50))  
+
+    fig, ax = plt.subplots(figsize=(50, 50))
     edges = G.edges(data=True)
-    weights = [d['weight'] * 10 for (u, v, d) in edges]  
-    edge_colors = [d['color'] for (u, v, d) in edges]    
+    weights = [d['weight'] * 10 for (u, v, d) in edges]
+    edge_colors = [d['color'] for (u, v, d) in edges]
     pos = nx.spring_layout(G)
-    
+
     nx.draw_networkx_edges(G, pos, alpha=0.3, width=weights, edge_color=edge_colors)
     node_size_list = [node_sizes.get(node, 100) for node in G.nodes]
     nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color="#210070", alpha=0.9)
-    
+
     label_options = {"ec": "k", "fc": "white", "alpha": 0.7}
     nx.draw_networkx_labels(G, pos, font_size=14, bbox=label_options)
-    
+
     #ax.margins(0.1, 0.05)
     #fig.tight_layout()
     #plt.axis("off")
@@ -107,7 +107,7 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
     for i, spectrum in enumerate(spectra, start=0):
         motif_node = f'motif_{i}'
         G.add_node(motif_node)
-        
+
         if spectrum.peaks:
             peak_list = spectrum.peaks.mz
             rounded_peak_list = [round(x, significant_figures) for x in peak_list]
@@ -120,14 +120,14 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
             loss_list = spectrum.losses.mz
             rounded_loss_list = [round(x, significant_figures) for x in loss_list]
             int_losses_list = spectrum.losses.intensities
-        
+
             for edge, weight in zip(rounded_loss_list, int_losses_list):
                 G.add_edge(motif_node, edge, weight=weight, color='blue')
-    
+
 
     node_sizes = {}
     if motif_sizes is None:
-        default_size = 800  
+        default_size = 800
         for i in range(1, len(spectra)): # error here!?
             node_sizes[f'motif_{i}'] = default_size
     else:
@@ -145,7 +145,7 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
             node_sizes[f'motif_{i}'] = ((motif_sizes_filtered[i] * 10) **3)/3 + \
                 (((n_smiles_cluster[i]/max_n_smiles_cluster)*10)**3)/3 + \
                     (((n_frags_cluster[i]/max_n_frags_cluster)*10)**3)/3
-            
+
     # new; for tox
     node_colors = {}
     if motif_colors is None:
@@ -157,28 +157,28 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
             node_colors[f'motif_{i}'] = motif_colors[i]
     #--------------------------
 
-    
-    pos = nx.spring_layout(G)  
-    fig, ax = plt.subplots(figsize=(10, 50)) 
-    
+
+    pos = nx.spring_layout(G)
+    fig, ax = plt.subplots(figsize=(10, 50))
+
     edges = G.edges(data=True)
-    weights = [d['weight'] * 10 for (u, v, d) in edges]  
-    edge_colors = [d['color'] for (u, v, d) in edges]    
+    weights = [d['weight'] * 10 for (u, v, d) in edges]
+    edge_colors = [d['color'] for (u, v, d) in edges]
     nx.draw_networkx_edges(G, pos, alpha=0.3, width=weights, edge_color=edge_colors)
     node_size_list = [node_sizes.get(node, 100) for node in G.nodes]
     node_color_list = [node_colors.get(node, "green") for node in G.nodes]
     #node_color_list_flat = [color for sublist in node_color_list for color in (sublist if isinstance(sublist, list) else [sublist])]
-    
-    #nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color="#210070", alpha=0.9) 
-    nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color=node_color_list, alpha=0.9) 
-    
+
+    #nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color="#210070", alpha=0.9)
+    nx.draw_networkx_nodes(G, pos, node_size=node_size_list, node_color=node_color_list, alpha=0.9)
+
     label_options = {"ec": "k", "fc": "white", "alpha": 0.7}
     nx.draw_networkx_labels(G, pos, font_size=6, bbox=label_options)
-    
+
     def on_click(event):
         for node, (x, y) in pos.items():
             dist = (x - event.xdata)**2 + (y - event.ydata)**2
-            if dist < 0.00025:  
+            if dist < 0.00025:
                 if isinstance(node, str):  # Check if the node is a string and matches "motif_x"
                     node_number = int(node.split('_')[1])
                     #print(f"Node {node} clicked!\n"
@@ -191,15 +191,15 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
                     img = MolsToGridImage(mols)
 
                     #spectra[node_number].plot()
-                    
+
                     pil_img = Image.open(io.BytesIO(img.data))
-                    
+
                     # Display new window
                     pil_img.show()
 
                     for spec in spectra_cluster[node_number]: # also added
                         spectra[node_number].plot_against(spec)
-                
+
                 break
 
     # Connect the click event to the on_click function
@@ -209,7 +209,7 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
     if file_generation:
         nx.write_graphml(G, "lda_model_output.graphml")
 
-    
+
 
     return G
 
@@ -217,7 +217,7 @@ def create_interactive_motif_network(spectra, significant_figures, motif_sizes, 
 
 def plot_convergence(convergence_curve):
     fig, ax = plt.subplots(figsize=(15, 5), nrows=1, ncols=1, sharey=True, sharex=False)
-    
+
     # --- Helper function to filter out non-integer ticks ---
     def set_integer_xticks(ax, step_size):
         # Get current x-ticks and filter out non-integer values
@@ -225,13 +225,13 @@ def plot_convergence(convergence_curve):
         xticks_int = xticks[xticks % 1 == 0].astype(int)  # Only keep whole numbers
         ax.set_xticks(xticks_int)
         ax.set_xticklabels(xticks_int)
-        
+
         # Set iterations on the secondary x-axis (below the plot)
         ax_x = ax.secondary_xaxis(-0.15)
         ax_x.set_xticks(xticks_int)
         ax_x.set_xticklabels((xticks_int * step_size).astype(int))
         ax_x.set_xlabel("Iterations")
-    
+
     # --- Plot for the first subplot (left side) ---
     c1_1, = ax.plot(convergence_curve["perplexity_history"], label="Perplexity Score", color="black")
     ax1_2 = ax.twinx()
@@ -243,12 +243,12 @@ def plot_convergence(convergence_curve):
     ax1_4.spines['right'].set_position(('outward', 120))
     c1_4, = ax1_4.plot(convergence_curve["log_likelihood_history"], label="Log Likelihood", color="green")
     ax.set_xlabel("Checkpoints")
-    
+
     # Apply integer ticks
     set_integer_xticks(ax, 50)
 
     ax.set_xlim(0, len(convergence_curve["perplexity_history"]))
-    
+
     ax.set_ylabel("Perplexity")
     ax1_2.set_ylabel("Topic Entropy")
     ax1_3.set_ylabel("Document Entropy")
@@ -264,11 +264,11 @@ def plot_convergence(convergence_curve):
 
     # Adding legends
     #ax.legend(handles=[c1_1, c1_2, c1_3], loc='best')
-    
+
     # Add a shared header for all three plots
     fig.suptitle('Different Convergence Curves', fontsize=16)
     fig.subplots_adjust(top=0.85, bottom=0.2)
-    #plt.tight_layout() 
+    #plt.tight_layout()
     return fig
 
 import matplotlib.pyplot as plt
@@ -279,9 +279,30 @@ from rdkit.Chem import MolFromSmiles
 from rdkit.Chem.Draw import MolsToGridImage
 from rdkit.Chem.Draw import MolToImage
 
-def show_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, savefig=None):
+import matplotlib.pyplot as plt
+from rdkit.Chem.Draw import MolsToGridImage
+from rdkit.Chem import MolFromSmiles
+from io import BytesIO
+from PIL import Image
+import os
+import sys
 
-    assert len(opt_motif_spectra) == len(motif_spectra)
+def show_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, savefig=None):
+    """
+    Displays (and optionally saves) side-by-side RDKit molecule grids plus
+    MS2LDA motif stems. Works in both Jupyter (plt.show()) and non-notebook (e.g. Dash)
+    environments. If 'savefig' is provided, saves a PNG for each motif.
+
+    :param opt_motif_spectra: List of optimized motif spectra (matchms Spectrum objects).
+    :param motif_spectra: List of original motif spectra (matchms Spectrum objects).
+    :param clustered_smiles: List of lists of SMILES strings corresponding to each motif.
+    :param savefig: (str or None) Folder path to save output figures. If None, figures are shown but not saved.
+    """
+    assert len(opt_motif_spectra) == len(motif_spectra), "Mismatch in length of optimized vs. original motifs"
+
+    # Create the folder if savefig is provided
+    if savefig:
+        os.makedirs(savefig, exist_ok=True)
 
     for m in range(len(motif_spectra)):
 
@@ -290,45 +311,63 @@ def show_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, sa
         mass_to_charge = motif_spectra[m].peaks.mz
         intensities = motif_spectra[m].peaks.intensities
 
+        # 1) Generate RDKit molecule grid as raw PNG bytes
+        mols = [MolFromSmiles(smi) for smi in clustered_smiles[m] if smi]
+        # avoid crash if there's an empty or None SMILES in the list
+        mols = [mol for mol in mols if mol is not None]
 
-        img = MolsToGridImage([MolFromSmiles(smi) for smi in clustered_smiles[m]], molsPerRow=len(clustered_smiles[m]), subImgSize=(400, 400))
-        img = Image.open(BytesIO(img.data))
+        if len(mols) > 0:
+            raw_png = MolsToGridImage(
+                mols,
+                molsPerRow=len(mols),
+                subImgSize=(400, 400),
+                returnPNG=True
+            )
+            pil_img = Image.open(BytesIO(raw_png))
+        else:
+            # If no valid molecules, create a blank image or skip
+            pil_img = Image.new("RGB", (400, 400), "white")
 
-        fig = plt.figure(figsize=(10,6), facecolor='none', edgecolor='none')
+        # 2) Create the figure and subplots
+        fig = plt.figure(figsize=(10, 6), facecolor='none', edgecolor='none')
         ax2 = fig.add_subplot(2, 1, 1)
-        ax2.imshow(img) 
+        ax2.imshow(pil_img)
         ax2.axis("off")
-        pos = ax2.get_position()  # Get current position
+
+        # Slight manual shift if needed
+        pos = ax2.get_position()
         ax2.set_position([pos.x0, pos.y0 - 0.1, pos.width, pos.height])
 
+        # 3) Stem plot for motif mass to charge
         ax1 = fig.add_subplot(2, 1, 2)
         ax1.stem(mass_to_charge, intensities, basefmt="k-", markerfmt="", linefmt="black", label=f"motif_{m}")
-        if mass_to_charge_opt.any():
+
+        if mass_to_charge_opt.size > 0:
             ax1.stem(mass_to_charge_opt, intensities_opt, basefmt="k-", markerfmt="", linefmt="red", label=f"opt motif_{m}")
+
         ax1.set_ylim(0,)
         ax1.set_xlabel('m/z', fontsize=12)
         ax1.set_ylabel('Intensity', fontsize=12)
-
-        # Customize the axes (remove top and right spines)
-        #ax = plt.gca()  # Get current axis
         ax1.spines['right'].set_visible(False)
         ax1.spines['top'].set_visible(False)
-
-        # Optionally change color and width of remaining spines
         ax1.spines['left'].set_color('black')
         ax1.spines['bottom'].set_color('black')
         ax1.spines['left'].set_linewidth(1.5)
         ax1.spines['bottom'].set_linewidth(1.5)
-
-        # Customize the ticks
         ax1.tick_params(axis='both', which='major', direction='out', length=6, width=1.5, color='black')
         plt.legend(loc="best")
 
+        # 4) Save or Show
         if savefig:
-            plt.savefig(f"{savefig}/motif_{m}.png", format="png", dpi=400)
-            plt.close()
-        # Show the plot
-    
+            outfile = os.path.join(savefig, f"motif_{m}.png")
+            plt.savefig(outfile, format="png", dpi=400)
+            plt.close(fig)
+        else:
+            # In a non-notebook environment (like Dash), plt.show() won't display inline,
+            # but won't break anything either. You can remove plt.show() if undesired.
+            plt.show()
+
+
 
 
 def compare_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, valid_spectra, valid_mols, savefig=None):
@@ -347,7 +386,7 @@ def compare_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles,
 
         fig = plt.figure(figsize=(10,12), facecolor='none', edgecolor='none')
         ax3 = fig.add_subplot(3, 1, 3)
-        ax3.imshow(img_2) 
+        ax3.imshow(img_2)
         ax3.axis("off")
         pos = ax3.get_position()  # Get current position
         ax3.set_position([pos.x0, pos.y0 + 0.05, pos.width, pos.height])  # Move it down by 0.05
@@ -388,7 +427,7 @@ def compare_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles,
 
 
         ax1 = fig.add_subplot(3, 1, 1)
-        ax1.imshow(img_1) 
+        ax1.imshow(img_1)
         ax1.axis("off")
         pos = ax1.get_position()  # Get current position
         ax1.set_position([pos.x0, pos.y0 - 0.05, pos.width, pos.height])  # Move it down by 0.05
@@ -421,6 +460,6 @@ if __name__ == "__main__":
                         intensities=np.array([0.6, 0.1, 0.6]),
                         metadata={'id': 'spectrum4',
                                   'precursor_mz': 265.})
-    
+
     spectra = [add_losses(spectrum_1), add_losses(spectrum_2), add_losses(spectrum_3), add_losses(spectrum_4)]
     create_network(spectra)

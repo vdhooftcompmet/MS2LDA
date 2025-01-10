@@ -2,29 +2,26 @@ import json
 from collections import defaultdict
 
 import numpy as np
-
-
-def generate_corpusjson_from_tomotopy(model, documents, spectra,
-                                      doc_metadata, min_prob_to_keep_beta=1e-3,
-                                      min_prob_to_keep_phi=1e-2, min_prob_to_keep_theta=1e-2,
+def generate_corpusjson_from_tomotopy(model, documents, spectra, doc_metadata,
+                                      min_prob_to_keep_beta=1e-3,
+                                      min_prob_to_keep_phi=1e-2,
+                                      min_prob_to_keep_theta=1e-2,
                                       filename=None):
     """
-    Generates the corpusjson dictionary from a trained tomotopy LDA model.
-
-    Args:
-        model (tomotopy.LDAModel): The trained tomotopy LDA model.
-        documents (list of list of str): List of documents, where each document is a list of words.
-        spectra (list of matchms.Spectrum): List of Spectrum objects corresponding to the documents.
-        doc_metadata (dict): Metadata for each document.
-        min_prob_to_keep_beta (float): Minimum probability to include a word in beta (topic-word distributions).
-        min_prob_to_keep_phi (float): Minimum probability to include a topic in phi (word-topic distributions per document).
-        min_prob_to_keep_theta (float): Minimum probability to include a topic in theta (document-topic distributions).
-        filename (str, optional): Path to save the generated corpusjson dictionary. Defaults to None.
-
-    Returns:
-        dict: The corpusjson dictionary compatible with the LDA output format.
+    A robust version that prevents KeyError if phi refers to a motif not
+    in doc's top topics or if 'motif_XX' is missing from beta.
     """
-    # Build word_index
+    import numpy as np
+    from collections import defaultdict
+    import json
+
+    # 1) Build doc names
+    if spectra is not None and len(spectra) == len(documents):
+        doc_names = [spec.get("id") for spec in spectra]
+    else:
+        doc_names = list(doc_metadata.keys())
+
+    # 2) Gather all unique tokens from `documents`:
     unique_words = set()
     for doc in documents:
         unique_words.update(doc)
@@ -32,101 +29,157 @@ def generate_corpusjson_from_tomotopy(model, documents, spectra,
     word_index = {word: idx for idx, word in enumerate(word_list)}
     n_words = len(word_index)
 
-    # Build doc_index
-    doc_names = [spec.get("id") for spec in spectra]
-    doc_index = {name: idx for idx, name in enumerate(doc_names)}
+    # 3) doc_index
+    doc_index = {name: i for i, name in enumerate(doc_names)}
     n_docs = len(doc_index)
 
-    # Build corpus
+    # 4) corpus
     corpus = {}
     for doc_name, doc_words in zip(doc_names, documents):
         word_counts = {}
-        for word in doc_words:
-            word_counts[word] = word_counts.get(word, 0) + 1
+        for w in doc_words:
+            word_counts[w] = word_counts.get(w, 0) + 1
         corpus[doc_name] = word_counts
 
-    # Number of topics
-    K = model.k  # Number of topics in the model
+    # 5) Number of topics and alpha
+    K = model.k
+    alpha = list(map(float, model.alpha))
 
-    # Alpha (Dirichlet priors for each topic)
-    alpha = list(map(float, model.alpha))  # Ensure it's a list of floats
+    # 6) Map each token => model’s vocab index if present
+    model_vocab = model.used_vocabs
+    model_vocab_index = {w: i for i, w in enumerate(model_vocab)}
+    word_to_model_idx = {}
+    for w in word_index:
+        if w in model_vocab_index:
+            word_to_model_idx[word_index[w]] = model_vocab_index[w]
 
-    # Build mapping between our word_index and model's vocabulary
-    model_vocab = model.used_vocabs  # List of words in model's vocabulary
-    model_vocab_index = {word: idx for idx, word in enumerate(model_vocab)}
+    # 7) Construct beta_matrix (K x n_words)
+    beta_matrix = np.zeros((K, n_words), dtype=float)
+    for k_idx in range(K):
+        word_probs = model.get_topic_word_dist(k_idx)
+        for w_i in range(n_words):
+            if w_i in word_to_model_idx:
+                model_wi = word_to_model_idx[w_i]
+                beta_matrix[k_idx, w_i] = word_probs[model_wi]
+            else:
+                beta_matrix[k_idx, w_i] = 0.0
 
-    # Map our word indices to model's vocabulary indices
-    word_to_model_vocab_idx = {word_index[word]: model_vocab_index[word] for word in word_index}
-
-    # Extract beta_matrix (topic-word distributions)
-    beta_matrix = np.zeros((K, n_words))
-    for k in range(K):
-        # Get word probabilities for topic k
-        word_probs = model.get_topic_word_dist(k)
-        # Map probabilities to our word order
-        for word_idx in word_index.values():
-            model_word_idx = word_to_model_vocab_idx[word_idx]
-            beta_matrix[k, word_idx] = word_probs[model_word_idx]
-    # Now, beta_matrix[k, w] is P(word w | topic k)
-
-    # Extract gamma_matrix (document-topic distributions)
-    gamma_matrix = np.zeros((n_docs, K))
+    # 8) gamma_matrix (doc-topic distribution)
+    gamma_matrix = np.zeros((n_docs, K), dtype=float)
     for d_idx, doc in enumerate(model.docs):
         gamma_matrix[d_idx, :] = doc.get_topic_dist()
 
-    # Revised Phi Matrix Calculation (more aligned with Gensim's approach)
+    # 9) Build phi_matrix
     phi_matrix = {}
     for d_idx, doc in enumerate(model.docs):
         doc_name = doc_names[d_idx]
-        phi_matrix[doc_name] = defaultdict(lambda: np.zeros(K))  # Default zero counts for words
-        # Count word-topic assignments efficiently
-        for word_id, topic_id in zip(doc.words, doc.topics):
-            word = model.vocabs[word_id]
-            phi_matrix[doc_name][word][topic_id] += 1  # Increment count directly
+        phi_matrix[doc_name] = defaultdict(lambda: np.zeros(K, dtype=float))
+        for (word_id, topic_id) in zip(doc.words, doc.topics):
+            w_str = model.vocabs[word_id]
+            phi_matrix[doc_name][w_str][topic_id] += 1.0
+        # Normalize each word’s topic distribution
+        for w_str, topic_vec in phi_matrix[doc_name].items():
+            total = topic_vec.sum()
+            if total > 0.0:
+                phi_matrix[doc_name][w_str] = topic_vec / total
 
-        # Normalize phi for each word within the document
-        for word, topic_counts in phi_matrix[doc_name].items():
-            total_count = topic_counts.sum()
-            if total_count > 0:
-                phi_matrix[doc_name][word] = topic_counts / total_count # Correctly normalize per word
+    # 10) Build topic_index + metadata
+    topic_index = {f"motif_{k}": k for k in range(K)}
+    topic_metadata = {f"motif_{k}": {"name": f"motif_{k}", "type": "learnt"} for k in range(K)}
 
-    # Build topic_index and topic_metadata
-    topic_index = {'motif_{0}'.format(k): k for k in range(K)}
-    topic_metadata = {'motif_{0}'.format(k): {'name': 'motif_{0}'.format(k), 'type': 'learnt'} for k in range(K)}
-
-    # Construct features_to_mz_range
-    features_to_mz_range = {}
-    for word in word_index:
-        if word.startswith("frag@") or word.startswith("loss@"):
+    # 11) For convenience, extract “features” if they look like "frag@X" or "loss@X".
+    features_to_mz = {}
+    for w in word_list:
+        if w.startswith("frag@") or w.startswith("loss@"):
             try:
-                mz_value = float(word.split("@")[1])
-                features_to_mz_range[word] = (mz_value, mz_value)
-            except ValueError:
+                val = float(w.split("@")[1])
+                features_to_mz[w] = (val, val)
+            except:
                 pass
-        else:
-            pass  # Handle other cases if necessary
 
-    # Use the generate_corpusjson function
-    lda_dict = generate_corpusjson(
-        corpus=corpus,
-        word_index=word_index,
-        doc_index=doc_index,
-        K=K,
-        alpha=alpha,
-        beta_matrix=beta_matrix,
-        gamma_matrix=gamma_matrix,
-        phi_matrix=phi_matrix,
-        doc_metadata=doc_metadata,
-        topic_index=topic_index,
-        topic_metadata=topic_metadata,
-        features=features_to_mz_range,
-        min_prob_to_keep_beta=min_prob_to_keep_beta,
-        min_prob_to_keep_phi=min_prob_to_keep_phi,
-        min_prob_to_keep_theta=min_prob_to_keep_theta,
-        filename=filename
-    )
+    # 12) Prepare the final dictionary
+    lda_dict = {
+        "corpus": corpus,
+        "word_index": word_index,
+        "doc_index": doc_index,
+        "K": K,
+        "alpha": alpha,
+        "beta": {},
+        "doc_metadata": doc_metadata,
+        "topic_index": topic_index,
+        "topic_metadata": topic_metadata,
+        "features": features_to_mz,
+        "gamma": [list(map(float, row)) for row in gamma_matrix],
+    }
+
+    reverse_word_index = {v: k for k, v in word_index.items()}
+    reverse_topic_index = {v: k for k, v in topic_index.items()}
+
+    # 13) Fill in beta
+    for k_idx in range(K):
+        t_name = reverse_topic_index[k_idx]  # e.g. "motif_49"
+        t_dict = {}
+        for w_i in range(n_words):
+            val = beta_matrix[k_idx, w_i]
+            if val > min_prob_to_keep_beta:
+                w_str = reverse_word_index[w_i]
+                t_dict[w_str] = float(val)
+        lda_dict["beta"][t_name] = t_dict
+
+    # 14) Build theta from gamma
+    e_theta = gamma_matrix / gamma_matrix.sum(axis=1, keepdims=True)
+    lda_dict["theta"] = {}
+    for d_idx in range(n_docs):
+        doc_name = doc_names[d_idx]
+        row = {}
+        for k_idx in range(K):
+            val = e_theta[d_idx, k_idx]
+            if val > min_prob_to_keep_theta:
+                row[reverse_topic_index[k_idx]] = float(val)
+        lda_dict["theta"][doc_name] = row
+
+    # 15) Build phi
+    lda_dict["phi"] = {}
+    for doc_name in phi_matrix:
+        lda_dict["phi"][doc_name] = {}
+        for w_str, topic_vec in phi_matrix[doc_name].items():
+            t_sub = {}
+            for k_idx in range(K):
+                p = topic_vec[k_idx]
+                if p >= min_prob_to_keep_phi:
+                    t_sub[reverse_topic_index[k_idx]] = float(p)
+            if len(t_sub) > 0:
+                lda_dict["phi"][doc_name][w_str] = t_sub
+
+    # 16) Compute overlap_scores – now robust to “missing” topic IDs
+    overlap_scores = {}
+    for doc_name, phi_dict in lda_dict["phi"].items():
+        # Instead of only doc topics, let's just do an empty dict & fill as needed
+        doc_overlaps = {}
+        for w_str, topic_probs in phi_dict.items():
+            for t in topic_probs:
+                # Skip if not in lda_dict["beta"] for some reason
+                if t not in lda_dict["beta"]:
+                    continue
+                # Add a zero if we haven't seen it
+                if t not in doc_overlaps:
+                    doc_overlaps[t] = 0.0
+                # Multiply
+                doc_overlaps[t] += lda_dict["beta"][t].get(w_str, 0.0) * topic_probs[t]
+        # Save
+        overlap_scores[doc_name] = {}
+        for t in doc_overlaps:
+            overlap_scores[doc_name][t] = float(doc_overlaps[t])
+    lda_dict["overlap_scores"] = overlap_scores
+
+    # 17) Optionally save
+    if filename:
+        with open(filename, "w") as f:
+            json.dump(lda_dict, f, indent=2)
 
     return lda_dict
+
+
 
 
 def generate_corpusjson(corpus, word_index, doc_index, K, alpha, beta_matrix, gamma_matrix,

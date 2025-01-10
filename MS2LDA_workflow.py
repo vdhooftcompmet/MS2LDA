@@ -100,6 +100,21 @@ app.layout = dbc.Container(
                                     ],
                                     className="mb-3",
                                 ),
+                                html.Div(
+                                    [
+                                        dbc.Label("Acquisition Type"),
+                                        dbc.RadioItems(
+                                            options=[
+                                                {"label": "DDA", "value": "DDA"},
+                                                {"label": "DIA", "value": "DIA"},
+                                            ],
+                                            value="DDA",  # default
+                                            id="acquisition-type",
+                                            inline=True,
+                                        ),
+                                    ],
+                                    className="mb-3",
+                                ),
                                 dbc.InputGroup(
                                     [
                                         dbc.InputGroupText("Top N Matches"),
@@ -427,7 +442,6 @@ def display_overlap_thresh(overlap_thresh_range):
 def display_prob_filter(prob_filter_range):
     return f"Showing features with probability between {prob_filter_range[0]:.2f} and {prob_filter_range[1]:.2f}"
 
-# Callback to handle Run Analysis and Load Results
 @app.callback(
     Output("run-status", "children"),
     Output("load-status", "children"),
@@ -459,27 +473,46 @@ def handle_run_or_load(
     results_contents,
     results_filename,
 ):
+    """
+    This callback either (1) runs MS2LDA from scratch on the uploaded data (when Run Analysis clicked),
+    or (2) loads precomputed results from a JSON file (when Load Results clicked).
+
+    We now avoid re-deriving tokens that mismatch the trained model.
+    Instead, we rely on the doc words already in `trained_ms2lda` for the LDA dictionary.
+    """
+    import base64, tempfile, os, json
+    import dash
+    from dash import html
+    from dash.exceptions import PreventUpdate
+    import tomotopy as tp
+    from rdkit.Chem import MolFromSmiles
+    import numpy as np
+    from matchms import Spectrum, Fragments
+    from MS2LDA.Preprocessing.load_and_clean import load_mgf, load_mzml, load_msp, clean_spectra
+    from MS2LDA.run import filetype_check
+    from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
+    from MS2LDA.Add_On.Spec2Vec.annotation_refined import hit_clustering, optimize_motif_spectrum
+    from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, load_s2v_and_library, calc_similarity, get_library_matches
+    from dash import no_update
+    import MS2LDA  # Our main run code
+
     ctx = dash.callback_context
-
     if not ctx.triggered:
-        raise dash.exceptions.PreventUpdate
-    else:
-        triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+        raise PreventUpdate
+    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-    # Initialize outputs
-    run_status = dash.no_update
-    load_status = dash.no_update
-    clustered_smiles_data = dash.no_update
-    optimized_motifs_data = dash.no_update
-    lda_dict_data = dash.no_update
-    spectra_data = dash.no_update
+    # Default "no update" for all outputs:
+    run_status = no_update
+    load_status = no_update
+    clustered_smiles_data = no_update
+    optimized_motifs_data = no_update
+    lda_dict_data = no_update
+    spectra_data = no_update
 
-    if triggered_id == 'run-button':
-        # Handle Run Analysis
+    # 1) -------------------- If RUN-BUTTON was clicked --------------------
+    if triggered_id == "run-button":
         if not data_contents:
-            run_status = dbc.Alert(
-                "Please upload a mass spectrometry data file.", color="danger"
-            )
+            run_status = dbc.Alert("Please upload a mass spec data file first!", color="danger")
             return (
                 run_status,
                 load_status,
@@ -488,35 +521,15 @@ def handle_run_or_load(
                 lda_dict_data,
                 spectra_data,
             )
-
-        # Decode the uploaded file
+        # Decode the uploaded file into temp
         try:
             content_type, content_string = data_contents.split(",")
             decoded = base64.b64decode(content_string)
-        except Exception as e:
-            run_status = dbc.Alert(
-                f"Error decoding the uploaded file: {str(e)}", color="danger"
-            )
-            return (
-                run_status,
-                load_status,
-                clustered_smiles_data,
-                optimized_motifs_data,
-                lda_dict_data,
-                spectra_data,
-            )
-
-        # Save the uploaded file to a temporary file
-        try:
-            with tempfile.NamedTemporaryFile(
-                    delete=False, suffix=os.path.splitext(data_filename)[1]
-            ) as tmp_file:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(data_filename)[1]) as tmp_file:
                 tmp_file.write(decoded)
                 tmp_file_path = tmp_file.name
         except Exception as e:
-            run_status = dbc.Alert(
-                f"Error saving the uploaded file: {str(e)}", color="danger"
-            )
+            run_status = dbc.Alert(f"Error handling the uploaded file: {str(e)}", color="danger")
             return (
                 run_status,
                 load_status,
@@ -526,111 +539,144 @@ def handle_run_or_load(
                 spectra_data,
             )
 
-        try:
-            # Generate motifs
-            motif_spectra, convergence_curve, trained_ms2lda, feature_words, cleaned_spectra = generate_motifs(
-                tmp_file_path, n_motifs=n_motifs, iterations=100
-            )
+        # We'll call MS2LDA.run exactly as in your notebook:
+        preprocessing_parameters = {
+            "min_mz": 0,
+            "max_mz": 2000,
+            "max_frags": 1000,
+            "min_frags": 5,
+            "min_intensity": 0.01,
+            "max_intensity": 1,
+        }
+        convergence_parameters = {
+            "step_size": 50,
+            "window_size": 10,
+            "threshold": 0.005,
+            "type": "perplexity_history",
+        }
+        annotation_parameters = {
+            "criterium": "best",
+            "cosine_similarity": 0.90,
+            "n_mols_retrieved": top_n,
+        }
+        model_parameters = {
+            "rm_top": 0,
+            "min_cf": 0,
+            "min_df": 3,
+            "alpha": 0.6,
+            "eta": 0.01,
+            "seed": 42,
+        }
+        train_parameters = {
+            "parallel": 1,
+            "workers": 0,
+        }
+        dataset_parameters = {
+            "acquisition_type": "DDA",
+            "charge": 1,
+            "name": "ms2lda_dashboard_run",
+            "output_folder": "ms2lda_results",
+        }
+        fingerprint_parameters = {
+            "fp_type": "rdkit",
+            "threshold": 0.8,
+        }
+        motif_parameter = 50
+        n_iterations = 100
 
-            # Generate lda_dict using the tomotopy model
-            # Construct doc_metadata
-            doc_metadata = {}
-            for spectrum in cleaned_spectra:
-                doc_name = spectrum.get("id")
-                metadata = spectrum.metadata.copy()
-                doc_metadata[doc_name] = metadata
+        # 1.1) Actually run the pipeline:
+        motif_spectra, optimized_motifs, motif_fps = MS2LDA.run(
+            dataset=tmp_file_path,
+            n_motifs=n_motifs,
+            n_iterations=n_iterations,
+            dataset_parameters=dataset_parameters,
+            train_parameters=train_parameters,
+            model_parameters=model_parameters,
+            convergence_parameters=convergence_parameters,
+            annotation_parameters=annotation_parameters,
+            motif_parameter=motif_parameter,
+            preprocessing_parameters=preprocessing_parameters,
+            fingerprint_parameters=fingerprint_parameters,
+        )
 
-            # Generate lda_dict
-            lda_dict = generate_corpusjson_from_tomotopy(
-                model=trained_ms2lda,
-                documents=feature_words,
-                spectra=cleaned_spectra,
-                doc_metadata=doc_metadata,
-                filename=None  # Not saving to file here
-            )
+        # 1.2) Now load the *trained* tomotopy model from disk, so we can build the LDA dictionary with the EXACT tokens:
+        trained_ms2lda = tp.LDAModel.load(os.path.join(dataset_parameters["output_folder"], "ms2lda.bin"))
 
-            # Load Spec2Vec model and library based on polarity
-            if polarity == "positive":
-                path_model = (
-                    "MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model"
-                )
-                path_library = (
-                    "MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
-                )
-            else:
-                path_model = (
-                    "MS2LDA/Add_On/Spec2Vec/model_negative_mode/150724_Spec2Vec_neg_CleanedLibraries.model"
-                )
-                path_library = (
-                    "MS2LDA/Add_On/Spec2Vec/model_negative_mode/negative_s2v_library.pkl"
-                )
+        # 1.3) Reconstruct the "documents" from the actual model's doc words:
+        #      (We do NOT re-run features_to_words ourselves; we just read from model docs.)
+        documents = []
+        for doc in trained_ms2lda.docs:
+            tokens = [trained_ms2lda.vocabs[word_id] for word_id in doc.words]
+            documents.append(tokens)
 
-            # Annotate motifs
-            s2v_similarity, library = load_s2v_and_library(path_model, path_library)
+        # 1.4) We also need doc_metadata. By default, the code sets them as "spec_0", "spec_1", etc.
+        #      If you want to preserve actual metadata, you might do so separately. Here we do a simple approach:
+        doc_metadata = {}
+        for i, doc in enumerate(trained_ms2lda.docs):
+            doc_name = f"spec_{i}"
+            doc_metadata[doc_name] = {"placeholder": f"Doc {i}"}
 
-            # Calculate embeddings and similarity matrix
-            motif_embeddings = calc_embeddings(s2v_similarity, motif_spectra)
-            similarity_matrix = calc_similarity(motif_embeddings, library.embeddings)
+        # 1.5) We'll pass "spectra=None" to generate_corpusjson_from_tomotopy, letting it handle doc naming from doc_metadata keys:
+        from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
+        lda_dict = generate_corpusjson_from_tomotopy(
+            model=trained_ms2lda,
+            documents=documents,
+            spectra=None,  # we skip re-cleaning for token consistency
+            doc_metadata=doc_metadata,
+            filename=None,
+        )
 
-            matching_settings = {
-                "similarity_matrix": similarity_matrix,
-                "library": library,
-                "top_n": top_n,
-                "unique_mols": unique_mols,
+        # 1.6) But we *do* want a store of the final cleaned spectra for the network tab (images, etc.).
+        #      We'll do that once. It's OK if it doesn't match the tokenization exactly, because we won't feed them into the LDA again.
+        loaded_spectra = filetype_check(tmp_file_path)
+        cleaned_spectra = clean_spectra(loaded_spectra, preprocessing_parameters=preprocessing_parameters)
+
+        # Turn `optimized_motifs` into Python dict form for dash store:
+        def spectrum_to_dict(s):
+            metadata = s.metadata.copy()
+            dct = {
+                "metadata": metadata,
+                "mz": [float(m) for m in s.peaks.mz],
+                "intensities": [float(i) for i in s.peaks.intensities],
             }
+            if s.losses:
+                dct["metadata"]["losses"] = [
+                    {"loss_mz": float(mz_), "loss_intensity": float(int_)}
+                    for mz_, int_ in zip(s.losses.mz, s.losses.intensities)
+                ]
+            return dct
 
-            library_matches = get_library_matches(matching_settings)
+        # Convert optimized motifs:
+        optimized_motifs_data = [spectrum_to_dict(m) for m in optimized_motifs]
+        # Convert the real "cleaned_spectra" so we can show them in the network:
+        spectra_data = [spectrum_to_dict(s) for s in cleaned_spectra]
 
-            # Refine Annotation
-            clustered_spectra, clustered_smiles, clustered_scores = hit_clustering(
-                s2v_similarity, motif_spectra, library_matches, criterium="best"
-            )
+        # For "clustered_smiles_data", we gather the short_annotation from each motif:
+        clustered_smiles_data = []
+        for mot in optimized_motifs:
+            ann = mot.get("short_annotation")
+            if isinstance(ann, list):
+                clustered_smiles_data.append(ann)
+            elif ann is None:
+                clustered_smiles_data.append([])
+            else:
+                # if single string
+                clustered_smiles_data.append([ann])
 
-            # Optimize motifs
-            optimized_motifs = []
-            for motif_spec, spec_list, smiles_list in zip(
-                    motif_spectra, clustered_spectra, clustered_smiles
-            ):
-                opt_motif = optimize_motif_spectrum(motif_spec, spec_list, smiles_list)
-                optimized_motifs.append(opt_motif)
+        run_status = dbc.Alert("MS2LDA.run completed successfully!", color="success")
+        return (
+            run_status,                # run-status
+            load_status,               # load-status
+            clustered_smiles_data,     # clustered-smiles-store
+            optimized_motifs_data,     # optimized-motifs-store
+            lda_dict,                  # lda-dict-store
+            spectra_data,              # spectra-store
+        )
 
-            # Store data in dcc.Store components
-            clustered_smiles_data = clustered_smiles  # list of lists
-            optimized_motifs_data = [spectrum_to_dict(s) for s in optimized_motifs]
-            lda_dict_data = lda_dict  # Store lda_dict
-            spectra_data = [spectrum_to_dict(s) for s in cleaned_spectra]
-
-            run_status = dbc.Alert(
-                "Analysis Completed Successfully! Switch to the 'View Network' or 'Motif Rankings' to view.",
-                color="success",
-            )
-
-            return (
-                run_status,
-                load_status,
-                clustered_smiles_data,
-                optimized_motifs_data,
-                lda_dict_data,
-                spectra_data,
-            )
-
-        except Exception as e:
-            run_status = dbc.Alert(f"An error occurred during analysis: {str(e)}", color="danger")
-            return (
-                run_status,
-                load_status,
-                clustered_smiles_data,
-                optimized_motifs_data,
-                lda_dict_data,
-                spectra_data,
-            )
-
-    elif triggered_id == 'load-results-button':
-        # Handle Load Results
+    # 2) -------------------- If LOAD-RESULTS-BUTTON was clicked --------------------
+    elif triggered_id == "load-results-button":
         if not results_contents:
-            load_status = dbc.Alert(
-                "Please upload a results JSON file.", color="danger"
-            )
+            load_status = dbc.Alert("Please upload a results JSON file.", color="danger")
             return (
                 run_status,
                 load_status,
@@ -639,16 +685,12 @@ def handle_run_or_load(
                 lda_dict_data,
                 spectra_data,
             )
-
-        # Decode the uploaded file
         try:
-            content_type, content_string = results_contents.split(',')
+            content_type, content_string = results_contents.split(",")
             decoded = base64.b64decode(content_string)
             data = json.loads(decoded)
         except Exception as e:
-            load_status = dbc.Alert(
-                f"Error decoding or parsing the uploaded file: {str(e)}", color="danger"
-            )
+            load_status = dbc.Alert(f"Error decoding or parsing the file: {str(e)}", color="danger")
             return (
                 run_status,
                 load_status,
@@ -658,12 +700,9 @@ def handle_run_or_load(
                 spectra_data,
             )
 
-        # Validate the presence of required keys
-        required_keys = {'clustered_smiles_data', 'optimized_motifs_data', 'lda_dict', 'spectra_data'}
+        required_keys = {"clustered_smiles_data", "optimized_motifs_data", "lda_dict", "spectra_data"}
         if not required_keys.issubset(data.keys()):
-            load_status = dbc.Alert(
-                "Invalid file format. Missing required data.", color="danger"
-            )
+            load_status = dbc.Alert("Invalid results file. Missing required data keys.", color="danger")
             return (
                 run_status,
                 load_status,
@@ -673,15 +712,14 @@ def handle_run_or_load(
                 spectra_data,
             )
 
+        # Extract from JSON
         try:
-            clustered_smiles_data = data['clustered_smiles_data']
-            optimized_motifs_data = data['optimized_motifs_data']
-            lda_dict_data = data['lda_dict']
-            spectra_data = data['spectra_data']
+            clustered_smiles_data = data["clustered_smiles_data"]
+            optimized_motifs_data = data["optimized_motifs_data"]
+            lda_dict_data = data["lda_dict"]
+            spectra_data = data["spectra_data"]
         except Exception as e:
-            load_status = dbc.Alert(
-                f"Error extracting data from the file: {str(e)}", color="danger"
-            )
+            load_status = dbc.Alert(f"Error reading data from file: {str(e)}", color="danger")
             return (
                 run_status,
                 load_status,
@@ -691,11 +729,7 @@ def handle_run_or_load(
                 spectra_data,
             )
 
-        load_status = dbc.Alert(
-            "Results loaded successfully! Switch to the 'View Results', 'Motif Rankings', or 'Motif Details' tab to view.",
-            color="success",
-        )
-
+        load_status = dbc.Alert("Results loaded successfully!", color="success")
         return (
             run_status,
             load_status,
@@ -707,6 +741,8 @@ def handle_run_or_load(
 
     else:
         raise dash.exceptions.PreventUpdate
+
+
 
 # Callback to handle Save Results
 @app.callback(
