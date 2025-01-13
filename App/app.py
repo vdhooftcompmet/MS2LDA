@@ -32,7 +32,7 @@ app.layout = dbc.Container(
                 Developed by [Jonas Dietrich](https://github.com/j-a-dietrich),
                 [Rosina Torres Ortega](https://github.com/rtlortega), and 
                 [Joe Wandy](https://github.com/joewandy).
-                """)
+                """, style={'textAlign': 'center'})
             ], width=True),
         ], align="end"),
         html.Hr(),

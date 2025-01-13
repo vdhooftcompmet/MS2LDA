@@ -45,7 +45,7 @@ from tqdm import tqdm
 import pandas as pd
 import numpy as np
 
-from Visualisation.ldadict import save_visualization_data
+from MS2LDA.Visualisation.ldadict import save_visualization_data
 
 
 #--------------------------------------------------------main functions------------------------------------------------------------#
