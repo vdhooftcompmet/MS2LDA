@@ -25,6 +25,7 @@ dependencies:
   - pyarrow>=17.0.0
   - pymzml>=2.5.10
   - scikit-learn>=1.5.1
+  - openpyxl=3.1.5
   - pip
   - pip:
       - dash>=2.18.1
