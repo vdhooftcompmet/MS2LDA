@@ -1,7 +1,9 @@
 import json
+import os
 from collections import defaultdict
 
 import numpy as np
+from matchms import Spectrum
 
 
 def generate_corpusjson_from_tomotopy(model, documents, spectra, doc_metadata,
@@ -136,35 +138,26 @@ def generate_corpusjson_from_tomotopy(model, documents, spectra, doc_metadata,
                 row[reverse_topic_index[k_idx]] = float(val)
         lda_dict["theta"][doc_name] = row
 
-    # Build phi
-    lda_dict["phi"] = {}
-    for doc_name in phi_matrix:
-        lda_dict["phi"][doc_name] = {}
-        for w_str, topic_vec in phi_matrix[doc_name].items():
-            t_sub = {}
-            for k_idx in range(K):
-                p = topic_vec[k_idx]
-                if p >= min_prob_to_keep_phi:
-                    t_sub[reverse_topic_index[k_idx]] = float(p)
-            if len(t_sub) > 0:
-                lda_dict["phi"][doc_name][w_str] = t_sub
-
     # Compute overlap_scores
     overlap_scores = {}
-    for doc_name, phi_dict in lda_dict["phi"].items():
-        # Instead of only doc topics, let's just do an empty dict & fill as needed
+    for doc_name, phi_dict in phi_matrix.items():
         doc_overlaps = {}
-        for w_str, topic_probs in phi_dict.items():
-            for t in topic_probs:
-                # Skip if not in lda_dict["beta"] for some reason
+        for w_str, topic_vec in phi_dict.items():
+
+            # For each topic that has p >= min_prob_to_keep_phi, check if we pass that threshold
+            for k_idx, p in enumerate(topic_vec):
+                if p < min_prob_to_keep_phi:
+                    continue
+
+                t = reverse_topic_index[k_idx]
                 if t not in lda_dict["beta"]:
                     continue
-                # Add a zero if we haven't seen it
+                # add a zero if not in doc_overlaps
                 if t not in doc_overlaps:
                     doc_overlaps[t] = 0.0
-                # Multiply
-                doc_overlaps[t] += lda_dict["beta"][t].get(w_str, 0.0) * topic_probs[t]
-        # Save
+                # multiply
+                doc_overlaps[t] += lda_dict["beta"][t].get(w_str, 0.0) * p
+
         overlap_scores[doc_name] = {}
         for t in doc_overlaps:
             overlap_scores[doc_name][t] = float(doc_overlaps[t])
@@ -176,3 +169,115 @@ def generate_corpusjson_from_tomotopy(model, documents, spectra, doc_metadata,
             json.dump(lda_dict, f, indent=2)
 
     return lda_dict
+
+
+def save_visualization_data(
+        trained_ms2lda,
+        cleaned_spectra,
+        optimized_motifs,
+        output_folder,
+        filename="ms2lda_viz.json",
+        min_prob_to_keep_beta=1e-3,
+        min_prob_to_keep_phi=1e-2,
+        min_prob_to_keep_theta=1e-2
+):
+    """
+    Creates the final data structure needed by the MS2LDA UI
+    (clustered_smiles_data, optimized_motifs_data, lda_dict, spectra_data)
+    and saves it to JSON in `output_folder/filename`.
+
+    Args:
+        trained_ms2lda (tomotopy.LDAModel): the trained LDA model in memory
+        cleaned_spectra (list of Spectrum): final cleaned spectra
+        optimized_motifs (list of Spectrum): annotated + optimized motifs
+        output_folder (str): folder path for saving the .json
+        filename (str): name of the saved JSON (default "ms2lda_viz.json")
+        min_prob_to_keep_beta (float): threshold for storing topic-word distribution in beta
+        min_prob_to_keep_phi (float): threshold for storing word-topic distribution in phi (used for overlap calc)
+        min_prob_to_keep_theta (float): threshold for doc-topic distribution in theta
+
+    Returns:
+        None
+    """
+
+    # 1) Build "documents" & doc_metadata from the model in memory
+    documents = []
+    for doc_idx, doc in enumerate(trained_ms2lda.docs):
+        tokens = [trained_ms2lda.vocabs[word_id] for word_id in doc.words]
+        documents.append(tokens)
+
+    doc_metadata = {}
+    for i, doc in enumerate(trained_ms2lda.docs):
+        doc_name = f"spec_{i}"
+        doc_metadata[doc_name] = {"placeholder": f"Doc {i}"}
+
+    # 2) Generate the main LDA dictionary (which does *not* store phi in final dict)
+    lda_dict = generate_corpusjson_from_tomotopy(
+        model=trained_ms2lda,
+        documents=documents,
+        spectra=None,  # skip re-cleaning for token consistency
+        doc_metadata=doc_metadata,
+        min_prob_to_keep_beta=min_prob_to_keep_beta,
+        min_prob_to_keep_phi=min_prob_to_keep_phi,
+        min_prob_to_keep_theta=min_prob_to_keep_theta,
+        filename=None,  # we won't save it here
+    )
+
+    # 3) Convert each cleaned spectrum to a dictionary
+    def spectrum_to_dict(s):
+        dct = {
+            "metadata": s.metadata.copy(),
+            "mz": [float(mz) for mz in s.peaks.mz],
+            "intensities": [float(i) for i in s.peaks.intensities],
+        }
+        if s.losses:
+            dct["metadata"]["losses"] = [
+                {"loss_mz": float(mz_), "loss_intensity": float(int_)}
+                for mz_, int_ in zip(s.losses.mz, s.losses.intensities)
+            ]
+        return dct
+
+    # 4) Convert each optimized motif to a dictionary
+    def motif_to_dict(m):
+        dct = {
+            "metadata": m.metadata.copy(),
+            "mz": [float(x) for x in m.peaks.mz],
+            "intensities": [float(x) for x in m.peaks.intensities],
+        }
+        if m.losses:
+            dct["metadata"]["losses"] = [
+                {"loss_mz": float(mz_), "loss_intensity": float(int_)}
+                for mz_, int_ in zip(m.losses.mz, m.losses.intensities)
+            ]
+        return dct
+
+    optimized_motifs_data = [motif_to_dict(m) for m in optimized_motifs]
+    spectra_data = [spectrum_to_dict(s) for s in cleaned_spectra]
+
+    # 5) Gather short_annotation from each optimized motif for "clustered_smiles_data"
+    clustered_smiles_data = []
+    for motif in optimized_motifs:
+        ann = motif.get("short_annotation")
+        if isinstance(ann, list):
+            clustered_smiles_data.append(ann)
+        elif ann is None:
+            clustered_smiles_data.append([])
+        else:
+            # single string
+            clustered_smiles_data.append([ann])
+
+    # 6) Build the final dictionary
+    final_data = {
+        "clustered_smiles_data": clustered_smiles_data,
+        "optimized_motifs_data": optimized_motifs_data,
+        "lda_dict": lda_dict,
+        "spectra_data": spectra_data,
+    }
+
+    # 7) Save to <output_folder>/<filename>
+    os.makedirs(output_folder, exist_ok=True)
+    outpath = os.path.join(output_folder, filename)
+    with open(outpath, "w") as f:
+        json.dump(final_data, f, indent=2)
+
+    print(f"Visualization data saved to: {outpath}")

@@ -45,6 +45,9 @@ from tqdm import tqdm
 import pandas as pd
 import numpy as np
 
+from Visualisation.ldadict import save_visualization_data
+
+
 #--------------------------------------------------------main functions------------------------------------------------------------#
 def run(dataset, n_motifs, n_iterations,
         dataset_parameters,
@@ -79,6 +82,15 @@ def run(dataset, n_motifs, n_iterations,
 
 
     store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, dataset_parameters["output_folder"])
+
+    # Save additional viz data
+    save_visualization_data(
+        trained_ms2lda,
+        cleaned_spectra,
+        optimized_motifs,
+        output_folder=dataset_parameters["output_folder"],
+        filename="ms2lda_viz.json"
+    )
 
     return motif_spectra, optimized_motifs, motif_fps
 

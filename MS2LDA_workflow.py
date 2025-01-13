@@ -431,7 +431,7 @@ app.layout = dbc.Container(
                                                                 dbc.Input(
                                                                     id="n-iterations",
                                                                     type="number",
-                                                                    value=100,
+                                                                    value=1000,
                                                                 ),
                                                             ],
                                                             className="mb-2",
@@ -582,17 +582,6 @@ app.layout = dbc.Container(
                                     className="d-grid gap-2",
                                 ),
                                 html.Div(id="run-status", style={"marginTop": "20px"}),
-                                html.Div(
-                                    [
-                                        dbc.Button(
-                                            "Save Results",
-                                            id="save-results-button",
-                                            color="secondary",
-                                        ),
-                                    ],
-                                    className="d-grid gap-2 mt-3",
-                                ),
-                                html.Div(id="save-status", style={"marginTop": "20px"}),
                             ],
                             width=6,
                         )
@@ -789,8 +778,6 @@ app.layout = dbc.Container(
         dcc.Store(id="lda-dict-store"),
         dcc.Store(id='selected-motif-store'),
         dcc.Store(id='spectra-store'),
-        # Include Download component
-        dcc.Download(id="download-results"),
     ],
     fluid=False,  # Fixed-width container
 )
@@ -1207,63 +1194,6 @@ def handle_run_or_load(
     else:
         raise dash.exceptions.PreventUpdate
 
-
-# Callback to handle Save Results
-@app.callback(
-    Output("download-results", "data"),
-    Output("save-status", "children"),
-    Input("save-results-button", "n_clicks"),
-    State("clustered-smiles-store", "data"),
-    State("optimized-motifs-store", "data"),
-    State("lda-dict-store", "data"),
-    State('spectra-store', "data"),
-    prevent_initial_call=True,
-)
-def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data, lda_dict, spectra_data):
-    if not n_clicks:
-        raise dash.exceptions.PreventUpdate
-
-    if not clustered_smiles_data or not optimized_motifs_data or not lda_dict or not spectra_data:
-        return (
-            dash.no_update,
-            dbc.Alert(
-                "No analysis results to save. Please run an analysis first.", color="warning"
-            ),
-        )
-
-    try:
-        data = {
-            'clustered_smiles_data': clustered_smiles_data,
-            'optimized_motifs_data': optimized_motifs_data,
-            'lda_dict': lda_dict,
-            'spectra_data': spectra_data,
-        }
-        json_data = json.dumps(data)
-        return dcc.send_string(json_data, filename="ms2lda_results.json"), dbc.Alert(
-            "Results saved successfully!", color="success"
-        )
-    except Exception as e:
-        return (
-            dash.no_update,
-            dbc.Alert(
-                f"An error occurred while saving the results: {str(e)}", color="danger"
-            ),
-        )
-
-# Helper function to convert Spectrum to dict (for serialization)
-def spectrum_to_dict(spectrum):
-    metadata = spectrum.metadata.copy()
-    if spectrum.losses:
-        metadata["losses"] = [
-            {"loss_mz": float(loss_mz), "loss_intensity": float(loss_intensity)}
-            for loss_mz, loss_intensity in zip(spectrum.losses.mz, spectrum.losses.intensities)
-        ]
-
-    return {
-        "metadata": metadata,
-        "mz": [float(m) for m in spectrum.peaks.mz.tolist()],
-        "intensities": [float(i) for i in spectrum.peaks.intensities.tolist()],
-    }
 
 # Updated Callback to create Cytoscape elements
 @app.callback(
