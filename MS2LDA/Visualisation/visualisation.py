@@ -1,15 +1,30 @@
-from matchms import Spectrum
-from matchms.filtering import add_losses
-import numpy as np
-import networkx as nx
-import matplotlib.pyplot as plt
-from rdkit.Chem import MolFromSmiles
-from rdkit.Chem.Draw import MolsToGridImage
-from PIL import Image
-import random
 import io
-import networkx as nx
+import os
 
+import matplotlib
+import matplotlib.pyplot as plt
+import networkx as nx
+from PIL import Image
+from rdkit.Chem import MolFromSmiles
+from rdkit.Chem.Draw import MolToImage
+from rdkit.Chem.Draw import MolsToGridImage
+
+
+def _in_jupyter_notebook():
+    """Return True if running inside a Jupyter notebook/lab, else False."""
+    try:
+        from IPython import get_ipython
+        shell = get_ipython().__class__.__name__
+        # 'ZMQInteractiveShell' => jupyter notebook or jupyter lab
+        return (shell == 'ZMQInteractiveShell')
+    except Exception:
+        return False
+
+# Try to detect environment
+_in_nb = _in_jupyter_notebook()
+if not _in_nb:
+    # Switch to a non-GUI backend so macOS won't complain about NSWindow in threads
+    matplotlib.use('Agg')
 
 def create_network(spectra, significant_figures=2, motif_sizes=None, file_generation=False):
     """
@@ -271,104 +286,127 @@ def plot_convergence(convergence_curve):
     #plt.tight_layout()
     return fig
 
-import matplotlib.pyplot as plt
-from PIL import Image
-from io import BytesIO
-
-from rdkit.Chem import MolFromSmiles
-from rdkit.Chem.Draw import MolsToGridImage
-from rdkit.Chem.Draw import MolToImage
-
-import matplotlib.pyplot as plt
-from rdkit.Chem.Draw import MolsToGridImage
-from rdkit.Chem import MolFromSmiles
-from io import BytesIO
-from PIL import Image
-import os
-import sys
 
 def show_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, savefig=None):
     """
-    Displays (and optionally saves) side-by-side RDKit molecule grids plus
-    MS2LDA motif stems. Works in both Jupyter (plt.show()) and non-notebook (e.g. Dash)
-    environments. If 'savefig' is provided, saves a PNG for each motif.
+    Show side-by-side RDKit molecule images from clustered SMILES,
+    and plot motif vs. optimized motif.
 
-    :param opt_motif_spectra: List of optimized motif spectra (matchms Spectrum objects).
-    :param motif_spectra: List of original motif spectra (matchms Spectrum objects).
-    :param clustered_smiles: List of lists of SMILES strings corresponding to each motif.
-    :param savefig: (str or None) Folder path to save output figures. If None, figures are shown but not saved.
+    - If in a Jupyter notebook, we'll try the 'Notebook-friendly' style.
+    - If not in Jupyter, we'll switch to a headless backend (no GUI windows),
+      skip plt.show(), and just close figures if not saving.
     """
-    assert len(opt_motif_spectra) == len(motif_spectra), "Mismatch in length of optimized vs. original motifs"
+    assert len(opt_motif_spectra) == len(motif_spectra), (
+        "Lengths of opt_motif_spectra and motif_spectra must match!"
+    )
 
-    # Create the folder if savefig is provided
-    if savefig:
+    # Create output folder if needed
+    if savefig is not None:
         os.makedirs(savefig, exist_ok=True)
 
-    for m in range(len(motif_spectra)):
+    # We'll pass 'returnPNG=not_in_jupyter' so that in Jupyter we do no `returnPNG`,
+    # in Dash we do `returnPNG=True`.
+    not_in_jupyter = not _in_nb
 
+    for m in range(len(motif_spectra)):
         mass_to_charge_opt = opt_motif_spectra[m].peaks.mz
         intensities_opt = opt_motif_spectra[m].peaks.intensities
         mass_to_charge = motif_spectra[m].peaks.mz
         intensities = motif_spectra[m].peaks.intensities
 
-        # 1) Generate RDKit molecule grid as raw PNG bytes
-        mols = [MolFromSmiles(smi) for smi in clustered_smiles[m] if smi]
-        # avoid crash if there's an empty or None SMILES in the list
-        mols = [mol for mol in mols if mol is not None]
+        # Convert SMILES -> RDKit mols
+        mols = []
+        for smi in clustered_smiles[m]:
+            mol = MolFromSmiles(smi)
+            if mol is not None:
+                mols.append(mol)
 
-        if len(mols) > 0:
-            raw_png = MolsToGridImage(
+        # If no valid SMILES, fallback to blank
+        pil_img = None
+        if len(mols) == 0:
+            pil_img = Image.new("RGB", (400, 400), "white")
+        else:
+            # Attempt to get either a PIL object or bytes from MolsToGridImage
+            # If in Jupyter => returnPNG=False
+            # if not => returnPNG=True
+            result = MolsToGridImage(
                 mols,
                 molsPerRow=len(mols),
                 subImgSize=(400, 400),
-                returnPNG=True
+                returnPNG=not_in_jupyter
             )
-            pil_img = Image.open(BytesIO(raw_png))
-        else:
-            # If no valid molecules, create a blank image or skip
-            pil_img = Image.new("RGB", (400, 400), "white")
+            pil_img = _convert_molgrid_result_to_pil(result)
+            if pil_img is None:
+                # If that fails, fallback blank
+                pil_img = Image.new("RGB", (400, 400), "white")
 
-        # 2) Create the figure and subplots
+        # Make figure
         fig = plt.figure(figsize=(10, 6), facecolor='none', edgecolor='none')
-        ax2 = fig.add_subplot(2, 1, 1)
-        ax2.imshow(pil_img)
-        ax2.axis("off")
 
-        # Slight manual shift if needed
-        pos = ax2.get_position()
-        ax2.set_position([pos.x0, pos.y0 - 0.1, pos.width, pos.height])
+        # Top subplot: molecule grid
+        ax_top = fig.add_subplot(2, 1, 1)
+        ax_top.imshow(pil_img)
+        ax_top.axis("off")
+        top_pos = ax_top.get_position()
+        ax_top.set_position([top_pos.x0, top_pos.y0 - 0.1, top_pos.width, top_pos.height])
 
-        # 3) Stem plot for motif mass to charge
-        ax1 = fig.add_subplot(2, 1, 2)
-        ax1.stem(mass_to_charge, intensities, basefmt="k-", markerfmt="", linefmt="black", label=f"motif_{m}")
+        # Bottom subplot: motif vs. optimized motif
+        ax_bot = fig.add_subplot(2, 1, 2)
+        ax_bot.stem(mass_to_charge, intensities,
+                    basefmt="k-", markerfmt="", linefmt="black",
+                    label=f"motif_{m}")
+        if len(mass_to_charge_opt) > 0:
+            ax_bot.stem(mass_to_charge_opt, intensities_opt,
+                        basefmt="k-", markerfmt="", linefmt="red",
+                        label=f"opt motif_{m}")
 
-        if mass_to_charge_opt.size > 0:
-            ax1.stem(mass_to_charge_opt, intensities_opt, basefmt="k-", markerfmt="", linefmt="red", label=f"opt motif_{m}")
-
-        ax1.set_ylim(0,)
-        ax1.set_xlabel('m/z', fontsize=12)
-        ax1.set_ylabel('Intensity', fontsize=12)
-        ax1.spines['right'].set_visible(False)
-        ax1.spines['top'].set_visible(False)
-        ax1.spines['left'].set_color('black')
-        ax1.spines['bottom'].set_color('black')
-        ax1.spines['left'].set_linewidth(1.5)
-        ax1.spines['bottom'].set_linewidth(1.5)
-        ax1.tick_params(axis='both', which='major', direction='out', length=6, width=1.5, color='black')
+        ax_bot.set_ylim(0,)
+        ax_bot.set_xlabel('m/z', fontsize=12)
+        ax_bot.set_ylabel('Intensity', fontsize=12)
+        ax_bot.spines['right'].set_visible(False)
+        ax_bot.spines['top'].set_visible(False)
+        ax_bot.spines['left'].set_color('black')
+        ax_bot.spines['bottom'].set_color('black')
+        ax_bot.spines['left'].set_linewidth(1.5)
+        ax_bot.spines['bottom'].set_linewidth(1.5)
+        ax_bot.tick_params(axis='both', which='major', direction='out',
+                           length=6, width=1.5, color='black')
         plt.legend(loc="best")
 
-        # 4) Save or Show
+        # Save or close
         if savefig:
             outfile = os.path.join(savefig, f"motif_{m}.png")
             plt.savefig(outfile, format="png", dpi=400)
             plt.close(fig)
         else:
-            # In a non-notebook environment (like Dash), plt.show() won't display inline,
-            # but won't break anything either. You can remove plt.show() if undesired.
-            plt.show()
+            # If in Jupyter => show
+            if _in_nb:
+                plt.show()
+            else:
+                plt.close(fig)
 
+def _convert_molgrid_result_to_pil(res):
+    """
+    Attempt to convert the result of MolsToGridImage(...) into a PIL image.
+    """
+    # If we get a direct PIL image
+    if isinstance(res, Image.Image):
+        if hasattr(res, "data"):
+            try:
+                return Image.open(io.BytesIO(res.data))
+            except Exception:
+                return res
+        else:
+            return res
 
+    # If it's bytes from returnPNG=True
+    if isinstance(res, bytes):
+        try:
+            return Image.open(io.BytesIO(res))
+        except Exception:
+            pass
 
+    return None
 
 def compare_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, valid_spectra, valid_mols, savefig=None):
 
