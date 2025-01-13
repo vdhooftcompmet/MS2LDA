@@ -1,33 +1,15 @@
 import base64
 import json
-import os
-import tempfile
 
 import dash
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objs as go
-
 from dash import dash_table
 from dash import html, dcc, Input, Output, State
 from matchms import Spectrum, Fragments
 from rdkit.Chem import MolFromSmiles
-
-from MS2LDA.Add_On.Spec2Vec.annotation import (
-    load_s2v_and_library,
-    get_library_matches,
-    calc_embeddings,
-    calc_similarity,
-)
-from MS2LDA.Add_On.Spec2Vec.annotation_refined import (
-    hit_clustering,
-    optimize_motif_spectrum,
-)
-from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
-from MS2LDA.running import generate_motifs
 
 # Initialize the Dash app
 app = dash.Dash(
@@ -59,8 +41,6 @@ app.layout = dbc.Container(
             ],
             className="mt-3",
         ),
-        # Include all components in the main layout
-        # Group components for each tab in a Div
         html.Div(
             id="run-analysis-tab-content",
             children=[
@@ -88,6 +68,7 @@ app.layout = dbc.Container(
                                 html.Div(
                                     id="file-upload-info", style={"marginBottom": "20px"}
                                 ),
+                                # Basic parameters
                                 dbc.InputGroup(
                                     [
                                         dbc.InputGroupText("Number of Motifs"),
@@ -154,6 +135,442 @@ app.layout = dbc.Container(
                                     ],
                                     className="mb-3",
                                 ),
+                                dbc.Button(
+                                    "Show/Hide Advanced Settings",
+                                    id="advanced-settings-button",
+                                    color="info",
+                                    className="mb-3",
+                                ),
+                                dbc.Collapse(
+                                    id="advanced-settings-collapse",
+                                    is_open=False,
+                                    children=[
+                                        html.H5("Advanced Parameters", className="mt-3"),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    [
+                                                        # Preprocessing
+                                                        html.H6("Preprocessing"),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("min_mz"),
+                                                                dbc.Input(
+                                                                    id="prep-min-mz",
+                                                                    type="number",
+                                                                    value=0,  # default
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("max_mz"),
+                                                                dbc.Input(
+                                                                    id="prep-max-mz",
+                                                                    type="number",
+                                                                    value=2000,  # default
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("max_frags"),
+                                                                dbc.Input(
+                                                                    id="prep-max-frags",
+                                                                    type="number",
+                                                                    value=1000,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("min_frags"),
+                                                                dbc.Input(
+                                                                    id="prep-min-frags",
+                                                                    type="number",
+                                                                    value=5,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("min_intensity"),
+                                                                dbc.Input(
+                                                                    id="prep-min-intensity",
+                                                                    type="number",
+                                                                    value=0.01,
+                                                                    step=0.001,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("max_intensity"),
+                                                                dbc.Input(
+                                                                    id="prep-max-intensity",
+                                                                    type="number",
+                                                                    value=1,
+                                                                    step=0.1,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                    ],
+                                                    width=6,
+                                                ),
+                                                dbc.Col(
+                                                    [
+                                                        # Convergence
+                                                        html.H6("Convergence"),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("step_size"),
+                                                                dbc.Input(
+                                                                    id="conv-step-size",
+                                                                    type="number",
+                                                                    value=50,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("window_size"),
+                                                                dbc.Input(
+                                                                    id="conv-window-size",
+                                                                    type="number",
+                                                                    value=10,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("threshold"),
+                                                                dbc.Input(
+                                                                    id="conv-threshold",
+                                                                    type="number",
+                                                                    value=0.005,
+                                                                    step=0.0001,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("type"),
+                                                                dbc.Select(
+                                                                    id="conv-type",
+                                                                    options=[
+                                                                        {"label": "perplexity_history", "value": "perplexity_history"},
+                                                                        {"label": "entropy_history_doc", "value": "entropy_history_doc"},
+                                                                        {"label": "entropy_history_topic", "value": "entropy_history_topic"},
+                                                                        {"label": "log_likelihood_history", "value": "log_likelihood_history"},
+                                                                    ],
+                                                                    value="perplexity_history",
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                    ],
+                                                    width=6,
+                                                ),
+                                            ],
+                                        ),
+                                        html.Hr(),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    [
+                                                        html.H6("Annotation"),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("criterium"),
+                                                                dbc.Select(
+                                                                    id="ann-criterium",
+                                                                    options=[
+                                                                        {"label": "best", "value": "best"},
+                                                                        {"label": "biggest", "value": "biggest"},
+                                                                    ],
+                                                                    value="best",
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("cosine_similarity"),
+                                                                dbc.Input(
+                                                                    id="ann-cosine-sim",
+                                                                    type="number",
+                                                                    value=0.90,
+                                                                    step=0.01,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                    ],
+                                                    width=6,
+                                                ),
+                                                dbc.Col(
+                                                    [
+                                                        html.H6("Model"),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("rm_top"),
+                                                                dbc.Input(
+                                                                    id="model-rm-top",
+                                                                    type="number",
+                                                                    value=0,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("min_cf"),
+                                                                dbc.Input(
+                                                                    id="model-min-cf",
+                                                                    type="number",
+                                                                    value=0,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("min_df"),
+                                                                dbc.Input(
+                                                                    id="model-min-df",
+                                                                    type="number",
+                                                                    value=3,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                    ],
+                                                    width=6,
+                                                ),
+                                            ]
+                                        ),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    [
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("alpha"),
+                                                                dbc.Input(
+                                                                    id="model-alpha",
+                                                                    type="number",
+                                                                    value=0.6,
+                                                                    step=0.1,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("eta"),
+                                                                dbc.Input(
+                                                                    id="model-eta",
+                                                                    type="number",
+                                                                    value=0.01,
+                                                                    step=0.001,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("seed"),
+                                                                dbc.Input(
+                                                                    id="model-seed",
+                                                                    type="number",
+                                                                    value=42,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                    ],
+                                                    width=6,
+                                                ),
+                                                dbc.Col(
+                                                    [
+                                                        html.H6("Train"),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("parallel"),
+                                                                dbc.Input(
+                                                                    id="train-parallel",
+                                                                    type="number",
+                                                                    value=1,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("workers"),
+                                                                dbc.Input(
+                                                                    id="train-workers",
+                                                                    type="number",
+                                                                    value=0,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("n_iterations"),
+                                                                dbc.Input(
+                                                                    id="n-iterations",
+                                                                    type="number",
+                                                                    value=100,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                    ],
+                                                    width=6,
+                                                ),
+                                            ]
+                                        ),
+                                        html.Hr(),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    [
+                                                        html.H6("Dataset"),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("charge"),
+                                                                dbc.Input(
+                                                                    id="dataset-charge",
+                                                                    type="number",
+                                                                    value=1,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("Run Name"),
+                                                                dbc.Input(
+                                                                    id="dataset-name",
+                                                                    type="text",
+                                                                    value="ms2lda_dashboard_run",
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("Output Folder"),
+                                                                dbc.Input(
+                                                                    id="dataset-output-folder",
+                                                                    type="text",
+                                                                    value="ms2lda_results",
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                    ],
+                                                    width=6,
+                                                ),
+                                                dbc.Col(
+                                                    [
+                                                        html.H6("Fingerprint"),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("fp_type"),
+                                                                dbc.Select(
+                                                                    id="fp-type",
+                                                                    options=[
+                                                                        {"label": "rdkit", "value": "rdkit"},
+                                                                        {"label": "maccs", "value": "maccs"},
+                                                                        {"label": "pubchem", "value": "pubchem"},
+                                                                        {"label": "ecfp", "value": "ecfp"},
+                                                                        # add more if needed
+                                                                    ],
+                                                                    value="rdkit",
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("fp threshold"),
+                                                                dbc.Input(
+                                                                    id="fp-threshold",
+                                                                    type="number",
+                                                                    value=0.8,
+                                                                    step=0.1,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("Motif Parameter"),
+                                                                dbc.Input(
+                                                                    id="motif-parameter",
+                                                                    type="number",
+                                                                    value=50,
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                    ],
+                                                    width=6,
+                                                ),
+                                            ]
+                                        ),
+                                        html.Hr(),
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    [
+                                                        html.H6("Spec2Vec Paths"),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("Model Path"),
+                                                                dbc.Input(
+                                                                    id="s2v-model-path",
+                                                                    type="text",
+                                                                    # put your real default if needed:
+                                                                    value="/Users/joewandy/Work/git/MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model",
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
+                                                                dbc.InputGroupText("Library Path"),
+                                                                dbc.Input(
+                                                                    id="s2v-library-path",
+                                                                    type="text",
+                                                                    # put your real default if needed:
+                                                                    value="/Users/joewandy/Work/git/MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl",
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                        ),
+                                                    ],
+                                                    width=12,
+                                                ),
+                                            ]
+                                        ),
+                                    ],
+                                ),
+                                # End advanced settings
+
+                                # The Run button
                                 html.Div(
                                     [
                                         dbc.Button(
@@ -442,6 +859,19 @@ def display_overlap_thresh(overlap_thresh_range):
 def display_prob_filter(prob_filter_range):
     return f"Showing features with probability between {prob_filter_range[0]:.2f} and {prob_filter_range[1]:.2f}"
 
+# ADDED/CHANGED: callback to show/hide advanced settings
+@app.callback(
+    Output("advanced-settings-collapse", "is_open"),
+    Input("advanced-settings-button", "n_clicks"),
+    State("advanced-settings-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_advanced_settings(n_clicks, is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+
+# Callback to run or load
 @app.callback(
     Output("run-status", "children"),
     Output("load-status", "children"),
@@ -459,6 +889,36 @@ def display_prob_filter(prob_filter_range):
     State("polarity", "value"),
     State("upload-results", "contents"),
     State("upload-results", "filename"),
+    # ADDED/CHANGED: advanced settings states
+    State("prep-min-mz", "value"),
+    State("prep-max-mz", "value"),
+    State("prep-max-frags", "value"),
+    State("prep-min-frags", "value"),
+    State("prep-min-intensity", "value"),
+    State("prep-max-intensity", "value"),
+    State("conv-step-size", "value"),
+    State("conv-window-size", "value"),
+    State("conv-threshold", "value"),
+    State("conv-type", "value"),
+    State("ann-criterium", "value"),
+    State("ann-cosine-sim", "value"),
+    State("model-rm-top", "value"),
+    State("model-min-cf", "value"),
+    State("model-min-df", "value"),
+    State("model-alpha", "value"),
+    State("model-eta", "value"),
+    State("model-seed", "value"),
+    State("train-parallel", "value"),
+    State("train-workers", "value"),
+    State("n-iterations", "value"),
+    State("dataset-charge", "value"),
+    State("dataset-name", "value"),
+    State("dataset-output-folder", "value"),
+    State("fp-type", "value"),
+    State("fp-threshold", "value"),
+    State("motif-parameter", "value"),
+    State("s2v-model-path", "value"),
+    State("s2v-library-path", "value"),
     prevent_initial_call=True,
 )
 def handle_run_or_load(
@@ -472,27 +932,48 @@ def handle_run_or_load(
     polarity,
     results_contents,
     results_filename,
+    # advanced settings
+    prep_min_mz,
+    prep_max_mz,
+    prep_max_frags,
+    prep_min_frags,
+    prep_min_intensity,
+    prep_max_intensity,
+    conv_step_size,
+    conv_window_size,
+    conv_threshold,
+    conv_type,
+    ann_criterium,
+    ann_cosine_sim,
+    model_rm_top,
+    model_min_cf,
+    model_min_df,
+    model_alpha,
+    model_eta,
+    model_seed,
+    train_parallel,
+    train_workers,
+    n_iterations,
+    dataset_charge,
+    dataset_name,
+    dataset_output_folder,
+    fp_type,
+    fp_threshold,
+    motif_parameter,
+    s2v_model_path,
+    s2v_library_path,
 ):
     """
     This callback either (1) runs MS2LDA from scratch on the uploaded data (when Run Analysis clicked),
     or (2) loads precomputed results from a JSON file (when Load Results clicked).
-
-    We now avoid re-deriving tokens that mismatch the trained model.
-    Instead, we rely on the doc words already in `trained_ms2lda` for the LDA dictionary.
     """
     import base64, tempfile, os, json
     import dash
-    from dash import html
     from dash.exceptions import PreventUpdate
     import tomotopy as tp
-    from rdkit.Chem import MolFromSmiles
-    import numpy as np
-    from matchms import Spectrum, Fragments
-    from MS2LDA.Preprocessing.load_and_clean import load_mgf, load_mzml, load_msp, clean_spectra
+    from MS2LDA.Preprocessing.load_and_clean import clean_spectra
     from MS2LDA.run import filetype_check
     from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
-    from MS2LDA.Add_On.Spec2Vec.annotation_refined import hit_clustering, optimize_motif_spectrum
-    from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, load_s2v_and_library, calc_similarity, get_library_matches
     from dash import no_update
     import MS2LDA  # Our main run code
 
@@ -509,7 +990,7 @@ def handle_run_or_load(
     lda_dict_data = no_update
     spectra_data = no_update
 
-    # 1) -------------------- If RUN-BUTTON was clicked --------------------
+    # 1) If RUN-BUTTON was clicked
     if triggered_id == "run-button":
         if not data_contents:
             run_status = dbc.Alert("Please upload a mass spec data file first!", color="danger")
@@ -539,50 +1020,48 @@ def handle_run_or_load(
                 spectra_data,
             )
 
-        # We'll call MS2LDA.run exactly as in your notebook:
+        # ADDED/CHANGED: dynamic parameter setup
         preprocessing_parameters = {
-            "min_mz": 0,
-            "max_mz": 2000,
-            "max_frags": 1000,
-            "min_frags": 5,
-            "min_intensity": 0.01,
-            "max_intensity": 1,
+            "min_mz": prep_min_mz,
+            "max_mz": prep_max_mz,
+            "max_frags": prep_max_frags,
+            "min_frags": prep_min_frags,
+            "min_intensity": prep_min_intensity,
+            "max_intensity": prep_max_intensity,
         }
         convergence_parameters = {
-            "step_size": 50,
-            "window_size": 10,
-            "threshold": 0.005,
-            "type": "perplexity_history",
+            "step_size": conv_step_size,
+            "window_size": conv_window_size,
+            "threshold": conv_threshold,
+            "type": conv_type,
         }
         annotation_parameters = {
-            "criterium": "best",
-            "cosine_similarity": 0.90,
+            "criterium": ann_criterium,
+            "cosine_similarity": ann_cosine_sim,
             "n_mols_retrieved": top_n,
         }
         model_parameters = {
-            "rm_top": 0,
-            "min_cf": 0,
-            "min_df": 3,
-            "alpha": 0.6,
-            "eta": 0.01,
-            "seed": 42,
+            "rm_top": model_rm_top,
+            "min_cf": model_min_cf,
+            "min_df": model_min_df,
+            "alpha": model_alpha,
+            "eta": model_eta,
+            "seed": model_seed,
         }
         train_parameters = {
-            "parallel": 1,
-            "workers": 0,
+            "parallel": train_parallel,
+            "workers": train_workers,
         }
         dataset_parameters = {
-            "acquisition_type": "DDA",
-            "charge": 1,
-            "name": "ms2lda_dashboard_run",
-            "output_folder": "ms2lda_results",
+            "acquisition_type": "DDA" if polarity == "positive" else "DDA",  # could also be changed
+            "charge": dataset_charge,
+            "name": dataset_name,
+            "output_folder": dataset_output_folder,
         }
         fingerprint_parameters = {
-            "fp_type": "rdkit",
-            "threshold": 0.8,
+            "fp_type": fp_type,
+            "threshold": fp_threshold,
         }
-        motif_parameter = 50
-        n_iterations = 100
 
         # 1.1) Actually run the pipeline:
         motif_spectra, optimized_motifs, motif_fps = MS2LDA.run(
@@ -599,39 +1078,30 @@ def handle_run_or_load(
             fingerprint_parameters=fingerprint_parameters,
         )
 
-        # 1.2) Now load the *trained* tomotopy model from disk, so we can build the LDA dictionary with the EXACT tokens:
+        # 1.2) Now load the trained tomotopy model from disk to build LDA dictionary:
         trained_ms2lda = tp.LDAModel.load(os.path.join(dataset_parameters["output_folder"], "ms2lda.bin"))
 
-        # 1.3) Reconstruct the "documents" from the actual model's doc words:
-        #      (We do NOT re-run features_to_words ourselves; we just read from model docs.)
         documents = []
         for doc in trained_ms2lda.docs:
             tokens = [trained_ms2lda.vocabs[word_id] for word_id in doc.words]
             documents.append(tokens)
-
-        # 1.4) We also need doc_metadata. By default, the code sets them as "spec_0", "spec_1", etc.
-        #      If you want to preserve actual metadata, you might do so separately. Here we do a simple approach:
         doc_metadata = {}
         for i, doc in enumerate(trained_ms2lda.docs):
             doc_name = f"spec_{i}"
             doc_metadata[doc_name] = {"placeholder": f"Doc {i}"}
 
-        # 1.5) We'll pass "spectra=None" to generate_corpusjson_from_tomotopy, letting it handle doc naming from doc_metadata keys:
-        from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
         lda_dict = generate_corpusjson_from_tomotopy(
             model=trained_ms2lda,
             documents=documents,
-            spectra=None,  # we skip re-cleaning for token consistency
+            spectra=None,
             doc_metadata=doc_metadata,
             filename=None,
         )
 
-        # 1.6) But we *do* want a store of the final cleaned spectra for the network tab (images, etc.).
-        #      We'll do that once. It's OK if it doesn't match the tokenization exactly, because we won't feed them into the LDA again.
+        # 1.3) Convert the real cleaned spectra for the network:
         loaded_spectra = filetype_check(tmp_file_path)
         cleaned_spectra = clean_spectra(loaded_spectra, preprocessing_parameters=preprocessing_parameters)
 
-        # Turn `optimized_motifs` into Python dict form for dash store:
         def spectrum_to_dict(s):
             metadata = s.metadata.copy()
             dct = {
@@ -646,12 +1116,9 @@ def handle_run_or_load(
                 ]
             return dct
 
-        # Convert optimized motifs:
         optimized_motifs_data = [spectrum_to_dict(m) for m in optimized_motifs]
-        # Convert the real "cleaned_spectra" so we can show them in the network:
         spectra_data = [spectrum_to_dict(s) for s in cleaned_spectra]
 
-        # For "clustered_smiles_data", we gather the short_annotation from each motif:
         clustered_smiles_data = []
         for mot in optimized_motifs:
             ann = mot.get("short_annotation")
@@ -660,7 +1127,6 @@ def handle_run_or_load(
             elif ann is None:
                 clustered_smiles_data.append([])
             else:
-                # if single string
                 clustered_smiles_data.append([ann])
 
         run_status = dbc.Alert("MS2LDA.run completed successfully!", color="success")
@@ -673,7 +1139,7 @@ def handle_run_or_load(
             spectra_data,              # spectra-store
         )
 
-    # 2) -------------------- If LOAD-RESULTS-BUTTON was clicked --------------------
+    # 2) If LOAD-RESULTS-BUTTON was clicked
     elif triggered_id == "load-results-button":
         if not results_contents:
             load_status = dbc.Alert("Please upload a results JSON file.", color="danger")
@@ -712,7 +1178,6 @@ def handle_run_or_load(
                 spectra_data,
             )
 
-        # Extract from JSON
         try:
             clustered_smiles_data = data["clustered_smiles_data"]
             optimized_motifs_data = data["optimized_motifs_data"]
@@ -741,7 +1206,6 @@ def handle_run_or_load(
 
     else:
         raise dash.exceptions.PreventUpdate
-
 
 
 # Callback to handle Save Results
@@ -790,7 +1254,6 @@ def save_results(n_clicks, clustered_smiles_data, optimized_motifs_data, lda_dic
 def spectrum_to_dict(spectrum):
     metadata = spectrum.metadata.copy()
     if spectrum.losses:
-        # Add loss to metadata to link losses to fragments during visualization
         metadata["losses"] = [
             {"loss_mz": float(loss_mz), "loss_intensity": float(loss_intensity)}
             for loss_mz, loss_intensity in zip(spectrum.losses.mz, spectrum.losses.intensities)
@@ -811,10 +1274,8 @@ def spectrum_to_dict(spectrum):
 )
 def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
     if active_tab != "results-tab" or not optimized_motifs_data:
-        # Hide the Cytoscape component when not on the results tab or no data
         return ""
 
-    # Reconstruct spectra from stored data
     spectra = []
     for s in optimized_motifs_data:
         spectrum = Spectrum(
@@ -841,14 +1302,13 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
     cytoscape_component = cyto.Cytoscape(
         id="cytoscape-network",
         elements=elements,
-        style={"width": "100%", "height": "100%"},  # Full height of the column
-        layout={"name": "cose", "animate": False},  # Set animate to False for faster rendering
+        style={"width": "100%", "height": "100%"},
+        layout={"name": "cose", "animate": False},
         stylesheet=[
-            # Motif Nodes
             {
                 "selector": 'node[type="motif"]',
                 "style": {
-                    "background-color": "#00008B",  # Dark Blue
+                    "background-color": "#00008B",
                     "label": "data(label)",
                     "text-background-color": "white",
                     "text-background-opacity": 0.7,
@@ -858,15 +1318,14 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
                     "text-border-width": 1,
                     "text-valign": "top",
                     "text-halign": "center",
-                    "color": "black",  # Text color
+                    "color": "black",
                     "font-size": "10px",
                 },
             },
-            # Fragment and Loss Nodes
             {
                 "selector": 'node[type="fragment"]',
                 "style": {
-                    "background-color": "#008000",  # Green
+                    "background-color": "#008000",
                     "label": "data(label)",
                     "text-background-color": "white",
                     "text-background-opacity": 0.7,
@@ -876,22 +1335,20 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
                     "text-border-width": 1,
                     "text-valign": "top",
                     "text-halign": "center",
-                    "color": "black",  # Text color
+                    "color": "black",
                     "font-size": "8px",
                 },
             },
-            # Edges
             {
                 "selector": "edge",
                 "style": {
                     "line-color": "red",
                     "opacity": 0.5,
-                    "width": "mapData(weight, 0, 1, 1, 10)",  # Adjust based on actual weight range
+                    "width": "mapData(weight, 0, 1, 1, 10)",
                     "target-arrow-shape": "none",
                     "curve-style": "bezier",
                 },
             },
-            # General Node Style (if needed)
             {
                 "selector": "node",
                 "style": {
@@ -914,8 +1371,6 @@ def display_molecule_images(nodeData, clustered_smiles_data):
         motif_number = int(nodeData["id"].split("_")[1])
         if motif_number < len(clustered_smiles_data):
             smiles_list = clustered_smiles_data[motif_number]
-
-            # Create molecules, making sure to filter out None results
             mols = []
             for smi in smiles_list:
                 try:
@@ -924,28 +1379,22 @@ def display_molecule_images(nodeData, clustered_smiles_data):
                         mols.append(mol)
                 except Exception as e:
                     print(f"Error converting SMILES {smi}: {str(e)}")
-
             if not mols:
                 return dbc.Alert(
                     "No valid molecules could be created from SMILES.",
                     color="warning"
                 )
-
             try:
-                # Create grid image with legends
-                legends = [f"Match {i + 1}" for i in range(len(mols))]
                 from rdkit.Chem import Draw
+                legends = [f"Match {i + 1}" for i in range(len(mols))]
                 img = Draw.MolsToGridImage(
                     mols,
-                    molsPerRow=1,  # Set to 1 for vertical stacking
+                    molsPerRow=1,
                     subImgSize=(200, 200),
                     legends=legends,
-                    returnPNG=True  # This is important!
+                    returnPNG=True
                 )
-
-                # Image is already in PNG format, just need to encode
                 encoded = base64.b64encode(img).decode("utf-8")
-
                 return html.Div([
                     html.H5(f"Molecules for Motif {motif_number}"),
                     html.Img(
@@ -953,34 +1402,17 @@ def display_molecule_images(nodeData, clustered_smiles_data):
                         style={"margin": "10px"},
                     ),
                 ])
-
             except Exception as e:
                 print(f"Error creating grid image: {str(e)}")
                 return dbc.Alert(
                     f"Error creating molecular grid image: {str(e)}",
                     color="danger"
                 )
-
         return dbc.Alert("Motif number out of range.", color="danger")
-
-    return ""  # Return empty for non-motif nodes
+    return ""
 
 def create_cytoscape_elements(spectra, smiles_clusters):
     elements = []
-    colors = [
-        "#FF5733",
-        "#33FF57",
-        "#3357FF",
-        "#F333FF",
-        "#FF33A8",
-        "#33FFF5",
-        "#F5FF33",
-        "#A833FF",
-        "#FF8633",
-        "#33FF86",
-    ]  # Add more colors if needed
-
-    # Sets to keep track of created fragment and loss nodes
     created_fragments = set()
     created_losses = set()
 
@@ -995,8 +1427,6 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                 }
             }
         )
-
-        # Add fragment nodes and edges
         for mz, intensity in zip(spectrum.peaks.mz, spectrum.peaks.intensities):
             rounded_mz = round(mz, 2)
             frag_node = f"frag_{rounded_mz}"
@@ -1016,12 +1446,10 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                     "data": {
                         "source": motif_node,
                         "target": frag_node,
-                        "weight": intensity,  # Use intensity as weight
+                        "weight": intensity,
                     }
                 }
             )
-
-        # Add loss nodes and edges
         if spectrum.losses is not None:
             precursor_mz = float(spectrum.metadata.get('precursor_mz', 0))
             for loss_data in spectrum.metadata.get("losses", []):
@@ -1031,7 +1459,6 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                 rounded_frag_mz = round(corresponding_frag_mz, 2)
                 frag_node = f"frag_{rounded_frag_mz}"
 
-                # Ensure the corresponding fragment node exists
                 if frag_node not in created_fragments:
                     elements.append(
                         {
@@ -1043,7 +1470,6 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                         }
                     )
                     created_fragments.add(frag_node)
-
                 loss_node = f"loss_{loss_mz}"
                 if loss_node not in created_losses:
                     elements.append(
@@ -1061,94 +1487,63 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                         "data": {
                             "source": motif_node,
                             "target": loss_node,
-                            "weight": loss_intensity,  # Use loss intensity as weight
+                            "weight": loss_intensity,
                         }
                     }
                 )
-                # Optionally, connect loss to corresponding fragment
                 elements.append(
                     {
                         "data": {
                             "source": loss_node,
                             "target": frag_node,
-                            "weight": loss_intensity,  # Use loss intensity as weight
+                            "weight": loss_intensity,
                         }
                     }
                 )
-
     return elements
-
-
 
 # Helper function to compute motif degrees
 def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
-    """
-    Computes the degree, average document-to-topic probability, and average overlap score for each motif.
-
-    Parameters:
-    - lda_dict (dict): The LDA dictionary containing 'beta', 'theta', and 'overlap_scores'.
-    - p_thresh (float): The probability threshold (lower bound).
-    - o_thresh (float): The overlap threshold (lower bound).
-
-    Returns:
-    - list of tuples: Each tuple contains (motif, degree, average_probability, average_overlap).
-    """
     motifs = lda_dict["beta"].keys()
     motif_degrees = {m: 0 for m in motifs}
-    motif_probabilities = {m: [] for m in motifs}  # Store probabilities for averaging
+    motif_probabilities = {m: [] for m in motifs}
     motif_overlap_scores = {m: [] for m in motifs}
     docs = lda_dict["theta"].keys()
 
     for doc in docs:
         for motif, p in lda_dict["theta"][doc].items():
-            if p >= p_thresh:  # Apply probability threshold
+            if p >= p_thresh:
                 o = lda_dict["overlap_scores"][doc].get(motif, 0.0)
-                if o >= o_thresh:  # Apply overlap threshold
+                if o >= o_thresh:
                     motif_degrees[motif] += 1
-                    motif_probabilities[motif].append(p)  # Store probability
+                    motif_probabilities[motif].append(p)
                     motif_overlap_scores[motif].append(o)
 
     md = []
+    import numpy as np
     for motif in motifs:
-        avg_probability = np.mean(motif_probabilities[motif]) if motif_probabilities[motif] else 0  # Calculate average probability
-        avg_overlap = np.mean(motif_overlap_scores[motif]) if motif_overlap_scores[motif] else 0  # Calculate average overlap
-        md.append((motif, motif_degrees[motif], avg_probability, avg_overlap))  # Add avg_probability to the tuple
-
-    md.sort(key=lambda x: x[1], reverse=True)  # Sorting to show the most relevant motifs at the top
+        avg_probability = np.mean(motif_probabilities[motif]) if motif_probabilities[motif] else 0
+        avg_overlap = np.mean(motif_overlap_scores[motif]) if motif_overlap_scores[motif] else 0
+        md.append((motif, motif_degrees[motif], avg_probability, avg_overlap))
+    md.sort(key=lambda x: x[1], reverse=True)
     return md
 
-# Callback to update the Motif Rankings TABLE ONLY (Outputs to different container)
+# Callback to update the Motif Rankings TABLE ONLY
 @app.callback(
-    Output('motif-rankings-table-container', 'children'),  # Output to a container for the table
+    Output('motif-rankings-table-container', 'children'),
     Input('lda-dict-store', 'data'),
     Input('probability-thresh', 'value'),
     Input('overlap-thresh', 'value'),
     Input('tabs', 'value'),
 )
 def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thresh, active_tab):
-    """
-    Updates the Motif Rankings table based on the provided thresholds and active tab.
-
-    Parameters:
-    - lda_dict_data (dict): The stored LDA dictionary data.
-    - probability_thresh (list or float): The selected probability threshold range.
-    - overlap_thresh (list or float): The selected overlap threshold range.
-    - active_tab (str): The currently active tab.
-
-    Returns:
-    - Dash DataTable component or an empty string.
-    """
     if active_tab != 'motif-rankings-tab' or not lda_dict_data:
         return ""
 
-    # Correctly extract the lower bound from RangeSliders to use as thresholds
     p_thresh = probability_thresh[0] if isinstance(probability_thresh, list) else probability_thresh
     o_thresh = overlap_thresh[0] if isinstance(overlap_thresh, list) else overlap_thresh
 
-    # Compute motif degrees with the provided thresholds
     motif_degree_list = compute_motif_degrees(lda_dict_data, p_thresh, o_thresh)
-
-    # Prepare DataFrame
     df = pd.DataFrame(motif_degree_list, columns=[
         'Motif',
         'Degree',
@@ -1156,10 +1551,6 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
         'Average Overlap Score'
     ])
 
-    # *** Remove the problematic filter ***
-    # df = df[df['Degree'] > 0]  # This line has been removed to include all motifs
-
-    # Add motif annotations if available
     motif_annotations = {}
     if 'topic_metadata' in lda_dict_data:
         for motif, metadata in lda_dict_data['topic_metadata'].items():
@@ -1167,7 +1558,6 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
 
     df['Annotation'] = df['Motif'].map(motif_annotations)
 
-    # Style to make the 'Motif' column look clickable
     style_data_conditional = [
         {
             'if': {'column_id': 'Motif'},
@@ -1177,10 +1567,9 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
         },
     ]
 
-    # Create DataTable with the filtered and sorted data
     table = dash_table.DataTable(
         id='motif-rankings-table',
-        data=df.to_dict('records'),  # Use the entire DataFrame without filtering out zero-degree motifs
+        data=df.to_dict('records'),
         columns=[
             {'name': 'Motif', 'id': 'Motif'},
             {'name': 'Degree', 'id': 'Degree', 'type': 'numeric', 'format': {'specifier': ''}},
@@ -1205,7 +1594,6 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
     )
 
     return table
-
 
 # Callback to store selected motif
 @app.callback(
@@ -1240,7 +1628,7 @@ def activate_motif_details_tab(selected_motif):
     Output('spectra-table', 'data'),
     Output('spectra-table', 'columns'),
     Input('selected-motif-store', 'data'),
-    Input('probability-filter', 'value'),  # Input for probability filter
+    Input('probability-filter', 'value'),
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
@@ -1248,27 +1636,22 @@ def activate_motif_details_tab(selected_motif):
 )
 def update_motif_details(selected_motif, probability_range, lda_dict_data, clustered_smiles_data, spectra_data):
     if not selected_motif or not lda_dict_data:
-        # Return empty placeholders
-        return '', [], [], [], ''  # Removed 'probability-filter-display' from outputs
+        return '', [], [], [], ''
 
     motif_name = selected_motif
     motif_data = lda_dict_data['beta'].get(motif_name, {})
 
-    # Apply probability filter to motif_data
     filtered_motif_data = {
         feature: prob for feature, prob in motif_data.items()
         if probability_range[0] <= prob <= probability_range[1]
     }
 
-    # Display Probability Filter range is handled by its own callback
-
-    total_prob = sum(filtered_motif_data.values())  # Calculate total probability after filtering
+    total_prob = sum(filtered_motif_data.values())
     content = []
 
-    # Features table (updated to use filtered data)
     feature_table = pd.DataFrame({
-        'Feature': filtered_motif_data.keys(),  # Filtered features
-        'Probability': filtered_motif_data.values(),  # Filtered probabilities
+        'Feature': filtered_motif_data.keys(),
+        'Probability': filtered_motif_data.values(),
     }).sort_values(by='Probability', ascending=False)
     feature_table_component = dash_table.DataTable(
         data=feature_table.to_dict('records'),
@@ -1282,9 +1665,8 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
     )
     content.append(html.H5('Features Explained by This Motif'))
     content.append(feature_table_component)
-    content.append(html.P(f'Total Probability (Filtered): {total_prob:.4f}'))  # Updated label
+    content.append(html.P(f'Total Probability (Filtered): {total_prob:.4f}'))
 
-    # Prepare spectra data
     spectra_data_list = []
     for doc, topics in lda_dict_data['theta'].items():
         prob = topics.get(motif_name, 0)
@@ -1297,7 +1679,6 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
             })
     spectra_df = pd.DataFrame(spectra_data_list).sort_values(by='Probability', ascending=False)
 
-    # Prepare data and columns for spectra-table
     spectra_table_data = spectra_df.to_dict('records')
     spectra_table_columns = [
         {'name': 'Spectrum', 'id': 'Spectrum'},
@@ -1305,7 +1686,6 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
         {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
     ]
 
-    # Compute data for bar plots
     features_in_motif = list(filtered_motif_data.keys())
     total_feature_probs = {feature: 0.0 for feature in features_in_motif}
     for motif, feature_probs in lda_dict_data['beta'].items():
@@ -1313,16 +1693,13 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
             if feature in total_feature_probs:
                 total_feature_probs[feature] += prob
 
+    import plotly.express as px
     barplot1_df = pd.DataFrame({
         'Feature': features_in_motif,
         'Probability in Motif': [filtered_motif_data[feature] for feature in features_in_motif],
         'Total Probability': [total_feature_probs[feature] for feature in features_in_motif],
     })
-
-    # Limit to top 10 items based on 'Probability in Motif'
     barplot1_df = barplot1_df.sort_values(by='Probability in Motif', ascending=False).head(10)
-
-    # Melt the dataframe to long format for grouped bar chart
     barplot1_df_long = pd.melt(
         barplot1_df,
         id_vars='Feature',
@@ -1330,8 +1707,6 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
         var_name='Type',
         value_name='Probability'
     )
-
-    # Create horizontal bar plot
     barplot1_fig = px.bar(
         barplot1_df_long,
         x='Probability',
@@ -1348,11 +1723,8 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
         legend_title='',
     )
 
-    # Second bar plot data
     feature_counts = {feature: 0 for feature in features_in_motif}
     for doc in spectra_df['Spectrum']:
-        # Assuming 'corpus' is a dictionary mapping doc to features
-        # Replace 'corpus' with the actual key if different
         doc_features = lda_dict_data['corpus'].get(doc, {}).keys()
         for feature in features_in_motif:
             if feature in doc_features:
@@ -1362,11 +1734,7 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
         'Feature': features_in_motif,
         'Count': [feature_counts[feature] for feature in features_in_motif],
     })
-
-    # Limit to top 10 items based on 'Count'
     barplot2_df = barplot2_df.sort_values(by='Count', ascending=False).head(10)
-
-    # Create horizontal bar plot
     barplot2_fig = px.bar(
         barplot2_df,
         x='Count',
@@ -1384,8 +1752,7 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
     content.append(dcc.Graph(figure=barplot1_fig))
     content.append(dcc.Graph(figure=barplot2_fig))
 
-    # Spec2Vec Matching Results
-    motif_index = int(motif_name.replace('motif_', ''))
+    motif_index = int(motif_name.replace('motif_', '')) if motif_name.startswith('motif_') else 0
     if clustered_smiles_data and motif_index < len(clustered_smiles_data):
         smiles_list = clustered_smiles_data[motif_index]
         if smiles_list:
@@ -1399,8 +1766,8 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
                 except Exception as e:
                     print(f"Error converting SMILES {smi}: {str(e)}")
             if mols:
-                legends = [f"Match {i + 1}" for i in range(len(mols))]
                 from rdkit.Chem import Draw
+                legends = [f"Match {i + 1}" for i in range(len(mols))]
                 img = Draw.MolsToGridImage(
                     mols,
                     molsPerRow=4,
@@ -1413,12 +1780,10 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
                     src=f"data:image/png;base64,{encoded}",
                     style={"margin": "10px"},
                 ))
-    # Get spectra IDs
+
     spectra_ids = spectra_df['Spectrum'].tolist()
     return f"Motif Details: {motif_name}", content, spectra_ids, spectra_table_data, spectra_table_columns
 
-# **FIX FOR INITIAL SPECTRUM DISPLAY AND Syncing Selected Rows with Spectrum Index**
-# Combine updating 'selected-spectrum-index' and 'spectra-table.selected_rows' into a single callback to avoid dependency cycles
 @app.callback(
     Output('selected-spectrum-index', 'data'),
     Output('spectra-table', 'selected_rows'),
@@ -1449,23 +1814,20 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
             new_index = current_index + 1
             return new_index, [new_index]
         else:
-            return current_index, dash.no_update  # Already at last spectrum
+            return current_index, dash.no_update
 
     elif triggered_id == 'prev-spectrum':
         if motif_spectra_ids and current_index > 0:
             new_index = current_index - 1
             return new_index, [new_index]
         else:
-            return current_index, dash.no_update  # Already at first spectrum
+            return current_index, dash.no_update
 
     elif triggered_id == 'selected-motif-store' or triggered_id == 'motif-spectra-ids-store':
-        # Reset index when motif changes or spectra IDs are updated
         return 0, [0]
 
     else:
         return current_index, dash.no_update
-
-# Callback to update the spectrum plot based on selected-spectrum-index and probability filter
 @app.callback(
     Output('spectrum-plot', 'children'),
     Input('selected-spectrum-index', 'data'),
@@ -1477,77 +1839,77 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
 )
 def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra_data, lda_dict_data, selected_motif):
     if spectra_ids and spectra_data and lda_dict_data and selected_motif:
-        # Validate selected_index
         if selected_index is None or selected_index < 0 or selected_index >= len(spectra_ids):
             return html.Div("Selected spectrum index is out of range.")
 
+        # Retrieve matching spectrum data
         spectrum_id = spectra_ids[selected_index]
-
-        # Retrieve the spectrum data based on spectrum_id
         spectrum_dict = next((s for s in spectra_data if s['metadata']['id'] == spectrum_id), None)
         if not spectrum_dict:
             return html.Div("Spectrum data not found.")
 
-        # Reconstruct the Spectrum object
+        # Reconstruct Spectrum object
+        from matchms import Spectrum, Fragments
+        import numpy as np
+        import pandas as pd
+        import plotly.graph_objs as go
+
         spectrum = Spectrum(
             mz=np.array(spectrum_dict['mz']),
             intensities=np.array(spectrum_dict['intensities']),
             metadata=spectrum_dict['metadata'],
         )
 
-        # Apply probability filtering to motif features
+        # Collect motif data and filter by probability
         motif_data = lda_dict_data['beta'].get(selected_motif, {})
         filtered_motif_data = {
             feature: prob for feature, prob in motif_data.items()
             if probability_range[0] <= prob <= probability_range[1]
         }
 
-        # Extract motif-associated features (fragments and losses) from filtered data
+        # Separate out fragment and loss features
         motif_mz_values = []
         motif_loss_values = []
-        for feature in filtered_motif_data.keys():
+        for feature in filtered_motif_data:
             if feature.startswith('frag@'):
                 try:
                     mz_value = float(feature.replace('frag@', ''))
                     motif_mz_values.append(mz_value)
                 except ValueError:
-                    continue
+                    pass
             elif feature.startswith('loss@'):
                 try:
                     loss_value = float(feature.replace('loss@', ''))
                     motif_loss_values.append(loss_value)
                 except ValueError:
-                    continue
+                    pass
 
-        # Create DataFrame for plotting
+        # Turn spectrum peaks into a DataFrame
         spectrum_df = pd.DataFrame({
             'mz': spectrum.peaks.mz,
             'intensity': spectrum.peaks.intensities,
         })
 
-        # Identify motif peaks within a tolerance only if they appear in the filtered motif data
+        # Mark peaks that match motif fragments
         tolerance = 0.1
         spectrum_df['is_motif'] = False
-        for mz in motif_mz_values:
-            mask = np.abs(spectrum_df['mz'] - mz) <= tolerance
-            # Set is_motif = True only for these peaks
+        for mz_val in motif_mz_values:
+            mask = np.abs(spectrum_df['mz'] - mz_val) <= tolerance
             spectrum_df.loc[mask, 'is_motif'] = True
 
-        # Define colors based on whether the peak is a motif peak
-        colors = ['#DC143C' if is_motif else '#B0B0B0' for is_motif in spectrum_df['is_motif']]
+        # Plot colors: highlight motif peaks in red
+        colors = ['#DC143C' if is_motif else '#B0B0B0'
+                  for is_motif in spectrum_df['is_motif']]
 
-        # Prepare parent ion information
+        # Check if there's a known precursor
         parent_ion_present = False
         parent_ion_mz = None
         parent_ion_intensity = None
         if 'precursor_mz' in spectrum.metadata:
             try:
                 parent_ion_mz = float(spectrum.metadata['precursor_mz'])
-                # Retrieve parent ion intensity if available, else use max intensity
-                if 'parent_intensity' in spectrum.metadata:
-                    parent_ion_intensity = float(spectrum.metadata['parent_intensity'])
-                else:
-                    parent_ion_intensity = spectrum.intensities.max() if spectrum.intensities.size > 0 else 0
+                # If no parent_intensity known, use max peak intensity
+                parent_ion_intensity = float(spectrum.metadata.get('parent_intensity', spectrum_df['intensity'].max()))
                 parent_ion_present = True
             except (ValueError, TypeError):
                 parent_ion_present = False
@@ -1555,33 +1917,29 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
         # Create Plotly figure
         fig = go.Figure()
 
-        # Add peaks trace
+        # 1) Bar trace for the main peaks
         fig.add_trace(go.Bar(
             x=spectrum_df['mz'],
             y=spectrum_df['intensity'],
-            marker=dict(
-                color=colors,
-                line=dict(color='white', width=0),
-            ),
+            marker=dict(color=colors, line=dict(color='white', width=0)),
             width=0.2,
             name='Peaks',
             hoverinfo='text',
             hovertext=[
-                f"Motif Peak: {is_motif}<br>m/z: {mz:.2f}<br>Intensity: {intensity}"
-                for mz, intensity, is_motif in zip(spectrum_df['mz'], spectrum_df['intensity'], spectrum_df['is_motif'])
+                f"Motif Peak: {motif}<br>m/z: {mz_val:.2f}<br>Intensity: {inten}"
+                for motif, mz_val, inten in zip(spectrum_df['is_motif'],
+                                                spectrum_df['mz'],
+                                                spectrum_df['intensity'])
             ],
             opacity=0.9,
         ))
 
-        # Add parent ion if present
+        # 2) Add a bar for the parent ion if present
         if parent_ion_present and parent_ion_mz is not None and parent_ion_intensity is not None:
             fig.add_trace(go.Bar(
                 x=[parent_ion_mz],
                 y=[parent_ion_intensity],
-                marker=dict(
-                    color='#0000FF',  # Parent Ion Blue
-                    line=dict(color='white', width=0),
-                ),
+                marker=dict(color='#0000FF', line=dict(color='white', width=0)),
                 width=0.4,
                 name='Parent Ion',
                 hoverinfo='text',
@@ -1589,59 +1947,55 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
                 opacity=1.0,
             ))
 
-        # Draw loss annotations only if they are in filtered_motif_data
+        # 3) Draw lines for “loss” annotation if the doc has "losses"
         if "losses" in spectrum.metadata and parent_ion_present:
             precursor_mz = parent_ion_mz
-            for loss_data in spectrum.metadata["losses"]:
-                loss_mz = loss_data["loss_mz"]
-                loss_intensity = loss_data["loss_intensity"]
-                loss_feature = f"loss@{loss_mz:.4f}"  # Create a string like loss@XXX to match format
-
-                # Check if this loss feature is in filtered_motif_data (and thus above threshold)
-                # We'll allow some tolerance for floating point formatting
-                # Instead of strict match, check by absolute difference
-                # Motif_loss_values are floats from filtered_motif_data, so let's just compare difference:
+            for loss_item in spectrum.metadata["losses"]:
+                loss_mz = loss_item["loss_mz"]
+                loss_intensity = loss_item["loss_intensity"]
+                # If this loss is not in the motif, skip it
+                # (some users want to see all, but let's follow your code's logic)
                 if not any(abs(loss_mz - val) <= tolerance for val in motif_loss_values):
                     continue
 
-                # Calculate corresponding fragment m/z
-                frag_mz = precursor_mz - loss_mz
-                frag_mask = np.abs(spectrum.peaks.mz - frag_mz) <= tolerance
-                if not np.any(frag_mask):
+                # Attempt to find a corresponding fragment
+                corresponding_frag_mz = precursor_mz - loss_mz
+                frag_mask = (np.abs(spectrum_df['mz'] - corresponding_frag_mz) <= tolerance)
+                # If no matches, skip
+                if not frag_mask.any():
                     continue
 
-                closest_frag_mz = spectrum.peaks.mz[frag_mask][0]
-                closest_frag_intensity = spectrum.peaks.intensities[frag_mask][0]
+                # Safely pick the first matched row
+                frag_subset = spectrum_df.loc[frag_mask]
+                if frag_subset.empty:
+                    continue  # <--- FIX: skip if empty
 
-                # Add horizontal dash line
+                closest_frag_mz = frag_subset['mz'].iloc[0]
+                closest_frag_intensity = frag_subset['intensity'].iloc[0]
+
+                # Add a dashed line connecting them
                 fig.add_shape(
                     type="line",
                     x0=closest_frag_mz,
                     y0=closest_frag_intensity,
                     x1=precursor_mz,
                     y1=closest_frag_intensity,
-                    line=dict(
-                        color="green",
-                        width=2,
-                        dash="dash",
-                    ),
+                    line=dict(color="green", width=2, dash="dash"),
                 )
+                # Add annotation for the loss value
                 fig.add_annotation(
                     x=(closest_frag_mz + precursor_mz) / 2,
                     y=closest_frag_intensity,
                     text=f"-{loss_mz:.2f}",
                     showarrow=False,
-                    font=dict(
-                        family="Courier New, monospace",
-                        size=12,
-                        color="green"
-                    ),
+                    font=dict(family="Courier New, monospace", size=12, color="green"),
                     bgcolor="rgba(255,255,255,0.7)",
                     xanchor="center",
                     yanchor="bottom",
                     standoff=5,
                 )
 
+        # Final figure layout
         fig.update_layout(
             title=f"Spectrum: {spectrum_id}",
             xaxis_title='m/z',
@@ -1662,16 +2016,12 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
             hovermode='closest',
         )
 
-        graph_component = dcc.Graph(
+        return dcc.Graph(
             figure=fig,
-            style={
-                'width': '100%',
-                'height': '600px',
-                'margin': 'auto'
-            }
+            style={'width': '100%', 'height': '600px', 'margin': 'auto'}
         )
 
-        return graph_component
+    return ""
 
 
 # Run the Dash app
