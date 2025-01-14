@@ -60,7 +60,7 @@ def run(dataset, n_motifs, n_iterations,
     loaded_spectra = filetype_check(dataset=dataset)
     cleaned_spectra = clean_spectra(loaded_spectra, preprocessing_parameters)
     print("Cleaning spectra ...", len(cleaned_spectra), "spectra left")
-    feature_words = features_to_words(spectra=cleaned_spectra, significant_figures=2, acquisition_type=dataset_parameters["acquisition_type"])
+    feature_words = features_to_words(spectra=cleaned_spectra, significant_figures=dataset_parameters["significant_digits"], acquisition_type=dataset_parameters["acquisition_type"])
     
     # Modeling
     ms2lda = define_model(n_motifs=n_motifs, model_parameters=model_parameters)
@@ -68,7 +68,7 @@ def run(dataset, n_motifs, n_iterations,
 
     # Motif Generation
     motifs = extract_motifs(trained_ms2lda, top_n=motif_parameter)
-    motif_spectra = create_motif_spectra(motifs, charge=dataset_parameters["charge"], motifset_name=dataset_parameters["name"]) # output name
+    motif_spectra = create_motif_spectra(motifs, charge=dataset_parameters["charge"], motifset_name=dataset_parameters["name"], significant_digits=dataset_parameters["significant_digits"]) # output name
 
     # Motif Annotation and Optimization
     library_matches, s2v_similarity = s2v_annotation(motif_spectra, annotation_parameters)
@@ -310,8 +310,8 @@ def s2v_annotation(motif_spectra, annotation_parameters):
 
 
 def load_s2v(
-        path_model = "/Users/rosinatorres/Documents/PhD/WP1/Project/Code/MS2LDA/MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model",
-        path_library = "/Users/rosinatorres/Documents/PhD/WP1/Project/Code/MS2LDA/MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
+        path_model = r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\Spec2Struc\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode\020724_Spec2Vec_pos_CleanedLibraries.model",
+        path_library = r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\Spec2Struc\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode\positive_s2v_library.pkl"
         ):
     
     s2v_similarity, library = load_s2v_and_library(path_model, path_library)

@@ -72,6 +72,7 @@ def motif_intersection_fragments(motif_spectrum, common_fragments, frag_err=2):
         if fragment_mz in motif_spectrum_fragments_mz:
             index = motif_spectrum_fragments_mz.index(fragment_mz)
             fragment_intensity = motif_spectrum.peaks.intensities[index]
+            fragment_mz = motif_spectrum.peaks.mz[index]
 
             opt_motif_fragments_mz.append(fragment_mz)
             opt_motif_fragments_intensities.append(fragment_intensity)
@@ -99,6 +100,7 @@ def motif_intersection_losses(motif_spectrum, common_losses, loss_err=2):
         if loss_mz in motif_spectrum_losses_mz:
             index = motif_spectrum_losses_mz.index(loss_mz)
             loss_intensity = motif_spectrum.losses.intensities[index]
+            loss_mz = motif_spectrum.losses.mz[index]
 
             opt_motif_losses_mz.append(loss_mz)
             opt_motif_losses_intensities.append(loss_intensity)

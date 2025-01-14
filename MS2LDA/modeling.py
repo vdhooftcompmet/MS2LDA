@@ -140,7 +140,7 @@ def extract_motifs(model, top_n=50):
     return motif_features
 
 
-def create_motif_spectra(motif_features, charge=1, motifset_name="unknown"):
+def create_motif_spectra(motif_features, charge=1, motifset_name="unknown", significant_digits=2):
     """creates a matchms spectrum object for the found motifs
     
     ARGS:
@@ -154,7 +154,7 @@ def create_motif_spectra(motif_features, charge=1, motifset_name="unknown"):
         
     for k, motif_k_features in enumerate(motif_features):
         if any("frag" in feature[0] for feature in motif_k_features):
-            motif_spectrum = create_spectrum(motif_k_features, k, charge=charge, motifset=motifset_name)
+            motif_spectrum = create_spectrum(motif_k_features, k, charge=charge, motifset=motifset_name, significant_digits=significant_digits)
             motif_spectra.append(motif_spectrum)
 
     return motif_spectra

@@ -266,7 +266,7 @@ def mf_finder(mz, session):
 
 def mf_finder_local(mz):
     chemcalcURL = 'https://www.chemcalc.org/chemcalc/em'
-    options = {'mfRange': 'C0-100H0-202N0-20O0-20S0-4',
+    options = {'mfRange': 'C0-100H0-202N0-20O0-20S0-5F0-7Cl0-7I0-1Br0-2', # fluor is missing!!!
                'numberOfResultsOnly': False,
                'typedResult': False,
                'useUnsaturation': False,
@@ -302,7 +302,10 @@ def analog_finder_local(spectrum, motif_fp_array, database):
             motif_fp = array_to_fingerprint(motif_fp_array)
             for candidate_smiles in analog_candidates_smiles:
                 candidate_mol = MolFromSmiles(candidate_smiles)
-                candidate_fp = MACCSkeys.GenMACCSKeys(candidate_mol)                    
+                if len(motif_fp_array) < 200:
+                    candidate_fp = MACCSkeys.GenMACCSKeys(candidate_mol) 
+                else:
+                    candidate_fp = Chem.RDKFingerprint(candidate_mol)                 
 
                 tanimoto_score = DataStructs.TanimotoSimilarity(motif_fp, candidate_fp)
                 analog_candidates.append((tanimoto_score, candidate_smiles))
@@ -386,7 +389,10 @@ def find_analogs(spectrum, motif_fp_array):
             motif_fp = array_to_fingerprint(motif_fp_array)
             for candidate_smiles in analog_candidates_smiles:
                 candidate_mol = MolFromSmiles(candidate_smiles)
-                candidate_fp = MACCSkeys.GenMACCSKeys(candidate_mol)                    
+                if len(motif_fp_array) < 200:
+                    candidate_fp = MACCSkeys.GenMACCSKeys(candidate_mol) 
+                else:
+                    candidate_fp = Chem.RDKFingerprint(candidate_mol)                     
 
                 tanimoto_score = DataStructs.TanimotoSimilarity(motif_fp, candidate_fp)
                 analog_candidates.append((tanimoto_score, candidate_smiles))
