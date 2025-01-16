@@ -45,6 +45,9 @@ from tqdm import tqdm
 import pandas as pd
 import numpy as np
 
+from MS2LDA.Visualisation.ldadict import save_visualization_data
+
+
 #--------------------------------------------------------main functions------------------------------------------------------------#
 def run(dataset, n_motifs, n_iterations,
         dataset_parameters,
@@ -56,11 +59,11 @@ def run(dataset, n_motifs, n_iterations,
         motif_parameter,
         fingerprint_parameters):
     """main function to run MS2LDA workflow in a jupyter notebook"""
-    
+
     loaded_spectra = filetype_check(dataset=dataset)
     cleaned_spectra = clean_spectra(loaded_spectra, preprocessing_parameters)
     print("Cleaning spectra ...", len(cleaned_spectra), "spectra left")
-    feature_words = features_to_words(spectra=cleaned_spectra, significant_figures=dataset_parameters["significant_digits"], acquisition_type=dataset_parameters["acquisition_type"])
+    feature_words = features_to_words(spectra=cleaned_spectra, significant_figures=dataset_parameters["significant_digits"], acquisition_type=dataset_parameters["acquisition_type"]) # significant digits need to be added in dash.
     
     # Modeling
     ms2lda = define_model(n_motifs=n_motifs, model_parameters=model_parameters)
@@ -79,7 +82,16 @@ def run(dataset, n_motifs, n_iterations,
 
 
     store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, dataset_parameters["output_folder"])
-    
+
+    # Save additional viz data
+    save_visualization_data(
+        trained_ms2lda,
+        cleaned_spectra,
+        optimized_motifs,
+        output_folder=dataset_parameters["output_folder"],
+        filename="ms2lda_viz.json"
+    )
+
     return motif_spectra, optimized_motifs, motif_fps
 
 
@@ -92,7 +104,7 @@ def screen_spectra(motifs_stored=None, dataset=None, motif_spectra=None, motifDB
 
     if motifDB or motifDB_query:
         if motifDB and motifDB_query:
-            if type(motifDB) == str: 
+            if type(motifDB) == str:
                 if motifDB.endswith(".xlsx"):
                     ms1_motifDB, ms2_motifDB = load_motifDB_excel(motifDB)
                     motifs_stored = massql_search(ms1_motifDB, ms2_motifDB, motifDB_query)
@@ -104,15 +116,15 @@ def screen_spectra(motifs_stored=None, dataset=None, motif_spectra=None, motifDB
                 motifs_stored = massql_search(ms1_motifDB, ms2_motifDB, motifDB_query)
             else:
                 raise ValueError("This file format is not supported")
-                
+
         else:
             raise ValueError("A MotifDB dataframe and a query need to be used as an input")
-    
+
     screening_hits_spectra = []
     screening_hits_motifs = []
     if dataset:
         screening_hits_spectra = spectrum_screening(dataset, motifs_stored, s2v_similarity, threshold=threshold)
-    
+
     if motif_spectra:
         screening_hits_motifs = motif_screening(motif_spectra, motifs_stored, s2v_similarity, threshold=threshold)
 
@@ -124,7 +136,7 @@ def screen_spectra(motifs_stored=None, dataset=None, motif_spectra=None, motifDB
         screening_hits.to_excel(writer)
 
     os.chdir(curr_dir)
-   
+
     return screening_hits
 
 
@@ -134,9 +146,9 @@ def screen_structure(motif_fps, motif_spectra, structure_query, fp_type="rdkit",
         query_fp = calc_fingerprints([[smiles]], fp_type=fp_type)
         query_fps.append(query_fp[0])
 
-    if len(motif_fps[0]) != len(query_fps[0]): 
+    if len(motif_fps[0]) != len(query_fps[0]):
         raise ValueError("Not the same fingerprints used", len(motif_fps[0]), "vs", len(query_fps[0]))
-    
+
     tanimoto_scores = tanimoto_similarity(query_fps, motif_fps)
     matching_motif_idx = np.argwhere(tanimoto_scores >= threshold)
     output = generate_output(matching_motif_idx, motif_spectra, tanimoto_scores, structure_query)
@@ -150,7 +162,7 @@ def screen_structure(motif_fps, motif_spectra, structure_query, fp_type="rdkit",
 
     return output
 
-    
+
 def generate_output(matching_motif_idx, motif_spectra, tanimoto_scores, structure_query):
     results = {
         "Query_Smiles": [],
@@ -177,12 +189,12 @@ def massql_search(ms1_motifDB, ms2_motifDB, motifDB_query):
     else:
         raise ValueError("No matching motif in MotifDB")
     return motif_matches
-    
-    
-    
+
+
+
 
 #--------------------------------------------------------helper functions------------------------------------------------------------#
-    
+
 def spectrum_screening(dataset, motifs_stored, s2v_similarity, threshold=0.5):
     dataset_spectra = filetype_check(dataset=dataset)
     dataset_spectra = clean_spectra(dataset_spectra)
@@ -199,7 +211,7 @@ def spectrum_screening(dataset, motifs_stored, s2v_similarity, threshold=0.5):
 
     return screening_hits
 
-    
+
 
 def motif_screening(motifs_stored, motif_spectra, s2v_similarity, threshold=0.7):
     motif_stored_embeddings = calc_embeddings(s2v_similarity, motifs_stored)
@@ -214,7 +226,7 @@ def motif_screening(motifs_stored, motif_spectra, s2v_similarity, threshold=0.7)
                 screening_hits.append(screening_hit)
 
     return screening_hits
-        
+
 
 
 def add_metadata(spectrum, motif_spectrum, value, screen_type):
@@ -226,7 +238,7 @@ def add_metadata(spectrum, motif_spectrum, value, screen_type):
         "ref_motif_id": motif_spectrum.get("id"),
         "ref_short_annotation": motif_spectrum.get("short_annotation"),
         "ref_annotation": motif_spectrum.get("annotation"),
-        "ref_charge": motif_spectrum.get("charge"),   
+        "ref_charge": motif_spectrum.get("charge"),
         }
 
 
@@ -260,11 +272,11 @@ def store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_c
 
     ms1_motifDB_opt, ms2_motifDB_opt = motifs2motifDB(optimized_motifs) # of motif_spectra?
     store_motifDB_excel(ms1_motifDB_opt, ms2_motifDB_opt, name="motifDB_optimized.xlsx")
-    ms1_motifDB, ms2_motifDB = motifs2motifDB(motif_spectra) 
+    ms1_motifDB, ms2_motifDB = motifs2motifDB(motif_spectra)
     store_motifDB_excel(ms1_motifDB, ms2_motifDB)
 
     os.chdir(curr_dir)
- 
+
 
 
 
@@ -282,12 +294,12 @@ def filetype_check(dataset):
 
     elif type(dataset) == list: # and type(dataset[0]) == matchms.Spectrum.Spectrum:
         loaded_spectra = dataset
-    
+
     else:
         raise ValueError("No valid dataset found!")
 
     return loaded_spectra
-    
+
 
 
 def s2v_annotation(motif_spectra, annotation_parameters):
@@ -296,7 +308,7 @@ def s2v_annotation(motif_spectra, annotation_parameters):
     print("Searches for candidates ...")
     motif_embeddings = calc_embeddings(s2v_similarity, motif_spectra)
     similarity_matrix = calc_similarity(motif_embeddings, library.embeddings)
-    
+
     matching_settings = {
         "similarity_matrix": similarity_matrix,
         "library": library,
@@ -305,15 +317,15 @@ def s2v_annotation(motif_spectra, annotation_parameters):
     }
 
     library_matches = get_library_matches(matching_settings)
-    
+
     return library_matches, s2v_similarity
 
 
 def load_s2v(
-        path_model = r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\Spec2Struc\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode\020724_Spec2Vec_pos_CleanedLibraries.model",
-        path_library = r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\Spec2Struc\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode\positive_s2v_library.pkl"
+        path_model = "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model",
+        path_library = "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
         ):
-    
+
     s2v_similarity, library = load_s2v_and_library(path_model, path_library)
 
     return s2v_similarity, library

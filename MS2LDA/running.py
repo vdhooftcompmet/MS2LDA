@@ -148,9 +148,8 @@ def generate_motifs(mgf_path,
                     
         screening_results_df = pd.DataFrame(screening_results)
         return motif_spectra, screening_results_df, screening_hits
-        
-    
-    return motif_spectra, convergence_curve, trained_ms2lda
+
+    return motif_spectra, convergence_curve, trained_ms2lda, feature_words, cleaned_spectra
 
 
 def annotate_motifs(motif_spectra, 
