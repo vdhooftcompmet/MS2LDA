@@ -322,8 +322,8 @@ def s2v_annotation(motif_spectra, annotation_parameters):
 
 
 def load_s2v(
-        path_model = "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model",
-        path_library = "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
+        path_model = "../MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model",
+        path_library = "../MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
         ):
 
     s2v_similarity, library = load_s2v_and_library(path_model, path_library)
