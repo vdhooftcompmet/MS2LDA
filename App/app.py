@@ -659,6 +659,23 @@ app.layout = dbc.Container(
                                                         html.H6("Dataset"),
                                                         dbc.InputGroup(
                                                             [
+                                                                dbc.InputGroupText("sig_digits", id="prep-sigdig-tooltip"),
+                                                                dbc.Input(
+                                                                    id="prep-sigdig",
+                                                                    type="number",
+                                                                    value=2,  # default
+                                                                ),
+                                                            ],
+                                                            className="mb-2",
+                                                            id="prep-sigdig-ig",
+                                                        ),
+                                                        dbc.Tooltip(
+                                                            "Significant number of digits for fragments and losses.",
+                                                            target="prep-sigdig-tooltip",
+                                                            placement="right",
+                                                        ),
+                                                        dbc.InputGroup(
+                                                            [
                                                                 dbc.InputGroupText("charge", id="dataset-charge-tooltip"),
                                                                 dbc.Input(
                                                                     id="dataset-charge",
@@ -1094,6 +1111,7 @@ def toggle_advanced_settings(n_clicks, is_open):
     State("upload-results", "contents"),
     State("upload-results", "filename"),
 
+    State("prep-sigdig", "value"),
     State("prep-min-mz", "value"),
     State("prep-max-mz", "value"),
     State("prep-max-frags", "value"),
@@ -1136,6 +1154,7 @@ def handle_run_or_load(
     polarity,
     results_contents,
     results_filename,
+    prep_sigdig,
     prep_min_mz,
     prep_max_mz,
     prep_max_frags,
@@ -1255,6 +1274,7 @@ def handle_run_or_load(
         dataset_parameters = {
             "acquisition_type": "DDA" if polarity == "positive" else "DDA",
             "charge": dataset_charge,
+            "significant_digits": prep_sigdig,
             "name": dataset_name,
             "output_folder": dataset_output_folder,
         }
