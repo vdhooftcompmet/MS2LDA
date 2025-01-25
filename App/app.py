@@ -16,8 +16,10 @@ from dash import html, dcc, Input, Output, State
 from dash import no_update
 from dash.exceptions import PreventUpdate
 from matchms import Spectrum, Fragments
+from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import MolFromSmiles
+from rdkit.Chem.Draw import MolsToGridImage
 
 import MS2LDA
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
@@ -68,6 +70,19 @@ app.layout = dbc.Container(
         html.Div(
             id="run-analysis-tab-content",
             children=[
+                html.Div(
+                    [
+                        dcc.Markdown(
+                            """
+                            This tab allows you to run an MS2LDA analysis from scratch using a single uploaded data file. 
+                            You can control basic parameters like the number of motifs, polarity, and top N Spec2Vec matches, 
+                            as well as advanced settings (e.g., min_mz, max_mz). 
+                            When ready, click "Run Analysis" to generate the results and proceed to the other tabs for visualization.
+                            """
+                        )
+                    ],
+                    style={"margin": "20px"},
+                ),
                 dbc.Row(
                     [
                         dbc.Col(
@@ -846,6 +861,18 @@ app.layout = dbc.Container(
         html.Div(
             id="load-results-tab-content",
             children=[
+                html.Div(
+                    [
+                        dcc.Markdown(
+                            """
+                            This tab allows you to load previously generated MS2LDA results (a JSON file). 
+                            Once loaded, you can explore them immediately in the subsequent tabs. 
+                            This is useful if you’ve run an analysis before and want to revisit or share the results.
+                            """
+                        )
+                    ],
+                    style={"margin": "20px"},
+                ),
                 dbc.Row(
                     [
                         dbc.Col(
@@ -888,10 +915,52 @@ app.layout = dbc.Container(
             style={"display": "none"},
         ),
 
-        # ----------------------- RESULTS TAB -----------------------
+        # ----------------------- CYTOSCAPE NETWORK TAB -----------------------
         html.Div(
             id="results-tab-content",
             children=[
+                html.Div(
+                    [
+                        dcc.Markdown(
+                            """
+                            This tab shows an interactive network of optimized motifs. 
+                            Each motif is displayed as a node, and its fragments or losses 
+                            appear as connected nodes (color-coded for clarity). 
+                            Only edges above the selected intensity threshold will be shown. 
+                            You can adjust that threshold with the slider. 
+                            By default, the extra edges from each loss node to its 
+                            corresponding fragment node are hidden for less clutter, 
+                            but you can re-enable them using the checkbox. 
+                            Click on any motif node to see its associated molecules on the right side.
+                            """
+                        )
+                    ],
+                    style={"margin": "20px"},
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col([
+                            dbc.Label("Edge Intensity Threshold"),
+                            dcc.Slider(
+                                id="edge-intensity-threshold",
+                                min=0,
+                                max=1,
+                                step=0.05,
+                                value=0.50,
+                                marks={0: "0.0", 0.5: "0.5", 1: "1.0"}
+                            )
+                        ], width=6),
+                        dbc.Col([
+                            dbc.Checklist(
+                                options=[{"label": "Add Loss -> Fragment Edge", "value": "show_loss_edge"}],
+                                value=[],
+                                id="toggle-loss-edge",
+                                inline=True,
+                            )
+                        ], width=6),
+                    ],
+                    style={"marginTop": "20px"},
+                ),
                 dbc.Row(
                     [
                         dbc.Col(
@@ -936,6 +1005,19 @@ app.layout = dbc.Container(
             id="motif-rankings-tab-content",
             children=[
                 dbc.Container([
+                    html.Div(
+                        [
+                            dcc.Markdown(
+                                """
+                                This tab displays your motifs in a ranked table, based on how frequently they appear 
+                                in your data and their average probabilities. You can filter the table by probability or overlap thresholds 
+                                to highlight motifs of interest. Clicking on a motif in the table takes you to detailed information about that motif.
+                                """
+                            )
+                        ],
+                        style={"margin": "20px"},
+                    ),
+
                     dbc.Row([
                         dbc.Col([
                             html.H3("Motif Rankings"),
@@ -990,6 +1072,19 @@ app.layout = dbc.Container(
         html.Div(
             id="motif-details-tab-content",
             children=[
+                html.Div(
+                    [
+                        dcc.Markdown(
+                            """
+                            This tab shows detailed information for a selected motif, such as its top features (fragments/losses) 
+                            filtered by probability range and how each spectrum relates to it. 
+                            You can browse individual spectra that contribute to the motif using the table and next/previous buttons, 
+                            and view an interactive mirror plot for deeper inspection.
+                            """
+                        )
+                    ],
+                    style={"margin": "20px"},
+                ),
                 html.H3(id='motif-details-title'),
                 # Add probability filter slider
                 html.Div([
@@ -1453,8 +1548,11 @@ def handle_run_or_load(
     Input("optimized-motifs-store", "data"),
     Input("clustered-smiles-store", "data"),
     Input("tabs", "value"),
+    Input("edge-intensity-threshold", "value"),
+    Input("toggle-loss-edge", "value"),
 )
-def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
+def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, edge_intensity_threshold,
+                     toggle_loss_edge):
     if active_tab != "results-tab" or not optimized_motifs_data:
         return ""
 
@@ -1479,7 +1577,15 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
 
     smiles_clusters = clustered_smiles_data
 
-    elements = create_cytoscape_elements(spectra, smiles_clusters)
+    # Convert the checkbox list into a boolean
+    show_loss_edge = ("show_loss_edge" in toggle_loss_edge)
+
+    elements = create_cytoscape_elements(
+        spectra,
+        smiles_clusters,
+        intensity_threshold=edge_intensity_threshold,
+        show_loss_edge=show_loss_edge
+    )
 
     cytoscape_component = cyto.Cytoscape(
         id="cytoscape-network",
@@ -1522,6 +1628,23 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
                 },
             },
             {
+                "selector": 'node[type="loss"]',
+                "style": {
+                    "background-color": "#FFD700",
+                    "label": "data(label)",
+                    "text-background-color": "white",
+                    "text-background-opacity": 0.7,
+                    "text-background-padding": "3px",
+                    "text-background-shape": "roundrectangle",
+                    "text-border-color": "black",
+                    "text-border-width": 1,
+                    "text-valign": "top",
+                    "text-halign": "center",
+                    "color": "black",
+                    "font-size": "8px",
+                },
+            },
+            {
                 "selector": "edge",
                 "style": {
                     "line-color": "red",
@@ -1543,7 +1666,7 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
     return cytoscape_component
 
 
-def create_cytoscape_elements(spectra, smiles_clusters):
+def create_cytoscape_elements(spectra, smiles_clusters, intensity_threshold=0.05, show_loss_edge=False):
     elements = []
     created_fragments = set()
     created_losses = set()
@@ -1560,6 +1683,8 @@ def create_cytoscape_elements(spectra, smiles_clusters):
             }
         )
         for mz, intensity in zip(spectrum.peaks.mz, spectrum.peaks.intensities):
+            if intensity < intensity_threshold:
+                continue
             rounded_mz = round(mz, 2)
             frag_node = f"frag_{rounded_mz}"
             if frag_node not in created_fragments:
@@ -1587,10 +1712,11 @@ def create_cytoscape_elements(spectra, smiles_clusters):
             for loss_data in spectrum.metadata.get("losses", []):
                 loss_mz = loss_data["loss_mz"]
                 loss_intensity = loss_data["loss_intensity"]
+                if loss_intensity < intensity_threshold:
+                    continue
                 corresponding_frag_mz = precursor_mz - loss_mz
                 rounded_frag_mz = round(corresponding_frag_mz, 2)
                 frag_node = f"frag_{rounded_frag_mz}"
-
                 if frag_node not in created_fragments:
                     elements.append(
                         {
@@ -1609,7 +1735,7 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                             "data": {
                                 "id": loss_node,
                                 "label": f"-{loss_mz:.2f}",
-                                "type": "fragment",
+                                "type": "loss",
                             }
                         }
                     )
@@ -1623,16 +1749,80 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                         }
                     }
                 )
-                elements.append(
-                    {
-                        "data": {
-                            "source": loss_node,
-                            "target": frag_node,
-                            "weight": loss_intensity,
+                # Conditionally re-add the line from loss node to fragment node if user wants it
+                if show_loss_edge:
+                    elements.append(
+                        {
+                            "data": {
+                                "source": loss_node,
+                                "target": frag_node,
+                                "weight": loss_intensity,
+                            }
                         }
-                    }
-                )
+                    )
+
     return elements
+
+
+@app.callback(
+    Output("molecule-images", "children"),
+    Input("cytoscape-network", "tapNodeData"),
+    State("clustered-smiles-store", "data"),
+)
+def display_node_data_on_click(tap_node_data, clustered_smiles_data):
+    if not tap_node_data:
+        raise PreventUpdate
+
+    node_type = tap_node_data.get("type", "")
+    node_id = tap_node_data.get("id", "")
+
+    # Only do something if user clicks on a "motif" node:
+    if node_type == "motif":
+        motif_index_str = node_id.replace("motif_", "")
+        try:
+            motif_index = int(motif_index_str)
+        except ValueError:
+            raise PreventUpdate
+
+        # Grab the SMILES cluster for this motif
+        if not clustered_smiles_data or motif_index >= len(clustered_smiles_data):
+            return html.Div(
+                "No SMILES found for this motif."
+            )
+
+        smiles_list = clustered_smiles_data[motif_index]
+        if not smiles_list:
+            return html.Div(
+                "This motif has no associated SMILES."
+            )
+
+        mols = []
+        for smi in smiles_list:
+            try:
+                mol = Chem.MolFromSmiles(smi)
+                if mol:
+                    mols.append(mol)
+            except Exception:
+                continue
+
+        if not mols:
+            return html.Div("No valid RDKit structures for these SMILES.")
+
+        # Create the grid image
+        grid_img = MolsToGridImage(
+            mols,
+            molsPerRow=4,
+            subImgSize=(200, 200),
+            legends=[f"Match {i + 1}" for i in range(len(mols))],
+            returnPNG=True
+        )
+        encoded = base64.b64encode(grid_img).decode("utf-8")
+
+        # Return an <img> with the PNG
+        return html.Img(src="data:image/png;base64," + encoded, style={"margin": "10px"})
+
+    # Otherwise (e.g. if user clicks a fragment/loss), do nothing special
+    raise PreventUpdate
 
 
 # -------------------------------- RANKINGS & DETAILS --------------------------------
