@@ -87,6 +87,7 @@ def clean_spectra(spectra, preprocessing_parameters={}):
     
     
     cleaned_spectra = []
+    count = 0
 
     for i, spectrum in enumerate(spectra):
         # metadata filters
@@ -105,8 +106,9 @@ def clean_spectra(spectra, preprocessing_parameters={}):
 
 
         if spectrum:
-            spectrum.set("id", f"spec_{i}")
+            spectrum.set("id", f"spec_{count}")  # reindex
             cleaned_spectra.append(spectrum)
+            count += 1
 
     return cleaned_spectra
 
