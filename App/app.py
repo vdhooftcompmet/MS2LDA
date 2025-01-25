@@ -963,6 +963,25 @@ app.layout = dbc.Container(
                 ),
                 dbc.Row(
                     [
+                        dbc.Col([
+                            dbc.Label("Graph Layout"),
+                            dcc.Dropdown(
+                                id="cytoscape-layout-dropdown",
+                                options=[
+                                    {"label": "CoSE", "value": "cose"},
+                                    {"label": "Force-Directed (Spring)", "value": "fcose"},
+                                    {"label": "Circle", "value": "circle"},
+                                    {"label": "Concentric", "value": "concentric"},
+                                ],
+                                value="fcose",
+                                clearable=False,
+                            )
+                        ], width=6),
+                    ],
+                    style={"marginTop": "20px"},
+                ),
+                dbc.Row(
+                    [
                         dbc.Col(
                             [
                                 html.Div(
@@ -1542,7 +1561,7 @@ def handle_run_or_load(
         raise dash.exceptions.PreventUpdate
 
 
-# Updated Callback to create Cytoscape elements
+# Callback to create Cytoscape elements
 @app.callback(
     Output("cytoscape-network-container", "children"),
     Input("optimized-motifs-store", "data"),
@@ -1550,9 +1569,10 @@ def handle_run_or_load(
     Input("tabs", "value"),
     Input("edge-intensity-threshold", "value"),
     Input("toggle-loss-edge", "value"),
+    Input("cytoscape-layout-dropdown", "value"),  # <--- NEW INPUT
 )
 def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, edge_intensity_threshold,
-                     toggle_loss_edge):
+                     toggle_loss_edge, layout_choice):
     if active_tab != "results-tab" or not optimized_motifs_data:
         return ""
 
@@ -1587,11 +1607,12 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, e
         show_loss_edge=show_loss_edge
     )
 
+    # Use the selected layout from the dropdown.
     cytoscape_component = cyto.Cytoscape(
         id="cytoscape-network",
         elements=elements,
         style={"width": "100%", "height": "100%"},
-        layout={"name": "cose", "animate": False},
+        layout={"name": layout_choice, "animate": True},
         stylesheet=[
             {
                 "selector": 'node[type="motif"]',
