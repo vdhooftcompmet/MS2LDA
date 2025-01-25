@@ -1,15 +1,28 @@
 import base64
 import json
+import os
+import tempfile
 
 import dash
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import numpy as np
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objs as go
+import tomotopy as tp
 from dash import dash_table
 from dash import html, dcc, Input, Output, State
+from dash import no_update
+from dash.exceptions import PreventUpdate
 from matchms import Spectrum, Fragments
+from rdkit.Chem import Draw
 from rdkit.Chem import MolFromSmiles
+
+import MS2LDA
+from MS2LDA.Preprocessing.load_and_clean import clean_spectra
+from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
+from MS2LDA.run import filetype_check
 
 # Initialize the Dash app
 app = dash.Dash(
@@ -27,7 +40,8 @@ app.layout = dbc.Container(
     [
         dbc.Row([
             dbc.Col([
-                html.Img(src="assets/MS2LDA_LOGO_white.jpg", alt="MS2LDA Logo", height="250px", style={'display': 'block', 'margin': 'auto'}),
+                html.Img(src="assets/MS2LDA_LOGO_white.jpg", alt="MS2LDA Logo", height="250px",
+                         style={'display': 'block', 'margin': 'auto'}),
                 dcc.Markdown("""
                 Developed by [Jonas Dietrich](https://github.com/j-a-dietrich),
                 [Rosina Torres Ortega](https://github.com/rtlortega), and 
@@ -179,9 +193,6 @@ app.layout = dbc.Container(
                                     target="polarity-tooltip",
                                     placement="right",
                                 ),
-
-                                # ------------- Moved n_iterations & S2V paths here -------------
-                                # n_iterations
                                 dbc.InputGroup(
                                     [
                                         dbc.InputGroupText("Iterations", id="iterations-tooltip"),
@@ -195,8 +206,6 @@ app.layout = dbc.Container(
                                     target="iterations-tooltip",
                                     placement="right",
                                 ),
-
-                                # S2V Model Path
                                 dbc.InputGroup(
                                     [
                                         dbc.InputGroupText("S2V Model Path", id="s2v-model-tooltip"),
@@ -214,8 +223,6 @@ app.layout = dbc.Container(
                                     target="s2v-model-tooltip",
                                     placement="right",
                                 ),
-
-                                # S2V Library Path
                                 dbc.InputGroup(
                                     [
                                         dbc.InputGroupText("S2V Library Path", id="s2v-library-tooltip"),
@@ -233,8 +240,6 @@ app.layout = dbc.Container(
                                     target="s2v-library-tooltip",
                                     placement="right",
                                 ),
-                                # ---------------------------------------------------------------
-
                                 dbc.Button(
                                     "Show/Hide Advanced Settings",
                                     id="advanced-settings-button",
@@ -288,7 +293,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("max_frags", id="prep-maxfrags-tooltip"),
+                                                                dbc.InputGroupText("max_frags",
+                                                                                   id="prep-maxfrags-tooltip"),
                                                                 dbc.Input(
                                                                     id="prep-max-frags",
                                                                     type="number",
@@ -305,7 +311,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("min_frags", id="prep-minfrags-tooltip"),
+                                                                dbc.InputGroupText("min_frags",
+                                                                                   id="prep-minfrags-tooltip"),
                                                                 dbc.Input(
                                                                     id="prep-min-frags",
                                                                     type="number",
@@ -322,7 +329,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("min_intensity", id="prep-minint-tooltip"),
+                                                                dbc.InputGroupText("min_intensity",
+                                                                                   id="prep-minint-tooltip"),
                                                                 dbc.Input(
                                                                     id="prep-min-intensity",
                                                                     type="number",
@@ -340,7 +348,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("max_intensity", id="prep-maxint-tooltip"),
+                                                                dbc.InputGroupText("max_intensity",
+                                                                                   id="prep-maxint-tooltip"),
                                                                 dbc.Input(
                                                                     id="prep-max-intensity",
                                                                     type="number",
@@ -365,7 +374,8 @@ app.layout = dbc.Container(
                                                         html.H6("Convergence"),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("step_size", id="conv-stepsz-tooltip"),
+                                                                dbc.InputGroupText("step_size",
+                                                                                   id="conv-stepsz-tooltip"),
                                                                 dbc.Input(
                                                                     id="conv-step-size",
                                                                     type="number",
@@ -382,7 +392,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("window_size", id="conv-winsz-tooltip"),
+                                                                dbc.InputGroupText("window_size",
+                                                                                   id="conv-winsz-tooltip"),
                                                                 dbc.Input(
                                                                     id="conv-window-size",
                                                                     type="number",
@@ -399,7 +410,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("threshold", id="conv-thresh-tooltip"),
+                                                                dbc.InputGroupText("threshold",
+                                                                                   id="conv-thresh-tooltip"),
                                                                 dbc.Input(
                                                                     id="conv-threshold",
                                                                     type="number",
@@ -421,10 +433,14 @@ app.layout = dbc.Container(
                                                                 dbc.Select(
                                                                     id="conv-type",
                                                                     options=[
-                                                                        {"label": "perplexity_history", "value": "perplexity_history"},
-                                                                        {"label": "entropy_history_doc", "value": "entropy_history_doc"},
-                                                                        {"label": "entropy_history_topic", "value": "entropy_history_topic"},
-                                                                        {"label": "log_likelihood_history", "value": "log_likelihood_history"},
+                                                                        {"label": "perplexity_history",
+                                                                         "value": "perplexity_history"},
+                                                                        {"label": "entropy_history_doc",
+                                                                         "value": "entropy_history_doc"},
+                                                                        {"label": "entropy_history_topic",
+                                                                         "value": "entropy_history_topic"},
+                                                                        {"label": "log_likelihood_history",
+                                                                         "value": "log_likelihood_history"},
                                                                     ],
                                                                     value="perplexity_history",
                                                                 ),
@@ -450,7 +466,8 @@ app.layout = dbc.Container(
                                                         html.H6("Annotation"),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("criterium", id="ann-criterium-tooltip"),
+                                                                dbc.InputGroupText("criterium",
+                                                                                   id="ann-criterium-tooltip"),
                                                                 dbc.Select(
                                                                     id="ann-criterium",
                                                                     options=[
@@ -470,7 +487,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("cosine_similarity", id="ann-cossim-tooltip"),
+                                                                dbc.InputGroupText("cosine_similarity",
+                                                                                   id="ann-cossim-tooltip"),
                                                                 dbc.Input(
                                                                     id="ann-cosine-sim",
                                                                     type="number",
@@ -613,7 +631,8 @@ app.layout = dbc.Container(
                                                         html.H6("Train"),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("parallel", id="train-parallel-tooltip"),
+                                                                dbc.InputGroupText("parallel",
+                                                                                   id="train-parallel-tooltip"),
                                                                 dbc.Input(
                                                                     id="train-parallel",
                                                                     type="number",
@@ -630,7 +649,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("workers", id="train-workers-tooltip"),
+                                                                dbc.InputGroupText("workers",
+                                                                                   id="train-workers-tooltip"),
                                                                 dbc.Input(
                                                                     id="train-workers",
                                                                     type="number",
@@ -659,7 +679,8 @@ app.layout = dbc.Container(
                                                         html.H6("Dataset"),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("sig_digits", id="prep-sigdig-tooltip"),
+                                                                dbc.InputGroupText("sig_digits",
+                                                                                   id="prep-sigdig-tooltip"),
                                                                 dbc.Input(
                                                                     id="prep-sigdig",
                                                                     type="number",
@@ -676,7 +697,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("charge", id="dataset-charge-tooltip"),
+                                                                dbc.InputGroupText("charge",
+                                                                                   id="dataset-charge-tooltip"),
                                                                 dbc.Input(
                                                                     id="dataset-charge",
                                                                     type="number",
@@ -693,7 +715,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("Run Name", id="dataset-name-tooltip"),
+                                                                dbc.InputGroupText("Run Name",
+                                                                                   id="dataset-name-tooltip"),
                                                                 dbc.Input(
                                                                     id="dataset-name",
                                                                     type="text",
@@ -710,7 +733,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("Output Folder", id="dataset-outdir-tooltip"),
+                                                                dbc.InputGroupText("Output Folder",
+                                                                                   id="dataset-outdir-tooltip"),
                                                                 dbc.Input(
                                                                     id="dataset-output-folder",
                                                                     type="text",
@@ -755,7 +779,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("fp threshold", id="fp-threshold-tooltip"),
+                                                                dbc.InputGroupText("fp threshold",
+                                                                                   id="fp-threshold-tooltip"),
                                                                 dbc.Input(
                                                                     id="fp-threshold",
                                                                     type="number",
@@ -773,7 +798,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("Motif Parameter", id="motif-param-tooltip"),
+                                                                dbc.InputGroupText("Motif Parameter",
+                                                                                   id="motif-param-tooltip"),
                                                                 dbc.Input(
                                                                     id="motif-parameter",
                                                                     type="number",
@@ -795,9 +821,6 @@ app.layout = dbc.Container(
                                         ),
                                     ],
                                 ),
-                                # End advanced settings
-
-                                # The Run button
                                 html.Div(
                                     [
                                         dbc.Button(
@@ -1015,6 +1038,7 @@ app.layout = dbc.Container(
     fluid=False,
 )
 
+
 # ----------------- Callbacks & Functions -----------------
 
 # Callback to show/hide tab contents based on active tab
@@ -1046,6 +1070,7 @@ def toggle_tab_content(active_tab):
 
     return run_style, load_style, results_style, motif_rankings_style, motif_details_style
 
+
 # Callback to display uploaded data file info
 @app.callback(
     Output("file-upload-info", "children"),
@@ -1058,13 +1083,14 @@ def update_output(contents, filename):
     else:
         return html.Div([html.H5("No file uploaded yet.")])
 
-# RangeSlider display
+
 @app.callback(
     Output('probability-thresh-display', 'children'),
     Input('probability-thresh', 'value')
 )
 def display_probability_thresh(prob_thresh_range):
     return f"Selected Probability Range: {prob_thresh_range[0]:.2f} - {prob_thresh_range[1]:.2f}"
+
 
 @app.callback(
     Output('overlap-thresh-display', 'children'),
@@ -1073,12 +1099,14 @@ def display_probability_thresh(prob_thresh_range):
 def display_overlap_thresh(overlap_thresh_range):
     return f"Selected Overlap Range: {overlap_thresh_range[0]:.2f} - {overlap_thresh_range[1]:.2f}"
 
+
 @app.callback(
     Output('probability-filter-display', 'children'),
     Input('probability-filter', 'value')
 )
 def display_prob_filter(prob_filter_range):
     return f"Showing features with probability between {prob_filter_range[0]:.2f} and {prob_filter_range[1]:.2f}"
+
 
 # Show/hide advanced settings
 @app.callback(
@@ -1091,6 +1119,7 @@ def toggle_advanced_settings(n_clicks, is_open):
     if n_clicks:
         return not is_open
     return is_open
+
 
 # ------------------- The MAIN callback to run or load results -------------------
 @app.callback(
@@ -1144,60 +1173,51 @@ def toggle_advanced_settings(n_clicks, is_open):
     prevent_initial_call=True,
 )
 def handle_run_or_load(
-    run_clicks,
-    load_clicks,
-    data_contents,
-    data_filename,
-    n_motifs,
-    top_n,
-    unique_mols,
-    polarity,
-    results_contents,
-    results_filename,
-    prep_sigdig,
-    prep_min_mz,
-    prep_max_mz,
-    prep_max_frags,
-    prep_min_frags,
-    prep_min_intensity,
-    prep_max_intensity,
-    conv_step_size,
-    conv_window_size,
-    conv_threshold,
-    conv_type,
-    ann_criterium,
-    ann_cosine_sim,
-    model_rm_top,
-    model_min_cf,
-    model_min_df,
-    model_alpha,
-    model_eta,
-    model_seed,
-    train_parallel,
-    train_workers,
-    n_iterations,
-    dataset_charge,
-    dataset_name,
-    dataset_output_folder,
-    fp_type,
-    fp_threshold,
-    motif_parameter,
-    s2v_model_path,
-    s2v_library_path,
+        run_clicks,
+        load_clicks,
+        data_contents,
+        data_filename,
+        n_motifs,
+        top_n,
+        unique_mols,
+        polarity,
+        results_contents,
+        results_filename,
+        prep_sigdig,
+        prep_min_mz,
+        prep_max_mz,
+        prep_max_frags,
+        prep_min_frags,
+        prep_min_intensity,
+        prep_max_intensity,
+        conv_step_size,
+        conv_window_size,
+        conv_threshold,
+        conv_type,
+        ann_criterium,
+        ann_cosine_sim,
+        model_rm_top,
+        model_min_cf,
+        model_min_df,
+        model_alpha,
+        model_eta,
+        model_seed,
+        train_parallel,
+        train_workers,
+        n_iterations,
+        dataset_charge,
+        dataset_name,
+        dataset_output_folder,
+        fp_type,
+        fp_threshold,
+        motif_parameter,
+        s2v_model_path,
+        s2v_library_path,
 ):
     """
     This callback either (1) runs MS2LDA from scratch on the uploaded data (when Run Analysis clicked),
     or (2) loads precomputed results from a JSON file (when Load Results clicked).
     """
-    import base64, tempfile, os, json
-    import dash
-    from dash.exceptions import PreventUpdate
-    import tomotopy as tp
-    from MS2LDA.Preprocessing.load_and_clean import clean_spectra
-    from MS2LDA.run import filetype_check
-    from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
-    from dash import no_update
-    import MS2LDA  # Our main run code
 
     ctx = dash.callback_context
     if not ctx.triggered:
@@ -1411,8 +1431,8 @@ def handle_run_or_load(
                 spectra_data,
             )
 
-        # ADDED: Show chosen file if no error
-        load_status = dbc.Alert(f"Selected Results File: {results_filename}\nResults loaded successfully!", color="success")
+        load_status = dbc.Alert(f"Selected Results File: {results_filename}\nResults loaded successfully!",
+                                color="success")
 
         return (
             run_status,
@@ -1425,6 +1445,7 @@ def handle_run_or_load(
 
     else:
         raise dash.exceptions.PreventUpdate
+
 
 # Updated Callback to create Cytoscape elements
 @app.callback(
@@ -1521,6 +1542,7 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
 
     return cytoscape_component
 
+
 def create_cytoscape_elements(spectra, smiles_clusters):
     elements = []
     created_fragments = set()
@@ -1612,6 +1634,7 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                 )
     return elements
 
+
 # -------------------------------- RANKINGS & DETAILS --------------------------------
 
 def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
@@ -1631,13 +1654,13 @@ def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
                     motif_overlap_scores[motif].append(o)
 
     md = []
-    import numpy as np
     for motif in motifs:
         avg_probability = np.mean(motif_probabilities[motif]) if motif_probabilities[motif] else 0
         avg_overlap = np.mean(motif_overlap_scores[motif]) if motif_overlap_scores[motif] else 0
         md.append((motif, motif_degrees[motif], avg_probability, avg_overlap))
     md.sort(key=lambda x: x[1], reverse=True)
     return md
+
 
 @app.callback(
     Output('motif-rankings-table-container', 'children'),
@@ -1683,8 +1706,10 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
         columns=[
             {'name': 'Motif', 'id': 'Motif'},
             {'name': 'Degree', 'id': 'Degree', 'type': 'numeric', 'format': {'specifier': ''}},
-            {'name': 'Average Doc-Topic Probability', 'id': 'Average Doc-Topic Probability', 'type': 'numeric', 'format': {'specifier': '.4f'}},
-            {'name': 'Average Overlap Score', 'id': 'Average Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
+            {'name': 'Average Doc-Topic Probability', 'id': 'Average Doc-Topic Probability', 'type': 'numeric',
+             'format': {'specifier': '.4f'}},
+            {'name': 'Average Overlap Score', 'id': 'Average Overlap Score', 'type': 'numeric',
+             'format': {'specifier': '.4f'}},
             {'name': 'Annotation', 'id': 'Annotation'},
         ],
         sort_action='native',
@@ -1705,6 +1730,7 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
 
     return table
 
+
 @app.callback(
     Output('selected-motif-store', 'data'),
     Input('motif-rankings-table', 'active_cell'),
@@ -1717,6 +1743,7 @@ def on_motif_click(active_cell, table_data):
         return motif
     return dash.no_update
 
+
 @app.callback(
     Output('tabs', 'value'),
     Input('selected-motif-store', 'data'),
@@ -1727,6 +1754,7 @@ def activate_motif_details_tab(selected_motif):
         return 'motif-details-tab'
     else:
         return dash.no_update
+
 
 @app.callback(
     Output('motif-details-title', 'children'),
@@ -1800,7 +1828,6 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
             if feature in total_feature_probs:
                 total_feature_probs[feature] += prob
 
-    import plotly.express as px
     barplot1_df = pd.DataFrame({
         'Feature': features_in_motif,
         'Probability in Motif': [filtered_motif_data[feature] for feature in features_in_motif],
@@ -1873,7 +1900,6 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
                 except Exception as e:
                     print(f"Error converting SMILES {smi}: {str(e)}")
             if mols:
-                from rdkit.Chem import Draw
                 legends = [f"Match {i + 1}" for i in range(len(mols))]
                 img = Draw.MolsToGridImage(
                     mols,
@@ -1890,6 +1916,7 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
 
     spectra_ids = spectra_df['Spectrum'].tolist()
     return f"Motif Details: {motif_name}", content, spectra_ids, spectra_table_data, spectra_table_columns
+
 
 @app.callback(
     Output('selected-spectrum-index', 'data'),
@@ -1936,6 +1963,7 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
     else:
         return current_index, dash.no_update
 
+
 @app.callback(
     Output('spectrum-plot', 'children'),
     Input('selected-spectrum-index', 'data'),
@@ -1955,11 +1983,6 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
         spectrum_dict = next((s for s in spectra_data if s['metadata']['id'] == spectrum_id), None)
         if not spectrum_dict:
             return html.Div("Spectrum data not found.")
-
-        from matchms import Spectrum, Fragments
-        import numpy as np
-        import pandas as pd
-        import plotly.graph_objs as go
 
         spectrum = Spectrum(
             mz=np.array(spectrum_dict['mz']),
@@ -2109,6 +2132,7 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
         )
 
     return ""
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)
