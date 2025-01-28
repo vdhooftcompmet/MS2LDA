@@ -1392,6 +1392,8 @@ def handle_run_or_load(
             "criterium": ann_criterium,
             "cosine_similarity": ann_cosine_sim,
             "n_mols_retrieved": top_n,
+            "s2v_model_path": s2v_model_path,
+            "s2v_library_path": s2v_library_path,
         }
         model_parameters = {
             "rm_top": model_rm_top,
@@ -1569,7 +1571,7 @@ def handle_run_or_load(
     Input("tabs", "value"),
     Input("edge-intensity-threshold", "value"),
     Input("toggle-loss-edge", "value"),
-    Input("cytoscape-layout-dropdown", "value"),  # <--- NEW INPUT
+    Input("cytoscape-layout-dropdown", "value"),
 )
 def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, edge_intensity_threshold,
                      toggle_loss_edge, layout_choice):
