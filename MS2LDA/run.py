@@ -1,9 +1,13 @@
+import MS2LDA
 from MS2LDA.Preprocessing.load_and_clean import load_mgf
 from MS2LDA.Preprocessing.load_and_clean import load_mzml
 from MS2LDA.Preprocessing.load_and_clean import load_msp
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 
+from MS2LDA.utils import partial_retrieve_spec4doc
+
 from MS2LDA.Preprocessing.generate_corpus import features_to_words
+from MS2LDA.Preprocessing.generate_corpus import map_doc2spec
 
 from MS2LDA.modeling import define_model
 from MS2LDA.modeling import train_model
@@ -44,6 +48,7 @@ import networkx as nx
 from tqdm import tqdm
 import pandas as pd
 import numpy as np
+from functools import partial
 
 from MS2LDA.Visualisation.ldadict import save_visualization_data
 
@@ -69,6 +74,10 @@ def run(dataset, n_motifs, n_iterations,
     ms2lda = define_model(n_motifs=n_motifs, model_parameters=model_parameters)
     trained_ms2lda, convergence_curve = train_model(ms2lda, feature_words, iterations=n_iterations, train_parameters=train_parameters, convergence_parameters=convergence_parameters)
 
+    # Mapping
+    doc2spec_map = map_doc2spec(feature_words, cleaned_spectra)
+    MS2LDA.retrieve_spec4doc = partial(partial_retrieve_spec4doc, doc2spec_map, trained_ms2lda)
+
     # Motif Generation
     motifs = extract_motifs(trained_ms2lda, top_n=motif_parameter)
     motif_spectra = create_motif_spectra(motifs, charge=dataset_parameters["charge"], motifset_name=dataset_parameters["name"], significant_digits=dataset_parameters["significant_digits"]) # output name
@@ -92,7 +101,7 @@ def run(dataset, n_motifs, n_iterations,
         filename="ms2lda_viz.json"
     )
 
-    return motif_spectra, optimized_motifs, motif_fps
+    return motif_spectra, optimized_motifs, motif_fps, doc2spec_map
 
 
 
@@ -322,8 +331,8 @@ def s2v_annotation(motif_spectra, annotation_parameters):
 
 
 def load_s2v(
-        path_model = "../MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model",
-        path_library = "../MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
+        path_model = r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\Spec2Struc\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode\020724_Spec2Vec_pos_CleanedLibraries.model",
+        path_library = r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\Spec2Struc\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode\positive_s2v_library.pkl"
         ):
 
     s2v_similarity, library = load_s2v_and_library(path_model, path_library)

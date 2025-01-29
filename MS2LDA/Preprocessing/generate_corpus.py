@@ -1,4 +1,22 @@
 from itertools import chain
+import hashlib
+
+def map_doc2spec(feature_words, spectra):
+    """generates hashkeys to find the original spectrum for a generate document
+    
+    ARGS:
+        feature_words:
+        metadata:
+    
+    RETURNS:
+        doc2spec_map:
+    """
+    doc2spec_map = {}
+    for feature_word, spectrum in zip(feature_words, spectra):
+        hashed_feature_word = hashlib.md5("".join(feature_word).encode('utf-8')).hexdigest()
+        doc2spec_map[hashed_feature_word] = spectrum
+    
+    return doc2spec_map
 
 
 def features_to_words(spectra, significant_figures=2, acquisition_type="DDA"): #You should write some unittests for this function; seems to be error prone

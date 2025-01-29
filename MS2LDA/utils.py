@@ -2,6 +2,7 @@ from rdkit import Chem
 from matchms import Spectrum, Fragments
 from matchms.filtering import normalize_intensities
 import numpy as np
+import hashlib
 
 
 from matchms import set_matchms_logger_level; set_matchms_logger_level("ERROR")
@@ -88,3 +89,15 @@ def match_frags_and_losses(motif_spectrum, analog_spectra):
         matching_losses.append(matching_loss)
 
     return matching_frags, matching_losses
+
+
+def partial_retrieve_spec4doc(doc2spec_map, ms2lda, doc_id):
+    """
+    """
+    original_doc = ""
+    for word_index in ms2lda.docs[doc_id].words:
+        original_doc += ms2lda.vocabs[word_index]
+
+    hashed_feature_word = hashlib.md5(original_doc.encode('utf-8')).hexdigest()
+    return doc2spec_map[hashed_feature_word]
+

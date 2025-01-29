@@ -91,24 +91,24 @@ def load_m2m_file(file): # currently it is not supported to change frag/loss tag
             if line.startswith("frag") or line.startswith("loss"):
                 features.append( (line.strip().split(",")) )
             elif line.startswith("#NAME"):
-                name = line.split("motif_")[1]
+                name = line.split("motif_")[1].strip()
             elif line.startswith("#SHORT_ANNOTATION"):
-                short_annotation = line.split(" ", 1)[1]
+                short_annotation = line.split(" ", 1)[1].strip()
             elif line.startswith("#MS2ACCURACY"):
-                ms2accuracy = line.split(" ")[1]
+                ms2accuracy = line.split(" ")[1].strip()
             elif line.startswith("#MOTIFSET"):
-                motifset = line.split(" ")[1]
+                motifset = line.split(" ")[1].strip()
             elif line.startswith("#CHARGE"):
-                charge = line.split(" ")[1]
+                charge = line.split(" ")[1].strip()
             elif line.startswith("#ANNOTATION"):
-                annotation = line.split(" ", 1)[1]
+                annotation = line.split(" ", 1)[1].strip()
 
     motif_spectrum = create_spectrum(features, name, frag_tag="fragment_", loss_tag="loss_", significant_digits=2)
-    motif_spectrum.set("short_annotation", short_annotation.strip())
-    motif_spectrum.set("charge", charge.strip())
-    motif_spectrum.set("ms2accuracy", ms2accuracy.strip())
-    motif_spectrum.set("motifset", motifset.strip())
-    motif_spectrum.set("annotation", annotation.strip())
+    motif_spectrum.set("short_annotation", short_annotation)
+    motif_spectrum.set("charge", charge)
+    motif_spectrum.set("ms2accuracy", ms2accuracy)
+    motif_spectrum.set("motifset", motifset)
+    motif_spectrum.set("annotation", annotation)
 
     return motif_spectrum
 

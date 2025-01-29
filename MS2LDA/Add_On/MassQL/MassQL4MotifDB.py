@@ -1,4 +1,5 @@
 import hashlib
+import random
 import numpy as np
 import pandas as pd
 
@@ -32,9 +33,13 @@ def motifs2motifDB(spectra):
         feature_dict["annotation"] = spectrum.get("annotation")
         feature_dict["motif_id"] = spectrum.get("id")
         feature_dict["motifset"] = spectrum.get("motifset")
-        string_to_hash = spectrum.get("id") + spectrum.get("motifset")
-        byte_string = string_to_hash.encode("utf-8")
-        hash_id = hashlib.md5(byte_string, usedforsecurity=False).hexdigest()
+        if spectrum.get("motifset"):
+            string_to_hash = spectrum.get("id") + spectrum.get("motifset")
+            byte_string = string_to_hash.encode("utf-8")
+            hash_id = hashlib.md5(byte_string, usedforsecurity=False).hexdigest()
+        else:
+            hash_id = random.getrandbits(128)
+            
         feature_dict["scan"] = hash_id
         feature_dict["ms1scan"] = 0
 
