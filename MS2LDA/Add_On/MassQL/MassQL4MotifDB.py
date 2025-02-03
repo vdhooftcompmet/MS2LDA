@@ -155,19 +155,31 @@ def store_motifDB(ms1_df, ms2_df, name="motifDB.json"):
     ms1_df["ms_level"] = "ms1"
     ms2_df["ms_level"] = "ms2"
 
+    #ms1_df = ms1_df.fillna("NaN")
+    #ms2_df = ms2_df.fillna("Nan")
+
     motifDB = {
-        "ms1": ms1_df,
-        "ms2": ms2_df,
+        "ms1": ms1_df.to_dict(),
+        "ms2": ms2_df.to_dict(),
     }
-    output_motifDB = json.dumps(motifDB, default=lambda x: x.to_dict(orient="split"), indent=2)
+    
     with open(name, "w") as outfile:
-        outfile.write(output_motifDB)
+        json.dump(motifDB, outfile)
+
     return True
 
 def load_motifDB(motifDB_filename):
-    motifDB = json.loads(motifDB_filename)
+    with open(motifDB_filename, "r") as infile:
+        motifDB = json.load(infile)
+
     ms1_df = pd.DataFrame(motifDB["ms1"])
     ms2_df = pd.DataFrame(motifDB["ms2"])
+    ms2_df["frag_mz"] = ms2_df["frag_mz"].astype(float)
+    ms2_df["frag_intens"] = ms2_df["frag_intens"].astype(float)
+    ms2_df["loss_mz"] = ms2_df["loss_mz"].astype(float)
+    ms2_df["loss_intens"] = ms2_df["loss_intens"].astype(float)
+    ms2_df["charge"] = ms2_df["charge"].astype(int)
+    ms2_df["ms2accuracy"] = ms2_df["ms2accuracy"].astype(float)
 
     return ms1_df, ms2_df
 

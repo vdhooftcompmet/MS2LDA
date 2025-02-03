@@ -115,6 +115,9 @@ def screen_spectra(motifs_stored=None, dataset=None, motif_spectra=None, motifDB
         if motifDB and motifDB_query:
             if type(motifDB) == str:
                 if motifDB.endswith(".xlsx"):
+                    ms1_motifDB, ms2_motifDB = load_motifDB_excel(motifDB)
+                    motifs_stored = massql_search(ms1_motifDB, ms2_motifDB, motifDB_query)
+                elif motifDB.endswith(".json"):
                     ms1_motifDB, ms2_motifDB = load_motifDB(motifDB)
                     motifs_stored = massql_search(ms1_motifDB, ms2_motifDB, motifDB_query)
                 else:
