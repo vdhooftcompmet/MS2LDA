@@ -1,15 +1,30 @@
 import base64
 import json
+import os
+import tempfile
 
 import dash
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import numpy as np
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objs as go
+import tomotopy as tp
 from dash import dash_table
 from dash import html, dcc, Input, Output, State
+from dash import no_update
+from dash.exceptions import PreventUpdate
 from matchms import Spectrum, Fragments
+from rdkit import Chem
+from rdkit.Chem import Draw
 from rdkit.Chem import MolFromSmiles
+from rdkit.Chem.Draw import MolsToGridImage
+
+import MS2LDA
+from MS2LDA.Preprocessing.load_and_clean import clean_spectra
+from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
+from MS2LDA.run import filetype_check
 
 # Initialize the Dash app
 app = dash.Dash(
@@ -27,7 +42,8 @@ app.layout = dbc.Container(
     [
         dbc.Row([
             dbc.Col([
-                html.Img(src="assets/MS2LDA_LOGO_white.jpg", alt="MS2LDA Logo", height="250px", style={'display': 'block', 'margin': 'auto'}),
+                html.Img(src="assets/MS2LDA_LOGO_white.jpg", alt="MS2LDA Logo", height="250px",
+                         style={'display': 'block', 'margin': 'auto'}),
                 dcc.Markdown("""
                 Developed by [Jonas Dietrich](https://github.com/j-a-dietrich),
                 [Rosina Torres Ortega](https://github.com/rtlortega), and 
@@ -54,6 +70,19 @@ app.layout = dbc.Container(
         html.Div(
             id="run-analysis-tab-content",
             children=[
+                html.Div(
+                    [
+                        dcc.Markdown(
+                            """
+                            This tab allows you to run an MS2LDA analysis from scratch using a single uploaded data file. 
+                            You can control basic parameters like the number of motifs, polarity, and top N Spec2Vec matches, 
+                            as well as advanced settings (e.g., min_mz, max_mz). 
+                            When ready, click "Run Analysis" to generate the results and proceed to the other tabs for visualization.
+                            """
+                        )
+                    ],
+                    style={"margin": "20px"},
+                ),
                 dbc.Row(
                     [
                         dbc.Col(
@@ -179,9 +208,6 @@ app.layout = dbc.Container(
                                     target="polarity-tooltip",
                                     placement="right",
                                 ),
-
-                                # ------------- Moved n_iterations & S2V paths here -------------
-                                # n_iterations
                                 dbc.InputGroup(
                                     [
                                         dbc.InputGroupText("Iterations", id="iterations-tooltip"),
@@ -195,8 +221,6 @@ app.layout = dbc.Container(
                                     target="iterations-tooltip",
                                     placement="right",
                                 ),
-
-                                # S2V Model Path
                                 dbc.InputGroup(
                                     [
                                         dbc.InputGroupText("S2V Model Path", id="s2v-model-tooltip"),
@@ -214,8 +238,6 @@ app.layout = dbc.Container(
                                     target="s2v-model-tooltip",
                                     placement="right",
                                 ),
-
-                                # S2V Library Path
                                 dbc.InputGroup(
                                     [
                                         dbc.InputGroupText("S2V Library Path", id="s2v-library-tooltip"),
@@ -233,8 +255,6 @@ app.layout = dbc.Container(
                                     target="s2v-library-tooltip",
                                     placement="right",
                                 ),
-                                # ---------------------------------------------------------------
-
                                 dbc.Button(
                                     "Show/Hide Advanced Settings",
                                     id="advanced-settings-button",
@@ -288,7 +308,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("max_frags", id="prep-maxfrags-tooltip"),
+                                                                dbc.InputGroupText("max_frags",
+                                                                                   id="prep-maxfrags-tooltip"),
                                                                 dbc.Input(
                                                                     id="prep-max-frags",
                                                                     type="number",
@@ -305,7 +326,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("min_frags", id="prep-minfrags-tooltip"),
+                                                                dbc.InputGroupText("min_frags",
+                                                                                   id="prep-minfrags-tooltip"),
                                                                 dbc.Input(
                                                                     id="prep-min-frags",
                                                                     type="number",
@@ -322,7 +344,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("min_intensity", id="prep-minint-tooltip"),
+                                                                dbc.InputGroupText("min_intensity",
+                                                                                   id="prep-minint-tooltip"),
                                                                 dbc.Input(
                                                                     id="prep-min-intensity",
                                                                     type="number",
@@ -340,7 +363,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("max_intensity", id="prep-maxint-tooltip"),
+                                                                dbc.InputGroupText("max_intensity",
+                                                                                   id="prep-maxint-tooltip"),
                                                                 dbc.Input(
                                                                     id="prep-max-intensity",
                                                                     type="number",
@@ -365,7 +389,8 @@ app.layout = dbc.Container(
                                                         html.H6("Convergence"),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("step_size", id="conv-stepsz-tooltip"),
+                                                                dbc.InputGroupText("step_size",
+                                                                                   id="conv-stepsz-tooltip"),
                                                                 dbc.Input(
                                                                     id="conv-step-size",
                                                                     type="number",
@@ -382,7 +407,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("window_size", id="conv-winsz-tooltip"),
+                                                                dbc.InputGroupText("window_size",
+                                                                                   id="conv-winsz-tooltip"),
                                                                 dbc.Input(
                                                                     id="conv-window-size",
                                                                     type="number",
@@ -399,7 +425,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("threshold", id="conv-thresh-tooltip"),
+                                                                dbc.InputGroupText("threshold",
+                                                                                   id="conv-thresh-tooltip"),
                                                                 dbc.Input(
                                                                     id="conv-threshold",
                                                                     type="number",
@@ -421,10 +448,14 @@ app.layout = dbc.Container(
                                                                 dbc.Select(
                                                                     id="conv-type",
                                                                     options=[
-                                                                        {"label": "perplexity_history", "value": "perplexity_history"},
-                                                                        {"label": "entropy_history_doc", "value": "entropy_history_doc"},
-                                                                        {"label": "entropy_history_topic", "value": "entropy_history_topic"},
-                                                                        {"label": "log_likelihood_history", "value": "log_likelihood_history"},
+                                                                        {"label": "perplexity_history",
+                                                                         "value": "perplexity_history"},
+                                                                        {"label": "entropy_history_doc",
+                                                                         "value": "entropy_history_doc"},
+                                                                        {"label": "entropy_history_topic",
+                                                                         "value": "entropy_history_topic"},
+                                                                        {"label": "log_likelihood_history",
+                                                                         "value": "log_likelihood_history"},
                                                                     ],
                                                                     value="perplexity_history",
                                                                 ),
@@ -450,7 +481,8 @@ app.layout = dbc.Container(
                                                         html.H6("Annotation"),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("criterium", id="ann-criterium-tooltip"),
+                                                                dbc.InputGroupText("criterium",
+                                                                                   id="ann-criterium-tooltip"),
                                                                 dbc.Select(
                                                                     id="ann-criterium",
                                                                     options=[
@@ -470,7 +502,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("cosine_similarity", id="ann-cossim-tooltip"),
+                                                                dbc.InputGroupText("cosine_similarity",
+                                                                                   id="ann-cossim-tooltip"),
                                                                 dbc.Input(
                                                                     id="ann-cosine-sim",
                                                                     type="number",
@@ -613,7 +646,8 @@ app.layout = dbc.Container(
                                                         html.H6("Train"),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("parallel", id="train-parallel-tooltip"),
+                                                                dbc.InputGroupText("parallel",
+                                                                                   id="train-parallel-tooltip"),
                                                                 dbc.Input(
                                                                     id="train-parallel",
                                                                     type="number",
@@ -630,7 +664,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("workers", id="train-workers-tooltip"),
+                                                                dbc.InputGroupText("workers",
+                                                                                   id="train-workers-tooltip"),
                                                                 dbc.Input(
                                                                     id="train-workers",
                                                                     type="number",
@@ -659,7 +694,8 @@ app.layout = dbc.Container(
                                                         html.H6("Dataset"),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("sig_digits", id="prep-sigdig-tooltip"),
+                                                                dbc.InputGroupText("sig_digits",
+                                                                                   id="prep-sigdig-tooltip"),
                                                                 dbc.Input(
                                                                     id="prep-sigdig",
                                                                     type="number",
@@ -676,7 +712,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("charge", id="dataset-charge-tooltip"),
+                                                                dbc.InputGroupText("charge",
+                                                                                   id="dataset-charge-tooltip"),
                                                                 dbc.Input(
                                                                     id="dataset-charge",
                                                                     type="number",
@@ -693,7 +730,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("Run Name", id="dataset-name-tooltip"),
+                                                                dbc.InputGroupText("Run Name",
+                                                                                   id="dataset-name-tooltip"),
                                                                 dbc.Input(
                                                                     id="dataset-name",
                                                                     type="text",
@@ -710,7 +748,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("Output Folder", id="dataset-outdir-tooltip"),
+                                                                dbc.InputGroupText("Output Folder",
+                                                                                   id="dataset-outdir-tooltip"),
                                                                 dbc.Input(
                                                                     id="dataset-output-folder",
                                                                     type="text",
@@ -755,7 +794,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("fp threshold", id="fp-threshold-tooltip"),
+                                                                dbc.InputGroupText("fp threshold",
+                                                                                   id="fp-threshold-tooltip"),
                                                                 dbc.Input(
                                                                     id="fp-threshold",
                                                                     type="number",
@@ -773,7 +813,8 @@ app.layout = dbc.Container(
                                                         ),
                                                         dbc.InputGroup(
                                                             [
-                                                                dbc.InputGroupText("Motif Parameter", id="motif-param-tooltip"),
+                                                                dbc.InputGroupText("Motif Parameter",
+                                                                                   id="motif-param-tooltip"),
                                                                 dbc.Input(
                                                                     id="motif-parameter",
                                                                     type="number",
@@ -795,9 +836,6 @@ app.layout = dbc.Container(
                                         ),
                                     ],
                                 ),
-                                # End advanced settings
-
-                                # The Run button
                                 html.Div(
                                     [
                                         dbc.Button(
@@ -823,6 +861,18 @@ app.layout = dbc.Container(
         html.Div(
             id="load-results-tab-content",
             children=[
+                html.Div(
+                    [
+                        dcc.Markdown(
+                            """
+                            This tab allows you to load previously generated MS2LDA results (a JSON file). 
+                            Once loaded, you can explore them immediately in the subsequent tabs. 
+                            This is useful if you’ve run an analysis before and want to revisit or share the results.
+                            """
+                        )
+                    ],
+                    style={"margin": "20px"},
+                ),
                 dbc.Row(
                     [
                         dbc.Col(
@@ -865,10 +915,71 @@ app.layout = dbc.Container(
             style={"display": "none"},
         ),
 
-        # ----------------------- RESULTS TAB -----------------------
+        # ----------------------- CYTOSCAPE NETWORK TAB -----------------------
         html.Div(
             id="results-tab-content",
             children=[
+                html.Div(
+                    [
+                        dcc.Markdown(
+                            """
+                            This tab shows an interactive network of optimized motifs. 
+                            Each motif is displayed as a node, and its fragments or losses 
+                            appear as connected nodes (color-coded for clarity). 
+                            Only edges above the selected intensity threshold will be shown. 
+                            You can adjust that threshold with the slider. 
+                            By default, the extra edges from each loss node to its 
+                            corresponding fragment node are hidden for less clutter, 
+                            but you can re-enable them using the checkbox. 
+                            Click on any motif node to see its associated molecules on the right side.
+                            """
+                        )
+                    ],
+                    style={"margin": "20px"},
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col([
+                            dbc.Label("Edge Intensity Threshold"),
+                            dcc.Slider(
+                                id="edge-intensity-threshold",
+                                min=0,
+                                max=1,
+                                step=0.05,
+                                value=0.50,
+                                marks={0: "0.0", 0.5: "0.5", 1: "1.0"}
+                            )
+                        ], width=6),
+                        dbc.Col([
+                            dbc.Checklist(
+                                options=[{"label": "Add Loss -> Fragment Edge", "value": "show_loss_edge"}],
+                                value=[],
+                                id="toggle-loss-edge",
+                                inline=True,
+                            )
+                        ], width=6),
+                    ],
+                    style={"marginTop": "20px"},
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col([
+                            dbc.Label("Graph Layout"),
+                            dcc.Dropdown(
+                                id="cytoscape-layout-dropdown",
+                                options=[
+                                    {"label": "CoSE", "value": "cose"},
+                                    {"label": "Force-Directed (Spring)", "value": "fcose"},
+                                    {"label": "Circle", "value": "circle"},
+                                    {"label": "Concentric", "value": "concentric"},
+                                ],
+                                value="fcose",
+                                clearable=False,
+                            )
+                        ], width=6),
+                    ],
+                    style={"marginTop": "20px"},
+                ),
                 dbc.Row(
                     [
                         dbc.Col(
@@ -913,6 +1024,19 @@ app.layout = dbc.Container(
             id="motif-rankings-tab-content",
             children=[
                 dbc.Container([
+                    html.Div(
+                        [
+                            dcc.Markdown(
+                                """
+                                This tab displays your motifs in a ranked table, based on how frequently they appear 
+                                in your data and their average probabilities. You can filter the table by probability or overlap thresholds 
+                                to highlight motifs of interest. Clicking on a motif in the table takes you to detailed information about that motif.
+                                """
+                            )
+                        ],
+                        style={"margin": "20px"},
+                    ),
+
                     dbc.Row([
                         dbc.Col([
                             html.H3("Motif Rankings"),
@@ -967,6 +1091,19 @@ app.layout = dbc.Container(
         html.Div(
             id="motif-details-tab-content",
             children=[
+                html.Div(
+                    [
+                        dcc.Markdown(
+                            """
+                            This tab shows detailed information for a selected motif, such as its top features (fragments/losses) 
+                            filtered by probability range and how each spectrum relates to it. 
+                            You can browse individual spectra that contribute to the motif using the table and next/previous buttons, 
+                            and view an interactive mirror plot for deeper inspection.
+                            """
+                        )
+                    ],
+                    style={"margin": "20px"},
+                ),
                 html.H3(id='motif-details-title'),
                 # Add probability filter slider
                 html.Div([
@@ -1015,6 +1152,7 @@ app.layout = dbc.Container(
     fluid=False,
 )
 
+
 # ----------------- Callbacks & Functions -----------------
 
 # Callback to show/hide tab contents based on active tab
@@ -1046,6 +1184,7 @@ def toggle_tab_content(active_tab):
 
     return run_style, load_style, results_style, motif_rankings_style, motif_details_style
 
+
 # Callback to display uploaded data file info
 @app.callback(
     Output("file-upload-info", "children"),
@@ -1058,13 +1197,14 @@ def update_output(contents, filename):
     else:
         return html.Div([html.H5("No file uploaded yet.")])
 
-# RangeSlider display
+
 @app.callback(
     Output('probability-thresh-display', 'children'),
     Input('probability-thresh', 'value')
 )
 def display_probability_thresh(prob_thresh_range):
     return f"Selected Probability Range: {prob_thresh_range[0]:.2f} - {prob_thresh_range[1]:.2f}"
+
 
 @app.callback(
     Output('overlap-thresh-display', 'children'),
@@ -1073,12 +1213,14 @@ def display_probability_thresh(prob_thresh_range):
 def display_overlap_thresh(overlap_thresh_range):
     return f"Selected Overlap Range: {overlap_thresh_range[0]:.2f} - {overlap_thresh_range[1]:.2f}"
 
+
 @app.callback(
     Output('probability-filter-display', 'children'),
     Input('probability-filter', 'value')
 )
 def display_prob_filter(prob_filter_range):
     return f"Showing features with probability between {prob_filter_range[0]:.2f} and {prob_filter_range[1]:.2f}"
+
 
 # Show/hide advanced settings
 @app.callback(
@@ -1091,6 +1233,7 @@ def toggle_advanced_settings(n_clicks, is_open):
     if n_clicks:
         return not is_open
     return is_open
+
 
 # ------------------- The MAIN callback to run or load results -------------------
 @app.callback(
@@ -1144,60 +1287,51 @@ def toggle_advanced_settings(n_clicks, is_open):
     prevent_initial_call=True,
 )
 def handle_run_or_load(
-    run_clicks,
-    load_clicks,
-    data_contents,
-    data_filename,
-    n_motifs,
-    top_n,
-    unique_mols,
-    polarity,
-    results_contents,
-    results_filename,
-    prep_sigdig,
-    prep_min_mz,
-    prep_max_mz,
-    prep_max_frags,
-    prep_min_frags,
-    prep_min_intensity,
-    prep_max_intensity,
-    conv_step_size,
-    conv_window_size,
-    conv_threshold,
-    conv_type,
-    ann_criterium,
-    ann_cosine_sim,
-    model_rm_top,
-    model_min_cf,
-    model_min_df,
-    model_alpha,
-    model_eta,
-    model_seed,
-    train_parallel,
-    train_workers,
-    n_iterations,
-    dataset_charge,
-    dataset_name,
-    dataset_output_folder,
-    fp_type,
-    fp_threshold,
-    motif_parameter,
-    s2v_model_path,
-    s2v_library_path,
+        run_clicks,
+        load_clicks,
+        data_contents,
+        data_filename,
+        n_motifs,
+        top_n,
+        unique_mols,
+        polarity,
+        results_contents,
+        results_filename,
+        prep_sigdig,
+        prep_min_mz,
+        prep_max_mz,
+        prep_max_frags,
+        prep_min_frags,
+        prep_min_intensity,
+        prep_max_intensity,
+        conv_step_size,
+        conv_window_size,
+        conv_threshold,
+        conv_type,
+        ann_criterium,
+        ann_cosine_sim,
+        model_rm_top,
+        model_min_cf,
+        model_min_df,
+        model_alpha,
+        model_eta,
+        model_seed,
+        train_parallel,
+        train_workers,
+        n_iterations,
+        dataset_charge,
+        dataset_name,
+        dataset_output_folder,
+        fp_type,
+        fp_threshold,
+        motif_parameter,
+        s2v_model_path,
+        s2v_library_path,
 ):
     """
     This callback either (1) runs MS2LDA from scratch on the uploaded data (when Run Analysis clicked),
     or (2) loads precomputed results from a JSON file (when Load Results clicked).
     """
-    import base64, tempfile, os, json
-    import dash
-    from dash.exceptions import PreventUpdate
-    import tomotopy as tp
-    from MS2LDA.Preprocessing.load_and_clean import clean_spectra
-    from MS2LDA.run import filetype_check
-    from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
-    from dash import no_update
-    import MS2LDA  # Our main run code
 
     ctx = dash.callback_context
     if not ctx.triggered:
@@ -1258,6 +1392,8 @@ def handle_run_or_load(
             "criterium": ann_criterium,
             "cosine_similarity": ann_cosine_sim,
             "n_mols_retrieved": top_n,
+            "s2v_model_path": s2v_model_path,
+            "s2v_library_path": s2v_library_path,
         }
         model_parameters = {
             "rm_top": model_rm_top,
@@ -1411,8 +1547,8 @@ def handle_run_or_load(
                 spectra_data,
             )
 
-        # ADDED: Show chosen file if no error
-        load_status = dbc.Alert(f"Selected Results File: {results_filename}\nResults loaded successfully!", color="success")
+        load_status = dbc.Alert(f"Selected Results File: {results_filename}\nResults loaded successfully!",
+                                color="success")
 
         return (
             run_status,
@@ -1426,14 +1562,19 @@ def handle_run_or_load(
     else:
         raise dash.exceptions.PreventUpdate
 
-# Updated Callback to create Cytoscape elements
+
+# Callback to create Cytoscape elements
 @app.callback(
     Output("cytoscape-network-container", "children"),
     Input("optimized-motifs-store", "data"),
     Input("clustered-smiles-store", "data"),
     Input("tabs", "value"),
+    Input("edge-intensity-threshold", "value"),
+    Input("toggle-loss-edge", "value"),
+    Input("cytoscape-layout-dropdown", "value"),
 )
-def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
+def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, edge_intensity_threshold,
+                     toggle_loss_edge, layout_choice):
     if active_tab != "results-tab" or not optimized_motifs_data:
         return ""
 
@@ -1458,13 +1599,22 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
 
     smiles_clusters = clustered_smiles_data
 
-    elements = create_cytoscape_elements(spectra, smiles_clusters)
+    # Convert the checkbox list into a boolean
+    show_loss_edge = ("show_loss_edge" in toggle_loss_edge)
 
+    elements = create_cytoscape_elements(
+        spectra,
+        smiles_clusters,
+        intensity_threshold=edge_intensity_threshold,
+        show_loss_edge=show_loss_edge
+    )
+
+    # Use the selected layout from the dropdown.
     cytoscape_component = cyto.Cytoscape(
         id="cytoscape-network",
         elements=elements,
         style={"width": "100%", "height": "100%"},
-        layout={"name": "cose", "animate": False},
+        layout={"name": layout_choice, "animate": True},
         stylesheet=[
             {
                 "selector": 'node[type="motif"]',
@@ -1501,6 +1651,23 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
                 },
             },
             {
+                "selector": 'node[type="loss"]',
+                "style": {
+                    "background-color": "#FFD700",
+                    "label": "data(label)",
+                    "text-background-color": "white",
+                    "text-background-opacity": 0.7,
+                    "text-background-padding": "3px",
+                    "text-background-shape": "roundrectangle",
+                    "text-border-color": "black",
+                    "text-border-width": 1,
+                    "text-valign": "top",
+                    "text-halign": "center",
+                    "color": "black",
+                    "font-size": "8px",
+                },
+            },
+            {
                 "selector": "edge",
                 "style": {
                     "line-color": "red",
@@ -1521,7 +1688,8 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab):
 
     return cytoscape_component
 
-def create_cytoscape_elements(spectra, smiles_clusters):
+
+def create_cytoscape_elements(spectra, smiles_clusters, intensity_threshold=0.05, show_loss_edge=False):
     elements = []
     created_fragments = set()
     created_losses = set()
@@ -1538,6 +1706,8 @@ def create_cytoscape_elements(spectra, smiles_clusters):
             }
         )
         for mz, intensity in zip(spectrum.peaks.mz, spectrum.peaks.intensities):
+            if intensity < intensity_threshold:
+                continue
             rounded_mz = round(mz, 2)
             frag_node = f"frag_{rounded_mz}"
             if frag_node not in created_fragments:
@@ -1565,10 +1735,11 @@ def create_cytoscape_elements(spectra, smiles_clusters):
             for loss_data in spectrum.metadata.get("losses", []):
                 loss_mz = loss_data["loss_mz"]
                 loss_intensity = loss_data["loss_intensity"]
+                if loss_intensity < intensity_threshold:
+                    continue
                 corresponding_frag_mz = precursor_mz - loss_mz
                 rounded_frag_mz = round(corresponding_frag_mz, 2)
                 frag_node = f"frag_{rounded_frag_mz}"
-
                 if frag_node not in created_fragments:
                     elements.append(
                         {
@@ -1587,7 +1758,7 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                             "data": {
                                 "id": loss_node,
                                 "label": f"-{loss_mz:.2f}",
-                                "type": "fragment",
+                                "type": "loss",
                             }
                         }
                     )
@@ -1601,16 +1772,81 @@ def create_cytoscape_elements(spectra, smiles_clusters):
                         }
                     }
                 )
-                elements.append(
-                    {
-                        "data": {
-                            "source": loss_node,
-                            "target": frag_node,
-                            "weight": loss_intensity,
+                # Conditionally re-add the line from loss node to fragment node if user wants it
+                if show_loss_edge:
+                    elements.append(
+                        {
+                            "data": {
+                                "source": loss_node,
+                                "target": frag_node,
+                                "weight": loss_intensity,
+                            }
                         }
-                    }
-                )
+                    )
+
     return elements
+
+
+@app.callback(
+    Output("molecule-images", "children"),
+    Input("cytoscape-network", "tapNodeData"),
+    State("clustered-smiles-store", "data"),
+)
+def display_node_data_on_click(tap_node_data, clustered_smiles_data):
+    if not tap_node_data:
+        raise PreventUpdate
+
+    node_type = tap_node_data.get("type", "")
+    node_id = tap_node_data.get("id", "")
+
+    # Only do something if user clicks on a "motif" node:
+    if node_type == "motif":
+        motif_index_str = node_id.replace("motif_", "")
+        try:
+            motif_index = int(motif_index_str)
+        except ValueError:
+            raise PreventUpdate
+
+        # Grab the SMILES cluster for this motif
+        if not clustered_smiles_data or motif_index >= len(clustered_smiles_data):
+            return html.Div(
+                "No SMILES found for this motif."
+            )
+
+        smiles_list = clustered_smiles_data[motif_index]
+        if not smiles_list:
+            return html.Div(
+                "This motif has no associated SMILES."
+            )
+
+        mols = []
+        for smi in smiles_list:
+            try:
+                mol = Chem.MolFromSmiles(smi)
+                if mol:
+                    mols.append(mol)
+            except Exception:
+                continue
+
+        if not mols:
+            return html.Div("No valid RDKit structures for these SMILES.")
+
+        # Create the grid image
+        grid_img = MolsToGridImage(
+            mols,
+            molsPerRow=4,
+            subImgSize=(200, 200),
+            legends=[f"Match {i + 1}" for i in range(len(mols))],
+            returnPNG=True
+        )
+        encoded = base64.b64encode(grid_img).decode("utf-8")
+
+        # Return an <img> with the PNG
+        return html.Img(src="data:image/png;base64," + encoded, style={"margin": "10px"})
+
+    # Otherwise (e.g. if user clicks a fragment/loss), do nothing special
+    raise PreventUpdate
+
 
 # -------------------------------- RANKINGS & DETAILS --------------------------------
 
@@ -1631,13 +1867,13 @@ def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
                     motif_overlap_scores[motif].append(o)
 
     md = []
-    import numpy as np
     for motif in motifs:
         avg_probability = np.mean(motif_probabilities[motif]) if motif_probabilities[motif] else 0
         avg_overlap = np.mean(motif_overlap_scores[motif]) if motif_overlap_scores[motif] else 0
         md.append((motif, motif_degrees[motif], avg_probability, avg_overlap))
     md.sort(key=lambda x: x[1], reverse=True)
     return md
+
 
 @app.callback(
     Output('motif-rankings-table-container', 'children'),
@@ -1683,8 +1919,10 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
         columns=[
             {'name': 'Motif', 'id': 'Motif'},
             {'name': 'Degree', 'id': 'Degree', 'type': 'numeric', 'format': {'specifier': ''}},
-            {'name': 'Average Doc-Topic Probability', 'id': 'Average Doc-Topic Probability', 'type': 'numeric', 'format': {'specifier': '.4f'}},
-            {'name': 'Average Overlap Score', 'id': 'Average Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
+            {'name': 'Average Doc-Topic Probability', 'id': 'Average Doc-Topic Probability', 'type': 'numeric',
+             'format': {'specifier': '.4f'}},
+            {'name': 'Average Overlap Score', 'id': 'Average Overlap Score', 'type': 'numeric',
+             'format': {'specifier': '.4f'}},
             {'name': 'Annotation', 'id': 'Annotation'},
         ],
         sort_action='native',
@@ -1705,6 +1943,7 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
 
     return table
 
+
 @app.callback(
     Output('selected-motif-store', 'data'),
     Input('motif-rankings-table', 'active_cell'),
@@ -1717,6 +1956,7 @@ def on_motif_click(active_cell, table_data):
         return motif
     return dash.no_update
 
+
 @app.callback(
     Output('tabs', 'value'),
     Input('selected-motif-store', 'data'),
@@ -1727,6 +1967,7 @@ def activate_motif_details_tab(selected_motif):
         return 'motif-details-tab'
     else:
         return dash.no_update
+
 
 @app.callback(
     Output('motif-details-title', 'children'),
@@ -1800,7 +2041,6 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
             if feature in total_feature_probs:
                 total_feature_probs[feature] += prob
 
-    import plotly.express as px
     barplot1_df = pd.DataFrame({
         'Feature': features_in_motif,
         'Probability in Motif': [filtered_motif_data[feature] for feature in features_in_motif],
@@ -1873,7 +2113,6 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
                 except Exception as e:
                     print(f"Error converting SMILES {smi}: {str(e)}")
             if mols:
-                from rdkit.Chem import Draw
                 legends = [f"Match {i + 1}" for i in range(len(mols))]
                 img = Draw.MolsToGridImage(
                     mols,
@@ -1890,6 +2129,7 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
 
     spectra_ids = spectra_df['Spectrum'].tolist()
     return f"Motif Details: {motif_name}", content, spectra_ids, spectra_table_data, spectra_table_columns
+
 
 @app.callback(
     Output('selected-spectrum-index', 'data'),
@@ -1936,6 +2176,7 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
     else:
         return current_index, dash.no_update
 
+
 @app.callback(
     Output('spectrum-plot', 'children'),
     Input('selected-spectrum-index', 'data'),
@@ -1955,11 +2196,6 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
         spectrum_dict = next((s for s in spectra_data if s['metadata']['id'] == spectrum_id), None)
         if not spectrum_dict:
             return html.Div("Spectrum data not found.")
-
-        from matchms import Spectrum, Fragments
-        import numpy as np
-        import pandas as pd
-        import plotly.graph_objs as go
 
         spectrum = Spectrum(
             mz=np.array(spectrum_dict['mz']),
@@ -2109,6 +2345,7 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
         )
 
     return ""
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)

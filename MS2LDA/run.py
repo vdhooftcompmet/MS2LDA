@@ -315,7 +315,10 @@ def filetype_check(dataset):
 
 def s2v_annotation(motif_spectra, annotation_parameters):
     print("Loading Spec2Vec model ...")
-    s2v_similarity, library = load_s2v()
+    path_model = annotation_parameters.get("s2v_model_path")
+    path_library = annotation_parameters.get("s2v_library_path")
+    s2v_similarity, library = load_s2v(path_model=path_model, path_library=path_library)
+
     print("Searches for candidates ...")
     motif_embeddings = calc_embeddings(s2v_similarity, motif_spectra)
     similarity_matrix = calc_similarity(motif_embeddings, library.embeddings)
@@ -333,9 +336,15 @@ def s2v_annotation(motif_spectra, annotation_parameters):
 
 
 def load_s2v(
-        path_model = r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\Spec2Struc\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode\020724_Spec2Vec_pos_CleanedLibraries.model",
-        path_library = r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\Spec2Struc\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode\positive_s2v_library.pkl"
+        path_model = None,
+        path_library = None
         ):
+
+    # If not specified, fallback to defaults
+    if path_model is None:
+        path_model = "../MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model"
+    if path_library is None:
+        path_library = "../MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
 
     s2v_similarity, library = load_s2v_and_library(path_model, path_library)
 
