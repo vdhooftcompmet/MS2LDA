@@ -91,13 +91,23 @@ def match_frags_and_losses(motif_spectrum, analog_spectra):
     return matching_frags, matching_losses
 
 
-def partial_retrieve_spec4doc(doc2spec_map, ms2lda, doc_id):
+def retrieve_spec4doc(doc2spec_map, ms2lda, doc_id):
     """
+    Retrieves the orginal spectrum for a given document based on a hashmap
+
+    ARGS:
+        doc2spec_map (dict): hash-spectrum pairs
+        ms2lda (tomotopy object): LDA model
+        doc_id (int): id of document
+
+    RETURNS:
+        retrieved_spec: matchms spectrum object
     """
     original_doc = ""
     for word_index in ms2lda.docs[doc_id].words:
         original_doc += ms2lda.vocabs[word_index]
 
     hashed_feature_word = hashlib.md5(original_doc.encode('utf-8')).hexdigest()
-    return doc2spec_map[hashed_feature_word]
+    retrieved_spec = doc2spec_map[hashed_feature_word]
+    return retrieved_spec
 

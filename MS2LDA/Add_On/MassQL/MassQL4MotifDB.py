@@ -2,6 +2,7 @@ import hashlib
 import random
 import numpy as np
 import pandas as pd
+import json
 
 from matchms import Spectrum, Fragments
 
@@ -150,18 +151,23 @@ def motifDB2motifs(motifDB_ms2, result_feature_table):
 
 
 
-def store_motifDB(ms1_df, ms2_df):
+def store_motifDB(ms1_df, ms2_df, name="motifDB.json"):
     ms1_df["ms_level"] = "ms1"
     ms2_df["ms_level"] = "ms2"
 
-    motifDB = pd.concat([ms1_df, ms2_df], keys=["ms1", "ms2"])
-    
-    return motifDB
+    motifDB = {
+        "ms1": ms1_df,
+        "ms2": ms2_df,
+    }
+    output_motifDB = json.dumps(motifDB, default=lambda x: x.to_dict(orient="split"), indent=2)
+    with open(name, "w") as outfile:
+        outfile.write(output_motifDB)
+    return True
 
-def load_motifDB(motifDB_filename): # doesn't work
-    motifDB = pd.read_feather(motifDB_filename)
-    ms1_df = motifDB[motifDB['ms_level'] == 'ms1']
-    ms2_df = motifDB[motifDB['ms_level'] == 'ms2']
+def load_motifDB(motifDB_filename):
+    motifDB = json.loads(motifDB_filename)
+    ms1_df = pd.DataFrame(motifDB["ms1"])
+    ms2_df = pd.DataFrame(motifDB["ms2"])
 
     return ms1_df, ms2_df
 

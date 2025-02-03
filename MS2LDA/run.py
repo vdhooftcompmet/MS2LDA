@@ -4,7 +4,7 @@ from MS2LDA.Preprocessing.load_and_clean import load_mzml
 from MS2LDA.Preprocessing.load_and_clean import load_msp
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 
-from MS2LDA.utils import partial_retrieve_spec4doc
+from MS2LDA.utils import retrieve_spec4doc
 
 from MS2LDA.Preprocessing.generate_corpus import features_to_words
 from MS2LDA.Preprocessing.generate_corpus import map_doc2spec
@@ -41,7 +41,7 @@ from massql import msql_engine
 
 from MS2LDA.Add_On.Fingerprints.FP_annotation import tanimoto_similarity
 
-import matchms
+import pickle
 import matplotlib.pyplot as plt
 import os
 import networkx as nx
@@ -76,7 +76,7 @@ def run(dataset, n_motifs, n_iterations,
 
     # Mapping
     doc2spec_map = map_doc2spec(feature_words, cleaned_spectra)
-    MS2LDA.retrieve_spec4doc = partial(partial_retrieve_spec4doc, doc2spec_map, trained_ms2lda)
+    MS2LDA.retrieve_spec4doc = partial(retrieve_spec4doc, doc2spec_map, trained_ms2lda)
 
     # Motif Generation
     motifs = extract_motifs(trained_ms2lda, top_n=motif_parameter)
@@ -90,7 +90,7 @@ def run(dataset, n_motifs, n_iterations,
     motif_fps = calc_fingerprints(clustered_smiles, fp_type=fingerprint_parameters["fp_type"], threshold=fingerprint_parameters["threshold"])
 
 
-    store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, dataset_parameters["output_folder"])
+    store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, doc2spec_map, dataset_parameters["output_folder"])
 
     # Save additional viz data
     save_visualization_data(
@@ -101,7 +101,7 @@ def run(dataset, n_motifs, n_iterations,
         filename="ms2lda_viz.json"
     )
 
-    return motif_spectra, optimized_motifs, motif_fps, doc2spec_map
+    return motif_spectra, optimized_motifs, motif_fps
 
 
 
@@ -115,7 +115,7 @@ def screen_spectra(motifs_stored=None, dataset=None, motif_spectra=None, motifDB
         if motifDB and motifDB_query:
             if type(motifDB) == str:
                 if motifDB.endswith(".xlsx"):
-                    ms1_motifDB, ms2_motifDB = load_motifDB_excel(motifDB)
+                    ms1_motifDB, ms2_motifDB = load_motifDB(motifDB)
                     motifs_stored = massql_search(ms1_motifDB, ms2_motifDB, motifDB_query)
                 else:
                     raise ValueError("This file format is not supported")
@@ -262,27 +262,29 @@ def add_annotation(motif_spectra, clustered_smiles):
 
     return motif_spectra_
 #-------------------------------------------------------------------------------------------------------------------------------------------------#
-def store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, output_folder="MS2LDA_Results"):
+def store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, doc2spec_map, output_folder="MS2LDA_Results"):
     curr_dir = os.getcwd()
     os.mkdir(output_folder)
     os.chdir(output_folder)
     store_m2m_folder(motif_spectra, "motifs")
-
+    print("m2m folder stored")
     convergence_curve_fig = plot_convergence(convergence_curve)
     convergence_curve_fig.savefig("convergence_curve.png",dpi=300)
-
-    network_fig = create_network(motif_spectra, significant_figures=2)
+    print("convergence curve stored")
+    network_fig = create_network(optimized_motifs, significant_figures=2) # motif spectra
     nx.write_graphml(network_fig, "network.graphml")
-
+    print("network stored")
     os.mkdir("motif_figures")
     show_annotated_motifs(optimized_motifs, motif_spectra, clustered_smiles, savefig="motif_figures")
 
     trained_ms2lda.save("ms2lda.bin")
+    with open("doc2spec_map.pkl", "wb") as outfile:
+        pickle.dump(doc2spec_map, outfile)
 
     ms1_motifDB_opt, ms2_motifDB_opt = motifs2motifDB(optimized_motifs) # of motif_spectra?
-    store_motifDB_excel(ms1_motifDB_opt, ms2_motifDB_opt, name="motifDB_optimized.xlsx")
+    store_motifDB(ms1_motifDB_opt, ms2_motifDB_opt, name="motifDB_optimized.json")
     ms1_motifDB, ms2_motifDB = motifs2motifDB(motif_spectra)
-    store_motifDB_excel(ms1_motifDB, ms2_motifDB)
+    store_motifDB(ms1_motifDB, ms2_motifDB)
 
     os.chdir(curr_dir)
 

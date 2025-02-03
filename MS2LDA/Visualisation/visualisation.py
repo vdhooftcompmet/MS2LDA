@@ -53,15 +53,17 @@ def create_network(spectra, significant_figures=2, motif_sizes=None, file_genera
 
         peak_list = spectrum.peaks.mz
         rounded_peak_list = [round(x, significant_figures) for x in peak_list]
-        loss_list = spectrum.losses.mz
-        rounded_loss_list = [round(x, significant_figures) for x in loss_list]
         int_peak_list = spectrum.peaks.intensities
-        int_losses_list = spectrum.losses.intensities
-
         for edge, weight in zip(rounded_peak_list, int_peak_list):
             G.add_edge(motif_node, edge, weight=weight, color='red')
-        for edge, weight in zip(rounded_loss_list, int_losses_list):
-            G.add_edge(motif_node, edge, weight=weight, color='blue')
+
+        if spectrum.losses:
+            loss_list = spectrum.losses.mz
+            rounded_loss_list = [round(x, significant_figures) for x in loss_list]
+            int_losses_list = spectrum.losses.intensities
+            
+            for edge, weight in zip(rounded_loss_list, int_losses_list):
+                G.add_edge(motif_node, edge, weight=weight, color='blue')
 
     #Arranging node size - motifs
     node_sizes = {}
