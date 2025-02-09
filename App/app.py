@@ -2029,11 +2029,35 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
             # The real index in spectra_data
             real_idx = doc2spec_index.get(doc_idx_str, -1)
 
+            precursor_mz = None
+            retention_time = None
+            feature_id = None
+            collision_energy = None
+            ionmode = None
+            ms_level = None
+            scans = None
+            if real_idx != -1:
+                sp_meta = spectra_data[real_idx]['metadata']
+                precursor_mz = sp_meta.get('precursor_mz')
+                retention_time = sp_meta.get('retention_time')
+                feature_id = sp_meta.get('feature_id')
+                collision_energy = sp_meta.get('collision_energy')
+                ionmode = sp_meta.get('ionmode')
+                ms_level = sp_meta.get('ms_level')
+                scans = sp_meta.get('scans')
+
             spectra_data_list.append({
                 'DocName': doc_name,
                 'SpecIndex': real_idx,
                 'Probability': prob,
                 'Overlap Score': overlap,
+                'PrecursorMz': precursor_mz,
+                'RetentionTime': retention_time,
+                'FeatureID': feature_id,
+                'CollisionEnergy': collision_energy,
+                'IonMode': ionmode,
+                'MsLevel': ms_level,
+                'Scans': scans
             })
 
     spectra_df = pd.DataFrame(spectra_data_list).sort_values(by='Probability', ascending=False)
@@ -2042,6 +2066,13 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
     spectra_table_columns = [
         {'name': 'DocName', 'id': 'DocName'},
         {'name': 'SpecIndex', 'id': 'SpecIndex', 'type': 'numeric'},
+        {'name': 'FeatureID', 'id': 'FeatureID'},
+        {'name': 'Scans', 'id': 'Scans'},
+        {'name': 'PrecursorMz', 'id': 'PrecursorMz', 'type': 'numeric', 'format': {'specifier': '.4f'}},
+        {'name': 'RetentionTime', 'id': 'RetentionTime', 'type': 'numeric', 'format': {'specifier': '.2f'}},
+        {'name': 'CollisionEnergy', 'id': 'CollisionEnergy'},
+        {'name': 'IonMode', 'id': 'IonMode'},
+        {'name': 'MsLevel', 'id': 'MsLevel'},
         {'name': 'Probability', 'id': 'Probability', 'type': 'numeric', 'format': {'specifier': '.4f'}},
         {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
     ]
