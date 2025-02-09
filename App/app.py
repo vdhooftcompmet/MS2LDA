@@ -1132,6 +1132,7 @@ app.layout = dbc.Container(
                     page_size=10,
                     row_selectable='single',
                     selected_rows=[0],
+                    hidden_columns=["SpecIndex"],
                 ),
                 # Next and Previous buttons
                 html.Div([
@@ -2015,21 +2016,32 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
     content.append(feature_table_component)
     content.append(html.P(f'Total Probability (Filtered): {total_prob:.4f}'))
 
+    # Build list of docs that contain this motif
     spectra_data_list = []
-    for doc, topics in lda_dict_data['theta'].items():
+    doc2spec_index = lda_dict_data["doc_to_spec_index"]
+
+    for doc_name, topics in lda_dict_data['theta'].items():
         prob = topics.get(motif_name, 0)
         if prob > 0:
-            overlap = lda_dict_data['overlap_scores'][doc].get(motif_name, 0)
+            overlap = lda_dict_data['overlap_scores'][doc_name].get(motif_name, 0)
+            # parse out doc index from doc_name e.g. "spec_7" => 7
+            doc_idx_str = doc_name.replace("spec_", "")
+            # The real index in spectra_data
+            real_idx = doc2spec_index.get(doc_idx_str, -1)
+
             spectra_data_list.append({
-                'Spectrum': doc,
+                'DocName': doc_name,
+                'SpecIndex': real_idx,
                 'Probability': prob,
                 'Overlap Score': overlap,
             })
+
     spectra_df = pd.DataFrame(spectra_data_list).sort_values(by='Probability', ascending=False)
 
     spectra_table_data = spectra_df.to_dict('records')
     spectra_table_columns = [
-        {'name': 'Spectrum', 'id': 'Spectrum'},
+        {'name': 'DocName', 'id': 'DocName'},
+        {'name': 'SpecIndex', 'id': 'SpecIndex', 'type': 'numeric'},
         {'name': 'Probability', 'id': 'Probability', 'type': 'numeric', 'format': {'specifier': '.4f'}},
         {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
     ]
@@ -2071,8 +2083,10 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
     )
 
     feature_counts = {feature: 0 for feature in features_in_motif}
-    for doc in spectra_df['Spectrum']:
-        doc_features = lda_dict_data['corpus'].get(doc, {}).keys()
+    for _, row in spectra_df.iterrows():
+        doc_name = row['DocName']
+        corpus_entry = lda_dict_data['corpus'].get(doc_name, {})
+        doc_features = corpus_entry.keys()
         for feature in features_in_motif:
             if feature in doc_features:
                 feature_counts[feature] += 1
@@ -2127,7 +2141,7 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
                     style={"margin": "10px"},
                 ))
 
-    spectra_ids = spectra_df['Spectrum'].tolist()
+    spectra_ids = spectra_df['SpecIndex'].tolist()
     return f"Motif Details: {motif_name}", content, spectra_ids, spectra_table_data, spectra_table_columns
 
 
@@ -2193,9 +2207,8 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
 
         # Retrieve matching spectrum data
         spectrum_id = spectra_ids[selected_index]
-        spectrum_dict = next((s for s in spectra_data if s['metadata']['id'] == spectrum_id), None)
-        if not spectrum_dict:
-            return html.Div("Spectrum data not found.")
+        # Get the actual spectrum dictionary
+        spectrum_dict = spectra_data[spectrum_id]
 
         spectrum = Spectrum(
             mz=np.array(spectrum_dict['mz']),
