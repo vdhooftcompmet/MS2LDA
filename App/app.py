@@ -1095,17 +1095,22 @@ app.layout = dbc.Container(
                     [
                         dcc.Markdown(
                             """
-                            This tab shows detailed information for a selected motif, such as its top features (fragments/losses) 
-                            filtered by probability range and how each spectrum relates to it. 
-                            You can browse individual spectra that contribute to the motif using the table and next/previous buttons, 
-                            and view an interactive mirror plot for deeper inspection.
+                            This tab shows detailed information for a selected motif. 
+
+                            - **Topic-Word Probability Filter**: Adjust this to control which motif features (fragments/losses) are displayed.
+                            - **Motif Details**: Displays the top features (fragments/losses) for this motif within your chosen probability range.
+                            - **Counts of Mass2Motif Features**: Bar plot comparing this motif’s feature probabilities against their total probabilities in the whole dataset.
+                            - **Counts of Features in Documents**: Bar plot summarizing how many documents (spectra) contain these features.
+                            - **Spec2Vec Matching Results**: Displays SMILES structures found for this motif via Spec2Vec.
+
+                            Below, you can see **spectra that contain this motif** and filter them using the **Overlap Score Filter**.
                             """
                         )
                     ],
                     style={"margin": "20px"},
                 ),
                 html.H3(id='motif-details-title'),
-                # Add probability filter slider
+
                 html.Div([
                     dbc.Label("Topic-Word Probability Filter:"),
                     dcc.RangeSlider(
@@ -1120,9 +1125,25 @@ app.layout = dbc.Container(
                     html.Div(id='probability-filter-display', style={"marginTop": "10px"})
                 ], className="mb-3"),
                 html.Div(id='motif-details-content'),
+
+                html.Div([
+                    dbc.Label("Overlap Score Filter:"),
+                    dcc.RangeSlider(
+                        id='overlap-filter',
+                        min=0,
+                        max=1,
+                        step=0.01,
+                        value=[0, 1],
+                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
+                        allowCross=False
+                    ),
+                    html.Div(id='overlap-filter-display', style={"marginTop": "10px"})
+                ], className="mb-3"),
+
                 dcc.Store(id='motif-spectra-ids-store'),
                 dcc.Store(id='selected-spectrum-index', data=0),
-                html.Div(id='spectrum-plot'),
+
+                # Spectrum table
                 dash_table.DataTable(
                     id='spectra-table',
                     data=[],
@@ -1134,7 +1155,9 @@ app.layout = dbc.Container(
                     selected_rows=[0],
                     hidden_columns=["SpecIndex"],
                 ),
-                # Next and Previous buttons
+
+                html.Div(id='spectrum-plot'),
+
                 html.Div([
                     dbc.Button('Previous', id='prev-spectrum', n_clicks=0, color="info"),
                     dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ms-2', color="info"),
@@ -1971,6 +1994,13 @@ def activate_motif_details_tab(selected_motif):
 
 
 @app.callback(
+    Output('overlap-filter-display', 'children'),
+    Input('overlap-filter', 'value')
+)
+def display_overlap_filter(overlap_filter_range):
+    return f"Showing docs with overlap score between {overlap_filter_range[0]:.2f} and {overlap_filter_range[1]:.2f}"
+
+@app.callback(
     Output('motif-details-title', 'children'),
     Output('motif-details-content', 'children'),
     Output('motif-spectra-ids-store', 'data'),
@@ -1978,26 +2008,31 @@ def activate_motif_details_tab(selected_motif):
     Output('spectra-table', 'columns'),
     Input('selected-motif-store', 'data'),
     Input('probability-filter', 'value'),
+    Input('overlap-filter', 'value'),
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
     prevent_initial_call=True,
 )
-def update_motif_details(selected_motif, probability_range, lda_dict_data, clustered_smiles_data, spectra_data):
+def update_motif_details(selected_motif, probability_range, overlap_range,
+                         lda_dict_data, clustered_smiles_data, spectra_data):
     if not selected_motif or not lda_dict_data:
         return '', [], [], [], ''
 
     motif_name = selected_motif
     motif_data = lda_dict_data['beta'].get(motif_name, {})
 
+    # Filter features by the probability slider
     filtered_motif_data = {
         feature: prob for feature, prob in motif_data.items()
         if probability_range[0] <= prob <= probability_range[1]
     }
-
     total_prob = sum(filtered_motif_data.values())
+
     content = []
 
+    # Show a table of features for this motif
+    import pandas as pd
     feature_table = pd.DataFrame({
         'Feature': filtered_motif_data.keys(),
         'Probability': filtered_motif_data.values(),
@@ -2012,18 +2047,19 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
         style_cell={'textAlign': 'left'},
         page_size=10,
     )
+
+    # Add subsection
     content.append(html.H5('Features Explained by This Motif'))
     content.append(feature_table_component)
     content.append(html.P(f'Total Probability (Filtered): {total_prob:.4f}'))
 
     # Build list of docs that contain this motif
-    spectra_data_list = []
     doc2spec_index = lda_dict_data["doc_to_spec_index"]
-
+    spectra_data_list = []
     for doc_name, topics in lda_dict_data['theta'].items():
         prob = topics.get(motif_name, 0)
         if prob > 0:
-            overlap = lda_dict_data['overlap_scores'][doc_name].get(motif_name, 0)
+            overlap = lda_dict_data['overlap_scores'][doc_name].get(motif_name, 0.0)
             # parse out doc index from doc_name e.g. "spec_7" => 7
             doc_idx_str = doc_name.replace("spec_", "")
             # The real index in spectra_data
@@ -2061,7 +2097,10 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
             })
 
     spectra_df = pd.DataFrame(spectra_data_list).sort_values(by='Probability', ascending=False)
+    # Filter by overlap score:
+    spectra_df = spectra_df[(spectra_df['Overlap Score'] >= overlap_range[0]) & (spectra_df['Overlap Score'] <= overlap_range[1])]
 
+    # Create data/columns for the table
     spectra_table_data = spectra_df.to_dict('records')
     spectra_table_columns = [
         {'name': 'DocName', 'id': 'DocName'},
@@ -2077,6 +2116,7 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
         {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
     ]
 
+    # Plot bar chart #1
     features_in_motif = list(filtered_motif_data.keys())
     total_feature_probs = {feature: 0.0 for feature in features_in_motif}
     for motif, feature_probs in lda_dict_data['beta'].items():
@@ -2113,6 +2153,7 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
         legend_title='',
     )
 
+    # Plot bar chart #2
     feature_counts = {feature: 0 for feature in features_in_motif}
     for _, row in spectra_df.iterrows():
         doc_name = row['DocName']
@@ -2144,6 +2185,7 @@ def update_motif_details(selected_motif, probability_range, lda_dict_data, clust
     content.append(dcc.Graph(figure=barplot1_fig))
     content.append(dcc.Graph(figure=barplot2_fig))
 
+    # Spec2Vec matching
     motif_index = int(motif_name.replace('motif_', '')) if motif_name.startswith('motif_') else 0
     if clustered_smiles_data and motif_index < len(clustered_smiles_data):
         smiles_list = clustered_smiles_data[motif_index]
