@@ -423,8 +423,8 @@ def handle_run_or_load(
 def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, edge_intensity_threshold,
                      toggle_loss_edge, layout_choice):
     if active_tab != "results-tab" or not optimized_motifs_data:
-        return ""
-
+        raise PreventUpdate
+    
     spectra = []
     for s in optimized_motifs_data:
         spectrum = Spectrum(
