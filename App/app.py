@@ -17,8 +17,6 @@ from dash import no_update
 from dash.exceptions import PreventUpdate
 from matchms import Spectrum, Fragments
 from rdkit import Chem
-from rdkit.Chem import Draw
-from rdkit.Chem import MolFromSmiles
 from rdkit.Chem.Draw import MolsToGridImage
 
 import MS2LDA
@@ -1039,7 +1037,6 @@ app.layout = dbc.Container(
 
                     dbc.Row([
                         dbc.Col([
-                            html.H3("Motif Rankings"),
                             # Row for the sliders and their displays
                             dbc.Row(
                                 [
@@ -1091,77 +1088,147 @@ app.layout = dbc.Container(
         html.Div(
             id="motif-details-tab-content",
             children=[
+                # Top summary
                 html.Div(
                     [
                         dcc.Markdown(
                             """
-                            This tab shows detailed information for a selected motif. 
+                            This tab is organized into three main sections: (1) Motif Details, (2) Features in Motifs, and (3) Documents in Motifs. 
 
-                            - **Topic-Word Probability Filter**: Adjust this to control which motif features (fragments/losses) are displayed.
-                            - **Motif Details**: Displays the top features (fragments/losses) for this motif within your chosen probability range.
-                            - **Counts of Mass2Motif Features**: Bar plot comparing this motif’s feature probabilities against their total probabilities in the whole dataset.
-                            - **Counts of Features in Documents**: Bar plot summarizing how many documents (spectra) contain these features.
-                            - **Spec2Vec Matching Results**: Displays SMILES structures found for this motif via Spec2Vec.
-
-                            Below, you can see **spectra that contain this motif** and filter them using the **Overlap Score Filter**.
+                            In **Motif Details**, you'll see the Spec2Vec matching results for the selected motif.
+                            In **Features in Motifs**, a probability filter helps you select which motif features (fragments/losses) to show, 
+                            along with bar plots indicating how strongly these features belong to the motif and how often they appear in the dataset.
+                            Finally, **Documents in Motifs** displays the spectra containing this motif, with filters for document-topic probability and overlap score.
                             """
                         )
                     ],
                     style={"margin": "20px"},
                 ),
-                html.H3(id='motif-details-title'),
 
-                html.Div([
-                    dbc.Label("Topic-Word Probability Filter:"),
-                    dcc.RangeSlider(
-                        id='probability-filter',
-                        min=0,
-                        max=1,
-                        step=0.01,
-                        value=[0, 1],
-                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
-                        allowCross=False
-                    ),
-                    html.Div(id='probability-filter-display', style={"marginTop": "10px"})
-                ], className="mb-3"),
-                html.Div(id='motif-details-content'),
-
-                html.Div([
-                    dbc.Label("Overlap Score Filter:"),
-                    dcc.RangeSlider(
-                        id='overlap-filter',
-                        min=0,
-                        max=1,
-                        step=0.01,
-                        value=[0, 1],
-                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
-                        allowCross=False
-                    ),
-                    html.Div(id='overlap-filter-display', style={"marginTop": "10px"})
-                ], className="mb-3"),
-
-                dcc.Store(id='motif-spectra-ids-store'),
-                dcc.Store(id='selected-spectrum-index', data=0),
-
-                # Spectrum table
-                dash_table.DataTable(
-                    id='spectra-table',
-                    data=[],
-                    columns=[],
-                    style_table={'overflowX': 'auto'},
-                    style_cell={'textAlign': 'left'},
-                    page_size=10,
-                    row_selectable='single',
-                    selected_rows=[0],
-                    hidden_columns=["SpecIndex"],
+                # ----------------- (A) Spec2Vec Results -----------------
+                html.Div(
+                    [
+                        html.H4(id='motif-details-title'),
+                        dcc.Markdown(
+                            """
+                            This section shows SMILES structures found by comparing the motif’s pseudo-spectrum against an external library.
+                            You can view top matching compounds here and visually inspect their chemical structures.
+                            """
+                        ),
+                        # This container will be dynamically filled in the callback
+                        html.Div(id='motif-spec2vec-container'),
+                    ],
+                    style={
+                        "border": "1px dashed #999",
+                        "padding": "15px",
+                        "borderRadius": "5px",
+                        "margin": "20px"
+                    },
                 ),
 
-                html.Div(id='spectrum-plot'),
+                # ----------------- (B) Features in Motifs -----------------
+                html.Div(
+                    [
+                        html.H4("Features in Motifs"),
+                        dcc.Markdown(
+                            """
+                            The **Topic-Word Probability Filter** below controls which motif features (fragments/losses) are displayed 
+                            based on their probability (`beta`). After filtering, you’ll see a table of selected features plus 
+                            bar charts illustrating their distribution in the motif and the dataset.
+                            """
+                        ),
 
-                html.Div([
-                    dbc.Button('Previous', id='prev-spectrum', n_clicks=0, color="info"),
-                    dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ms-2', color="info"),
-                ], className='mt-3'),
+                        dbc.Label("Topic-Word Probability Filter:"),
+                        dcc.RangeSlider(
+                            id='probability-filter',
+                            min=0,
+                            max=1,
+                            step=0.01,
+                            value=[0, 1],
+                            marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
+                            allowCross=False
+                        ),
+                        html.Div(id='probability-filter-display', style={"marginTop": "10px"}),
+
+                        # This container will hold the feature table & first bar chart
+                        html.Div(id='motif-features-container'),
+                    ],
+                    style={
+                        "border": "1px dashed #999",
+                        "padding": "15px",
+                        "borderRadius": "5px",
+                        "margin": "20px"
+                    },
+                ),
+
+                # ----------------- (C) Documents in Motifs -----------------
+                html.Div(
+                    [
+                        html.H4("Documents in Motifs"),
+                        dcc.Markdown(
+                            """
+                            This section shows spectra that include the current motif. 
+                            **Document-Topic Probability Filter** (theta) narrows the list by motif representation in each spectrum, 
+                            and **Overlap Score Filter** focuses on how closely the spectrum’s features match this motif’s top features.
+                            """
+                        ),
+
+                        dbc.Label("Document-Topic Probability Filter:"),
+                        dcc.RangeSlider(
+                            id='doc-topic-filter',
+                            min=0,
+                            max=1,
+                            step=0.01,
+                            value=[0, 1],
+                            marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
+                            allowCross=False
+                        ),
+                        html.Div(id='doc-topic-filter-display', style={"marginTop": "10px"}),
+
+                        dbc.Label("Overlap Score Filter:"),
+                        dcc.RangeSlider(
+                            id='overlap-filter',
+                            min=0,
+                            max=1,
+                            step=0.01,
+                            value=[0, 1],
+                            marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
+                            allowCross=False
+                        ),
+                        html.Div(id='overlap-filter-display', style={"marginTop": "10px"}),
+
+                        dcc.Store(id='motif-spectra-ids-store'),
+                        dcc.Store(id='selected-spectrum-index', data=0),
+
+                        # This container will hold the second bar chart & doc table
+                        html.Div(id='motif-documents-container'),
+
+                        dash_table.DataTable(
+                            id='spectra-table',
+                            data=[],
+                            columns=[],
+                            style_table={'overflowX': 'auto'},
+                            style_cell={'textAlign': 'left'},
+                            page_size=10,
+                            row_selectable='single',
+                            selected_rows=[0],
+                            hidden_columns=["SpecIndex"],
+                        ),
+
+                        html.Div(id='spectrum-plot'),
+
+                        html.Div([
+                            dbc.Button('Previous', id='prev-spectrum', n_clicks=0, color="info"),
+                            dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ms-2', color="info"),
+                        ], className='mt-3'),
+                    ],
+                    style={
+                        "border": "1px dashed #999",
+                        "padding": "15px",
+                        "borderRadius": "5px",
+                        "margin": "20px"
+                    },
+                ),
             ],
             style={"display": "none"},
         ),
@@ -1220,30 +1287,6 @@ def update_output(contents, filename):
         return html.Div([html.H5(f"Uploaded File: {filename}")])
     else:
         return html.Div([html.H5("No file uploaded yet.")])
-
-
-@app.callback(
-    Output('probability-thresh-display', 'children'),
-    Input('probability-thresh', 'value')
-)
-def display_probability_thresh(prob_thresh_range):
-    return f"Selected Probability Range: {prob_thresh_range[0]:.2f} - {prob_thresh_range[1]:.2f}"
-
-
-@app.callback(
-    Output('overlap-thresh-display', 'children'),
-    Input('overlap-thresh', 'value')
-)
-def display_overlap_thresh(overlap_thresh_range):
-    return f"Selected Overlap Range: {overlap_thresh_range[0]:.2f} - {overlap_thresh_range[1]:.2f}"
-
-
-@app.callback(
-    Output('probability-filter-display', 'children'),
-    Input('probability-filter', 'value')
-)
-def display_prob_filter(prob_filter_range):
-    return f"Showing features with probability between {prob_filter_range[0]:.2f} and {prob_filter_range[1]:.2f}"
 
 
 # Show/hide advanced settings
@@ -1994,50 +2037,95 @@ def activate_motif_details_tab(selected_motif):
 
 
 @app.callback(
+    Output('probability-thresh-display', 'children'),
+    Input('probability-thresh', 'value')
+)
+def display_probability_thresh(prob_thresh_range):
+    return f"Selected Probability Range: {prob_thresh_range[0]:.2f} - {prob_thresh_range[1]:.2f}"
+
+
+@app.callback(
+    Output('overlap-thresh-display', 'children'),
+    Input('overlap-thresh', 'value')
+)
+def display_overlap_thresh(overlap_thresh_range):
+    return f"Selected Overlap Range: {overlap_thresh_range[0]:.2f} - {overlap_thresh_range[1]:.2f}"
+
+
+@app.callback(
+    Output('probability-filter-display', 'children'),
+    Input('probability-filter', 'value')
+)
+def display_prob_filter(prob_filter_range):
+    return f"Showing features with probability between {prob_filter_range[0]:.2f} and {prob_filter_range[1]:.2f}"
+
+
+@app.callback(
+    Output('doc-topic-filter-display', 'children'),
+    Input('doc-topic-filter', 'value')
+)
+def display_doc_topic_filter(value_range):
+    return f"Filtering docs with motif probability between {value_range[0]:.2f} and {value_range[1]:.2f}"
+
+
+@app.callback(
     Output('overlap-filter-display', 'children'),
     Input('overlap-filter', 'value')
 )
-def display_overlap_filter(overlap_filter_range):
-    return f"Showing docs with overlap score between {overlap_filter_range[0]:.2f} and {overlap_filter_range[1]:.2f}"
+def display_overlap_filter(overlap_range):
+    return f"Filtering docs with overlap score between {overlap_range[0]:.2f} and {overlap_range[1]:.2f}"
+
 
 @app.callback(
     Output('motif-details-title', 'children'),
-    Output('motif-details-content', 'children'),
+    Output('motif-spec2vec-container', 'children'),
+    Output('motif-features-container', 'children'),
+    Output('motif-documents-container', 'children'),
     Output('motif-spectra-ids-store', 'data'),
     Output('spectra-table', 'data'),
     Output('spectra-table', 'columns'),
     Input('selected-motif-store', 'data'),
     Input('probability-filter', 'value'),
+    Input('doc-topic-filter', 'value'),
     Input('overlap-filter', 'value'),
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
     prevent_initial_call=True,
 )
-def update_motif_details(selected_motif, probability_range, overlap_range,
+def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
                          lda_dict_data, clustered_smiles_data, spectra_data):
+    """
+    Populates the Motif Details tab:
+      - Title (motif-details-title)
+      - Spec2Vec container (motif-spec2vec-container)
+      - Features container (motif-features-container) => includes:
+          * Table of motif features (fragments/losses) filtered by Probability
+          * Barplot: “Proportion of Total Intensity in Motif”
+          * Barplot: “Counts of Features in Documents” across the entire dataset
+      - Documents container (motif-documents-container) => doc table
+      - Also returns doc table data/columns and the doc’s SpecIndex for next/prev controls
+    """
     if not selected_motif or not lda_dict_data:
-        return '', [], [], [], ''
+        return '', '', '', '', [], [], []
 
     motif_name = selected_motif
-    motif_data = lda_dict_data['beta'].get(motif_name, {})
 
-    # Filter features by the probability slider
+    # Filter Beta (Topic-Word Probability)
+    motif_data = lda_dict_data['beta'].get(motif_name, {})
     filtered_motif_data = {
-        feature: prob for feature, prob in motif_data.items()
-        if probability_range[0] <= prob <= probability_range[1]
+        f: p for f, p in motif_data.items()
+        if beta_range[0] <= p <= beta_range[1]
     }
     total_prob = sum(filtered_motif_data.values())
 
-    content = []
-
-    # Show a table of features for this motif
-    import pandas as pd
+    # Build a mini table for these features
     feature_table = pd.DataFrame({
         'Feature': filtered_motif_data.keys(),
         'Probability': filtered_motif_data.values(),
     }).sort_values(by='Probability', ascending=False)
-    feature_table_component = dash_table.DataTable(
+
+    feature_table_component = dash.dash_table.DataTable(
         data=feature_table.to_dict('records'),
         columns=[
             {'name': 'Feature', 'id': 'Feature'},
@@ -2048,86 +2136,18 @@ def update_motif_details(selected_motif, probability_range, overlap_range,
         page_size=10,
     )
 
-    # Add subsection
-    content.append(html.H5('Features Explained by This Motif'))
-    content.append(feature_table_component)
-    content.append(html.P(f'Total Probability (Filtered): {total_prob:.4f}'))
-
-    # Build list of docs that contain this motif
-    doc2spec_index = lda_dict_data["doc_to_spec_index"]
-    spectra_data_list = []
-    for doc_name, topics in lda_dict_data['theta'].items():
-        prob = topics.get(motif_name, 0)
-        if prob > 0:
-            overlap = lda_dict_data['overlap_scores'][doc_name].get(motif_name, 0.0)
-            # parse out doc index from doc_name e.g. "spec_7" => 7
-            doc_idx_str = doc_name.replace("spec_", "")
-            # The real index in spectra_data
-            real_idx = doc2spec_index.get(doc_idx_str, -1)
-
-            precursor_mz = None
-            retention_time = None
-            feature_id = None
-            collision_energy = None
-            ionmode = None
-            ms_level = None
-            scans = None
-            if real_idx != -1:
-                sp_meta = spectra_data[real_idx]['metadata']
-                precursor_mz = sp_meta.get('precursor_mz')
-                retention_time = sp_meta.get('retention_time')
-                feature_id = sp_meta.get('feature_id')
-                collision_energy = sp_meta.get('collision_energy')
-                ionmode = sp_meta.get('ionmode')
-                ms_level = sp_meta.get('ms_level')
-                scans = sp_meta.get('scans')
-
-            spectra_data_list.append({
-                'DocName': doc_name,
-                'SpecIndex': real_idx,
-                'Probability': prob,
-                'Overlap Score': overlap,
-                'PrecursorMz': precursor_mz,
-                'RetentionTime': retention_time,
-                'FeatureID': feature_id,
-                'CollisionEnergy': collision_energy,
-                'IonMode': ionmode,
-                'MsLevel': ms_level,
-                'Scans': scans
-            })
-
-    spectra_df = pd.DataFrame(spectra_data_list).sort_values(by='Probability', ascending=False)
-    # Filter by overlap score:
-    spectra_df = spectra_df[(spectra_df['Overlap Score'] >= overlap_range[0]) & (spectra_df['Overlap Score'] <= overlap_range[1])]
-
-    # Create data/columns for the table
-    spectra_table_data = spectra_df.to_dict('records')
-    spectra_table_columns = [
-        {'name': 'DocName', 'id': 'DocName'},
-        {'name': 'SpecIndex', 'id': 'SpecIndex', 'type': 'numeric'},
-        {'name': 'FeatureID', 'id': 'FeatureID'},
-        {'name': 'Scans', 'id': 'Scans'},
-        {'name': 'PrecursorMz', 'id': 'PrecursorMz', 'type': 'numeric', 'format': {'specifier': '.4f'}},
-        {'name': 'RetentionTime', 'id': 'RetentionTime', 'type': 'numeric', 'format': {'specifier': '.2f'}},
-        {'name': 'CollisionEnergy', 'id': 'CollisionEnergy'},
-        {'name': 'IonMode', 'id': 'IonMode'},
-        {'name': 'MsLevel', 'id': 'MsLevel'},
-        {'name': 'Probability', 'id': 'Probability', 'type': 'numeric', 'format': {'specifier': '.4f'}},
-        {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
-    ]
-
-    # Plot bar chart #1
+    # Bar Chart: Proportion in Motif vs. Overall
     features_in_motif = list(filtered_motif_data.keys())
-    total_feature_probs = {feature: 0.0 for feature in features_in_motif}
-    for motif, feature_probs in lda_dict_data['beta'].items():
-        for feature, prob in feature_probs.items():
-            if feature in total_feature_probs:
-                total_feature_probs[feature] += prob
+    total_feature_probs = {ft: 0.0 for ft in features_in_motif}
+    for m_name, feature_probs in lda_dict_data['beta'].items():
+        for ft, val in feature_probs.items():
+            if ft in total_feature_probs:
+                total_feature_probs[ft] += val
 
     barplot1_df = pd.DataFrame({
         'Feature': features_in_motif,
-        'Probability in Motif': [filtered_motif_data[feature] for feature in features_in_motif],
-        'Total Probability': [total_feature_probs[feature] for feature in features_in_motif],
+        'Probability in Motif': [filtered_motif_data[ft] for ft in features_in_motif],
+        'Total Probability': [total_feature_probs[ft] for ft in features_in_motif],
     })
     barplot1_df = barplot1_df.sort_values(by='Probability in Motif', ascending=False).head(10)
     barplot1_df_long = pd.melt(
@@ -2144,7 +2164,7 @@ def update_motif_details(selected_motif, probability_range, overlap_range,
         color='Type',
         orientation='h',
         barmode='group',
-        title='Proportion of Total Intensity Explained by This Motif (Top 10 Features)',
+        title='Proportion of Total Intensity Explained by This Motif (Top 10 Features)'
     )
     barplot1_fig.update_layout(
         yaxis={'categoryorder': 'total ascending'},
@@ -2153,19 +2173,17 @@ def update_motif_details(selected_motif, probability_range, overlap_range,
         legend_title='',
     )
 
-    # Plot bar chart #2
-    feature_counts = {feature: 0 for feature in features_in_motif}
-    for _, row in spectra_df.iterrows():
-        doc_name = row['DocName']
-        corpus_entry = lda_dict_data['corpus'].get(doc_name, {})
-        doc_features = corpus_entry.keys()
-        for feature in features_in_motif:
-            if feature in doc_features:
-                feature_counts[feature] += 1
+    # Bar Chart: Counts of Features in Documents
+    # This second barplot shows how many docs in the ENTIRE dataset have each of these features
+    feature_counts = {ft: 0 for ft in features_in_motif}
+    for doc_name, w_counts in lda_dict_data['corpus'].items():
+        for ft in features_in_motif:
+            if ft in w_counts:
+                feature_counts[ft] += 1
 
     barplot2_df = pd.DataFrame({
         'Feature': features_in_motif,
-        'Count': [feature_counts[feature] for feature in features_in_motif],
+        'Count': [feature_counts[ft] for ft in features_in_motif],
     })
     barplot2_df = barplot2_df.sort_values(by='Count', ascending=False).head(10)
     barplot2_fig = px.bar(
@@ -2173,49 +2191,166 @@ def update_motif_details(selected_motif, probability_range, overlap_range,
         x='Count',
         y='Feature',
         orientation='h',
-        title='Counts of Features in Documents Associated with This Motif (Top 10 Features)',
+        title='Counts of Features in Documents (Entire Dataset)',
     )
     barplot2_fig.update_layout(
         yaxis={'categoryorder': 'total ascending'},
-        xaxis_title='Count',
+        xaxis_title='Number of Documents',
         yaxis_title='Feature',
     )
 
-    content.append(html.H5('Counts of Mass2Motif Features'))
-    content.append(dcc.Graph(figure=barplot1_fig))
-    content.append(dcc.Graph(figure=barplot2_fig))
+    # Spec2Vec Matching Results
+    motif_idx = 0
+    if motif_name.startswith('motif_'):
+        motif_idx_str = motif_name.replace('motif_', '')
+        try:
+            motif_idx = int(motif_idx_str)
+        except ValueError:
+            pass
 
-    # Spec2Vec matching
-    motif_index = int(motif_name.replace('motif_', '')) if motif_name.startswith('motif_') else 0
-    if clustered_smiles_data and motif_index < len(clustered_smiles_data):
-        smiles_list = clustered_smiles_data[motif_index]
+    spec2vec_container = []
+    if clustered_smiles_data and motif_idx < len(clustered_smiles_data):
+        smiles_list = clustered_smiles_data[motif_idx]
         if smiles_list:
-            content.append(html.H5('Spec2Vec Matching Results'))
+            spec2vec_container.append(html.H5('Spec2Vec Matching Results'))
             mols = []
             for smi in smiles_list:
                 try:
-                    mol = MolFromSmiles(smi)
-                    if mol is not None:
+                    mol = Chem.MolFromSmiles(smi)
+                    if mol:
                         mols.append(mol)
-                except Exception as e:
-                    print(f"Error converting SMILES {smi}: {str(e)}")
+                except:
+                    pass
             if mols:
-                legends = [f"Match {i + 1}" for i in range(len(mols))]
-                img = Draw.MolsToGridImage(
+                grid_img = MolsToGridImage(
                     mols,
                     molsPerRow=4,
                     subImgSize=(200, 200),
-                    legends=legends,
+                    legends=[f"Match {i + 1}" for i in range(len(mols))],
                     returnPNG=True
                 )
-                encoded = base64.b64encode(img).decode("utf-8")
-                content.append(html.Img(
-                    src=f"data:image/png;base64,{encoded}",
-                    style={"margin": "10px"},
+                encoded = base64.b64encode(grid_img).decode("utf-8")
+                spec2vec_container.append(html.Img(
+                    src="data:image/png;base64," + encoded,
+                    style={"margin": "10px"}
                 ))
 
-    spectra_ids = spectra_df['SpecIndex'].tolist()
-    return f"Motif Details: {motif_name}", content, spectra_ids, spectra_table_data, spectra_table_columns
+    # Doc-Topic Probability / Overlap filter & doc table
+    doc2spec_index = lda_dict_data["doc_to_spec_index"]
+    docs_for_this_motif = []
+    for doc_name, topic_probs in lda_dict_data['theta'].items():
+        doc_topic_prob = topic_probs.get(motif_name, 0.0)
+        if doc_topic_prob <= 0:
+            continue
+        overlap_score = lda_dict_data['overlap_scores'][doc_name].get(motif_name, 0.0)
+
+        if (theta_range[0] <= doc_topic_prob <= theta_range[1]) and (
+                overlap_range[0] <= overlap_score <= overlap_range[1]):
+            real_idx = -1
+            doc_idx_str = doc_name.replace("spec_", "")
+            if doc_idx_str in doc2spec_index:
+                real_idx = doc2spec_index[doc_idx_str]
+            # gather metadata
+            precursor_mz = None
+            retention_time = None
+            feature_id = None
+            collision_energy = None
+            ionmode = None
+            ms_level = None
+            scans = None
+            if real_idx != -1 and real_idx < len(spectra_data):
+                sp_meta = spectra_data[real_idx]['metadata']
+                precursor_mz = sp_meta.get('precursor_mz')
+                retention_time = sp_meta.get('retention_time')
+                feature_id = sp_meta.get('feature_id')
+                collision_energy = sp_meta.get('collision_energy')
+                ionmode = sp_meta.get('ionmode')
+                ms_level = sp_meta.get('ms_level')
+                scans = sp_meta.get('scans')
+
+            docs_for_this_motif.append({
+                'DocName': doc_name,
+                'SpecIndex': real_idx,
+                'FeatureID': feature_id,
+                'Scans': scans,
+                'PrecursorMz': precursor_mz,
+                'RetentionTime': retention_time,
+                'CollisionEnergy': collision_energy,
+                'IonMode': ionmode,
+                'MsLevel': ms_level,
+                'Doc-Topic Probability': doc_topic_prob,
+                'Overlap Score': overlap_score,
+            })
+
+    # Create output df for table
+    doc_cols = [
+        'DocName', 'SpecIndex', 'FeatureID', 'Scans', 'PrecursorMz', 'RetentionTime',
+        'CollisionEnergy', 'IonMode', 'MsLevel', 'Doc-Topic Probability', 'Overlap Score'
+    ]
+    docs_df = pd.DataFrame(docs_for_this_motif, columns=doc_cols)
+    if not docs_df.empty:
+        # Sort only if not empty
+        docs_df = docs_df.sort_values(by='Doc-Topic Probability', ascending=False)
+
+    table_data = docs_df.to_dict('records')
+    table_columns = [
+        {'name': 'DocName', 'id': 'DocName'},
+        {'name': 'SpecIndex', 'id': 'SpecIndex', 'type': 'numeric'},
+        {'name': 'FeatureID', 'id': 'FeatureID'},
+        {'name': 'Scans', 'id': 'Scans'},
+        {'name': 'PrecursorMz', 'id': 'PrecursorMz', 'type': 'numeric', 'format': {'specifier': '.4f'}},
+        {'name': 'RetentionTime', 'id': 'RetentionTime', 'type': 'numeric', 'format': {'specifier': '.2f'}},
+        {'name': 'CollisionEnergy', 'id': 'CollisionEnergy'},
+        {'name': 'IonMode', 'id': 'IonMode'},
+        {'name': 'MsLevel', 'id': 'MsLevel'},
+        {'name': 'Doc-Topic Probability', 'id': 'Doc-Topic Probability', 'type': 'numeric',
+         'format': {'specifier': '.4f'}},
+        {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
+    ]
+
+    # Provide the list of SpecIndex for next/prev
+    spectra_ids = docs_df['SpecIndex'].tolist() if not docs_df.empty else []
+
+    # Return the updated content
+    motif_title = f"Motif Details: {motif_name}"
+
+    # (1) Spec2Vec container
+    spec2vec_div = html.Div(spec2vec_container)
+
+    # (2) Features container => feature table, barplot1, then the “Counts of Features in Documents” barplot
+    features_div = html.Div([
+        # Table of motif features
+        html.Div([
+            html.H5("Motif Features Table"),
+            feature_table_component,
+            html.P(f"Total Probability (Filtered): {total_prob:.4f}")
+        ]),
+        html.H5("Proportion of Features in Motif vs. Overall"),
+        dcc.Graph(figure=barplot1_fig),
+        html.H5("Counts of Features in Documents (Entire Dataset)"),
+        dcc.Markdown(
+            """
+            This shows how many documents in the entire dataset contain each selected feature. 
+            It does **not** consider the doc-topic or overlap filters; it's purely a global count.
+            """
+        ),
+        dcc.Graph(figure=barplot2_fig),
+    ])
+
+    # (3) Documents container => doc table only
+    docs_div = html.Div([
+        html.P("Documents containing this motif are listed below (affected by doc-topic & overlap filters)."),
+    ])
+
+    return (
+        motif_title,  # Motif Title
+        spec2vec_div,  # (A) Spec2Vec Container
+        features_div,  # (B) Features container
+        docs_div,  # (C) Document container
+        spectra_ids,  # motif-spectra-ids-store
+        table_data,  # Data for dash_table
+        table_columns,  # Columns for dash_table
+    )
 
 
 @app.callback(
