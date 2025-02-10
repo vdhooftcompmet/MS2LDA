@@ -34,7 +34,6 @@ MOTIFDB_FOLDER = "../MS2LDA/MotifDB"
 
 
 # Callback to show/hide tab contents based on active tab
-# Callback to show/hide tab contents based on active tab
 @app.callback(
     Output("run-analysis-tab-content", "style"),
     Output("load-results-tab-content", "style"),
@@ -75,6 +74,8 @@ def toggle_tab_content(active_tab):
     )
 
 
+# -------------------------------- RUN AND LOAD RESULTS --------------------------------
+
 # Callback to display uploaded data file info
 @app.callback(
     Output("file-upload-info", "children"),
@@ -101,7 +102,6 @@ def toggle_advanced_settings(n_clicks, is_open):
     return is_open
 
 
-# ------------------- The MAIN callback to run or load results -------------------
 @app.callback(
     Output("run-status", "children"),
     Output("load-status", "children"),
@@ -427,6 +427,9 @@ def handle_run_or_load(
 
     else:
         raise dash.exceptions.PreventUpdate
+
+
+# -------------------------------- CYTOSCAPE NETWORK --------------------------------
 
 
 # Callback to create Cytoscape elements
@@ -1367,6 +1370,8 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
     return ""
 
 
+# -------------------------------- SCREENING --------------------------------
+
 @app.callback(
     Output("m2m-folders-checklist", "options"),
     Output("m2m-subfolders-store", "data"),
@@ -1472,8 +1477,9 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
 
-    # Start
-    progress_val = 0
+    # Show please wait message
+    message = dbc.Alert("Computing similarities... please wait (this may take a while).", color="info")
+    progress_val = 0 # doesn't work yet
     button_disabled = True
 
     # check input
@@ -1559,9 +1565,10 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
         f"Computed {len(df)} total matches from {len(user_motifs)} user motifs and {len(all_refs)} references.",
         color="success"
     )
+    button_disabled = False
 
     # re-enable button
-    return json_data, msg, progress_val, False
+    return json_data, msg, progress_val, button_disabled
 
 
 @app.callback(
