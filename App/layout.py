@@ -1190,9 +1190,7 @@ def create_screening_tab():
                 style={"margin-top": "20px", "margin-bottom": "20px"},
             ),
             html.Hr(),
-            # TODO: switch this to the new JSON format later
             html.H4("Reference Motif Sets Found"),
-            # We'll wrap the checklist in a Loading spinner
             dcc.Loading(
                 id="m2m-subfolders-loading",
                 type="default",
@@ -1244,6 +1242,15 @@ def create_screening_tab():
                     "backgroundColor": "rgb(230, 230, 230)",
                     "fontWeight": "bold",
                 },
+                # NEW: make user_motif_id visually clickable
+                style_data_conditional=[
+                    {
+                        'if': {'column_id': 'user_motif_id'},
+                        'cursor': 'pointer',
+                        'textDecoration': 'underline',
+                        'color': 'blue',
+                    },
+                ],
             ),
             dbc.Button("Save to CSV", id="save-screening-csv", color="secondary", className="mt-2"),
             dbc.Button("Save to JSON", id="save-screening-json", color="secondary", className="ms-2 mt-2"),

@@ -750,8 +750,11 @@ def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
     Input('probability-thresh', 'value'),
     Input('overlap-thresh', 'value'),
     Input('tabs', 'value'),
+    State('screening-fullresults-store', 'data'),
+    State('optimized-motifs-store', 'data'),
 )
-def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thresh, active_tab):
+def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thresh, active_tab,
+                                screening_data, optimized_motifs_data):
     if active_tab != 'motif-rankings-tab' or not lda_dict_data:
         return ""
 
@@ -766,12 +769,74 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
         'Average Overlap Score'
     ])
 
+    # 1) topic_metadata from LDA
     motif_annotations = {}
     if 'topic_metadata' in lda_dict_data:
         for motif, metadata in lda_dict_data['topic_metadata'].items():
             motif_annotations[motif] = metadata.get('annotation', '')
 
-    df['Annotation'] = df['Motif'].map(motif_annotations)
+    # 2) short_annotation from optimized_motifs_store
+    combined_annotations = []
+    for motif_name in df['Motif']:
+        existing_lda_anno = motif_annotations.get(motif_name, "")
+        short_anno_str = ""
+
+        # parse motif index
+        motif_idx = None
+        if motif_name.startswith("motif_"):
+            try:
+                motif_idx = int(motif_name.replace("motif_", ""))
+            except ValueError:
+                pass
+
+        if optimized_motifs_data and motif_idx is not None and 0 <= motif_idx < len(optimized_motifs_data):
+            # short_annotation might be list of SMILES or None
+            short_anno = optimized_motifs_data[motif_idx]["metadata"].get("short_annotation", "")
+            if isinstance(short_anno, list):
+                # Join them into one string
+                short_anno_str = ", ".join(short_anno)
+            elif isinstance(short_anno, str):
+                short_anno_str = short_anno
+            else:
+                short_anno_str = ""
+
+        # combine them
+        if existing_lda_anno and short_anno_str:
+            combined = f"{existing_lda_anno} / {short_anno_str}"
+        elif short_anno_str:
+            combined = short_anno_str
+        else:
+            combined = existing_lda_anno
+
+        combined_annotations.append(combined)
+
+    df['Annotation'] = combined_annotations
+
+    # 3) Screening references in new column
+    screening_hits = []
+    if screening_data:
+        try:
+            scdf = pd.read_json(screening_data, orient="records")
+            for motif in df['Motif']:
+                # Filter this motif’s hits
+                hits_for_motif = scdf[scdf['user_motif_id'] == motif].sort_values('score', ascending=False)
+                if hits_for_motif.empty:
+                    screening_hits.append("")
+                else:
+                    # Collect up to 3 references in the format: "ref_motifset|ref_motif_id(score)"
+                    top3 = hits_for_motif.head(3)
+                    combined = []
+                    for i, row in top3.iterrows():
+                        # add motifset + motif_id + score
+                        combined.append(f"{row['ref_motifset']}|{row['ref_motif_id']}({row['score']:.2f})")
+                    screening_hits.append("; ".join(combined))
+        except Exception:
+            # If there's any JSON/parsing error, fallback
+            screening_hits = ["" for _ in range(len(df))]
+    else:
+        screening_hits = ["" for _ in range(len(df))]
+
+    df['ScreeningHits'] = screening_hits
 
     style_data_conditional = [
         {
@@ -793,13 +858,14 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
             {'name': 'Average Overlap Score', 'id': 'Average Overlap Score', 'type': 'numeric',
              'format': {'specifier': '.4f'}},
             {'name': 'Annotation', 'id': 'Annotation'},
+            {'name': 'ScreeningHits', 'id': 'ScreeningHits'},
         ],
         sort_action='native',
         filter_action='native',
         page_size=20,
         style_table={'overflowX': 'auto'},
         style_cell={
-            'minWidth': '150px', 'width': '200px', 'maxWidth': '350px',
+            'minWidth': '150px', 'width': '200px', 'maxWidth': '400px',
             'whiteSpace': 'normal',
             'textAlign': 'left',
         },
@@ -811,19 +877,6 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
     )
 
     return table
-
-
-@app.callback(
-    Output('selected-motif-store', 'data'),
-    Input('motif-rankings-table', 'active_cell'),
-    State('motif-rankings-table', 'data'),
-    prevent_initial_call=True,
-)
-def on_motif_click(active_cell, table_data):
-    if active_cell and active_cell['column_id'] == 'Motif':
-        motif = table_data[active_cell['row']]['Motif']
-        return motif
-    return dash.no_update
 
 
 @app.callback(
@@ -893,21 +946,13 @@ def display_overlap_filter(overlap_range):
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
+    State('optimized-motifs-store', 'data'),  # NEW STATE for short_annotation
+    State('screening-fullresults-store', 'data'),  # NEW STATE for screening hits
     prevent_initial_call=True,
 )
 def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
-                         lda_dict_data, clustered_smiles_data, spectra_data):
-    """
-    Populates the Motif Details tab:
-      - Title (motif-details-title)
-      - Spec2Vec container (motif-spec2vec-container)
-      - Features container (motif-features-container) => includes:
-          * Table of motif features (fragments/losses) filtered by Probability
-          * Barplot: “Proportion of Total Intensity in Motif”
-          * Barplot: “Counts of Features in Documents” across the entire dataset
-      - Documents container (motif-documents-container) => doc table
-      - Also returns doc table data/columns and the doc’s SpecIndex for next/prev controls
-    """
+                         lda_dict_data, clustered_smiles_data, spectra_data,
+                         optimized_motifs_data, screening_data):
     if not selected_motif or not lda_dict_data:
         return '', '', '', '', [], [], []
 
@@ -1011,6 +1056,14 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
             pass
 
     spec2vec_container = []
+    # Insert user short annotation if present
+    user_short_anno_text = ""
+    if optimized_motifs_data and motif_idx < len(optimized_motifs_data):
+        # Attempt to read user short annotation from metadata
+        meta_anno = optimized_motifs_data[motif_idx]['metadata'].get('short_annotation', "")
+        if meta_anno:
+            user_short_anno_text = f"User ShortAnno: {meta_anno}"
+
     if clustered_smiles_data and motif_idx < len(clustered_smiles_data):
         smiles_list = clustered_smiles_data[motif_idx]
         if smiles_list:
@@ -1036,6 +1089,10 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
                     src="data:image/png;base64," + encoded,
                     style={"margin": "10px"}
                 ))
+
+    # If we have a user short annotation, display it right after the SMILES image
+    if user_short_anno_text:
+        spec2vec_container.append(html.Div(user_short_anno_text, style={"marginTop": "10px"}))
 
     # Doc-Topic Probability / Overlap filter & doc table
     doc2spec_index = lda_dict_data["doc_to_spec_index"]
@@ -1144,11 +1201,45 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
         html.P("Documents containing this motif are listed below (affected by doc-topic & overlap filters)."),
     ])
 
+    # Build a small table for screening hits if present
+    screening_box = ""
+    if screening_data:
+        try:
+            scdf = pd.read_json(screening_data, orient="records")
+            hits_df = scdf[scdf['user_motif_id'] == motif_name].copy()
+            hits_df = hits_df.sort_values('score', ascending=False)
+            if not hits_df.empty:
+                screening_table = dash_table.DataTable(
+                    columns=[
+                        {'name': 'Ref Motif ID', 'id': 'ref_motif_id'},
+                        {'name': 'Ref ShortAnno', 'id': 'ref_short_annotation'},
+                        {'name': 'Ref MotifSet', 'id': 'ref_motifset'},
+                        {'name': 'Score', 'id': 'score', 'type': 'numeric', 'format': {'specifier': '.4f'}}
+                    ],
+                    data=hits_df.to_dict('records'),
+                    page_size=5,
+                    style_table={'overflowX': 'auto'},
+                    style_cell={'textAlign': 'left'},
+                )
+                screening_box = html.Div([
+                    html.H5("Screening Annotations"),
+                    screening_table
+                ],
+                    style={
+                        "border": "1px dashed #999",
+                        "padding": "10px",
+                        "borderRadius": "5px",
+                        "margin-bottom": "5px"
+                    })
+        except:
+            pass
+
+    # Combine final output
     return (
         motif_title,  # Motif Title
-        spec2vec_div,  # (A) Spec2Vec Container
-        features_div,  # (B) Features container
-        docs_div,  # (C) Document container
+        html.Div([spec2vec_div, screening_box]),  # Show the SMILES and user shortAnno, then screening hits
+        features_div,  # Features container
+        docs_div,  # Documents container
         spectra_ids,  # motif-spectra-ids-store
         table_data,  # Data for dash_table
         table_columns,  # Columns for dash_table
@@ -1479,7 +1570,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
 
     # Show please wait message
     message = dbc.Alert("Computing similarities... please wait (this may take a while).", color="info")
-    progress_val = 0 # doesn't work yet
+    progress_val = 0  # doesn't work yet
     button_disabled = True
 
     # check input
@@ -1615,5 +1706,48 @@ def save_screening_results(csv_click, json_click, table_data):
     elif button_id == "save-screening-json":
         out_str = df.to_json(orient="records")
         return no_update, dict(content=out_str, filename="screening_results.json")
+    else:
+        raise dash.exceptions.PreventUpdate
+
+
+@app.callback(
+    Output("selected-motif-store", "data"),
+    [
+        Input("motif-rankings-table", "active_cell"),
+        Input("screening-results-table", "active_cell"),
+    ],
+    [
+        State("motif-rankings-table", "data"),
+        State("screening-results-table", "data"),
+    ],
+    prevent_initial_call=True,
+)
+def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, screening_data):
+    # Check if anything actually triggered
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise dash.exceptions.PreventUpdate
+
+    # If user clicked a motif in the Motif Rankings table
+    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    if triggered_id == "motif-rankings-table":
+        if ranking_active_cell and ranking_data:
+            col_id = ranking_active_cell["column_id"]
+            row_id = ranking_active_cell["row"]
+            if col_id == "Motif":
+                motif = ranking_data[row_id]["Motif"]
+                return motif
+        raise dash.exceptions.PreventUpdate
+
+    # If user clicked a motif in the Screening table
+    elif triggered_id == "screening-results-table":
+        if screening_active_cell and screening_data:
+            col_id = screening_active_cell["column_id"]
+            row_id = screening_active_cell["row"]
+            if col_id == "user_motif_id":
+                motif_id = screening_data[row_id]["user_motif_id"]
+                return motif_id
+        raise dash.exceptions.PreventUpdate
+
     else:
         raise dash.exceptions.PreventUpdate
