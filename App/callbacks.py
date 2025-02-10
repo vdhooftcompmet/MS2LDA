@@ -11,21 +11,29 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 import tomotopy as tp
+from dash import Input, Output, State, no_update, dcc
 from dash import dash_table
-from dash import html, dcc, Input, Output, State
-from dash import no_update
+from dash import html
 from dash.exceptions import PreventUpdate
-from matchms import Spectrum, Fragments
+from matchms import Fragments
+from matchms import Spectrum
 from rdkit import Chem
 from rdkit.Chem.Draw import MolsToGridImage
 
 import MS2LDA
+from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
+from MS2LDA.motif_parser import load_m2m_folder
 from MS2LDA.run import filetype_check
+from MS2LDA.run import load_s2v
 from app_instance import app
 
+# Hardcode the path for .m2m references
+MOTIFDB_FOLDER = "../MS2LDA/MotifDB"
 
+
+# Callback to show/hide tab contents based on active tab
 # Callback to show/hide tab contents based on active tab
 @app.callback(
     Output("run-analysis-tab-content", "style"),
@@ -33,6 +41,7 @@ from app_instance import app
     Output("results-tab-content", "style"),
     Output("motif-rankings-tab-content", "style"),
     Output("motif-details-tab-content", "style"),
+    Output("screening-tab-content", "style"),
     Input("tabs", "value"),
 )
 def toggle_tab_content(active_tab):
@@ -41,6 +50,7 @@ def toggle_tab_content(active_tab):
     results_style = {"display": "none"}
     motif_rankings_style = {"display": "none"}
     motif_details_style = {"display": "none"}
+    screening_style = {"display": "none"}
 
     if active_tab == "run-analysis-tab":
         run_style = {"display": "block"}
@@ -52,8 +62,17 @@ def toggle_tab_content(active_tab):
         motif_rankings_style = {"display": "block"}
     elif active_tab == "motif-details-tab":
         motif_details_style = {"display": "block"}
+    elif active_tab == "screening-tab":
+        screening_style = {"display": "block"}
 
-    return run_style, load_style, results_style, motif_rankings_style, motif_details_style
+    return (
+        run_style,
+        load_style,
+        results_style,
+        motif_rankings_style,
+        motif_details_style,
+        screening_style,
+    )
 
 
 # Callback to display uploaded data file info
@@ -424,7 +443,7 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, e
                      toggle_loss_edge, layout_choice):
     if active_tab != "results-tab" or not optimized_motifs_data:
         raise PreventUpdate
-    
+
     spectra = []
     for s in optimized_motifs_data:
         spectrum = Spectrum(
@@ -1346,3 +1365,248 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
         )
 
     return ""
+
+
+@app.callback(
+    Output("m2m-folders-checklist", "options"),
+    Output("m2m-subfolders-store", "data"),
+    Input("tabs", "value"),
+)
+def auto_scan_m2m_subfolders(tab_value):
+    if tab_value != "screening-tab":
+        raise dash.exceptions.PreventUpdate
+
+    if not os.path.exists(MOTIFDB_FOLDER):
+        return ([], {})
+
+    folder_options = []
+    subfolder_data = {}
+    for root, dirs, files in os.walk(MOTIFDB_FOLDER):
+        m2m_files = [f for f in files if f.endswith(".m2m")]
+        if m2m_files:
+            label = os.path.basename(root) or "Root"
+            folder_options.append({"label": label, "value": root})
+            subfolder_data[root] = {
+                "folder_label": label,
+                "count_m2m": len(m2m_files),
+            }
+    folder_options = sorted(folder_options, key=lambda x: x["label"].lower())
+    return folder_options, subfolder_data
+
+
+def make_spectrum_from_dict(spectrum_dict):
+    try:
+        mz_ = np.array(spectrum_dict["mz"], dtype=float)
+        ints_ = np.array(spectrum_dict["intensities"], dtype=float)
+        meta_ = spectrum_dict["metadata"]
+        sp = Spectrum(mz=mz_, intensities=ints_, metadata=meta_)
+        if "losses" in meta_:
+            loss_mz = []
+            loss_int = []
+            for x in meta_["losses"]:
+                loss_mz.append(x["loss_mz"])
+                loss_int.append(x["loss_intensity"])
+            sp.losses = Fragments(
+                mz=np.array(loss_mz),
+                intensities=np.array(loss_int)
+            )
+        return sp
+    except:
+        return None
+
+
+def filter_and_normalize_spectra(spectrum_list):
+    def trunc_annotation(val, max_len=40):
+        """Truncate any string over max_len for readability."""
+        if isinstance(val, str) and len(val) > max_len:
+            return val[:max_len] + "..."
+        return val
+
+    valid = []
+    for sp in spectrum_list:
+        if not sp.peaks or len(sp.peaks.mz) == 0:
+            continue
+        # Normalize peaks
+        max_i = sp.peaks.intensities.max()
+        if max_i <= 0:
+            continue
+        if max_i > 1.0:
+            sp.peaks = Fragments(
+                mz=sp.peaks.mz,
+                intensities=sp.peaks.intensities / max_i
+            )
+        # Normalize losses
+        if sp.losses and len(sp.losses.mz) > 0:
+            max_l = sp.losses.intensities.max()
+            if max_l > 1.0:
+                sp.losses = Fragments(
+                    mz=sp.losses.mz,
+                    intensities=sp.losses.intensities / max_l
+                )
+
+        # Possibly convert short_annotation from list->string
+        ann = sp.get("short_annotation", "")
+        if isinstance(ann, list):
+            joined = ", ".join(map(str, ann))
+            joined = trunc_annotation(joined, 60)
+            sp.set("short_annotation", joined)
+        elif isinstance(ann, str):
+            sp.set("short_annotation", trunc_annotation(ann, 60))
+
+        valid.append(sp)
+
+    return valid
+
+
+@app.callback(
+    Output("screening-fullresults-store", "data"),
+    Output("compute-screening-status", "children"),
+    Output("screening-progress", "value"),
+    Output("compute-screening-button", "disabled"),
+    Input("compute-screening-button", "n_clicks"),
+    State("m2m-folders-checklist", "value"),
+    State("optimized-motifs-store", "data"),
+    prevent_initial_call=True,
+)
+def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data):
+    if not n_clicks:
+        raise dash.exceptions.PreventUpdate
+
+    # Start
+    progress_val = 0
+    button_disabled = True
+
+    # check input
+    if not selected_folders:
+        return None, dbc.Alert("No reference MotifDB set selected!", color="warning"), 100, False
+    if not optimized_motifs_data:
+        return None, dbc.Alert("No optimized motifs found! Please run MS2LDA or load your data first.",
+                               color="warning"), 100, False
+
+    progress_val = 10
+
+    # convert user motifs
+    user_motifs = []
+    for entry in optimized_motifs_data:
+        sp = make_spectrum_from_dict(entry)
+        if sp:
+            user_motifs.append(sp)
+    user_motifs = filter_and_normalize_spectra(user_motifs)
+    if not user_motifs:
+        return None, dbc.Alert("No valid user motifs after normalization!", color="warning"), 100, False
+    progress_val = 25
+
+    # gather references
+    all_refs = []
+    for folder_path in selected_folders:
+        these_refs = load_m2m_folder(folder_path)
+        for r in these_refs:
+            r.set("source_folder", folder_path)
+        all_refs.extend(these_refs)
+    all_refs = filter_and_normalize_spectra(all_refs)
+    if not all_refs:
+        return None, dbc.Alert("No valid references found in MotifDB folder!", color="warning"), 100, False
+    progress_val = 40
+
+    # load spec2vec
+    print("loading s2v")
+    s2v_sim, _ = load_s2v()
+    print("loaded s2v")
+    progress_val = 60
+
+    # embeddings
+    user_emb = calc_embeddings(s2v_sim, user_motifs)
+    print("user_emb shape:", user_emb.shape)
+    ref_emb = calc_embeddings(s2v_sim, all_refs)
+    print("ref_emb shape:", ref_emb.shape)
+    progress_val = 80
+
+    # similarity
+    sim_matrix = calc_similarity(user_emb, ref_emb)
+    print("sim_matrix shape:", sim_matrix.shape)
+    progress_val = 90
+
+    # build results
+    results = []
+    for user_i, user_sp in enumerate(user_motifs):
+        user_id = user_sp.get("id", "")
+        user_anno = user_sp.get("short_annotation", "")
+        for ref_j, ref_sp in enumerate(all_refs):
+            score = sim_matrix.iloc[ref_j, user_i]
+            ref_id = ref_sp.get("id", "")
+            ref_anno = ref_sp.get("short_annotation", "")
+            ref_motifset = ref_sp.get("motifset", "")
+
+            results.append({
+                "user_motif_id": user_id,
+                "user_short_annotation": user_anno,
+                "ref_motif_id": ref_id,
+                "ref_short_annotation": ref_anno,
+                "ref_motifset": ref_motifset,
+                "score": round(float(score), 4),
+            })
+
+    if not results:
+        return None, dbc.Alert("No results after similarity!", color="warning"), 100, False
+
+    # sort descending
+    df = pd.DataFrame(results)
+    df = df.sort_values("score", ascending=False)
+    json_data = df.to_json(orient="records")
+
+    progress_val = 100
+    msg = dbc.Alert(
+        f"Computed {len(df)} total matches from {len(user_motifs)} user motifs and {len(all_refs)} references.",
+        color="success"
+    )
+
+    # re-enable button
+    return json_data, msg, progress_val, False
+
+
+@app.callback(
+    Output("screening-results-table", "data"),
+    Output("screening-threshold-value", "children"),
+    Input("screening-fullresults-store", "data"),
+    Input("screening-threshold-slider", "value"),
+)
+def filter_screening_results(fullresults_json, threshold):
+    if not fullresults_json:
+        return [], ""
+
+    # The "FutureWarning" can appear for read_json on raw strings.
+    # We can ignore or wrap with io.StringIO. For now, ignoring is fine.
+    df = pd.read_json(fullresults_json, orient="records")
+
+    filtered = df[df["score"] >= threshold].copy()
+    filtered = filtered.sort_values("score", ascending=False)
+    table_data = filtered.to_dict("records")
+    label = f"Minimum Similarity: {threshold:.2f} — {len(filtered)}/{len(df)} results"
+    return table_data, label
+
+
+@app.callback(
+    Output("download-screening-csv", "data"),
+    Output("download-screening-json", "data"),
+    Input("save-screening-csv", "n_clicks"),
+    Input("save-screening-json", "n_clicks"),
+    State("screening-results-table", "data"),
+    prevent_initial_call=True,
+)
+def save_screening_results(csv_click, json_click, table_data):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise dash.exceptions.PreventUpdate
+
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    if not table_data:
+        return no_update, no_update
+
+    df = pd.DataFrame(table_data)
+    if button_id == "save-screening-csv":
+        return dcc.send_data_frame(df.to_csv, "screening_results.csv", index=False), no_update
+    elif button_id == "save-screening-json":
+        out_str = df.to_json(orient="records")
+        return no_update, dict(content=out_str, filename="screening_results.json")
+    else:
+        raise dash.exceptions.PreventUpdate

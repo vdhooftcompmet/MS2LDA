@@ -18,7 +18,7 @@ def create_run_analysis_tab():
                         """
                     )
                 ],
-                style={"margin": "20px"},
+                style={"margin-top": "20px", "margin-bottom": "20px"},
             ),
             dbc.Row(
                 [
@@ -810,7 +810,7 @@ def create_load_results_tab():
                         """
                     )
                 ],
-                style={"margin": "20px"},
+                style={"margin-top": "20px", "margin-bottom": "20px"},
             ),
             dbc.Row(
                 [
@@ -876,7 +876,7 @@ def create_cytoscape_network_tab():
                         """
                     )
                 ],
-                style={"margin": "20px"},
+                style={"margin-top": "20px", "margin-bottom": "20px"},
             ),
             dbc.Row(
                 [
@@ -977,7 +977,7 @@ def create_motif_rankings_tab():
                             """
                         )
                     ],
-                    style={"margin": "20px"},
+                    style={"margin-top": "20px", "margin-bottom": "20px"},
                 ),
 
                 dbc.Row([
@@ -1035,7 +1035,6 @@ def create_motif_details_tab():
     tab = html.Div(
         id="motif-details-tab-content",
         children=[
-            # Top summary
             html.Div(
                 [
                     dcc.Markdown(
@@ -1049,10 +1048,8 @@ def create_motif_details_tab():
                         """
                     )
                 ],
-                style={"margin": "20px"},
+                style={"margin-top": "20px", "margin-bottom": "20px"},
             ),
-
-            # ----------------- (A) Spec2Vec Results -----------------
             html.Div(
                 [
                     html.H4(id='motif-details-title'),
@@ -1067,13 +1064,11 @@ def create_motif_details_tab():
                 ],
                 style={
                     "border": "1px dashed #999",
-                    "padding": "15px",
+                    "padding": "10px",
                     "borderRadius": "5px",
-                    "margin": "20px"
+                    "margin-bottom": "5px"
                 },
             ),
-
-            # ----------------- (B) Features in Motifs -----------------
             html.Div(
                 [
                     html.H4("Features in Motifs"),
@@ -1102,13 +1097,11 @@ def create_motif_details_tab():
                 ],
                 style={
                     "border": "1px dashed #999",
-                    "padding": "15px",
+                    "padding": "10px",
                     "borderRadius": "5px",
-                    "margin": "20px"
+                    "margin-bottom": "5px"
                 },
             ),
-
-            # ----------------- (C) Documents in Motifs -----------------
             html.Div(
                 [
                     html.H4("Documents in Motifs"),
@@ -1168,12 +1161,93 @@ def create_motif_details_tab():
                 ],
                 style={
                     "border": "1px dashed #999",
-                    "padding": "15px",
+                    "padding": "10px",
                     "borderRadius": "5px",
-                    "margin": "20px"
+                    "margin-bottom": "5px"
                 },
             ),
         ],
         style={"display": "none"},
     )
     return tab
+
+
+def create_screening_tab():
+    return html.Div(
+        id="screening-tab-content",
+        style={"display": "none"},
+        children=[
+            html.Div(
+                [
+                    dcc.Markdown("""
+                        This tab allows you to automatically compare your optimized motifs
+                        against the reference motifs from MotifDB. To begin, first select 
+                        which reference sets you want to include. Then click "Compute Similarities" 
+                        to run the screening using Spec2Vec comparison. Screening results are shown 
+                        in the table below, and you can use the slider to filter the table by minimum similarity score.
+                    """),
+                ],
+                style={"margin-top": "20px", "margin-bottom": "20px"},
+            ),
+            html.Hr(),
+            # TODO: switch this to the new JSON format later
+            html.H4("Reference Motif Sets Found"),
+            # We'll wrap the checklist in a Loading spinner
+            dcc.Loading(
+                id="m2m-subfolders-loading",
+                type="default",
+                children=[
+                    dbc.Checklist(
+                        id="m2m-folders-checklist",
+                        options=[],
+                        value=[],
+                        switch=True,
+                        className="mb-3",
+                    )
+                ],
+            ),
+            dbc.Button("Compute Similarities", id="compute-screening-button", color="primary", disabled=False),
+            dbc.Progress(id="screening-progress", value=0, striped=True, animated=True,
+                         style={"marginTop": "10px", "width": "100%", "height": "20px"}),
+            html.Div(id="compute-screening-status", style={"marginTop": "10px"}),
+            html.Hr(),
+            dbc.Row([
+                dbc.Col([
+                    html.Label("Minimum Similarity Score"),
+                    dcc.Slider(
+                        id="screening-threshold-slider",
+                        min=0,
+                        max=1,
+                        step=0.05,
+                        value=0.0,
+                        marks={0: "0", 0.25: "0.25", 0.5: "0.5", 0.75: "0.75", 1: "1"},
+                    ),
+                    html.Div(id="screening-threshold-value", style={"marginTop": "10px"}),
+                ], width=6),
+            ], style={"marginTop": "10px"}),
+            html.H5("Screening Results (Filtered)"),
+            dash_table.DataTable(
+                id="screening-results-table",
+                columns=[
+                    {"name": "User Motif ID", "id": "user_motif_id"},
+                    {"name": "User ShortAnno", "id": "user_short_annotation"},
+                    {"name": "Reference Motif ID", "id": "ref_motif_id"},
+                    {"name": "Ref ShortAnno", "id": "ref_short_annotation"},
+                    {"name": "Ref MotifSet", "id": "ref_motifset"},
+                    {"name": "Similarity Score", "id": "score"},
+                ],
+                data=[],
+                page_size=15,
+                style_table={"overflowX": "auto"},
+                style_cell={"textAlign": "left", "maxWidth": "250px", "whiteSpace": "normal"},
+                style_header={
+                    "backgroundColor": "rgb(230, 230, 230)",
+                    "fontWeight": "bold",
+                },
+            ),
+            dbc.Button("Save to CSV", id="save-screening-csv", color="secondary", className="mt-2"),
+            dbc.Button("Save to JSON", id="save-screening-json", color="secondary", className="ms-2 mt-2"),
+            dcc.Download(id="download-screening-csv"),
+            dcc.Download(id="download-screening-json"),
+        ],
+    )

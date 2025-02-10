@@ -30,6 +30,7 @@ app.layout = dbc.Container(
                 dcc.Tab(label="View Network", value="results-tab", id="results-tab"),
                 dcc.Tab(label="Motif Rankings", value="motif-rankings-tab", id="motif-rankings-tab"),
                 dcc.Tab(label="Motif Details", value="motif-details-tab", id="motif-details-tab"),
+                dcc.Tab(label="Screening", value="screening-tab", id="screening-tab"),
             ],
             className="mt-3",
         ),
@@ -40,6 +41,7 @@ app.layout = dbc.Container(
         layout.create_cytoscape_network_tab(),
         layout.create_motif_rankings_tab(),
         layout.create_motif_details_tab(),
+        layout.create_screening_tab(),
 
         # Hidden storage
         dcc.Store(id='motif-spectra-ids-store'),
@@ -49,6 +51,9 @@ app.layout = dbc.Container(
         dcc.Store(id="lda-dict-store"),
         dcc.Store(id='selected-motif-store'),
         dcc.Store(id='spectra-store'),
+        dcc.Store(id="screening-fullresults-store"),
+        dcc.Store(id="m2m-subfolders-store"),
+
     ],
     fluid=False,
 )
