@@ -97,8 +97,8 @@ def run(dataset, n_motifs, n_iterations,
         trained_ms2lda,
         cleaned_spectra,
         optimized_motifs,
-        output_folder=dataset_parameters["output_folder"],
-        filename="ms2lda_viz.json"
+        doc2spec_map,
+        dataset_parameters["output_folder"]
     )
 
     return motif_spectra, optimized_motifs, motif_fps

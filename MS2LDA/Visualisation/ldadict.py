@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 from collections import defaultdict
@@ -175,6 +176,7 @@ def save_visualization_data(
         trained_ms2lda,
         cleaned_spectra,
         optimized_motifs,
+        doc2spec_map,
         output_folder,
         filename="ms2lda_viz.json",
         min_prob_to_keep_beta=1e-3,
@@ -190,6 +192,7 @@ def save_visualization_data(
         trained_ms2lda (tomotopy.LDAModel): the trained LDA model in memory
         cleaned_spectra (list of Spectrum): final cleaned spectra
         optimized_motifs (list of Spectrum): annotated + optimized motifs
+        doc2spec_map (dict): doc-hash to original Spectrum map
         output_folder (str): folder path for saving the .json
         filename (str): name of the saved JSON (default "ms2lda_viz.json")
         min_prob_to_keep_beta (float): threshold for storing topic-word distribution in beta
@@ -267,6 +270,23 @@ def save_visualization_data(
             clustered_smiles_data.append([ann])
 
     # 6) Build the final dictionary
+        # build doc→spec index from doc2spec_map
+        # Map Spectrum object -> integer index
+        spectrum_to_idx = {spec: i for i, spec in enumerate(cleaned_spectra)}
+        doc_to_spec_index = {}
+
+        for d_idx, doc in enumerate(trained_ms2lda.docs):
+            words = [trained_ms2lda.vocabs[w_id] for w_id in doc.words]
+            doc_text = "".join(words)
+            hashed = hashlib.md5(doc_text.encode("utf-8")).hexdigest()
+            if hashed in doc2spec_map:
+                real_spec = doc2spec_map[hashed]
+                doc_to_spec_index[str(d_idx)] = spectrum_to_idx.get(real_spec, -1)
+            else:
+                doc_to_spec_index[str(d_idx)] = -1 # hash is not found
+
+        lda_dict["doc_to_spec_index"] = doc_to_spec_index
+
     final_data = {
         "clustered_smiles_data": clustered_smiles_data,
         "optimized_motifs_data": optimized_motifs_data,
