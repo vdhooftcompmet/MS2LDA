@@ -1,0 +1,909 @@
+{
+    "urine_mass2motif_1.m2m": {
+        "SMILES": [
+        ],
+        "ANNOTATION": "62.98196 fragment (unknown core)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_100.m2m": {
+        "SMILES": [
+            "C1=CC(=O)NC=C1"
+        ],
+        "ANNOTATION": "hydroxypyridine substructure",
+        "PUBCHEMID":[8871]
+    },
+    "urine_mass2motif_102.m2m": {
+        "SMILES": [
+        ],
+        "ANNOTATION": "128.9533 fragment (unknown core)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_104.m2m": {
+        "SMILES": [
+             
+        ],
+        "ANNOTATION": "5 6-dihydroxyindole related (fragments would fit substructure - indole related)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_105.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "164.9304 fragment (unknown core)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_106.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "unsat diC-FA",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_111.m2m": {
+        "SMILES": [
+            "CN1[C@@H](CCC1=O)C2=CN=CC=C2"
+        ],
+        "ANNOTATION": "Cotinine",
+        "PUBCHEMID":[854019]
+    },
+    "urine_mass2motif_115.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "CHOOH loss - indicative for free carboxylic acid group",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_117.m2m": {
+        "SMILES": [
+        ],
+        "ANNOTATION": "Loss based Mass2Motif - different losses combined including 133 - C6H15NO2 e.g. from propylcarnitine",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_120.m2m": {
+        "SMILES": [
+            "C(C(C(=O)O)N=C(N)N)C(=O)O"
+        ],
+        "ANNOTATION": "Guanidinosuccinic acid",
+        "PUBCHEMID":[97856]
+    },
+    "urine_mass2motif_122.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Paracetamol mercapturate related (i.e. metabolites containing N-acetylcysteine adduct with paracetamol)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_126.m2m": {
+        "SMILES": [
+            "CC1=CC=CC=C1 "
+        ],
+        "ANNOTATION": "C7H7 and C5H5 fragments - indicative of methylbenzene substructure (aromatic)",
+        "PUBCHEMID":[1140]
+    },
+    "urine_mass2motif_128.m2m": {
+        "SMILES": [
+            "C[N+]1(CCC[C@H]1C(=O)[O-])C "
+        ],
+        "ANNOTATION": "Mostly proline betaine C13 isotope related Mass2Motif",
+        "PUBCHEMID":[115244]
+    },
+    "urine_mass2motif_130.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Polyethylene glycol related Mass2Motif – C6H13O3 fragment and smaller fragments present in PEG related compounds",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_133.m2m": {
+        "SMILES": [
+            "C(CC(=O)N)[C@@H](C(=O)O)N"
+        ],
+        "ANNOTATION": "Glutamine",
+        "PUBCHEMID":[5961]
+    },
+    "urine_mass2motif_134.m2m": {
+        "SMILES": [
+            "CNC1=CC=CC=C1"
+        ],
+        "ANNOTATION": "methylaminobenzene substructure related Mass2Motif (i.e. from dimethylaniline)",
+        "PUBCHEMID":[7515]
+    },
+    "urine_mass2motif_137.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Steroid related (including C8H11O fragment",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_138.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "ethanolimidazole substructure related Mass2Motif",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_141.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Amine loss - Indicative for free NH2 group in fragmented molecule",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_147.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Fragment ion indicative for conjugation of a phosphate group (H4O4P)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_148.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Unclear Mass2Motif",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_149.m2m": {
+        "SMILES": [
+            "CN(C)CCC(C1=CC=C(C=C1)Cl)C2=CC=CC=N2"
+        ],
+        "ANNOTATION": "Chlorphenamine related (230.07 fragment) + another drug? (135.05 fragment)",
+        "PUBCHEMID":[2725]
+    },
+    "urine_mass2motif_151.m2m": {
+        "SMILES": [
+            "C1=CC(=C(C(=C1)O)O)O"
+        ],
+        "ANNOTATION": "Dimethylated pyrogallol substructure related Mass2Motif",
+        "PUBCHEMID":[1057]
+    },
+    "urine_mass2motif_152.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Background related Mass2Motif - 147 fragmented across RT window for all urines",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_153.m2m": {
+        "SMILES": [
+            "C1=C(NC=N1)C[C@@H](C(=O)O)N"
+        ],
+        "ANNOTATION": "Histidine related",
+        "PUBCHEMID":[6274]
+    },
+    "urine_mass2motif_159.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "C6H10O3 metabolite with C3H7O fragment - check - interesting!",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_163.m2m": {
+        "SMILES": [
+            "C1=CC=C(C=C1)C(=O)OOC(=O)C2=CC=CC=C2"
+        ],
+        "ANNOTATION": "Benzoyl substructure (likely from N-benzoyl) related Mass2Motif",
+        "PUBCHEMID":[7187]
+    },
+    "urine_mass2motif_164.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "[Phenylalanine-CHOOH] related Mass2Motif",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_165.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "C9H12N and C12H19N2O3 based substructure related Mass2Motif - interesting - shows differential patterns",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_167.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "hydroxylated amine-steroid core?",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_169.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Includes but not restricted to citalopram [fluor] related fragments (i.e. 109.0470)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_173.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Cytoplex (citric acid based) plasticer related losses",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_175.m2m": {
+        "SMILES": [
+            "C1CC2CC1CC2(C(=O)O)N"
+        ],
+        "ANNOTATION": "2-Amino-2-norbornanecarboxylic acid related?? includes but not restricted to ramipril",
+        "PUBCHEMID":[115288]
+    },
+    "urine_mass2motif_176.m2m": {
+        "SMILES": [
+            "C1=C(NC(=O)N=C1)N"
+        ],
+        "ANNOTATION": "Cytosine related Mass2Motif",
+        "PUBCHEMID":[597]
+    },
+    "urine_mass2motif_177.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Drug or xenobiotic - present in three urines and both sulphation and glucuronidation of core structure",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_18.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "C2H3N loss - could be specific for a type of ring?",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_180.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Mixed motif - several cores - some metabolites fragmented several times (including isotopes)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_181.m2m": {
+        "SMILES": [
+            "CC1=NC(=C2C(=N1)N=CN2)N"
+        ],
+        "ANNOTATION": "Methyladenine related Mass2Motif",
+        "PUBCHEMID":[15048]
+    },
+    "urine_mass2motif_183.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "guanidino group related Mass2Motif (CH6N3 fragment)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_186.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Mixed motif of Cyclobenzaprine related metabolites (urine 02) and unclear cores (other urines)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_187.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Mass2Motif related to Imidazole group linked to a carboxylgroup through one CH2 group i.e. like in imidazole acetic acid",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_190.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Loss based Mass2Motif - different losses combined in 147 and 105 losses - including glutamic acid (glutamate) related loss",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_191.m2m": {
+        "SMILES": [
+            "C[S+](CC[C@@H](C(=O)[O-])N)C[C@@H]1[C@H]([C@H]([C@@H](O1)N2C=NC3=C(N=CN=C32)N)O)O"
+        ],
+        "ANNOTATION": "Acylcarnitine related Mass2Motif - subset showing strong C3H9N loss",
+        "PUBCHEMID":[34755]
+    },
+    "urine_mass2motif_192.m2m": {
+        "SMILES": [
+            "CN(CC(=O)O)C(=N)N"
+        ],
+        "ANNOTATION": "Creatine related Mass2Motif",
+        "PUBCHEMID":[586]
+    },
+    "urine_mass2motif_194.m2m": {
+        "SMILES": [
+            "CN1CC(=O)N=C1N"
+        ],
+        "ANNOTATION": "Creatinine related Mass2Motif",
+        "PUBCHEMID":[588]
+    },
+    "urine_mass2motif_197.m2m": {
+        "SMILES": [
+            "CC1=CC=CC=N1"
+        ],
+        "ANNOTATION": "Methylpyridine",
+        "PUBCHEMID":[7975]
+    },
+    "urine_mass2motif_200.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Acetyl loss",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_202.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Acylcarnitine subset of C10 and longer acyl conjugates related Mass2Motif",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_203.m2m": {
+        "SMILES": [
+            "C[S+](CC[C@@H](C(=O)[O-])N)C[C@@H]1[C@H]([C@H]([C@@H](O1)N2C=NC3=C(N=CN=C32)N)O)O"
+        ],
+        "ANNOTATION": "Acylcarnitine related Mass2Motif (mostly) [smaller in degree]",
+        "PUBCHEMID":[34755]
+    },
+    "urine_mass2motif_207.m2m": {
+        "SMILES": [
+            " C(CC(=O)N)[C@@H](C(=O)O)N"
+        ],
+        "ANNOTATION": "Glutamine related Mass2Motif (smaller degrees very similar fragments to M2M 133)",
+        "PUBCHEMID":[5961]
+    },
+    "urine_mass2motif_208.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Unclear what it can be - loss related to features containing 80.9479 fragment",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_210.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Sartan related (includes antihypertensives such as losartan)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_211.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "13C isotope motif of unknown core possibly Arecaidine (chewing nut metabolit",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_212.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Multiple cores",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_213.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "C4H7O3 fragment with CO2 loss - likely indicative of fatty acid substructure (1/2-OH-propionic acid?)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_22.m2m": {
+        "SMILES": [
+            "COC1=CC2=C(C=CN=C2C=C1)[C@@H]([C@H]3C[C@@H]4CCN3C[C@@H]4C=C)O"
+        ],
+        "ANNOTATION": "Mixed motif of Quinidine (urine 97) and different cores in other urines",
+        "PUBCHEMID":[441074]
+    },
+    "urine_mass2motif_221.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Unclear what it can be - 105.9654 fragment",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_224.m2m": {
+        "SMILES": [
+            "COC1=CC2=C(C=CN=C2C=C1)[C@@H]([C@H]3C[C@@H]4CCN3C[C@@H]4C=C)O"
+        ],
+        "ANNOTATION": "Amlodipine M2M",
+        "PUBCHEMID":[441074]
+    },
+    "urine_mass2motif_228.m2m": {
+        "SMILES": [
+            "C(CCN)C[C@@H](C(=O)O)N"
+        ],
+        "ANNOTATION": "Lysine",
+        "PUBCHEMID":[5962]
+    },
+    "urine_mass2motif_229.m2m": {
+        "SMILES": [
+            "CN(C)C"
+        ],
+        "ANNOTATION": "Trimethylamine",
+        "PUBCHEMID":[1146]
+    },
+    "urine_mass2motif_23.m2m": {
+        "SMILES": [
+            "C(C(=O)O)N"
+        ],
+        "ANNOTATION": "Glycine",
+        "PUBCHEMID":[750]
+    },
+    "urine_mass2motif_230.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "H2O loss",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_232.m2m": {
+        "SMILES": [
+            "COC1=CC=CC=C1OCCNCC(COC2=CC=CC3=C2C4=CC=CC=C4N3)O"
+        ],
+        "ANNOTATION": "Mixed motif including Carvedilol (urine 105) - and unclear other cores in other urines",
+        "PUBCHEMID":[2585]
+    },
+    "urine_mass2motif_236.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Mixed motif of modified Diltiazem related (urines 51 and 85) and smaller (methoxylated) phenolic substructure related Mass2Motif",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_237.m2m": {
+        "SMILES": [
+            "C[N+]1(CCC[C@H]1C(=O)[O-])C"
+        ],
+        "ANNOTATION": "Proline betaine related",
+        "PUBCHEMID":[115244]
+    },
+    "urine_mass2motif_238.m2m": {
+        "SMILES": [
+            "C1CC(=O)N[C@@H]1C(=O)O"
+        ],
+        "ANNOTATION": "Pyroglutamate (pyroglutamic acid) or glutamine related Mass2Motif",
+        "PUBCHEMID":[7405]
+    },
+    "urine_mass2motif_239.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "aracetamol related Mass2Motif (C13 isotope features and fragments)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_240.m2m": {
+        "SMILES": [
+            "CC(=NCCC[C@@H](C(=O)O)N)N"
+        ],
+        "ANNOTATION": "(E)-N5-(1-Aminoethylidene)-L-ornithine related mass2motif",
+        "PUBCHEMID":[107984]
+    },
+    "urine_mass2motif_241.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Loss of [hexose-H2O] – indication of hexose conjugation (for example glucose)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_242.m2m": {
+        "SMILES": [
+            "C[N+]1=CC=CC(=C1)C(=O)[O-]"
+        ],
+        "ANNOTATION": "Trigonelline",
+        "PUBCHEMID":[5570]
+    },
+    "urine_mass2motif_245.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Unclear Mass2Motif",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_246.m2m": {
+        "SMILES": [
+            "CN1C2=C(C(=O)N(C1=O)C)NC=N2"
+        ],
+        "ANNOTATION": "Theophylline related Mass2Motif",
+        "PUBCHEMID":[2153]
+    },
+    "urine_mass2motif_247.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Isotopes of Acylcarnitines related Mass2Motif",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_248.m2m": {
+        "SMILES": [
+            "CN1C=CC2=CC=CC=C21  "
+        ],
+        "ANNOTATION": "Methylindole substructure related Mass2Motif",
+        "PUBCHEMID":[11781]
+    },
+    "urine_mass2motif_249.m2m": {
+        "SMILES": [
+            "CN1C=CC(=NC1=O)N"
+        ],
+        "ANNOTATION": "Methylcytosine related Mass2Motif",
+        "PUBCHEMID":[79143]
+    },
+    "urine_mass2motif_256.m2m": {
+        "SMILES": [
+            "CCCCC(C(=O)O)N"
+        ],
+        "ANNOTATION": "2-amino-hexanoic acid",
+        "PUBCHEMID":[9475]
+    },
+    "urine_mass2motif_259.m2m": {
+        "SMILES": [
+            "C1C[C@H](NC1)C(=O)O"
+        ],
+        "ANNOTATION": "Proline (and arginine) related Mass2Motif",
+        "PUBCHEMID":[45742]
+    },
+    "urine_mass2motif_260.m2m": {
+        "SMILES": [
+            "CCOC(=O)C1=CC=CC=C1C(=O)OCC"
+        ],
+        "ANNOTATION": "Diethyl phtalate related Mass2Motif",
+        "PUBCHEMID":[6781]
+    },
+    "urine_mass2motif_261.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Dechloronated substructure of Chlorphenamine related",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_262.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Background",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_266.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Background",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_268.m2m": {
+        "SMILES": [
+            "C(CC(=O)N)[C@@H](C(=O)O)N "
+        ],
+        "ANNOTATION": "Glutamine related Mass2Motif (C13 isotopes)",
+        "PUBCHEMID":[5961]
+    },
+    "urine_mass2motif_269.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Mixed motif with serotonin-based drug Motif (urine 49) and random other cores (other urines)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_27.m2m": {
+        "SMILES": [
+            "CN1CCOCC1"
+        ],
+        "ANNOTATION": "N-methyl-morpholine fragment",
+        "PUBCHEMID":[7972]
+    },
+    "urine_mass2motif_271.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Fragments indicative for presence of steroid backbone",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_272.m2m": {
+        "SMILES": [
+            "C(CS(=O)(=O)O)N"
+        ],
+        "ANNOTATION": "Taurine related (+ 143.1177 fragment?)",
+        "PUBCHEMID":[1123]
+    },
+    "urine_mass2motif_273.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "C4H10NO2 amino acid substructure",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_278.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Dimethylated guanidino group related",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_279.m2m": {
+        "SMILES": [
+            "CN1CC[C@]23[C@@H]4[C@H]1CC5=C2C(=C(C=C5)OC)O[C@H]3[C@H](C=C4)O"
+        ],
+        "ANNOTATION": "Codeine related",
+        "PUBCHEMID":[5284371]
+    },
+    "urine_mass2motif_281.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Mixed motif of Clopidogrel (urine 93) and a mix of other cores (no well defined ones in several mtbs)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_282.m2m": {
+        "SMILES": [
+            "COC1=CC2=C(C=CN=C2C=C1)[C@@H]([C@H]3C[C@@H]4CCN3C[C@@H]4C=C)O"
+        ],
+        "ANNOTATION": "Quinidine related substructure?",
+        "PUBCHEMID":[441074]
+    },
+    "urine_mass2motif_283.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "CO loss - indicative for presence of ketone/aldehyde/lactone group (C=O)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_284.m2m": {
+        "SMILES": [
+            "C1=NC2=C(N1)C(=O)NC=N2"
+        ],
+        "ANNOTATION": "Hypoxanthine related",
+        "PUBCHEMID":[135398638]
+    },
+    "urine_mass2motif_286.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "C4H8N based Mass2Motif - indicative for proline arginine ornitine citrulline and N-containing ring structures",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_288.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Alkylamine (C4H10N and C4H7 fragments)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_29.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Major loss is related to loss of sulphate group from phenolic (aromatic) structure (SO3 loss)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_291.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Check - nitrogen containing ring core structure - could be from alkaloid?",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_292.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Mixed motif of Diltiazem (urine 51) and citric acid (from citroplex plasticizer) related Mass2Motif (co-fragmentation in urine 51)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_30.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Unknown core",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_31.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Loss based Mass2Motif - different losses combined in 105 and 59 losses i.e. CH5N3 included",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_32.m2m": {
+        "SMILES": [
+            
+        ],
+        "ANNOTATION": "CH3ON loss - [loss ppm out of normal range - feature selection issue?]" ,
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_34.m2m": {
+        "SMILES": [
+            "C1CCNC(C1)C(=O)O"
+        ],
+        "ANNOTATION": "Pipecolic acid (pipecolate) related Mass2Motif",
+        "PUBCHEMID":[849]
+    },
+    "urine_mass2motif_37.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "C5H7NO3 loss",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_38.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "methylethylimidazole substructure (i.e. from 3-methylhistamine)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_39.m2m": {
+        "SMILES": [
+            "CC1=NC=C(C(=C1O)C=O)CO"
+        ],
+        "ANNOTATION": "Pyridoxal related substructure (one fragment is different) related Mass2Motif",
+        "PUBCHEMID":[1050]
+    },
+    "urine_mass2motif_4.m2m": {
+        "SMILES": [
+            "CC1=CC(=NC(=N1)N)C"
+        ],
+        "ANNOTATION": "4 6-Dimethyl-2-pyrimidinamine related?! Mass2Motif - check further....",
+        "PUBCHEMID":[13021]
+    },
+    "urine_mass2motif_41.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Multiple losses",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_47.m2m": {
+        "SMILES": [
+            "CC(C(C1=C(C=CC(=C1)OC)OC)O)N"
+        ],
+        "ANNOTATION": "Mixed motif of drug possibly methoxamine related in urine 51 and other cores spread over the other urines",
+        "PUBCHEMID":[6082]
+    },
+    "urine_mass2motif_50.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Unclear what it can be - 80.9479 fragment of at least three related (co-eluting) masses",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_52.m2m": {
+        "SMILES": [
+            "CC1=NNC(=O)C1CCC(=O)O"
+        ],
+        "ANNOTATION": "Clear distinct pattern - Mass2Motif possibly related to 3-(3-methyl-5-oxo-1 4-dihydropyrazol-4-yl)propanoic acid",
+        "PUBCHEMID":[2771950]
+    },
+    "urine_mass2motif_56.m2m": {
+        "SMILES": [
+            "CN1C=CC(=NC1=O)N"
+        ],
+        "ANNOTATION": "Methylcytosine related Mass2Motif",
+        "PUBCHEMID":[79143]
+    },
+    "urine_mass2motif_57.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Double water loss i.e. 2*H20 – Generic feature for metabolites containing several free OH groups attached to a aliphatic chain like sugars.",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_59.m2m": {
+        "SMILES": [
+            "CC(C)C(CCCN(C)CCC1=CC(=C(C=C1)OC)OC)(C#N)C2=CC(=C(C=C2)OC)OC"
+        ],
+        "ANNOTATION": "Verapamil",
+        "PUBCHEMID":[2520]
+    },
+    "urine_mass2motif_64.m2m": {
+        "SMILES": [
+            "C1CC(=O)N(C1)CC(=O)O"
+        ],
+        "ANNOTATION": "C6H9NO3 substructure - possibly (2-Oxo-1-pyrrolidinyl)acetic acid - related Mass2Motif",
+        "PUBCHEMID":[3146687]
+    },
+    "urine_mass2motif_65.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Background related Mass2Motif - 202 fragmented across RT window",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_66.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "CO2 loss - from any specific structure?!",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_67.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Sugar related (small) fragments",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_68.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Alkyl aromatic substructure – indicative for aromatic ring with 2-carbon alkyl chain attached i.e. phenylethene fragment",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_7.m2m": {
+        "SMILES": [
+            "C1=NC2=NC=NC(=C2N1)N"
+        ],
+        "ANNOTATION": "Adenine related",
+        "PUBCHEMID":[190]
+    },
+    "urine_mass2motif_72.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Pentose loss",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_78.m2m": {
+        "SMILES": [
+            "C[N+](C)(C)CC(=O)[O-]"
+        ],
+        "ANNOTATION": "Betaine related",
+        "PUBCHEMID":[247]
+    },
+    "urine_mass2motif_80.m2m": {
+        "SMILES": [
+            "CC(=O)NC1=CC(=C(C=C1)O)OC"
+        ],
+        "ANNOTATION": "Methoxyparacetamol",
+        "PUBCHEMID":[3080594]
+    },
+    "urine_mass2motif_83.m2m": {
+        "SMILES": [
+            "COC1=CC=CC2=C1N=CN2"
+        ],
+        "ANNOTATION": "4-Methoxy-1H-benzimidazole substructure (of Esomeprazole) related Mass2Motif",
+        "PUBCHEMID":[14970878]
+    },
+    "urine_mass2motif_86.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Combined loss of NH3 and CH2O2 - with loss of NH3 group more often present than the loss of CH2O2 (if at all present....) - any structural feature? amino acid/peptide related?",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_88.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Alkylamine (C4H10N and C3H8N fragments)",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_90.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "N-acetylneuramic acid and hydroxybenzoyl related",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_93.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Mass2Motif related to [glucoronate-H2O] indicative for glucuronidation",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_94.m2m": {
+        "SMILES": [
+              
+        ],
+        "ANNOTATION": "Mixed motif of drug (urine 49) and other cores in other urines",
+        "PUBCHEMID":[]
+    },
+    "urine_mass2motif_95.m2m": {
+        "SMILES": [
+            "CC1=NC=CN1"
+        ],
+        "ANNOTATION": "Methylimidazole related Mass2Motif",
+        "PUBCHEMID":[12749]
+    },
+    "urine_mass2motif_97.m2m": {
+        "SMILES": [
+            "CC(=O)NC1=CC=C(C=C1)O"
+        ],
+        "ANNOTATION": "Paracetamol related",
+        "PUBCHEMID":[1983]
+    }
+}

@@ -154,3 +154,6 @@ deepmol.egg-info
 *.model
 *.pkl
 *.dict
+*.mzML
+*.bin
+*.ai

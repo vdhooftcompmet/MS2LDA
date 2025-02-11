@@ -266,7 +266,7 @@ def mf_finder(mz, session):
 
 def mf_finder_local(mz):
     chemcalcURL = 'https://www.chemcalc.org/chemcalc/em'
-    options = {'mfRange': 'C0-100H0-202N0-20O0-20S0-5F0-7Cl0-7I0-1Br0-2', # fluor is missing!!!
+    options = {'mfRange': 'C0-100H0-202N0-20O0-20S0-5F0-8Cl0-8I0-2Br0-2',
                'numberOfResultsOnly': False,
                'typedResult': False,
                'useUnsaturation': False,
@@ -280,9 +280,9 @@ def mf_finder_local(mz):
                'integerUnsaturation': False,
                # Ions/Radicals can have non-integer unsaturation
                'referenceVersion': '2013',
-               'massRange': 0.5
-#              'minMass': -0.5,
-#              'maxMass': 0.5,
+               'massRange': 0.005
+#              'minMass': -0.005,
+#              'maxMass': 0.005,
               }
     
     return requests.get(chemcalcURL, options).json()

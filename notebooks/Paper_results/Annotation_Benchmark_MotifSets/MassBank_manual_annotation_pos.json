@@ -1,0 +1,214 @@
+{
+    "mb_motif_0.m2m": {
+        "SMILES": [
+          	"CC(C)CC(C(=O)O)N"
+        ],
+	"ANNOTATION": "nitrogen containing substructure [C5H12N] (in beer related to Leucine)",
+	"PUBCHEMCID": [6106]
+    },
+    "mb_motif_10.m2m": {
+        "SMILES": [
+          	
+        ],
+	"ANNOTATION": "Loss of C3H6 - indicative for the presence of an isopropyl",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_11.m2m": {
+        "SMILES": [
+           	"CC(C)NCC(COC1=CC=C(C=C1)CC(=O)N)O"
+        ],
+	"ANNOTATION": "Atenolol related fragments and losses",
+	"PUBCHEMCID": [2249]
+    },
+    "mb_motif_12.m2m": {
+        "SMILES": [
+            	"CC(C)CC(C(=O)O)N"
+        ],
+	"ANNOTATION": "Leucine related fragments and losses",
+	"PUBCHEMCID": [6106]
+    },
+    "mb_motif_13.m2m": {
+        "SMILES": [
+            	"CCC1=CC=CC=C1"
+        ],
+	"ANNOTATION": "Alkyl aromatic substructure – indicative for aromatic ring with 2-carbon alkyl chain attached i.e. phenylethene fragment from ethylbenzene as a result of the fragmentation process.",
+	"PUBCHEMCID": [7500]
+    },
+    "mb_motif_150.m2m": {
+        "SMILES": [
+            
+        ],
+	"ANNOTATION": "Acetyl loss",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_16.m2m": {
+        "SMILES": [
+            "C1=CC(=C(C=C1C2=C(C(=O)C3=C(C=C(C=C3O2)O)O)O)O)O"
+        ],
+	"ANNOTATION": "Fragments indicative for quercetin/glycosylated quercetin substructure",
+	"PUBCHEMCID": [5280343]
+    },
+    "mb_motif_17.m2m": {
+        "SMILES": [
+		"C1CC(=O)NC1C(=O)O",
+	  	"C(CC(=O)N)C(C(=O)O)N"
+        ],
+	"ANNOTATION": "Fragment ions indicative for pyroglutamic acid (pyroglutamate) or glutamine (both in MzCloud) – structure can be formed from glutamic acid (glutamate) in the mass spectrometer as well.",
+	"PUBCHEMCID": [7405, 5961]
+    },
+    "mb_motif_19.m2m": {
+        "SMILES": [
+            	"CCC1=CC=CC=C1O"
+        ],
+	"ANNOTATION": "Fragments indicative for ethylphenol (i.e. resulting from Tyramine in beer) or the structurally related paramethylmethoxybenzene (MassBank) substructure",
+	"PUBCHEMCID": [6997]
+    },
+    "mb_motif_195.m2m": {
+        "SMILES": [
+            
+        ],
+	"ANNOTATION": "Amide presence",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_20.m2m": {
+        "SMILES": [
+            	"C1=CC=C(C=C1)C=CC(=O)O",
+		"COC1=C(C=CC(=C1)C=CC(=O)O)O"
+        ],
+	"ANNOTATION": "Fragments indicative for cinnamic/hydroxycinnamic acid substructure",
+	"PUBCHEMCID": [444539, 445858]
+    },
+    "mb_motif_21.m2m": {
+        "SMILES": [
+            	"C1=NC2=NC=NC(=C2N1)N"
+        ],
+	"ANNOTATION": "Adenine",
+	"PUBCHEMCID": [190]
+    },
+    "mb_motif_24.m2m": {
+        "SMILES": [
+            	"C(C1C(C(C(C(O1)O)O)O)O)O"
+        ],
+	"ANNOTATION": "Fragments indicative of a glycosylation – i.e. indicative for a sugar conjugation (in beer often related to glucose)",
+	"PUBCHEMCID": [5793]
+    },
+    "mb_motif_25.m2m": {
+        "SMILES": [
+            	"C1=C(NC=N1)CC(C(=O)O)N"
+        ],
+	"ANNOTATION": "Fragments indicative for histidine (C6H10N3O2) substructure (MzCloud)",
+	"PUBCHEMCID": [6274]
+    },
+    "mb_motif_28.m2m": {
+        "SMILES": [
+            	"CC(=O)NCCCCN"
+        ],
+	"ANNOTATION": "Fragment ions indicative for C6H12NO substructure (in beer related to N-acetylputrescine - MzCloud)",
+	"PUBCHEMCID": [122356]
+    },
+    "mb_motif_29.m2m": {
+        "SMILES": [
+            	"C(C1C(C(C(C(O1)O)O)O)O)O"
+        ],
+	"ANNOTATION": "Oxygen-rich losses and fragments also occurring in hexose spectra – related to M2M 211 (hexose [glucose] conjugatation) – possibly hydrated-hexose loss?",
+	"PUBCHEMCID": [206]
+    },
+    "mb_motif_31.m2m": {
+        "SMILES": [
+            	"C1=C(NC=N1)CC(=O)O"
+        ],
+	"ANNOTATION": "Imidazole group linked to a carboxylgroup through one CH2 group i.e. like in imidazole acetic acid",
+	"PUBCHEMCID": [96215]
+    },
+    "mb_motif_32.m2m": {
+        "SMILES": [
+            	"COC1=C(C=CC(=C1)C=CC(=O)O)O"
+        ],
+	"ANNOTATION": "fragments indicative for ferulic acid based substructure (MzCloud)",
+	"PUBCHEMCID": [445858]
+    },
+    "mb_motif_33.m2m": {
+        "SMILES": [
+            	"C1=NC2=C(N1)C(=O)NC(=N2)N"
+        ],
+	"ANNOTATION": "Fragment ions indicative for guanine (C5H5N5O) based substructure",
+	"PUBCHEMCID": [135398634]
+    },
+    "mb_motif_35.m2m": {
+        "SMILES": [
+            	"C1CCNC(C1)C(=O)O"
+        ],
+	"ANNOTATION": "Fragment ions indicative for alkylamine substructure C5H10N (in beer often pipecolic acid [pipecolate])",
+	"PUBCHEMCID": [849]
+    },
+    "mb_motif_36.m2m": {
+        "SMILES": [
+            	"C([C@@H](C(=O)O)N)C(=O)N"
+        ],
+	"ANNOTATION": "Fragments indicative for asparagine substructure (MzCloud) – prevalent in Beer 3",
+	"PUBCHEMCID": [6267]
+    },
+    "mb_motif_37.m2m": {
+        "SMILES": [
+            	
+        ],
+	"ANNOTATION": "Derived from massbank_binned_005 ms2lda experiment id=190",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_38.m2m": {
+        "SMILES": [
+            	"C1=CC(=CC=C1O)O"
+        ],
+	"ANNOTATION": "Fragments indicative for dihydroxylated benzene ring substructure (MzCloud) – C6H5O2 fragment corresponds to positively charged fragment with two hydroxyl groups.",
+	"PUBCHEMCID": [785]
+    },
+    "mb_motif_39.m2m": {
+        "SMILES": [
+            	"C1=NC2=NC=NC(=C2N1)N"
+        ],
+	"ANNOTATION": "Fragments indicative adenine (C5H6N5) substructure",
+	"PUBCHEMCID": [190]
+    },
+    "mb_motif_4.m2m": {
+        "SMILES": [
+            	
+        ],
+	"ANNOTATION": "Loss of methyl group – indicative for presence of methoxy [O-CH3] methylsulfyl [S-CH3] or methylgroup connected to aromatic ring system",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_40.m2m": {
+        "SMILES": [
+            	"CC1C(C(C(C(O1)O)O)O)O"
+        ],
+	"ANNOTATION": "Loss indicative of [deoxyhexose-H2O]",
+	"PUBCHEMCID": [840]
+    },
+    "mb_motif_41.m2m": {
+        "SMILES": [
+            	"C(C1C(C(C(C(O1)O)O)O)O)O"
+        ],
+	"ANNOTATION": "Loss indicative of [hexose-H20]",
+	"PUBCHEMCID": [206]
+    },
+    "mb_motif_42.m2m": {
+        "SMILES": [
+            	"C1=CC(=CC=C1C2=C(C(=O)C3=C(C=C(C=C3O2)O)O)O)O"
+        ],
+	"ANNOTATION": "Fragments indicative for kaempferol/glycosylated kaempferol substructure",
+	"PUBCHEMCID": [5280863]
+    },
+    "mb_motif_43.m2m": {
+        "SMILES": [
+            	"C1=C(NC=N1)C[C@@H](C(=O)O)N"
+        ],
+	"ANNOTATION": "Fragments indicative for histidine (C6H10N3O2) substructure (MzCloud)",
+	"PUBCHEMCID": [6274]
+    },
+    "mb_motif_5.m2m": {
+        "SMILES": [
+            	"CC(=O)NCCCCN"
+        ],
+	"ANNOTATION": "Fragment ions indicative for N-acetylputrescine substructure (MzCloud)",
+	"PUBCHEMCID": [122356]
+    }
+}
