@@ -166,7 +166,8 @@ def optimize_motif_spectrum(motif_spectrum, hit_spectra, smiles_cluster, frag_er
     opt_motif_losses_mz, opt_motif_losses_intensities = motif_intersection_losses(motif_spectrum, common_losses, loss_err)
 
     opt_motif_spectrum = reconstruct_motif_spectrum(opt_motif_fragments_mz, opt_motif_fragments_intensities, opt_motif_losses_mz, opt_motif_losses_intensities)
-    opt_motif_spectrum.set("short_annotation", smiles_cluster)
+    opt_motif_spectrum.set("Auto_annotation", smiles_cluster)
+    opt_motif_spectrum.set("short_annotation", None)
     opt_motif_spectrum.set("charge", motif_spectrum.get("charge"))
     opt_motif_spectrum.set("ms2accuracy", motif_spectrum.get("ms2accuracy"))
     opt_motif_spectrum.set("motifset", motif_spectrum.get("motifset"))
