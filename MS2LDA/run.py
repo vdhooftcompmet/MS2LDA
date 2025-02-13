@@ -249,6 +249,7 @@ def add_metadata(spectrum, motif_spectrum, value, screen_type):
         "ref_motifset": motif_spectrum.get("motifset"),
         "ref_motif_id": motif_spectrum.get("id"),
         "ref_short_annotation": motif_spectrum.get("short_annotation"),
+        "ref_auto_annotation": motif_spectrum.get("Auto_annotation"),
         "ref_annotation": motif_spectrum.get("annotation"),
         "ref_charge": motif_spectrum.get("charge"),
         }
@@ -352,65 +353,3 @@ def load_s2v(
     s2v_similarity, library = load_s2v_and_library(path_model, path_library)
 
     return s2v_similarity, library
-
-
-def run_advanced(dataset, n_motifs, n_iterations,
-        dataset_parameters,
-        train_parameters,
-        model_parameters,
-        convergence_parameters,
-        annotation_parameters,
-        preprocessing_parameters,
-        motif_parameter,
-        fingerprint_parameters):
-    """main function to run MS2LDA workflow in a jupyter notebook"""
-
-    loaded_spectra = filetype_check(dataset=dataset)
-    cleaned_spectra = clean_spectra(loaded_spectra, preprocessing_parameters)
-    print("Cleaning spectra ...", len(cleaned_spectra), "spectra left")
-    feature_words = features_to_words(spectra=cleaned_spectra, significant_figures=dataset_parameters["significant_digits"], acquisition_type=dataset_parameters["acquisition_type"]) # significant digits need to be added in dash.
-    
-
-    # bootstrapping
-    n_runs = 10
-    motifs_per_runs = []
-    run_x = 0
-    while run_x < n_runs: 
-        # subpart molecules, random n_motifs from normal distribution, based on input
-
-        # Modeling
-        ms2lda = define_model(n_motifs=n_motifs, model_parameters=model_parameters)
-        trained_ms2lda, convergence_curve = train_model(ms2lda, feature_words, iterations=n_iterations, train_parameters=train_parameters, convergence_parameters=convergence_parameters)
-
-        # Mapping
-        doc2spec_map = map_doc2spec(feature_words, cleaned_spectra)
-        MS2LDA.retrieve_spec4doc = partial(retrieve_spec4doc, doc2spec_map, trained_ms2lda)
-
-        # Motif Generation
-        motifs = extract_motifs(trained_ms2lda, top_n=motif_parameter)
-        motif_spectra = create_motif_spectra(motifs, charge=dataset_parameters["charge"], motifset_name=dataset_parameters["name"], significant_digits=dataset_parameters["significant_digits"]) # output name
-
-        # Motif Annotation and Optimization
-        library_matches, s2v_similarity = s2v_annotation(motif_spectra, annotation_parameters)
-        clustered_spectra, clustered_smiles, clustered_scores = hit_clustering(s2v_similarity=s2v_similarity, motif_spectra=motif_spectra, library_matches=library_matches, criterium=annotation_parameters["criterium"], cosine_similarity=annotation_parameters["cosine_similarity"])
-        motif_spectra = add_annotation(motif_spectra, clustered_smiles)
-        optimized_motifs = motif_optimization(motif_spectra, clustered_spectra, clustered_smiles, loss_err=1)
-        motif_fps = calc_fingerprints(clustered_smiles, fp_type=fingerprint_parameters["fp_type"], threshold=fingerprint_parameters["threshold"])
-
-    # selelcting
-
-
-    store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, doc2spec_map, dataset_parameters["output_folder"])
-
-    # Save additional viz data
-    save_visualization_data(
-        trained_ms2lda,
-        cleaned_spectra,
-        optimized_motifs,
-        output_folder=dataset_parameters["output_folder"],
-        filename="ms2lda_viz.json"
-    )
-
-    return motif_spectra, optimized_motifs, motif_fps
-
-    
