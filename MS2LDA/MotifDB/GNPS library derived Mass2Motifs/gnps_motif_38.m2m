@@ -1,8 +1,0 @@
-#MS2ACCURACY 0.005
-#MOTIFSET GNPS_library_derived_Mass2Motifs
-#CHARGE 1
-#NAME gnps_motif_38
-#ANNOTATION Loss of CH2O2 - indicative for underivatized carboxilic acid group
-#SHORT_ANNOTATION Loss of CH2O2 - indicative for underivatized carboxilic acid group
-#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
-loss_46.0075,1.0

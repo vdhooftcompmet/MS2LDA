@@ -1,8 +1,0 @@
-#MS2ACCURACY 0.005
-#MOTIFSET GNPS_library_derived_Mass2Motifs
-#CHARGE 1
-#NAME gnps_motif_13
-#ANNOTATION Amine loss - Indicative for free NH2 group in fragmented molecule
-#SHORT_ANNOTATION Amine loss - Indicative for free NH2 group in fragmented molecule
-#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
-loss_17.0275,1.0
