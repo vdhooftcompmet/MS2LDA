@@ -61,8 +61,9 @@ def store_m2m_folder(motif_spectra, folder):
 
     os.makedirs(folder)
 
-    for motif_number, motif_spectrum in enumerate(motif_spectra):
-        store_m2m_file(motif_spectrum, motif_number, folder)
+    for motif_spectrum in motif_spectra:
+        _, motif_number = motif_spectrum.get("id").split("_")
+        store_m2m_file(motif_spectrum, int(motif_number), folder)
 
     return True
 
