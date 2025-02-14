@@ -284,8 +284,8 @@ def plot_convergence(convergence_curve):
 
     # Add a shared header for all three plots
     fig.suptitle('Different Convergence Curves', fontsize=16)
-    fig.subplots_adjust(top=0.85, bottom=0.2)
-    #plt.tight_layout()
+    fig.subplots_adjust(top=0.85, bottom=0.2, right=0.85)
+    plt.tight_layout()
     return fig
 
 

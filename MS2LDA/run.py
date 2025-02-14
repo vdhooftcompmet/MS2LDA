@@ -273,7 +273,7 @@ def store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_c
     store_m2m_folder(motif_spectra, "motifs")
     print("m2m folder stored")
     convergence_curve_fig = plot_convergence(convergence_curve)
-    convergence_curve_fig.savefig("convergence_curve.png",dpi=300)
+    convergence_curve_fig.savefig("convergence_curve.png",dpi=300, bbox_inches="tight", pad_inches=0.2)
     print("convergence curve stored")
     network_fig = create_network(optimized_motifs, significant_figures=2) # motif spectra
     nx.write_graphml(network_fig, "network.graphml")
