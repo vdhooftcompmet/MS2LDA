@@ -1,0 +1,1894 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d1" for="edge" attr.name="color" attr.type="string"/>
+<key id="d0" for="edge" attr.name="weight" attr.type="float"/>
+<graph edgedefault="undirected"><node id="motif_0"/>
+<node id="motif_1"/>
+<node id="motif_2"/>
+<node id="95.05"/>
+<node id="103.05"/>
+<node id="motif_3"/>
+<node id="147.04"/>
+<node id="153.02"/>
+<node id="motif_4"/>
+<node id="motif_5"/>
+<node id="136.06"/>
+<node id="motif_6"/>
+<node id="78.99"/>
+<node id="127.02"/>
+<node id="142.99"/>
+<node id="motif_7"/>
+<node id="79.05"/>
+<node id="91.05"/>
+<node id="93.07"/>
+<node id="105.07"/>
+<node id="133.1"/>
+<node id="motif_8"/>
+<node id="145.1"/>
+<node id="motif_9"/>
+<node id="333.2"/>
+<node id="motif_10"/>
+<node id="68.05"/>
+<node id="95.06"/>
+<node id="112.09"/>
+<node id="motif_11"/>
+<node id="motif_12"/>
+<node id="145.03"/>
+<node id="motif_13"/>
+<node id="115.05"/>
+<node id="117.07"/>
+<node id="143.07"/>
+<node id="144.08"/>
+<node id="motif_14"/>
+<node id="213.16"/>
+<node id="motif_15"/>
+<node id="282.28"/>
+<node id="283.28"/>
+<node id="motif_16"/>
+<node id="132.08"/>
+<node id="133.09"/>
+<node id="148.11"/>
+<node id="motif_17"/>
+<node id="motif_18"/>
+<node id="motif_19"/>
+<node id="motif_20"/>
+<node id="86.1"/>
+<node id="98.98"/>
+<node id="104.11"/>
+<node id="125.0"/>
+<node id="184.07"/>
+<node id="motif_21"/>
+<node id="161.13"/>
+<node id="255.21"/>
+<node id="motif_22"/>
+<node id="motif_23"/>
+<node id="100.11"/>
+<node id="144.14"/>
+<node id="motif_24"/>
+<node id="184.05"/>
+<node id="motif_25"/>
+<node id="120.09"/>
+<node id="motif_26"/>
+<node id="motif_27"/>
+<node id="55.05"/>
+<node id="motif_28"/>
+<node id="motif_29"/>
+<node id="motif_30"/>
+<node id="motif_31"/>
+<node id="177.03"/>
+<node id="motif_32"/>
+<node id="107.05"/>
+<node id="135.04"/>
+<node id="motif_33"/>
+<node id="173.13"/>
+<node id="motif_34"/>
+<node id="65.04"/>
+<node id="111.04"/>
+<node id="motif_35"/>
+<node id="119.09"/>
+<node id="motif_36"/>
+<node id="motif_37"/>
+<node id="motif_38"/>
+<node id="297.06"/>
+<node id="motif_39"/>
+<node id="59.05"/>
+<node id="motif_40"/>
+<node id="291.2"/>
+<node id="motif_41"/>
+<node id="motif_42"/>
+<node id="60.08"/>
+<node id="motif_43"/>
+<node id="313.27"/>
+<node id="motif_44"/>
+<node id="motif_45"/>
+<node id="146.1"/>
+<node id="motif_46"/>
+<node id="165.07"/>
+<node id="motif_47"/>
+<node id="motif_48"/>
+<node id="159.12"/>
+<node id="motif_49"/>
+<node id="112.02"/>
+<node id="motif_50"/>
+<node id="111.08"/>
+<node id="motif_51"/>
+<node id="motif_52"/>
+<node id="184.08"/>
+<node id="motif_53"/>
+<node id="motif_54"/>
+<node id="123.08"/>
+<node id="motif_55"/>
+<node id="128.06"/>
+<node id="171.08"/>
+<node id="motif_56"/>
+<node id="536.26"/>
+<node id="motif_57"/>
+<node id="motif_58"/>
+<node id="105.04"/>
+<node id="motif_59"/>
+<node id="motif_60"/>
+<node id="motif_61"/>
+<node id="motif_62"/>
+<node id="178.08"/>
+<node id="207.08"/>
+<node id="motif_63"/>
+<node id="161.1"/>
+<node id="motif_64"/>
+<node id="motif_65"/>
+<node id="116.05"/>
+<node id="131.07"/>
+<node id="motif_66"/>
+<node id="motif_67"/>
+<node id="62.06"/>
+<node id="motif_68"/>
+<node id="motif_69"/>
+<node id="73.05"/>
+<node id="91.06"/>
+<node id="167.06"/>
+<node id="225.04"/>
+<node id="299.06"/>
+<node id="359.03"/>
+<node id="motif_70"/>
+<node id="83.05"/>
+<node id="motif_71"/>
+<node id="motif_72"/>
+<node id="88.08"/>
+<node id="106.09"/>
+<node id="288.29"/>
+<node id="289.29"/>
+<node id="motif_73"/>
+<node id="motif_74"/>
+<node id="599.5"/>
+<node id="motif_75"/>
+<node id="102.05"/>
+<node id="145.06"/>
+<node id="motif_76"/>
+<node id="191.14"/>
+<node id="motif_77"/>
+<node id="72.04"/>
+<node id="motif_78"/>
+<node id="119.05"/>
+<node id="motif_79"/>
+<node id="motif_80"/>
+<node id="212.08"/>
+<node id="motif_81"/>
+<node id="motif_82"/>
+<node id="81.04"/>
+<node id="motif_83"/>
+<node id="123.04"/>
+<node id="motif_84"/>
+<node id="motif_85"/>
+<node id="motif_86"/>
+<node id="137.06"/>
+<node id="motif_87"/>
+<node id="202.08"/>
+<node id="motif_88"/>
+<node id="motif_89"/>
+<node id="141.01"/>
+<node id="158.04"/>
+<node id="motif_90"/>
+<node id="275.2"/>
+<node id="454.37"/>
+<node id="motif_91"/>
+<node id="77.04"/>
+<node id="105.03"/>
+<node id="motif_92"/>
+<node id="72.08"/>
+<node id="motif_93"/>
+<node id="107.09"/>
+<node id="motif_94"/>
+<node id="motif_95"/>
+<node id="motif_96"/>
+<node id="69.07"/>
+<node id="97.1"/>
+<node id="motif_97"/>
+<node id="70.04"/>
+<node id="125.02"/>
+<node id="motif_98"/>
+<node id="177.05"/>
+<node id="motif_99"/>
+<node id="67.05"/>
+<node id="motif_100"/>
+<node id="335.26"/>
+<node id="337.27"/>
+<node id="motif_101"/>
+<node id="motif_102"/>
+<node id="135.12"/>
+<node id="motif_103"/>
+<node id="motif_104"/>
+<node id="motif_105"/>
+<node id="motif_106"/>
+<node id="motif_107"/>
+<node id="motif_108"/>
+<node id="motif_109"/>
+<node id="motif_110"/>
+<node id="158.1"/>
+<node id="motif_111"/>
+<node id="199.08"/>
+<node id="motif_112"/>
+<node id="98.1"/>
+<node id="116.11"/>
+<node id="motif_113"/>
+<node id="motif_114"/>
+<node id="89.04"/>
+<node id="motif_115"/>
+<node id="166.09"/>
+<node id="motif_116"/>
+<node id="motif_117"/>
+<node id="337.12"/>
+<node id="motif_118"/>
+<node id="275.15"/>
+<node id="motif_119"/>
+<node id="motif_120"/>
+<node id="175.04"/>
+<node id="motif_121"/>
+<node id="motif_122"/>
+<node id="301.13"/>
+<node id="motif_123"/>
+<node id="motif_124"/>
+<node id="457.21"/>
+<node id="motif_125"/>
+<node id="motif_126"/>
+<node id="motif_127"/>
+<node id="motif_128"/>
+<node id="130.06"/>
+<node id="motif_129"/>
+<node id="motif_130"/>
+<node id="81.07"/>
+<node id="motif_131"/>
+<node id="98.06"/>
+<node id="108.01"/>
+<node id="140.11"/>
+<node id="166.1"/>
+<node id="210.16"/>
+<node id="motif_132"/>
+<node id="185.04"/>
+<node id="motif_133"/>
+<node id="152.07"/>
+<node id="153.07"/>
+<node id="motif_134"/>
+<node id="117.06"/>
+<node id="118.06"/>
+<node id="146.06"/>
+<node id="motif_135"/>
+<node id="142.12"/>
+<node id="motif_136"/>
+<node id="120.08"/>
+<node id="motif_137"/>
+<node id="motif_138"/>
+<node id="motif_139"/>
+<node id="69.03"/>
+<node id="motif_140"/>
+<node id="165.05"/>
+<node id="motif_141"/>
+<node id="motif_142"/>
+<node id="155.09"/>
+<node id="motif_143"/>
+<node id="152.06"/>
+<node id="motif_144"/>
+<node id="motif_145"/>
+<node id="motif_146"/>
+<node id="303.05"/>
+<node id="motif_147"/>
+<node id="101.06"/>
+<node id="129.05"/>
+<node id="motif_148"/>
+<node id="160.08"/>
+<node id="motif_149"/>
+<node id="motif_150"/>
+<node id="motif_151"/>
+<node id="109.1"/>
+<node id="motif_152"/>
+<node id="motif_153"/>
+<node id="317.1"/>
+<node id="motif_154"/>
+<node id="121.1"/>
+<node id="motif_155"/>
+<node id="motif_156"/>
+<node id="motif_157"/>
+<node id="85.03"/>
+<node id="97.03"/>
+<node id="motif_158"/>
+<node id="123.12"/>
+<node id="137.13"/>
+<node id="motif_159"/>
+<node id="177.06"/>
+<node id="motif_160"/>
+<node id="motif_161"/>
+<node id="203.08"/>
+<node id="motif_162"/>
+<node id="165.09"/>
+<node id="motif_163"/>
+<node id="69.0"/>
+<node id="157.05"/>
+<node id="motif_164"/>
+<node id="motif_165"/>
+<node id="87.04"/>
+<node id="89.06"/>
+<node id="177.11"/>
+<node id="motif_166"/>
+<node id="motif_167"/>
+<node id="motif_168"/>
+<node id="114.96"/>
+<node id="motif_169"/>
+<node id="53.04"/>
+<node id="81.03"/>
+<node id="motif_170"/>
+<node id="193.1"/>
+<node id="motif_171"/>
+<node id="motif_172"/>
+<node id="84.08"/>
+<node id="motif_173"/>
+<node id="motif_174"/>
+<node id="167.07"/>
+<node id="motif_175"/>
+<node id="113.0"/>
+<node id="motif_176"/>
+<node id="68.02"/>
+<node id="71.06"/>
+<node id="96.06"/>
+<node id="186.08"/>
+<node id="motif_177"/>
+<node id="121.06"/>
+<node id="motif_178"/>
+<node id="motif_179"/>
+<node id="147.12"/>
+<node id="motif_180"/>
+<node id="85.1"/>
+<node id="motif_181"/>
+<node id="135.08"/>
+<node id="motif_182"/>
+<node id="motif_183"/>
+<node id="177.13"/>
+<node id="motif_184"/>
+<node id="316.32"/>
+<node id="motif_185"/>
+<node id="159.07"/>
+<node id="motif_186"/>
+<node id="149.06"/>
+<node id="motif_187"/>
+<node id="motif_188"/>
+<node id="motif_189"/>
+<node id="motif_190"/>
+<node id="219.06"/>
+<node id="279.09"/>
+<node id="motif_191"/>
+<node id="132.09"/>
+<node id="motif_192"/>
+<node id="80.05"/>
+<node id="92.05"/>
+<node id="108.04"/>
+<node id="motif_193"/>
+<node id="motif_194"/>
+<node id="149.1"/>
+<node id="motif_195"/>
+<node id="156.08"/>
+<node id="motif_196"/>
+<node id="motif_197"/>
+<node id="motif_198"/>
+<node id="57.07"/>
+<node id="111.12"/>
+<node id="motif_199"/>
+<node id="motif_200"/>
+<node id="169.06"/>
+<node id="176.06"/>
+<node id="177.07"/>
+<node id="203.07"/>
+<node id="204.08"/>
+<node id="232.08"/>
+<node id="motif_201"/>
+<node id="163.04"/>
+<node id="motif_202"/>
+<node id="107.06"/>
+<node id="124.09"/>
+<node id="125.07"/>
+<node id="motif_203"/>
+<node id="123.01"/>
+<node id="motif_204"/>
+<node id="60.04"/>
+<node id="motif_205"/>
+<node id="motif_206"/>
+<node id="74.02"/>
+<node id="102.06"/>
+<node id="motif_207"/>
+<node id="133.06"/>
+<node id="motif_208"/>
+<node id="motif_209"/>
+<node id="131.97"/>
+<node id="181.05"/>
+<node id="210.06"/>
+<node id="211.06"/>
+<node id="motif_210"/>
+<node id="motif_211"/>
+<node id="motif_212"/>
+<node id="58.06"/>
+<node id="motif_213"/>
+<node id="motif_214"/>
+<node id="motif_215"/>
+<node id="motif_216"/>
+<node id="motif_217"/>
+<node id="130.0"/>
+<node id="motif_218"/>
+<node id="motif_219"/>
+<node id="247.13"/>
+<node id="motif_220"/>
+<node id="motif_221"/>
+<node id="186.05"/>
+<node id="motif_222"/>
+<node id="137.03"/>
+<node id="motif_223"/>
+<node id="motif_224"/>
+<node id="motif_225"/>
+<node id="158.98"/>
+<node id="motif_226"/>
+<node id="motif_227"/>
+<node id="motif_228"/>
+<node id="motif_229"/>
+<node id="motif_230"/>
+<node id="189.13"/>
+<node id="motif_231"/>
+<node id="motif_232"/>
+<node id="145.05"/>
+<node id="motif_233"/>
+<node id="151.11"/>
+<node id="motif_234"/>
+<node id="174.09"/>
+<node id="motif_235"/>
+<node id="83.02"/>
+<node id="139.05"/>
+<node id="157.06"/>
+<node id="182.06"/>
+<node id="motif_236"/>
+<node id="166.08"/>
+<node id="motif_237"/>
+<node id="motif_238"/>
+<node id="motif_239"/>
+<node id="motif_240"/>
+<node id="motif_241"/>
+<node id="160.07"/>
+<node id="motif_242"/>
+<node id="motif_243"/>
+<node id="140.05"/>
+<node id="141.06"/>
+<node id="149.01"/>
+<node id="204.02"/>
+<node id="206.02"/>
+<node id="222.03"/>
+<node id="motif_244"/>
+<node id="motif_245"/>
+<node id="134.1"/>
+<node id="motif_246"/>
+<node id="motif_247"/>
+<node id="motif_248"/>
+<edge source="motif_2" target="95.05">
+  <data key="d0">0.3377876679284577</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_2" target="103.05">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="95.05" target="motif_7">
+  <data key="d0">0.16666737806893467</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="95.05" target="motif_37">
+  <data key="d0">0.8454681050186774</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="95.05" target="motif_70">
+  <data key="d0">0.940115386723397</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="95.05" target="motif_91">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="95.05" target="motif_121">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="95.05" target="motif_227">
+  <data key="d0">0.6693630971684964</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_3" target="147.04">
+  <data key="d0">0.1672080093771749</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_3" target="153.02">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="147.04" target="motif_78">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_5" target="136.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="136.06" target="motif_244">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_6" target="78.99">
+  <data key="d0">0.24070051967464487</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_6" target="127.02">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_6" target="142.99">
+  <data key="d0">0.8838011676821756</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="142.99" target="motif_49">
+  <data key="d0">0.2320494943286219</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="142.99" target="motif_226">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_7" target="79.05">
+  <data key="d0">0.33095174095092666</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_7" target="91.05">
+  <data key="d0">0.6935513974640224</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_7" target="93.07">
+  <data key="d0">0.18487393149203454</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_7" target="105.07">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_7" target="133.1">
+  <data key="d0">0.5133575443590324</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="79.05" target="motif_126">
+  <data key="d0">0.2589838479168234</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="79.05" target="motif_130">
+  <data key="d0">0.37639490549828786</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="79.05" target="motif_154">
+  <data key="d0">0.8340724375820486</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="79.05" target="motif_227">
+  <data key="d0">0.5693635247091321</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="91.05" target="motif_8">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="91.05" target="motif_13">
+  <data key="d0">0.20481356657969707</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="91.05" target="motif_68">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="91.05" target="motif_70">
+  <data key="d0">0.2748213779217617</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="91.05" target="motif_121">
+  <data key="d0">0.9317275955877715</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="91.05" target="motif_227">
+  <data key="d0">0.7953199976877178</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="93.07" target="motif_130">
+  <data key="d0">0.44079309250635157</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="93.07" target="motif_154">
+  <data key="d0">0.8711649973495659</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="93.07" target="motif_177">
+  <data key="d0">0.14547028682852414</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="93.07" target="motif_210">
+  <data key="d0">0.30337731452903377</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="105.07" target="motif_8">
+  <data key="d0">0.8732414534602975</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="105.07" target="motif_51">
+  <data key="d0">0.1631931574575301</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="105.07" target="motif_130">
+  <data key="d0">0.17935568709425265</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="105.07" target="motif_179">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="105.07" target="motif_223">
+  <data key="d0">0.10820960884625952</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="105.07" target="motif_245">
+  <data key="d0">0.3106514356219294</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="105.07" target="motif_246">
+  <data key="d0">0.3537405563176427</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="133.1" target="motif_36">
+  <data key="d0">0.426782129680537</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="133.1" target="motif_64">
+  <data key="d0">0.684033303864059</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_8" target="145.1">
+  <data key="d0">0.9217540183785221</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_9" target="333.2">
+  <data key="d0">0.42328158704634566</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_10" target="68.05">
+  <data key="d0">0.0676408626360868</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_10" target="95.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_10" target="112.09">
+  <data key="d0">0.4075062199219755</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="95.06" target="motif_73">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="95.06" target="motif_202">
+  <data key="d0">0.20447506844885133</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="112.09" target="motif_73">
+  <data key="d0">0.30485780906598803</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_12" target="145.03">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="145.03" target="motif_98">
+  <data key="d0">0.2840881013049185</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="145.03" target="motif_159">
+  <data key="d0">0.39600352713195613</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_13" target="115.05">
+  <data key="d0">0.37212813981229476</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_13" target="117.07">
+  <data key="d0">0.3013820073792544</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_13" target="143.07">
+  <data key="d0">0.21401056249288175</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_13" target="144.08">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="115.05" target="motif_75">
+  <data key="d0">0.9868688580041601</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="115.05" target="motif_134">
+  <data key="d0">0.39039403394430533</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="115.05" target="motif_143">
+  <data key="d0">0.5891947792584766</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="115.05" target="motif_148">
+  <data key="d0">0.3979966813962614</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="115.05" target="motif_185">
+  <data key="d0">0.1630159623394612</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="117.07" target="motif_75">
+  <data key="d0">0.39394555481643045</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="117.07" target="motif_214">
+  <data key="d0">0.589559904366223</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="143.07" target="motif_110">
+  <data key="d0">0.6962509680846881</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="144.08" target="motif_79">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_14" target="213.16">
+  <data key="d0">0.23464158698971027</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_15" target="282.28">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_15" target="283.28">
+  <data key="d0">0.5058868502591528</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="282.28" target="motif_188">
+  <data key="d0">0.6599383590068985</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_16" target="132.08">
+  <data key="d0">0.40926471452917745</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_16" target="133.09">
+  <data key="d0">0.5518560013345871</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_16" target="148.11">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="132.08" target="motif_148">
+  <data key="d0">0.24359397011437317</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="132.08" target="motif_223">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="133.09" target="motif_165">
+  <data key="d0">0.18568192961936733</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="133.09" target="motif_223">
+  <data key="d0">0.4413911349463641</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_20" target="86.1">
+  <data key="d0">0.703152626087148</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_20" target="98.98">
+  <data key="d0">0.026326591340625496</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_20" target="104.11">
+  <data key="d0">0.4835478491974124</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_20" target="125.0">
+  <data key="d0">0.045031101358860494</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_20" target="184.07">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="98.98" target="motif_105">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="98.98" target="motif_149">
+  <data key="d0">0.5393322963328501</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="98.98" target="motif_196">
+  <data key="d0">0.48335051393520023</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="104.11" target="motif_42">
+  <data key="d0">0.7267604573220753</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="104.11" target="motif_103">
+  <data key="d0">0.23934549877753192</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="125.0" target="motif_81">
+  <data key="d0">0.353507096028423</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_21" target="161.13">
+  <data key="d0">0.3651702626215911</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_21" target="255.21">
+  <data key="d0">0.7183837995269987</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="161.13" target="motif_60">
+  <data key="d0">0.5875919372352322</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="161.13" target="motif_108">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="161.13" target="motif_229">
+  <data key="d0">0.3142123395837192</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="161.13" target="motif_231">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="255.21" target="motif_182">
+  <data key="d0">0.23937180222260365</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_23" target="100.11">
+  <data key="d0">0.2022396837180524</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_23" target="144.14">
+  <data key="d0">0.2048846351266075</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_24" target="184.05">
+  <data key="d0">0.5192422728463189</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_25" target="120.09">
+  <data key="d0">0.3785258905785647</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_27" target="55.05">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="55.05" target="motif_41">
+  <data key="d0">0.958969820717837</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="55.05" target="motif_57">
+  <data key="d0">0.6310258668727867</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="55.05" target="motif_70">
+  <data key="d0">0.7325699230176232</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="55.05" target="motif_71">
+  <data key="d0">0.5288825296261155</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="55.05" target="motif_92">
+  <data key="d0">0.21705432457177712</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="55.05" target="motif_96">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="55.05" target="motif_129">
+  <data key="d0">0.5490076114392439</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="55.05" target="motif_156">
+  <data key="d0">0.6707416793303218</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_31" target="177.03">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_32" target="107.05">
+  <data key="d0">0.3200968542191266</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_32" target="135.04">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="107.05" target="motif_88">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="107.05" target="motif_123">
+  <data key="d0">0.2450228703706141</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="135.04" target="motif_201">
+  <data key="d0">0.17387193221045347</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_33" target="173.13">
+  <data key="d0">0.3050926126879343</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_34" target="65.04">
+  <data key="d0">0.8748451504347142</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_34" target="111.04">
+  <data key="d0">0.49751247187076975</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="65.04" target="motif_53">
+  <data key="d0">0.36770204057226014</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="65.04" target="motif_192">
+  <data key="d0">0.6013244838007562</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="111.04" target="motif_147">
+  <data key="d0">0.33753972560189077</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="111.04" target="motif_163">
+  <data key="d0">0.7724751232196234</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_35" target="119.09">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_38" target="297.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_39" target="59.05">
+  <data key="d0">0.37106921344678745</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_40" target="291.2">
+  <data key="d0">0.33114795487570275</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="291.2" target="motif_197">
+  <data key="d0">0.8166697713522636</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_42" target="60.08">
+  <data key="d0">0.6855320233256933</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_43" target="313.27">
+  <data key="d0">0.9162942406094566</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="313.27" target="motif_90">
+  <data key="d0">0.16636629356743868</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="313.27" target="motif_150">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_45" target="146.1">
+  <data key="d0">0.33486705163126523</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_46" target="165.07">
+  <data key="d0">0.1902005973720778</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="165.07" target="motif_236">
+  <data key="d0">0.5490759182945972</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_48" target="159.12">
+  <data key="d0">0.0706594356717577</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_49" target="112.02">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_50" target="111.08">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_52" target="184.08">
+  <data key="d0">0.08634940322383683</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="184.08" target="motif_218">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_54" target="123.08">
+  <data key="d0">0.24569777914297047</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="123.08" target="motif_66">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_55" target="128.06">
+  <data key="d0">0.8333366005299291</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_55" target="171.08">
+  <data key="d0">0.6190551635004724</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="128.06" target="motif_143">
+  <data key="d0">0.725679387811437</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_56" target="536.26">
+  <data key="d0">0.5539696426845117</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_58" target="105.04">
+  <data key="d0">0.742146447241188</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="105.04" target="motif_91">
+  <data key="d0">0.056727621154656016</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="105.04" target="motif_237">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_62" target="178.08">
+  <data key="d0">0.597945075905369</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_62" target="207.08">
+  <data key="d0">0.4484631146339367</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="178.08" target="motif_200">
+  <data key="d0">0.1655563275066554</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_63" target="161.1">
+  <data key="d0">0.4318310573094315</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_65" target="116.05">
+  <data key="d0">0.10899668278135737</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_65" target="131.07">
+  <data key="d0">0.17166665493728134</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_67" target="62.06">
+  <data key="d0">0.8830443489900984</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_69" target="73.05">
+  <data key="d0">0.2441842848124377</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_69" target="91.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_69" target="167.06">
+  <data key="d0">0.4202924296063151</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_69" target="225.04">
+  <data key="d0">0.3627608234428678</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_69" target="299.06">
+  <data key="d0">0.27712220015966166</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_69" target="359.03">
+  <data key="d0">0.21563806801378066</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="167.06" target="motif_238">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="299.06" target="motif_145">
+  <data key="d0">0.42472151728447</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_70" target="83.05">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_72" target="88.08">
+  <data key="d0">0.8627187657360831</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_72" target="106.09">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_72" target="288.29">
+  <data key="d0">0.3265993194382496</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_72" target="289.29">
+  <data key="d0">0.7211022891143745</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="106.09" target="motif_184">
+  <data key="d0">0.7967389160349658</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_74" target="599.5">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_75" target="102.05">
+  <data key="d0">0.5242472664756038</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_75" target="145.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_76" target="191.14">
+  <data key="d0">0.3753505985055911</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_77" target="72.04">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_78" target="119.05">
+  <data key="d0">0.5442380625317287</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_80" target="212.08">
+  <data key="d0">0.33445926687484623</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_82" target="81.04">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="81.04" target="motif_202">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_83" target="123.04">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_86" target="137.06">
+  <data key="d0">0.6430878496686162</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_87" target="202.08">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="202.08" target="motif_152">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_89" target="141.01">
+  <data key="d0">0.8472930753726859</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_89" target="158.04">
+  <data key="d0">0.8325150168753758</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="141.01" target="motif_213">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_90" target="275.2">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_90" target="454.37">
+  <data key="d0">0.19409246704732225</data>
+  <data key="d1">blue</data>
+</edge>
+<edge source="motif_91" target="77.04">
+  <data key="d0">0.22681177867755503</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_91" target="105.03">
+  <data key="d0">0.26446985467377326</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="105.03" target="motif_200">
+  <data key="d0">0.179015088789193</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_92" target="72.08">
+  <data key="d0">0.572060031374325</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="72.08" target="motif_172">
+  <data key="d0">0.5981556047310728</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="72.08" target="motif_224">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_93" target="107.09">
+  <data key="d0">0.4482060470562262</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_96" target="69.07">
+  <data key="d0">0.38153488607481467</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_96" target="97.1">
+  <data key="d0">0.30278412710100755</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="69.07" target="motif_158">
+  <data key="d0">0.3581779291711076</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="69.07" target="motif_198">
+  <data key="d0">0.9281057362032095</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="97.1" target="motif_158">
+  <data key="d0">0.031245225078631172</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="97.1" target="motif_198">
+  <data key="d0">0.9607849616742049</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_97" target="70.04">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_97" target="125.02">
+  <data key="d0">0.5133414050499328</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="70.04" target="motif_225">
+  <data key="d0">0.21044390470049665</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_98" target="177.05">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_99" target="67.05">
+  <data key="d0">0.43881156372693136</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="67.05" target="motif_130">
+  <data key="d0">0.592273043565138</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="67.05" target="motif_151">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="67.05" target="motif_154">
+  <data key="d0">0.9872363145508941</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="67.05" target="motif_156">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="67.05" target="motif_158">
+  <data key="d0">0.36641515483669834</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_100" target="335.26">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_100" target="337.27">
+  <data key="d0">0.2622194740560363</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="335.26" target="motif_189">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="337.27" target="motif_189">
+  <data key="d0">0.615211014856636</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_102" target="135.12">
+  <data key="d0">0.6975937485951358</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="135.12" target="motif_210">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_110" target="158.1">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_111" target="199.08">
+  <data key="d0">0.33334443421443327</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_112" target="98.1">
+  <data key="d0">0.19253646488848364</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_112" target="116.11">
+  <data key="d0">0.4904263655566707</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_114" target="89.04">
+  <data key="d0">0.4158125197664078</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_115" target="166.09">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_117" target="337.12">
+  <data key="d0">0.9354846474926232</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_118" target="275.15">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_120" target="175.04">
+  <data key="d0">0.05979462996651111</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_122" target="301.13">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_124" target="457.21">
+  <data key="d0">0.3395677277571578</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_128" target="130.06">
+  <data key="d0">0.5620363759835648</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_130" target="81.07">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="81.07" target="motif_154">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="81.07" target="motif_158">
+  <data key="d0">0.6398911095990345</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_131" target="98.06">
+  <data key="d0">0.10483936092221392</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_131" target="108.01">
+  <data key="d0">0.4126437451700591</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_131" target="140.11">
+  <data key="d0">0.15688357697522812</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_131" target="166.1">
+  <data key="d0">0.22379759064162258</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_131" target="210.16">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_132" target="185.04">
+  <data key="d0">0.06884282976184178</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_133" target="152.07">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_133" target="153.07">
+  <data key="d0">0.11603149494001144</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_134" target="117.06">
+  <data key="d0">0.27081743587660784</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_134" target="118.06">
+  <data key="d0">0.9706920380917796</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_134" target="146.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="117.06" target="motif_148">
+  <data key="d0">0.19621407929833817</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="117.06" target="motif_223">
+  <data key="d0">0.4855748965136089</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_135" target="142.12">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_136" target="120.08">
+  <data key="d0">0.9431043944753992</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="120.08" target="motif_247">
+  <data key="d0">0.24650788899531714</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_139" target="69.03">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="69.03" target="motif_157">
+  <data key="d0">0.15871793893449868</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_140" target="165.05">
+  <data key="d0">0.9946997337310611</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_142" target="155.09">
+  <data key="d0">0.7939175966481887</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_143" target="152.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_146" target="303.05">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_147" target="101.06">
+  <data key="d0">0.45995086924490386</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_147" target="129.05">
+  <data key="d0">0.2313300428723279</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_148" target="160.08">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="160.08" target="motif_185">
+  <data key="d0">0.8793113434163264</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_151" target="109.1">
+  <data key="d0">0.38728832779748734</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="109.1" target="motif_158">
+  <data key="d0">0.7752656592616112</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="109.1" target="motif_242">
+  <data key="d0">0.6758116581686484</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_153" target="317.1">
+  <data key="d0">0.6464532913525091</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_154" target="121.1">
+  <data key="d0">0.24502682105593826</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_157" target="85.03">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_157" target="97.03">
+  <data key="d0">0.40910691971586477</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_158" target="123.12">
+  <data key="d0">0.14935002321205795</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_158" target="137.13">
+  <data key="d0">0.013577790812620467</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_159" target="177.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_161" target="203.08">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_162" target="165.09">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_163" target="69.0">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_163" target="157.05">
+  <data key="d0">0.8174182835125541</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_165" target="87.04">
+  <data key="d0">0.045546590806013774</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_165" target="89.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_165" target="177.11">
+  <data key="d0">0.013545423313341805</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="89.06" target="motif_215">
+  <data key="d0">0.4490537135580564</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_168" target="114.96">
+  <data key="d0">0.5557206623349996</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_169" target="53.04">
+  <data key="d0">0.3211547267347399</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_169" target="81.03">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_170" target="193.1">
+  <data key="d0">0.27402717793114967</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_172" target="84.08">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_174" target="167.07">
+  <data key="d0">0.5462891411758231</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_175" target="113.0">
+  <data key="d0">0.9642447080663563</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_176" target="68.02">
+  <data key="d0">0.3059170506169243</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_176" target="71.06">
+  <data key="d0">0.17159915912289667</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_176" target="96.06">
+  <data key="d0">0.3586159244188332</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_176" target="186.08">
+  <data key="d0">0.368255965382487</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_177" target="121.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_179" target="147.12">
+  <data key="d0">0.8387793463485504</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="147.12" target="motif_191">
+  <data key="d0">0.25772587105652756</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="147.12" target="motif_229">
+  <data key="d0">0.22404903560923403</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_180" target="85.1">
+  <data key="d0">0.7780959691038628</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_181" target="135.08">
+  <data key="d0">0.5818514653676475</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_183" target="177.13">
+  <data key="d0">0.19084742024519777</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_184" target="316.32">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_185" target="159.07">
+  <data key="d0">0.35502074254991023</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_186" target="149.06">
+  <data key="d0">0.8395552773935422</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_190" target="219.06">
+  <data key="d0">0.5245156187125983</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_190" target="279.09">
+  <data key="d0">0.6176517221225953</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_191" target="132.09">
+  <data key="d0">0.09682297178532874</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_192" target="80.05">
+  <data key="d0">0.4566853552165678</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_192" target="92.05">
+  <data key="d0">0.8311319070822721</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_192" target="108.04">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_194" target="149.1">
+  <data key="d0">0.4613476455906931</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_195" target="156.08">
+  <data key="d0">0.4967270314140242</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_198" target="57.07">
+  <data key="d0">0.7826832352463038</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_198" target="111.12">
+  <data key="d0">0.5196156999105115</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="57.07" target="motif_248">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_200" target="169.06">
+  <data key="d0">0.15882693160809586</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_200" target="176.06">
+  <data key="d0">0.6339215100274882</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_200" target="177.07">
+  <data key="d0">0.17228569289063347</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_200" target="203.07">
+  <data key="d0">0.6258462532579656</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_200" target="204.08">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_200" target="232.08">
+  <data key="d0">0.9380896981003269</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_201" target="163.04">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_202" target="107.06">
+  <data key="d0">0.22310563308105452</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_202" target="124.09">
+  <data key="d0">0.29250446087259313</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_202" target="125.07">
+  <data key="d0">0.37121860280950625</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_203" target="123.01">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_204" target="60.04">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_206" target="74.02">
+  <data key="d0">0.22551842124847085</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_206" target="102.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_207" target="133.06">
+  <data key="d0">0.24836269908028033</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_209" target="131.97">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_209" target="181.05">
+  <data key="d0">0.3623685054635485</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_209" target="210.06">
+  <data key="d0">0.20085390579611187</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_209" target="211.06">
+  <data key="d0">0.9747194668823244</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_212" target="58.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_217" target="130.0">
+  <data key="d0">0.9258641319797754</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="130.0" target="motif_228">
+  <data key="d0">0.6511011539264211</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_219" target="247.13">
+  <data key="d0">0.7533415232850894</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_221" target="186.05">
+  <data key="d0">0.49858264650940604</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_222" target="137.03">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_225" target="158.98">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_230" target="189.13">
+  <data key="d0">0.26394737876707525</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_232" target="145.05">
+  <data key="d0">0.1765844305262024</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_233" target="151.11">
+  <data key="d0">0.6506959159867411</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_234" target="174.09">
+  <data key="d0">0.5685776042029531</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_235" target="83.02">
+  <data key="d0">0.45261363975106506</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_235" target="139.05">
+  <data key="d0">0.11882472640206446</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_235" target="157.06">
+  <data key="d0">0.10028089577892012</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_235" target="182.06">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_236" target="166.08">
+  <data key="d0">0.2757178465478612</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_241" target="160.07">
+  <data key="d0">1.0</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_243" target="140.05">
+  <data key="d0">0.4131630412527623</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_243" target="141.06">
+  <data key="d0">0.5473724154604174</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_243" target="149.01">
+  <data key="d0">0.2833396292516384</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_243" target="204.02">
+  <data key="d0">0.9377198987416183</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_243" target="206.02">
+  <data key="d0">0.259655632118766</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_243" target="222.03">
+  <data key="d0">0.3982508999872985</data>
+  <data key="d1">red</data>
+</edge>
+<edge source="motif_245" target="134.1">
+  <data key="d0">0.5378729836356061</data>
+  <data key="d1">red</data>
+</edge>
+</graph></graphml>

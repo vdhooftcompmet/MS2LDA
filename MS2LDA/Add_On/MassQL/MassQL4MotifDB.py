@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import json
 
-from matchms import Spectrum, Fragments
+#from matchms import Spectrum, Fragments
 
 def motifs2motifDB(spectra):
     """converts a set of motif spectra into a MassQL dataframe format
@@ -32,22 +32,21 @@ def motifs2motifDB(spectra):
         feature_dict["ms2accuracy"] = spectrum.get("ms2accuracy")
         feature_dict["short_annotation"] = spectrum.get("short_annotation") 
         feature_dict["annotation"] = spectrum.get("annotation")
-        feature_dict["Auto_annotation"] = spectrum.get("Auto_annotation")
+        feature_dict["auto_annotation"] = spectrum.get("auto_annotation")
         feature_dict["motif_id"] = spectrum.get("id")
         feature_dict["motifset"] = spectrum.get("motifset")
-        feature_dict["Analysis_MassSpectrometer"] = spectrum.get("Analysis_MassSpectrometer")
-        feature_dict["Collision_Energy"] = spectrum.get("Collision_Energy")
-        feature_dict["Other_Information"] = spectrum.get("Other_Information")
-        feature_dict["Scientific_Name"] = spectrum.get("Scientific_Name")
-        feature_dict["Sample_Type"] = spectrum.get("Sample_Type")
-        feature_dict["Massive_ID"] = spectrum.get("Massive_ID")
-        feature_dict["Taxon_ID"] = spectrum.get("Taxon_ID")
-        feature_dict["Analysis_IonizationSource"] = spectrum.get("Analysis_IonizationSource")
-        feature_dict["Analysis_ChromatographyAndPhase"] = spectrum.get("Analysis_ChromatographyAndPhase")
-        feature_dict["Analysis_Polarity"] = spectrum.get("Analysis_Polarity")
-        feature_dict["Paper_URL"] = spectrum.get("Paper_URL")
-        feature_dict["Auto_annotation"] = spectrum.get("Auto_annotation")
-        feature_dict["Property"] = spectrum.get("Property")
+        feature_dict["analysis_massspectrometer"] = spectrum.get("analysis_massspectrometer")
+        feature_dict["collision_energy"] = spectrum.get("collision_energy")
+        feature_dict["other_information"] = spectrum.get("other_information")
+        feature_dict["scientific_name"] = spectrum.get("scientific_name")
+        feature_dict["sample_type"] = spectrum.get("sample_type")
+        feature_dict["massive_id"] = spectrum.get("massive_id")
+        feature_dict["taxon_id"] = spectrum.get("taxon_id")
+        feature_dict["analysis_ionizationsource"] = spectrum.get("analysis_ionizationsource")
+        feature_dict["analysis_chromatographyandphase"] = spectrum.get("analysis_chromatographyandphase")
+        feature_dict["analysis_polarity"] = spectrum.get("analysis_polarity")
+        feature_dict["paper_url"] = spectrum.get("paper_url")
+        feature_dict["property"] = spectrum.get("property")
       
         if spectrum.get("motifset"):
             string_to_hash = spectrum.get("id") + spectrum.get("motifset")
@@ -152,19 +151,19 @@ def motifDB2motifs(motifDB_ms2, filter_table=None):
         ms2accuracy = motif.ms2accuracy
         motifset = motif.motifset
         motif_id = motif.motif_id
-        Analysis_MassSpectrometer = motif.Analysis_MassSpectrometer
-        Collision_Energy = motif.Collision_Energy
-        Other_Information = motif.Other_Information
-        Scientific_Name = motif.Scientific_Name
-        Sample_Type = motif.Sample_Type
-        Massive_ID = motif.Massive_ID
-        Taxon_ID = motif.Taxon_ID
-        Analysis_IonizationSource = motif.Analysis_IonizationSource
-        Analysis_ChromatographyAndPhase = motif.Analysis_ChromatographyAndPhase
-        Analysis_Polarity = motif.Analysis_Polarity
-        Paper_URL = motif.Paper_URL
-        Auto_annotation = motif.Auto_annotation
-        Property = motif.Property
+        analysis_massspectrometer = motif.analysis_massspectrometer
+        collision_energy = motif.collision_energy
+        other_information = motif.other_information
+        scientific_name = motif.scientific_name
+        sample_type = motif.sample_type
+        massive_id = motif.massive_id
+        taxon_id = motif.taxon_id
+        analysis_ionizationsource = motif.analysis_ionizationsource
+        analysis_chromatographyandphase = motif.analysis_chromatographyandphase
+        analysis_polarity = motif.analysis_polarity
+        paper_url = motif.paper_url
+        auto_annotation = motif.auto_annotation
+        property = motif.property
 
 
         motif_spectrum = Spectrum(
@@ -178,19 +177,19 @@ def motifDB2motifs(motifDB_ms2, filter_table=None):
                 "ms2accuracy": ms2accuracy,
                 "motifset": motifset,
                 "motif_id": motif_id,
-                "Analysis_MassSpectrometer": Analysis_MassSpectrometer,
-                "Collision_Energy": Collision_Energy,
-                "Other_Information": Other_Information,
-                "Scientific_Name": Scientific_Name,
-                "Sample_Type": Sample_Type,
-                "Massive_ID": Massive_ID,
-                "Taxon_ID": Taxon_ID,
-                "Analysis_IonizationSource": Analysis_IonizationSource,
-                "Analysis_ChromatographyAndPhase": Analysis_ChromatographyAndPhase,
-                "Analysis_Polarity": Analysis_Polarity,
-                "Paper_URL": Paper_URL,
-                "Auto_annotation": Auto_annotation,
-                "Property": Property,
+                "analysis_massspectrometer": analysis_massspectrometer,
+                "collision_energy": collision_energy,
+                "other_information": other_information,
+                "scientific_name": scientific_name,
+                "sample_type": sample_type,
+                "massive_id": massive_id,
+                "taxon_id": taxon_id,
+                "analysis_ionizationsource": analysis_ionizationsource,
+                "analysis_chromatographyandphase": analysis_chromatographyandphase,
+                "analysis_polarity": analysis_polarity,
+                "paper_url": paper_url,
+                "auto_annotation": auto_annotation,
+                "property": property,
             }
         )
 
@@ -219,19 +218,19 @@ def group_ms2(ms2_df):
         "motif_id": "first",
         "motifset": "first",
         "ms1scan": "first",
-        "Analysis_MassSpectrometer": "first",
-        "Collision_Energy": "first",
-        "Other_Information": "first",
-        "Scientific_Name": "first",
-        "Sample_Type": "first",
-        "Massive_ID": "first",
-        "Taxon_ID": "first",
-        "Analysis_IonizationSource": "first",
-        "Analysis_ChromatographyAndPhase": "first",
-        "Analysis_Polarity": "first",
-        "Paper_URL": "first",
-        "Auto_annotation": "first",
-        "Property": "first",
+        "analysis_massspectrometer": "first",
+        "collision_energy": "first",
+        "other_information": "first",
+        "scientific_name": "first",
+        "sample_type": "first",
+        "massive_id": "first",
+        "taxon_id": "first",
+        "analysis_ionizationsource": "first",
+        "analysis_chromatographyandphase": "first",
+        "analysis_polarity": "first",
+        "paper_url": "first",
+        "auto_annotation": "first",
+        "property": "first",
         }
         ).reset_index()
     
