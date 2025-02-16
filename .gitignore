@@ -156,5 +156,6 @@ deepmol.egg-info
 *.pkl
 *.dict
 *.mzML
+*viz.json
 *.bin
 *.ai
