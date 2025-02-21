@@ -159,3 +159,4 @@ deepmol.egg-info
 *viz.json
 *.bin
 *.ai
+*.graphml
