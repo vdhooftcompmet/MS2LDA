@@ -21,12 +21,13 @@ from rdkit import Chem
 from rdkit.Chem.Draw import MolsToGridImage
 
 import MS2LDA
-from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
+from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings
+from MS2LDA.Add_On.Spec2Vec.annotation_refined import calc_similarity
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
 from MS2LDA.motif_parser import load_m2m_folder
 from MS2LDA.run import filetype_check
-from MS2LDA.run import load_s2v
+from MS2LDA.run import load_s2v_model
 from app_instance import app
 
 # Hardcode the path for .m2m references
@@ -464,7 +465,7 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, e
             )
         else:
             spectrum.losses = None
-        spectra.append(spectrum)
+        spectra.append(spectrum) # needs to be a Mass2Motif object
 
     smiles_clusters = clustered_smiles_data
 
@@ -1607,7 +1608,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
 
     # load spec2vec
     print("loading s2v")
-    s2v_sim, _ = load_s2v()
+    s2v_sim = load_s2v_model()
     print("loaded s2v")
     progress_val = 60
 

@@ -368,7 +368,7 @@ def agglomerative_clustering(masked_spectra_similarity, cosine_similarity=0.6):
         cosine_distance = 1 - cosine_similarity
         cosine_distance_matrix = 1 - masked_spectra_similarity
         clustering = AgglomerativeClustering(
-            distance_threshold=cosine_distance,  
+            distance_threshold=cosine_distance,
             n_clusters= None,
             linkage="complete",
         )

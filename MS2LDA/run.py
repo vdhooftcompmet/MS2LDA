@@ -94,13 +94,14 @@ def run(dataset, n_motifs, n_iterations,
     store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, doc2spec_map, dataset_parameters["output_folder"])
 
     # Save additional viz data
-    save_visualization_data(
-        trained_ms2lda,
-        cleaned_spectra,
-        optimized_motifs,
-        doc2spec_map,
-        dataset_parameters["output_folder"]
-    )
+    if n_motifs < 500:
+        save_visualization_data(
+            trained_ms2lda,
+            cleaned_spectra,
+            optimized_motifs,
+            doc2spec_map,
+            dataset_parameters["output_folder"]
+        )
 
     return motif_spectra, optimized_motifs, motif_fps
 
