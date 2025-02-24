@@ -719,72 +719,58 @@ def display_node_data_on_click(tap_node_data, clustered_smiles_data):
 
 # -------------------------------- RANKINGS & DETAILS --------------------------------
 
-def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
+def compute_motif_degrees(lda_dict, p_low, p_high, o_low, o_high):
     motifs = lda_dict["beta"].keys()
     motif_degrees = {m: 0 for m in motifs}
     motif_probabilities = {m: [] for m in motifs}
     motif_overlap_scores = {m: [] for m in motifs}
     docs = lda_dict["theta"].keys()
 
+    # For each document, check if the motif's doc-topic prob p
+    # is within [p_low, p_high], and overlap is within [o_low, o_high].
     for doc in docs:
         for motif, p in lda_dict["theta"][doc].items():
-            if p >= p_thresh:
+            if p_low <= p <= p_high:
                 o = lda_dict["overlap_scores"][doc].get(motif, 0.0)
-                if o >= o_thresh:
+                if o_low <= o <= o_high:
                     motif_degrees[motif] += 1
                     motif_probabilities[motif].append(p)
                     motif_overlap_scores[motif].append(o)
 
     md = []
     for motif in motifs:
-        avg_probability = np.mean(motif_probabilities[motif]) if motif_probabilities[motif] else 0
-        avg_overlap = np.mean(motif_overlap_scores[motif]) if motif_overlap_scores[motif] else 0
+        if motif_probabilities[motif]:
+            avg_probability = np.mean(motif_probabilities[motif])
+            avg_overlap = np.mean(motif_overlap_scores[motif])
+        else:
+            avg_probability = 0
+            avg_overlap = 0
+
         md.append((motif, motif_degrees[motif], avg_probability, avg_overlap))
+
     md.sort(key=lambda x: x[1], reverse=True)
     return md
 
 
 @app.callback(
-    Output("motif-rankings-state", "data"),
-    [
-        Input("motif-rankings-table", "page_current"),
-        Input("motif-rankings-table", "sort_by"),
-        Input("motif-rankings-table", "filter_query"),
-    ],
-    [
-        State("tabs", "value"),
-        State("lda-dict-store", "data"),
-    ],
-    prevent_initial_call=True,
-)
-def store_motif_ranking_table_state(page_current, sort_by, filter_query, current_tab, lda_dict_data):
-    if current_tab not in ["motif-rankings-tab", "motif-details-tab"] or not lda_dict_data:
-        return None
-    return {
-        "page_current": page_current,
-        "sort_by": sort_by,
-        "filter_query": filter_query,
-    }
-
-@app.callback(
     Output('motif-rankings-table-container', 'children'),
+    Output('motif-rankings-count', 'children'),
     Input('lda-dict-store', 'data'),
     Input('probability-thresh', 'value'),
     Input('overlap-thresh', 'value'),
     Input('tabs', 'value'),
     State('screening-fullresults-store', 'data'),
     State('optimized-motifs-store', 'data'),
-    State('motif-rankings-state', 'data'),
 )
 def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thresh, active_tab,
-                                screening_data, optimized_motifs_data, ranking_state):
+                                screening_data, optimized_motifs_data):
     if active_tab != 'motif-rankings-tab' or not lda_dict_data:
-        return ""
+        return "", ""
 
-    p_thresh = probability_thresh[0] if isinstance(probability_thresh, list) else probability_thresh
-    o_thresh = overlap_thresh[0] if isinstance(overlap_thresh, list) else overlap_thresh
+    p_low, p_high = probability_thresh
+    o_low, o_high = overlap_thresh
 
-    motif_degree_list = compute_motif_degrees(lda_dict_data, p_thresh, o_thresh)
+    motif_degree_list = compute_motif_degrees(lda_dict_data, p_low, p_high, o_low, o_high)
     df = pd.DataFrame(motif_degree_list, columns=[
         'Motif',
         'Degree',
@@ -820,8 +806,6 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
                 short_anno_str = ", ".join(short_anno)
             elif isinstance(short_anno, str):
                 short_anno_str = short_anno
-            else:
-                short_anno_str = ""
 
         # combine them
         if existing_lda_anno and short_anno_str:
@@ -849,8 +833,7 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
                     # Collect up to 3 references in the format: "ref_motifset|ref_motif_id(score)"
                     top3 = hits_for_motif.head(3)
                     combined = []
-                    for i, row in top3.iterrows():
-                        # add motifset + motif_id + score
+                    for _, row in top3.iterrows():
                         combined.append(f"{row['ref_motifset']}|{row['ref_motif_id']}({row['score']:.2f})")
                     screening_hits.append("; ".join(combined))
         except Exception:
@@ -858,8 +841,10 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
             screening_hits = ["" for _ in range(len(df))]
     else:
         screening_hits = ["" for _ in range(len(df))]
-
     df['ScreeningHits'] = screening_hits
+
+    # Filter out motifs that have no docs passing, i.e. degree=0
+    df = df[df['Degree'] > 0].copy()
 
     style_data_conditional = [
         {
@@ -870,60 +855,37 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
         },
     ]
 
-    if ranking_state and active_tab in ["motif-rankings-tab", "motif-details-tab"]:
-        stored_page = ranking_state.get("page_current", 0)
-        stored_sort_by = ranking_state.get("sort_by", [])
-        stored_filter_query = ranking_state.get("filter_query", "")
-    else:
-        stored_page = 0
-        stored_sort_by = []
-        stored_filter_query = ""
-
     table = dash_table.DataTable(
         id='motif-rankings-table',
         data=df.to_dict('records'),
         columns=[
             {'name': 'Motif', 'id': 'Motif'},
             {'name': 'Degree', 'id': 'Degree', 'type': 'numeric'},
-            {'name': 'Average Doc-Topic Probability', 'id': 'Average Doc-Topic Probability', 'type': 'numeric',
-             'format': {'specifier': '.4f'}},
+            {'name': 'Average Doc-Topic Probability', 'id': 'Average Doc-Topic Probability',
+             'type': 'numeric', 'format': {'specifier': '.4f'}},
             {'name': 'Average Overlap Score', 'id': 'Average Overlap Score', 'type': 'numeric',
              'format': {'specifier': '.4f'}},
             {'name': 'Annotation', 'id': 'Annotation'},
             {'name': 'ScreeningHits', 'id': 'ScreeningHits'},
         ],
-
-        # We keep sort/filter/pagination
         sort_action='native',
         filter_action='native',
         page_size=20,
-
-        # If you want to store pagination, sort, filter state while the table is in memory
-        persistence=True,
-        persistence_type='memory',
-        persisted_props=["page_current", "sort_by", "filter_query"],
-
         style_table={'overflowX': 'auto'},
         style_cell={
             'minWidth': '150px', 'width': '200px', 'maxWidth': '400px',
             'whiteSpace': 'normal',
             'textAlign': 'left',
         },
-        style_data_conditional=[
-            {
-                'if': {'column_id': 'Motif'},
-                'cursor': 'pointer',
-                'textDecoration': 'underline',
-                'color': 'blue',
-            },
-        ],
+        style_data_conditional=style_data_conditional,
         style_header={
             'backgroundColor': 'rgb(230, 230, 230)',
             'fontWeight': 'bold'
         },
     )
 
-    return table
+    row_count_message = f"{len(df)} motif(s) pass the filter"
+    return table, row_count_message
 
 
 @app.callback(
@@ -1756,6 +1718,7 @@ def save_screening_results(csv_click, json_click, table_data):
     else:
         raise dash.exceptions.PreventUpdate
 
+
 @app.callback(
     Output("selected-motif-store", "data"),
     [
@@ -1763,41 +1726,29 @@ def save_screening_results(csv_click, json_click, table_data):
         Input("screening-results-table", "active_cell"),
     ],
     [
-        # Use derived_viewport_data and derived_viewport_indices
-        State("motif-rankings-table", "derived_viewport_data"),
-        State("motif-rankings-table", "derived_viewport_indices"),
+        State("motif-rankings-table", "data"),
         State("screening-results-table", "data"),
     ],
     prevent_initial_call=True,
 )
-def on_motif_click(
-    ranking_active_cell, screening_active_cell,
-    ranking_viewport_data, ranking_viewport_indices,
-    screening_data
-):
-    if not dash.callback_context.triggered:
-        raise PreventUpdate
+def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, screening_data):
+    # Check if anything actually triggered
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise dash.exceptions.PreventUpdate
 
-    triggered_id = dash.callback_context.triggered[0]["prop_id"].split(".")[0]
-
-    # If user clicked a row in the "motif-rankings-table"...
+    # If user clicked a motif in the Motif Rankings table
+    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
     if triggered_id == "motif-rankings-table":
-        if ranking_active_cell and ranking_viewport_data:
+        if ranking_active_cell and ranking_data:
             col_id = ranking_active_cell["column_id"]
-            row_in_viewport = ranking_active_cell["row"]
-
-            # Only proceed if they clicked the "Motif" column
+            row_id = ranking_active_cell["row"]
             if col_id == "Motif":
-                # row_in_viewport is the index of the row *on this page*
-                # derived_viewport_data is the entire subset of data for the *current page*
-                # so we can directly do:
-                row_data = ranking_viewport_data[row_in_viewport]
-                motif_name = row_data["Motif"]
-                return motif_name
+                motif = ranking_data[row_id]["Motif"]
+                return motif
+        raise dash.exceptions.PreventUpdate
 
-        raise PreventUpdate
-
-    # If user clicked in screening table...
+    # If user clicked a motif in the Screening table
     elif triggered_id == "screening-results-table":
         if screening_active_cell and screening_data:
             col_id = screening_active_cell["column_id"]
@@ -1805,7 +1756,7 @@ def on_motif_click(
             if col_id == "user_motif_id":
                 motif_id = screening_data[row_id]["user_motif_id"]
                 return motif_id
-        raise PreventUpdate
+        raise dash.exceptions.PreventUpdate
 
     else:
-        raise PreventUpdate
+        raise dash.exceptions.PreventUpdate
