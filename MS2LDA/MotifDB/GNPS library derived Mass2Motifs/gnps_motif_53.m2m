@@ -1,9 +1,0 @@
-#MS2ACCURACY 0.005
-#MOTIFSET GNPS_library_derived_Mass2Motifs
-#CHARGE 1
-#NAME gnps_motif_53
-#ANNOTATION Imidazole group linked to a carboxylgroup through one CH2 group i.e. like in imidazole acetic acid
-#SHORT_ANNOTATION Imidazole group linked to a carboxylgroup through one CH2 group i.e. like in imidazole acetic acid
-#COMMENT Derived from gnps_binned_005 ms2lda experiment id=191
-fragment_83.0625,0.856463878326996
-fragment_56.0475,0.143536121673004
