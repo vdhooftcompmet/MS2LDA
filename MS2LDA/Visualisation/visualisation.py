@@ -354,9 +354,10 @@ def show_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, sa
 
         # Bottom subplot: motif vs. optimized motif
         ax_bot = fig.add_subplot(2, 1, 2)
-        ax_bot.stem(mass_to_charge, intensities,
-                    basefmt="k-", markerfmt="", linefmt="black",
-                    label=f"motif_{m}")
+        if len(mass_to_charge):
+            ax_bot.stem(mass_to_charge, intensities,
+                        basefmt="k-", markerfmt="", linefmt="black",
+                        label=f"motif_{m}")
         if len(mass_to_charge_opt) > 0:
             ax_bot.stem(mass_to_charge_opt, intensities_opt,
                         basefmt="k-", markerfmt="", linefmt="red",

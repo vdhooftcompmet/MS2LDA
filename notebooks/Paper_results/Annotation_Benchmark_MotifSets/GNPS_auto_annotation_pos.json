@@ -18,7 +18,9 @@
         "SMILES": [
             "O=C(O)CC(=O)O",
             "Cc1ccc(CN(Cc2cc(=O)n3nc(C(C)C)sc3n2)CC(C)C)cc1",
-            "CC(NC(=O)C(C#N)=Cc1cccc(Br)n1)c1ccccc1"
+            "CC(NC(=O)C(C#N)=Cc1cccc(Br)n1)c1ccccc1",
+            "Cc1ccc(CSc2nc3c(c(O)nc(=O)n3C)n2CC(=N)O)cc1",
+            "COc1ccc(C(=O)c2ccccc2-c2ccc3c(c2)S(=O)(=O)Cc2cc(C(=O)NCc4ccc(C)cc4)sc2-3)cc1"
         ]
     },
     "gnps_motif_115.m2m": {
@@ -48,7 +50,9 @@
             "CC(=O)OCCOCCOCCOC(C)=O",
             "CCOc1cc(C=NNC(=O)CC2(C)OCCO2)ccc1OCc1ccccc1",
             "Cc1cc2c(F)c(Oc3ncnn4cc(OCC(C)OC(=O)C(C)N)c(C)c34)ccc2[nH]1",
-            "CCCCOCCOCCOC(C)=O"
+            "CCCCOCCOCCOC(C)=O",
+            "COc1cc(C2NCCC3(OCCO3)C2(C)C)cc(OC)c1OC",
+            "CC(=O)OCCN(CCOC(C)=O)c1ccc(N=Nc2ccc([N+](=O)[O-])cc2C#N)cc1"
         ]
     },
     "gnps_motif_16.m2m": {
@@ -140,11 +144,7 @@
     },
     "gnps_motif_3.m2m": {
         "SMILES": [
-            "CCN(CC)CCC(=O)N1N=C(c2c(-c3ccccc3)c3cc(Br)ccc3[nH]c2=O)CC1c1ccc(Br)cc1",
-            "CCC(Oc1ccccc1)c1nn2c(CN(CC)CC)nnc2s1",
-            "CN(C)CCCN1c2ccccc2CCc2ccccc21",
-            "CCOC(=O)Nc1ccc2c(c1)N(C(=O)CN(CC)CC)c1ccccc1CC2",
-            "CCCNC(C)C(=O)Nc1c(C)csc1C(=O)OC"
+            "CCN(CC)CCC(=O)N1N=C(c2c(-c3ccccc3)c3cc(Br)ccc3[nH]c2=O)CC1c1ccc(Br)cc1"
         ]
     },
     "gnps_motif_30.m2m": {
@@ -176,7 +176,8 @@
     },
     "gnps_motif_35.m2m": {
         "SMILES": [
-            "NC(=O)CCC(Nc1ccc([N+](=O)[O-])cc1)C(=O)O"
+            "NC(=O)CCC(Nc1ccc([N+](=O)[O-])cc1)C(=O)O",
+            "NC(CCC(=O)Nc1ccc([N+](=O)[O-])cc1)C(=O)O"
         ]
     },
     "gnps_motif_36.m2m": {
@@ -215,8 +216,7 @@
         "SMILES": [
             "CN1CC(=O)NC1=O",
             "O=C1C=CC(=O)c2c1ccc1c2ccc2ccccc21",
-            "O=c1c2cccc3ccc4cccc1c4c32",
-            "Cc1ccc2nc3sc(=O)sc3nc2c1"
+            "O=C(O)c1cc(=O)c2ccccc2[nH]1"
         ]
     },
     "gnps_motif_41.m2m": {
@@ -297,14 +297,16 @@
             "O=C1CNC(=O)CN1",
             "CC12CCC(O)CC1CCC1C2CCC2(C)C(C3=CC(=O)OC3)C(O)CC12O",
             "O=C(O)C1Cc2c([nH]c3ccccc23)C(c2coc3ccccc3c2=O)N1",
-            "Oc1cc(O)c2c(c1)OC(c1cc(O)c(O)c(O)c1)C(O)C2"
+            "CC1C(O)CC2C(C(=O)O)=COC(OC3OC(CO)C(O)C(O)C3O)C21",
+            "Oc1cc(O)c2c(c1)OC(c1cc(O)c(O)c(O)c1)C(O)C2",
+            "CNC(=O)Oc1cccc2ccccc12"
         ]
     },
     "gnps_motif_55.m2m": {
         "SMILES": [
             "O=c1ccn(C2CC(O)C(COP(=O)(O)OP(=O)(O)OP(=O)(O)O)O2)c(=O)[nH]1",
-            "Clc1ccc(CSc2nnc(-c3cnccn3)n2Cc2ccco2)c(Cl)c1",
-            "NS(=O)(=O)c1cc(C(=O)O)c(NCc2ccco2)cc1Cl"
+            "Cc1cn(C2CC(O)C(COP(=O)(O)OP(=O)(O)OC3OC(CO)C(O)C(O)C3O)O2)c(=O)[nH]c1=O",
+            "O=c1ccn(C2CC(O)C(COP(=O)(O)O)O2)c(=O)[nH]1"
         ]
     },
     "gnps_motif_56.m2m": {
@@ -319,7 +321,12 @@
             "O=C(C=Cc1ccc(O)c(O)c1)OC(Cc1ccc(O)c(O)c1)C(=O)O",
             "C=C(C)C1Cc2c(ccc3c2OC2COc4cc(OC)c(OC)cc4C2C3=O)O1",
             "CCc1c(C(=O)NN2CCCCC2)nn(-c2ccc(Cl)cc2Cl)c1-c1ccc(C#Cc2ccc(C(F)(F)F)cc2)s1",
-            "CN(C)C1C(=O)C(=C(O)NCN2CCCC2)C(=O)C2(O)C(=O)C3=C(O)c4c(O)cccc4C(C)(O)C3CC12"
+            "CN(C)C1C(=O)C(=C(O)NCN2CCCC2)C(=O)C2(O)C(=O)C3=C(O)c4c(O)cccc4C(C)(O)C3CC12",
+            "NCCCCNCCCN",
+            "CC(=O)OC1CC2CCC1(C)C2(C)C",
+            "NC(CSSCC(N)C(=O)O)C(=O)O",
+            "CCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
+            "CCCCCCCCCCC(=O)NC(CCCCN)C(=O)O"
         ]
     },
     "gnps_motif_58.m2m": {

@@ -53,6 +53,7 @@ app.layout = dbc.Container(
         dcc.Store(id='spectra-store'),
         dcc.Store(id="screening-fullresults-store"),
         dcc.Store(id="m2m-subfolders-store"),
+        dcc.Store(id="motif-rankings-state", data=None, storage_type="memory"),
 
     ],
     fluid=False,

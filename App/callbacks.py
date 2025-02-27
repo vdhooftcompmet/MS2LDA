@@ -21,12 +21,13 @@ from rdkit import Chem
 from rdkit.Chem.Draw import MolsToGridImage
 
 import MS2LDA
-from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
+from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings
+from MS2LDA.Add_On.Spec2Vec.annotation_refined import calc_similarity
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
 from MS2LDA.motif_parser import load_m2m_folder
 from MS2LDA.run import filetype_check
-from MS2LDA.run import load_s2v
+from MS2LDA.run import load_s2v_model
 from app_instance import app
 
 # Hardcode the path for .m2m references
@@ -464,7 +465,7 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, e
             )
         else:
             spectrum.losses = None
-        spectra.append(spectrum)
+        spectra.append(spectrum) # needs to be a Mass2Motif object
 
     smiles_clusters = clustered_smiles_data
 
@@ -745,6 +746,28 @@ def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
 
 
 @app.callback(
+    Output("motif-rankings-state", "data"),
+    [
+        Input("motif-rankings-table", "page_current"),
+        Input("motif-rankings-table", "sort_by"),
+        Input("motif-rankings-table", "filter_query"),
+    ],
+    [
+        State("tabs", "value"),
+        State("lda-dict-store", "data"),
+    ],
+    prevent_initial_call=True,
+)
+def store_motif_ranking_table_state(page_current, sort_by, filter_query, current_tab, lda_dict_data):
+    if current_tab not in ["motif-rankings-tab", "motif-details-tab"] or not lda_dict_data:
+        return None
+    return {
+        "page_current": page_current,
+        "sort_by": sort_by,
+        "filter_query": filter_query,
+    }
+
+@app.callback(
     Output('motif-rankings-table-container', 'children'),
     Input('lda-dict-store', 'data'),
     Input('probability-thresh', 'value'),
@@ -752,9 +775,10 @@ def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
     Input('tabs', 'value'),
     State('screening-fullresults-store', 'data'),
     State('optimized-motifs-store', 'data'),
+    State('motif-rankings-state', 'data'),
 )
 def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thresh, active_tab,
-                                screening_data, optimized_motifs_data):
+                                screening_data, optimized_motifs_data, ranking_state):
     if active_tab != 'motif-rankings-tab' or not lda_dict_data:
         return ""
 
@@ -847,12 +871,21 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
         },
     ]
 
+    if ranking_state and active_tab in ["motif-rankings-tab", "motif-details-tab"]:
+        stored_page = ranking_state.get("page_current", 0)
+        stored_sort_by = ranking_state.get("sort_by", [])
+        stored_filter_query = ranking_state.get("filter_query", "")
+    else:
+        stored_page = 0
+        stored_sort_by = []
+        stored_filter_query = ""
+
     table = dash_table.DataTable(
         id='motif-rankings-table',
         data=df.to_dict('records'),
         columns=[
             {'name': 'Motif', 'id': 'Motif'},
-            {'name': 'Degree', 'id': 'Degree', 'type': 'numeric', 'format': {'specifier': ''}},
+            {'name': 'Degree', 'id': 'Degree', 'type': 'numeric'},
             {'name': 'Average Doc-Topic Probability', 'id': 'Average Doc-Topic Probability', 'type': 'numeric',
              'format': {'specifier': '.4f'}},
             {'name': 'Average Overlap Score', 'id': 'Average Overlap Score', 'type': 'numeric',
@@ -860,16 +893,31 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
             {'name': 'Annotation', 'id': 'Annotation'},
             {'name': 'ScreeningHits', 'id': 'ScreeningHits'},
         ],
+
+        # We keep sort/filter/pagination
         sort_action='native',
         filter_action='native',
         page_size=20,
+
+        # If you want to store pagination, sort, filter state while the table is in memory
+        persistence=True,
+        persistence_type='memory',
+        persisted_props=["page_current", "sort_by", "filter_query"],
+
         style_table={'overflowX': 'auto'},
         style_cell={
             'minWidth': '150px', 'width': '200px', 'maxWidth': '400px',
             'whiteSpace': 'normal',
             'textAlign': 'left',
         },
-        style_data_conditional=style_data_conditional,
+        style_data_conditional=[
+            {
+                'if': {'column_id': 'Motif'},
+                'cursor': 'pointer',
+                'textDecoration': 'underline',
+                'color': 'blue',
+            },
+        ],
         style_header={
             'backgroundColor': 'rgb(230, 230, 230)',
             'fontWeight': 'bold'
@@ -1607,7 +1655,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
 
     # load spec2vec
     print("loading s2v")
-    s2v_sim, _ = load_s2v()
+    s2v_sim = load_s2v_model()
     print("loaded s2v")
     progress_val = 60
 
@@ -1709,7 +1757,6 @@ def save_screening_results(csv_click, json_click, table_data):
     else:
         raise dash.exceptions.PreventUpdate
 
-
 @app.callback(
     Output("selected-motif-store", "data"),
     [
@@ -1717,29 +1764,41 @@ def save_screening_results(csv_click, json_click, table_data):
         Input("screening-results-table", "active_cell"),
     ],
     [
-        State("motif-rankings-table", "data"),
+        # Use derived_viewport_data and derived_viewport_indices
+        State("motif-rankings-table", "derived_viewport_data"),
+        State("motif-rankings-table", "derived_viewport_indices"),
         State("screening-results-table", "data"),
     ],
     prevent_initial_call=True,
 )
-def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, screening_data):
-    # Check if anything actually triggered
-    ctx = dash.callback_context
-    if not ctx.triggered:
-        raise dash.exceptions.PreventUpdate
+def on_motif_click(
+    ranking_active_cell, screening_active_cell,
+    ranking_viewport_data, ranking_viewport_indices,
+    screening_data
+):
+    if not dash.callback_context.triggered:
+        raise PreventUpdate
 
-    # If user clicked a motif in the Motif Rankings table
-    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    triggered_id = dash.callback_context.triggered[0]["prop_id"].split(".")[0]
+
+    # If user clicked a row in the "motif-rankings-table"...
     if triggered_id == "motif-rankings-table":
-        if ranking_active_cell and ranking_data:
+        if ranking_active_cell and ranking_viewport_data:
             col_id = ranking_active_cell["column_id"]
-            row_id = ranking_active_cell["row"]
-            if col_id == "Motif":
-                motif = ranking_data[row_id]["Motif"]
-                return motif
-        raise dash.exceptions.PreventUpdate
+            row_in_viewport = ranking_active_cell["row"]
 
-    # If user clicked a motif in the Screening table
+            # Only proceed if they clicked the "Motif" column
+            if col_id == "Motif":
+                # row_in_viewport is the index of the row *on this page*
+                # derived_viewport_data is the entire subset of data for the *current page*
+                # so we can directly do:
+                row_data = ranking_viewport_data[row_in_viewport]
+                motif_name = row_data["Motif"]
+                return motif_name
+
+        raise PreventUpdate
+
+    # If user clicked in screening table...
     elif triggered_id == "screening-results-table":
         if screening_active_cell and screening_data:
             col_id = screening_active_cell["column_id"]
@@ -1747,7 +1806,7 @@ def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, scr
             if col_id == "user_motif_id":
                 motif_id = screening_data[row_id]["user_motif_id"]
                 return motif_id
-        raise dash.exceptions.PreventUpdate
+        raise PreventUpdate
 
     else:
-        raise dash.exceptions.PreventUpdate
+        raise PreventUpdate
