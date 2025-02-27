@@ -21,16 +21,26 @@ from rdkit import Chem
 from rdkit.Chem.Draw import MolsToGridImage
 
 import MS2LDA
+from MS2LDA.Add_On.MassQL.MassQL4MotifDB import load_motifDB, motifDB2motifs
 from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
-from MS2LDA.motif_parser import load_m2m_folder
 from MS2LDA.run import filetype_check
 from MS2LDA.run import load_s2v
 from app_instance import app
 
 # Hardcode the path for .m2m references
 MOTIFDB_FOLDER = "../MS2LDA/MotifDB"
+
+
+def load_motifset_file(json_path):
+    """
+    Loads a single JSON motifset file.
+    Returns a list of motifs in the file as matchms Spectra.
+    """
+    ms1_df, ms2_df = load_motifDB(json_path)
+    motifs = motifDB2motifs(ms2_df, ms2_df)
+    return motifs
 
 
 # Callback to show/hide tab contents based on active tab
@@ -1487,14 +1497,14 @@ def auto_scan_m2m_subfolders(tab_value):
     folder_options = []
     subfolder_data = {}
     for root, dirs, files in os.walk(MOTIFDB_FOLDER):
-        m2m_files = [f for f in files if f.endswith(".m2m")]
-        if m2m_files:
-            label = os.path.basename(root) or "Root"
-            folder_options.append({"label": label, "value": root})
-            subfolder_data[root] = {
-                "folder_label": label,
-                "count_m2m": len(m2m_files),
-            }
+        json_files = [f for f in files if f.startswith("Motifset") and f.endswith(".json")]
+        for jsonf in json_files:
+            fullpath = os.path.join(root, jsonf)
+            label = jsonf
+            folder_options.append({"label": label, "value": fullpath})
+            # FIXME: populate count_m2m correctly and show it on the screen
+            subfolder_data[fullpath] = {"folder_label": label, "count_m2m": 1}
+
     folder_options = sorted(folder_options, key=lambda x: x["label"].lower())
     return folder_options, subfolder_data
 
@@ -1604,14 +1614,15 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
 
     # gather references
     all_refs = []
-    for folder_path in selected_folders:
-        these_refs = load_m2m_folder(folder_path)
+    for json_file_path in selected_folders:
+        these_refs = load_motifset_file(json_file_path)
         for r in these_refs:
-            r.set("source_folder", folder_path)
+            r.set("source_folder", json_file_path)
         all_refs.extend(these_refs)
+
     all_refs = filter_and_normalize_spectra(all_refs)
     if not all_refs:
-        return None, dbc.Alert("No valid references found in MotifDB folder!", color="warning"), 100, False
+        return None, dbc.Alert("No valid references found in the selected file(s)!", color="warning"), 100, False
     progress_val = 40
 
     # load spec2vec

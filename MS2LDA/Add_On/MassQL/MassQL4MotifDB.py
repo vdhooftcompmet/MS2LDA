@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import json
 
+from matchms import Spectrum, Fragments
+
 
 # from matchms import Spectrum, Fragments
 
