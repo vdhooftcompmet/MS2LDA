@@ -720,27 +720,35 @@ def display_node_data_on_click(tap_node_data, clustered_smiles_data):
 
 # -------------------------------- RANKINGS & DETAILS --------------------------------
 
-def compute_motif_degrees(lda_dict, p_thresh, o_thresh):
+def compute_motif_degrees(lda_dict, p_low, p_high, o_low, o_high):
     motifs = lda_dict["beta"].keys()
     motif_degrees = {m: 0 for m in motifs}
     motif_probabilities = {m: [] for m in motifs}
     motif_overlap_scores = {m: [] for m in motifs}
     docs = lda_dict["theta"].keys()
 
+    # For each document, check if the motif's doc-topic prob p
+    # is within [p_low, p_high], and overlap is within [o_low, o_high].
     for doc in docs:
         for motif, p in lda_dict["theta"][doc].items():
-            if p >= p_thresh:
+            if p_low <= p <= p_high:
                 o = lda_dict["overlap_scores"][doc].get(motif, 0.0)
-                if o >= o_thresh:
+                if o_low <= o <= o_high:
                     motif_degrees[motif] += 1
                     motif_probabilities[motif].append(p)
                     motif_overlap_scores[motif].append(o)
 
     md = []
     for motif in motifs:
-        avg_probability = np.mean(motif_probabilities[motif]) if motif_probabilities[motif] else 0
-        avg_overlap = np.mean(motif_overlap_scores[motif]) if motif_overlap_scores[motif] else 0
+        if motif_probabilities[motif]:
+            avg_probability = np.mean(motif_probabilities[motif])
+            avg_overlap = np.mean(motif_overlap_scores[motif])
+        else:
+            avg_probability = 0
+            avg_overlap = 0
+
         md.append((motif, motif_degrees[motif], avg_probability, avg_overlap))
+
     md.sort(key=lambda x: x[1], reverse=True)
     return md
 
@@ -769,6 +777,7 @@ def store_motif_ranking_table_state(page_current, sort_by, filter_query, current
 
 @app.callback(
     Output('motif-rankings-table-container', 'children'),
+    Output('motif-rankings-count', 'children'),
     Input('lda-dict-store', 'data'),
     Input('probability-thresh', 'value'),
     Input('overlap-thresh', 'value'),
@@ -780,12 +789,12 @@ def store_motif_ranking_table_state(page_current, sort_by, filter_query, current
 def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thresh, active_tab,
                                 screening_data, optimized_motifs_data, ranking_state):
     if active_tab != 'motif-rankings-tab' or not lda_dict_data:
-        return ""
+        return "", ""
 
-    p_thresh = probability_thresh[0] if isinstance(probability_thresh, list) else probability_thresh
-    o_thresh = overlap_thresh[0] if isinstance(overlap_thresh, list) else overlap_thresh
+    p_low, p_high = probability_thresh
+    o_low, o_high = overlap_thresh
 
-    motif_degree_list = compute_motif_degrees(lda_dict_data, p_thresh, o_thresh)
+    motif_degree_list = compute_motif_degrees(lda_dict_data, p_low, p_high, o_low, o_high)
     df = pd.DataFrame(motif_degree_list, columns=[
         'Motif',
         'Degree',
@@ -821,8 +830,6 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
                 short_anno_str = ", ".join(short_anno)
             elif isinstance(short_anno, str):
                 short_anno_str = short_anno
-            else:
-                short_anno_str = ""
 
         # combine them
         if existing_lda_anno and short_anno_str:
@@ -850,8 +857,7 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
                     # Collect up to 3 references in the format: "ref_motifset|ref_motif_id(score)"
                     top3 = hits_for_motif.head(3)
                     combined = []
-                    for i, row in top3.iterrows():
-                        # add motifset + motif_id + score
+                    for _, row in top3.iterrows():
                         combined.append(f"{row['ref_motifset']}|{row['ref_motif_id']}({row['score']:.2f})")
                     screening_hits.append("; ".join(combined))
         except Exception:
@@ -859,8 +865,10 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
             screening_hits = ["" for _ in range(len(df))]
     else:
         screening_hits = ["" for _ in range(len(df))]
-
     df['ScreeningHits'] = screening_hits
+
+    # Filter out motifs that have no docs passing, i.e. degree=0
+    df = df[df['Degree'] > 0].copy()
 
     style_data_conditional = [
         {
@@ -924,7 +932,8 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
         },
     )
 
-    return table
+    row_count_message = f"{len(df)} motif(s) pass the filter"
+    return table, row_count_message
 
 
 @app.callback(
