@@ -763,14 +763,15 @@ def compute_motif_degrees(lda_dict, p_low, p_high, o_low, o_high):
 
 
 @app.callback(
-    Output('motif-rankings-table-container', 'children'),
-    Output('motif-rankings-count', 'children'),
-    Input('lda-dict-store', 'data'),
-    Input('probability-thresh', 'value'),
-    Input('overlap-thresh', 'value'),
-    Input('tabs', 'value'),
-    State('screening-fullresults-store', 'data'),
-    State('optimized-motifs-store', 'data'),
+    Output("motif-rankings-table", "data"),
+    Output("motif-rankings-table", "columns"),
+    Output("motif-rankings-count", "children"),
+    Input("lda-dict-store", "data"),
+    Input("probability-thresh", "value"),
+    Input("overlap-thresh", "value"),
+    Input("tabs", "value"),
+    State("screening-fullresults-store", "data"),
+    State("optimized-motifs-store", "data"),
 )
 def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thresh, active_tab,
                                 screening_data, optimized_motifs_data):
@@ -808,11 +809,13 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
             except ValueError:
                 pass
 
-        if optimized_motifs_data and motif_idx is not None and 0 <= motif_idx < len(optimized_motifs_data):
-            # short_annotation might be list of SMILES or None
+        if (
+            optimized_motifs_data
+            and motif_idx is not None
+            and 0 <= motif_idx < len(optimized_motifs_data)
+        ):
             short_anno = optimized_motifs_data[motif_idx]["metadata"].get("short_annotation", "")
             if isinstance(short_anno, list):
-                # Join them into one string
                 short_anno_str = ", ".join(short_anno)
             elif isinstance(short_anno, str):
                 short_anno_str = short_anno
@@ -856,46 +859,42 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
     # Filter out motifs that have no docs passing, i.e. degree=0
     df = df[df['Degree'] > 0].copy()
 
-    style_data_conditional = [
+    table_data = df.to_dict("records")
+    table_columns = [
         {
-            'if': {'column_id': 'Motif'},
-            'cursor': 'pointer',
-            'textDecoration': 'underline',
-            'color': 'blue',
+            "name": "Motif",
+            "id": "Motif",
+        },
+        {
+            "name": "Degree",
+            "id": "Degree",
+            "type": "numeric",
+        },
+        {
+            "name": "Average Doc-Topic Probability",
+            "id": "Average Doc-Topic Probability",
+            "type": "numeric",
+            "format": {"specifier": ".4f"},
+        },
+        {
+            "name": "Average Overlap Score",
+            "id": "Average Overlap Score",
+            "type": "numeric",
+            "format": {"specifier": ".4f"},
+        },
+        {
+            "name": "Annotation",
+            "id": "Annotation",
+        },
+        {
+            "name": "ScreeningHits",
+            "id": "ScreeningHits",
         },
     ]
 
-    table = dash_table.DataTable(
-        id='motif-rankings-table',
-        data=df.to_dict('records'),
-        columns=[
-            {'name': 'Motif', 'id': 'Motif'},
-            {'name': 'Degree', 'id': 'Degree', 'type': 'numeric'},
-            {'name': 'Average Doc-Topic Probability', 'id': 'Average Doc-Topic Probability',
-             'type': 'numeric', 'format': {'specifier': '.4f'}},
-            {'name': 'Average Overlap Score', 'id': 'Average Overlap Score', 'type': 'numeric',
-             'format': {'specifier': '.4f'}},
-            {'name': 'Annotation', 'id': 'Annotation'},
-            {'name': 'ScreeningHits', 'id': 'ScreeningHits'},
-        ],
-        sort_action='native',
-        filter_action='native',
-        page_size=20,
-        style_table={'overflowX': 'auto'},
-        style_cell={
-            'minWidth': '150px', 'width': '200px', 'maxWidth': '400px',
-            'whiteSpace': 'normal',
-            'textAlign': 'left',
-        },
-        style_data_conditional=style_data_conditional,
-        style_header={
-            'backgroundColor': 'rgb(230, 230, 230)',
-            'fontWeight': 'bold'
-        },
-    )
-
     row_count_message = f"{len(df)} motif(s) pass the filter"
-    return table, row_count_message
+    return table_data, table_columns, row_count_message
+
 
 
 @app.callback(
@@ -1501,9 +1500,10 @@ def auto_scan_m2m_subfolders(tab_value):
         for jsonf in json_files:
             fullpath = os.path.join(root, jsonf)
             label = jsonf
-            folder_options.append({"label": label, "value": fullpath})
-            # FIXME: populate count_m2m correctly and show it on the screen
-            subfolder_data[fullpath] = {"folder_label": label, "count_m2m": 1}
+            ms1_df, ms2_df = load_motifDB(fullpath)
+            count_m2m = len(ms2_df["scan"].unique())
+            folder_options.append({"label": f"{label} ({count_m2m} motifs)", "value": fullpath})
+            subfolder_data[fullpath] = {"folder_label": label, "count_m2m": count_m2m}
 
     folder_options = sorted(folder_options, key=lambda x: x["label"].lower())
     return folder_options, subfolder_data

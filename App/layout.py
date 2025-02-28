@@ -1028,7 +1028,26 @@ def create_motif_rankings_tab():
                             ]
                         ),
                         html.Div(id="motif-rankings-count", style={"marginTop": "10px"}),
-                        html.Div(id="motif-rankings-table-container", style={"marginTop": "20px"})
+                        dash_table.DataTable(
+                            id='motif-rankings-table',
+                            data=[],
+                            columns=[],
+                            sort_action='native',
+                            filter_action='native',
+                            page_size=20,
+                            style_table={'overflowX': 'auto'},
+                            style_cell={
+                                'minWidth': '150px', 'width': '200px', 'maxWidth': '400px',
+                                'whiteSpace': 'normal',
+                                'textAlign': 'left',
+                            },
+                            style_data_conditional=[],
+                            style_header={
+                                'backgroundColor': 'rgb(230, 230, 230)',
+                                'fontWeight': 'bold'
+                            },
+                        ),
+
                     ], width=12),
                 ]),
             ]),
