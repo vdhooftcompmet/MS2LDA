@@ -20,10 +20,11 @@ def store_m2m_file(motif_spectrum, motif_number, folder):
     filename = os.path.join(folder, f"{folder_name}_motif_{motif_number}.m2m")
 
     with open(filename, "w") as output:
-
-        output.write(f"#MS2ACCURACY 0.005\n") # number should be adjustable
+        ms2accuracy = motif_spectrum.get("ms2accuracy")
+        output.write(f"#MS2ACCURACY {ms2accuracy}\n") # number should be adjustable
         output.write(f"#MOTIFSET {folder.replace(' ', '_')}\n")
-        output.write(f"#CHARGE 1\n") # number should be adjustable
+        charge = motif_spectrum.get("charge")
+        output.write(f"#CHARGE {charge}\n") # number should be adjustable
         # add name
         output.write(f"#NAME {folder_name}_motif_{motif_number}\n")
         # add (long) annotation
@@ -32,6 +33,9 @@ def store_m2m_file(motif_spectrum, motif_number, folder):
         # add (short) annotation
         short_annotation = motif_spectrum.get("short_annotation")
         output.write(f"#SHORT_ANNOTATION {short_annotation}\n")
+        # add auto annotation
+        auto_annotation = motif_spectrum.get("auto_annotation")
+        output.write(f"#AUTO_ANNOTATION {auto_annotation}\n")
         # add comment
         comment = motif_spectrum.get("comment")
         output.write(f"#COMMENT {comment}\n")
@@ -86,6 +90,7 @@ def load_m2m_file(file): # currently it is not supported to change frag/loss tag
     motifset = None
     charge = None
     annotation = None
+    auto_annotation = None
 
     with open(file, "r") as motif_file:
         for line in motif_file:
@@ -103,13 +108,16 @@ def load_m2m_file(file): # currently it is not supported to change frag/loss tag
                 charge = line.split(" ")[1].strip()
             elif line.startswith("#ANNOTATION"):
                 annotation = line.split(" ", 1)[1].strip()
+            elif line.startswith("#AUTO_ANNOTATION"):
+                auto_annotation = line.split(" ", 1)[1].strip()
 
-    motif_spectrum = create_spectrum(features, name, frag_tag="fragment_", loss_tag="loss_", significant_digits=2)
+    motif_spectrum = create_spectrum(features, name, frag_tag="fragment_", loss_tag="loss_", significant_digits=3)
     motif_spectrum.set("short_annotation", short_annotation)
     motif_spectrum.set("charge", charge)
     motif_spectrum.set("ms2accuracy", ms2accuracy)
     motif_spectrum.set("motifset", motifset)
     motif_spectrum.set("annotation", annotation)
+    motif_spectrum.set("auto_annotation", auto_annotation)
 
     return motif_spectrum
 

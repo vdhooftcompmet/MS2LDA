@@ -1,8 +1,11 @@
-from rdkit import Chem
-from matchms import Spectrum, Fragments
-from matchms.filtering import normalize_intensities
+#from rdkit import Chem
+#from matchms import Spectrum, Fragments
+#from matchms.filtering import normalize_intensities
+import requests
+import os
 import numpy as np
 import hashlib
+from MS2LDA.Mass2Motif import Mass2Motif
 
 
 from matchms import set_matchms_logger_level; set_matchms_logger_level("ERROR")
@@ -44,9 +47,11 @@ def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", sig
     normalized_loss_intensities = normalized_intensities[len(sorted_fragments):]
 
     # create spectrum object
-    spectrum = Spectrum(
-        mz=np.array(sorted_fragments),
-        intensities=np.array(normalized_frag_intensities),
+    spectrum = Mass2Motif(
+        frag_mz=np.array(sorted_fragments),
+        frag_intensities=np.array(normalized_frag_intensities),
+        loss_mz=np.array(sorted_losses),
+        loss_intensities=np.array(normalized_loss_intensities),
         metadata={
             "id": f"motif_{k}".strip(),
             "charge": charge,
@@ -54,7 +59,6 @@ def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", sig
             "motifset": motifset,
         }
     )
-    spectrum.losses = Fragments(mz=np.array(sorted_losses), intensities=np.array(normalized_loss_intensities))
 
     return spectrum
 
@@ -111,3 +115,35 @@ def retrieve_spec4doc(doc2spec_map, ms2lda, doc_id):
     retrieved_spec = doc2spec_map[hashed_feature_word]
     return retrieved_spec
 
+
+
+def download_model_and_data(file_urls=[
+    "https://zenodo.org/records/12625409/files/020724_Spec2Vec_pos_CleanedLibraries.model?download=1",
+    "https://zenodo.org/records/12625409/files/020724_Spec2Vec_pos_CleanedLibraries.model.syn1neg.npy?download=1",
+    "https://zenodo.org/records/12625409/files/020724_Spec2Vec_pos_CleanedLibraries.model.wv.vectors.npy?download=1",
+    "https://zenodo.org/records/12625409/files/positive_s2v_library.pkl?download=1",
+    ], mode="positive"):
+    """Downloads the spec2vec model and the needed datasets for the automated annotation"""
+
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    #relative_directory = f"Add_On/Spec2Vec/model_{mode}_mode"
+    relative_directory = f"Add_On/Spec2Vec/trash_{mode}"
+    save_directory = os.path.join(script_directory, relative_directory)
+
+    os.makedirs(save_directory, exist_ok=True)
+    print(save_directory)
+
+    for url in file_urls:
+        response = requests.get(url)
+        if response.status_code == 200:
+        
+            file_name = os.path.basename(url.split("?download")[0])
+            file_path = os.path.join(save_directory, file_name)
+
+            with open(file_path, 'wb') as file:
+                file.write(response.content)
+            print(f"Downloaded {file_name}")
+        else:
+            print(f"Failed to download {url}")
+
+            

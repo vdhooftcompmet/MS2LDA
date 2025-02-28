@@ -102,7 +102,7 @@ def clean_spectra(spectra, preprocessing_parameters={}):
         spectrum = msfilters.select_by_mz(spectrum, mz_from=preprocessing_parameters["min_mz"], mz_to=preprocessing_parameters["max_mz"])
         spectrum = msfilters.reduce_to_number_of_peaks(spectrum, n_max=preprocessing_parameters["max_frags"])
         spectrum = msfilters.require_minimum_number_of_peaks(spectrum, n_required=preprocessing_parameters["min_frags"])
-        spectrum = msfilters.add_losses(spectrum)
+        #spectrum = msfilters.add_losses(spectrum)
 
 
         if spectrum:

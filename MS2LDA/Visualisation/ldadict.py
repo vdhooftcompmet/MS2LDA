@@ -260,7 +260,7 @@ def save_visualization_data(
     # 5) Gather short_annotation from each optimized motif for "clustered_smiles_data"
     clustered_smiles_data = []
     for motif in optimized_motifs:
-        ann = motif.get("short_annotation")
+        ann = motif.get("auto_annotation")
         if isinstance(ann, list):
             clustered_smiles_data.append(ann)
         elif ann is None:
