@@ -22,11 +22,12 @@ from rdkit.Chem.Draw import MolsToGridImage
 
 import MS2LDA
 from MS2LDA.Add_On.MassQL.MassQL4MotifDB import load_motifDB, motifDB2motifs
-from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
+from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings
+from MS2LDA.Add_On.Spec2Vec.annotation_refined import calc_similarity
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
 from MS2LDA.run import filetype_check
-from MS2LDA.run import load_s2v
+from MS2LDA.run import load_s2v_model
 from app_instance import app
 
 # Hardcode the path for .m2m references
@@ -1627,7 +1628,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
 
     # load spec2vec
     print("loading s2v")
-    s2v_sim, _ = load_s2v()
+    s2v_sim, _ = load_s2v_model()
     print("loaded s2v")
     progress_val = 60
 

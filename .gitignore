@@ -1,5 +1,5 @@
 #models/
-.DS_Store/
+.DS_Store
 *cpython*
 
 # Byte-compiled / optimized / DLL files
@@ -86,6 +86,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.DS_Store
 
 # IPython
 profile_default/
@@ -155,5 +156,7 @@ deepmol.egg-info
 *.pkl
 *.dict
 *.mzML
+*viz.json
 *.bin
 *.ai
+*.graphml

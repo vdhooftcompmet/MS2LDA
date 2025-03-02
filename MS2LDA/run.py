@@ -14,9 +14,10 @@ from MS2LDA.modeling import train_model
 from MS2LDA.modeling import extract_motifs
 from MS2LDA.modeling import create_motif_spectra
 
-from MS2LDA.Add_On.Spec2Vec.annotation import load_s2v_and_library
-from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
+from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity_faiss
 from MS2LDA.Add_On.Spec2Vec.annotation import get_library_matches
+from MS2LDA.Add_On.Spec2Vec.annotation import load_s2v_model
+
 
 from MS2LDA.Add_On.Spec2Vec.annotation_refined import hit_clustering
 from MS2LDA.Add_On.Spec2Vec.annotation_refined import motif_optimization
@@ -93,15 +94,17 @@ def run(dataset, n_motifs, n_iterations,
     store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, doc2spec_map, dataset_parameters["output_folder"])
 
     # Save additional viz data
-    save_visualization_data(
-        trained_ms2lda,
-        cleaned_spectra,
-        optimized_motifs,
-        doc2spec_map,
-        dataset_parameters["output_folder"]
-    )
+    if n_motifs < 500:
+        save_visualization_data(
+            trained_ms2lda,
+            cleaned_spectra,
+            optimized_motifs,
+            doc2spec_map,
+            dataset_parameters["output_folder"]
+        )
 
     return motif_spectra, optimized_motifs, motif_fps
+
 
 
 
@@ -109,7 +112,7 @@ def screen_spectra(motifs_stored=None, dataset=None, motif_spectra=None, motifDB
 
     if not s2v_similarity:
         print("Loading Spec2Vec model ...")
-        s2v_similarity, _ = load_s2v()
+        s2v_similarity = load_s2v_model(path_model=path_model)
 
     if motifDB or motifDB_query:
         if motifDB and motifDB_query:
@@ -212,7 +215,7 @@ def spectrum_screening(dataset, motifs_stored, s2v_similarity, threshold=0.5):
     dataset_spectra = clean_spectra(dataset_spectra)
     dataset_embeddings = calc_embeddings(s2v_similarity, dataset_spectra)
     motif_stored_embeddings = calc_embeddings(s2v_similarity, motifs_stored)
-    spectrum_motif_similarities = calc_similarity(dataset_embeddings, motif_stored_embeddings)
+    spectrum_motif_similarities = calc_similarity_faiss(dataset_embeddings, motif_stored_embeddings)
 
     screening_hits = []
     for row_index, row in tqdm(spectrum_motif_similarities.iterrows()):
@@ -228,7 +231,7 @@ def spectrum_screening(dataset, motifs_stored, s2v_similarity, threshold=0.5):
 def motif_screening(motifs_stored, motif_spectra, s2v_similarity, threshold=0.7):
     motif_stored_embeddings = calc_embeddings(s2v_similarity, motifs_stored)
     motif_embeddings = calc_embeddings(s2v_similarity, motif_spectra)
-    motif_motif_similarities = calc_similarity(motif_embeddings, motif_stored_embeddings)
+    motif_motif_similarities = calc_similarity_faiss(motif_embeddings, motif_stored_embeddings)
 
     screening_hits = []
     for row_index, row in tqdm(motif_motif_similarities.iterrows()):
@@ -249,6 +252,7 @@ def add_metadata(spectrum, motif_spectrum, value, screen_type):
         "ref_motifset": motif_spectrum.get("motifset"),
         "ref_motif_id": motif_spectrum.get("id"),
         "ref_short_annotation": motif_spectrum.get("short_annotation"),
+        "ref_auto_annotation": motif_spectrum.get("auto_annotation"),
         "ref_annotation": motif_spectrum.get("annotation"),
         "ref_charge": motif_spectrum.get("charge"),
         }
@@ -260,7 +264,7 @@ def add_annotation(motif_spectra, clustered_smiles):
 
     motif_spectra_ = []
     for motif_spectrum, clustered_smi in zip(motif_spectra, clustered_smiles):
-        motif_spectrum.set("short_annotation", clustered_smi)
+        motif_spectrum.set("auto_annotation", clustered_smi)
         motif_spectra_.append(motif_spectrum)
 
     return motif_spectra_
@@ -272,9 +276,9 @@ def store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_c
     store_m2m_folder(motif_spectra, "motifs")
     print("m2m folder stored")
     convergence_curve_fig = plot_convergence(convergence_curve)
-    convergence_curve_fig.savefig("convergence_curve.png",dpi=300)
+    convergence_curve_fig.savefig("convergence_curve.png",dpi=300, bbox_inches="tight", pad_inches=0.2)
     print("convergence curve stored")
-    network_fig = create_network(optimized_motifs, significant_figures=2) # motif spectra
+    network_fig = create_network(optimized_motifs, significant_figures=2)
     nx.write_graphml(network_fig, "network.graphml")
     print("network stored")
     os.mkdir("motif_figures")
@@ -284,10 +288,10 @@ def store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_c
     with open("doc2spec_map.pkl", "wb") as outfile:
         pickle.dump(doc2spec_map, outfile)
 
-    ms1_motifDB_opt, ms2_motifDB_opt = motifs2motifDB(optimized_motifs) # of motif_spectra?
-    store_motifDB(ms1_motifDB_opt, ms2_motifDB_opt, name="motifDB_optimized.json")
+    ms1_motifDB_opt, ms2_motifDB_opt = motifs2motifDB(optimized_motifs)
+    store_motifDB(ms1_motifDB_opt, ms2_motifDB_opt, name="motifset_optimized.json")
     ms1_motifDB, ms2_motifDB = motifs2motifDB(motif_spectra)
-    store_motifDB(ms1_motifDB, ms2_motifDB)
+    store_motifDB(ms1_motifDB, ms2_motifDB, name="motifset.json")
 
     os.chdir(curr_dir)
 
@@ -306,7 +310,7 @@ def filetype_check(dataset):
         else:
             raise TypeError("File format not supported. Only .mgf, .mzml, and .msp")
 
-    elif type(dataset) == list: # and type(dataset[0]) == matchms.Spectrum.Spectrum:
+    elif type(dataset) == list: 
         loaded_spectra = dataset
 
     else:
@@ -315,102 +319,27 @@ def filetype_check(dataset):
     return loaded_spectra
 
 
-
 def s2v_annotation(motif_spectra, annotation_parameters):
-    print("Loading Spec2Vec model ...")
     path_model = annotation_parameters.get("s2v_model_path")
-    path_library = annotation_parameters.get("s2v_library_path")
-    s2v_similarity, library = load_s2v(path_model=path_model, path_library=path_library)
+    s2v_similarity = load_s2v_model(path_model=path_model)
 
-    print("Searches for candidates ...")
+    path_embeddings = annotation_parameters.get("s2v_library_embeddings")
+    embeddings = np.load(path_embeddings)
+    
+    path_db = annotation_parameters.get("s2v_library_db")
+    path_embeddings = annotation_parameters.get("s2v_library_embeddings")
+
     motif_embeddings = calc_embeddings(s2v_similarity, motif_spectra)
-    similarity_matrix = calc_similarity(motif_embeddings, library.embeddings)
+    similarities, indices = calc_similarity_faiss(motif_embeddings, embeddings)
 
     matching_settings = {
-        "similarity_matrix": similarity_matrix,
-        "library": library,
+        "similarities": similarities,
+        "indices": indices,
+        "db_path": path_db,
         "top_n": annotation_parameters["n_mols_retrieved"],
         "unique_mols": True,
     }
 
-    library_matches = get_library_matches(matching_settings)
+    library_matches = get_library_matches(**matching_settings)
 
     return library_matches, s2v_similarity
-
-
-def load_s2v(
-        path_model = None,
-        path_library = None
-        ):
-
-    # If not specified, fallback to defaults
-    if path_model is None:
-        path_model = "../MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model"
-    if path_library is None:
-        path_library = "../MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl"
-
-    s2v_similarity, library = load_s2v_and_library(path_model, path_library)
-
-    return s2v_similarity, library
-
-
-def run_advanced(dataset, n_motifs, n_iterations,
-        dataset_parameters,
-        train_parameters,
-        model_parameters,
-        convergence_parameters,
-        annotation_parameters,
-        preprocessing_parameters,
-        motif_parameter,
-        fingerprint_parameters):
-    """main function to run MS2LDA workflow in a jupyter notebook"""
-
-    loaded_spectra = filetype_check(dataset=dataset)
-    cleaned_spectra = clean_spectra(loaded_spectra, preprocessing_parameters)
-    print("Cleaning spectra ...", len(cleaned_spectra), "spectra left")
-    feature_words = features_to_words(spectra=cleaned_spectra, significant_figures=dataset_parameters["significant_digits"], acquisition_type=dataset_parameters["acquisition_type"]) # significant digits need to be added in dash.
-    
-
-    # bootstrapping
-    n_runs = 10
-    motifs_per_runs = []
-    run_x = 0
-    while run_x < n_runs: 
-        # subpart molecules, random n_motifs from normal distribution, based on input
-
-        # Modeling
-        ms2lda = define_model(n_motifs=n_motifs, model_parameters=model_parameters)
-        trained_ms2lda, convergence_curve = train_model(ms2lda, feature_words, iterations=n_iterations, train_parameters=train_parameters, convergence_parameters=convergence_parameters)
-
-        # Mapping
-        doc2spec_map = map_doc2spec(feature_words, cleaned_spectra)
-        MS2LDA.retrieve_spec4doc = partial(retrieve_spec4doc, doc2spec_map, trained_ms2lda)
-
-        # Motif Generation
-        motifs = extract_motifs(trained_ms2lda, top_n=motif_parameter)
-        motif_spectra = create_motif_spectra(motifs, charge=dataset_parameters["charge"], motifset_name=dataset_parameters["name"], significant_digits=dataset_parameters["significant_digits"]) # output name
-
-        # Motif Annotation and Optimization
-        library_matches, s2v_similarity = s2v_annotation(motif_spectra, annotation_parameters)
-        clustered_spectra, clustered_smiles, clustered_scores = hit_clustering(s2v_similarity=s2v_similarity, motif_spectra=motif_spectra, library_matches=library_matches, criterium=annotation_parameters["criterium"], cosine_similarity=annotation_parameters["cosine_similarity"])
-        motif_spectra = add_annotation(motif_spectra, clustered_smiles)
-        optimized_motifs = motif_optimization(motif_spectra, clustered_spectra, clustered_smiles, loss_err=1)
-        motif_fps = calc_fingerprints(clustered_smiles, fp_type=fingerprint_parameters["fp_type"], threshold=fingerprint_parameters["threshold"])
-
-    # selelcting
-
-
-    store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, doc2spec_map, dataset_parameters["output_folder"])
-
-    # Save additional viz data
-    save_visualization_data(
-        trained_ms2lda,
-        cleaned_spectra,
-        optimized_motifs,
-        output_folder=dataset_parameters["output_folder"],
-        filename="ms2lda_viz.json"
-    )
-
-    return motif_spectra, optimized_motifs, motif_fps
-
-    

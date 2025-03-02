@@ -8,7 +8,7 @@
     },
     "mb_motif_10.m2m": {
         "SMILES": [
-          	
+          	"CC(O)C"
         ],
 	"ANNOTATION": "Loss of C3H6 - indicative for the presence of an isopropyl",
 	"PUBCHEMCID": []
@@ -73,7 +73,7 @@
     "mb_motif_20.m2m": {
         "SMILES": [
             	"C1=CC=C(C=C1)C=CC(=O)O",
-		"COC1=C(C=CC(=C1)C=CC(=O)O)O"
+		        "COC1=C(C=CC(=C1)C=CC(=O)O)O"
         ],
 	"ANNOTATION": "Fragments indicative for cinnamic/hydroxycinnamic acid substructure",
 	"PUBCHEMCID": [444539, 445858]
@@ -171,7 +171,7 @@
     },
     "mb_motif_4.m2m": {
         "SMILES": [
-            	
+            	"COc1ccccc1"
         ],
 	"ANNOTATION": "Loss of methyl group – indicative for presence of methoxy [O-CH3] methylsulfyl [S-CH3] or methylgroup connected to aromatic ring system",
 	"PUBCHEMCID": []

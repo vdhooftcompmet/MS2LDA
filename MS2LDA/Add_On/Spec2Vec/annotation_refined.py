@@ -1,19 +1,23 @@
 # this script contains masking and hierachical clustering
 
 from matchms import Spectrum, Fragments
+from MS2LDA.Mass2Motif import Mass2Motif
 
 from scipy.stats import spearmanr
 from scipy.cluster.hierarchy import linkage, fcluster
 
-from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
+from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity_faiss
 #from Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
-
+from spec2vec.vector_operations import cosine_similarity_matrix
 
 from functools import reduce
 import numpy as np
 
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics.pairwise import cosine_similarity
+
+from MS2LDA.Mass2Motif import Mass2Motif
+import pandas as pd
 
 
 #-------------------------------------------------reconstruct motif spectrum---------------------------------------#
@@ -120,27 +124,41 @@ def reconstruct_motif_spectrum(opt_motif_fragments_mz, opt_motif_fragments_inten
     RETURNS: 
         opt_motif_spectrum: matchms spectrum object
     """
-    if opt_motif_fragments_mz:
+    if len(opt_motif_fragments_mz) == len(opt_motif_fragments_intensities) and len(opt_motif_fragments_mz) > 0:
         sorted_fragments = sorted(zip(opt_motif_fragments_mz, opt_motif_fragments_intensities))
         opt_motif_fragments_mz, opt_motif_fragments_intensities = zip(*sorted_fragments)
     else:
-        opt_motif_fragments_mz = []
-        opt_motif_losses_intensities = []
+        opt_motif_fragments_mz = np.array([])
+        opt_motif_losses_intensities = np.array([])
 
-
-    opt_motif_spectrum = Spectrum(
-        mz = np.array(opt_motif_fragments_mz),
-        intensities = np.array(opt_motif_fragments_intensities),
-    )
-
-    if opt_motif_losses_mz and opt_motif_losses_intensities: # for some reasons it can be that losses have mz but no intensity for large numbers of extracted compounds
+    if len(opt_motif_losses_mz) == len(opt_motif_losses_intensities) and len(opt_motif_losses_mz) > 0: # I once saw that there was a loss mz 0f 1.003 and no intensity!!
         sorted_losses = sorted(zip(opt_motif_losses_mz, opt_motif_losses_intensities))
         opt_motif_losses_mz, opt_motif_losses_intensities = zip(*sorted_losses)
 
-        opt_motif_spectrum.losses = Fragments(
-            mz=np.array(opt_motif_losses_mz),
-            intensities=np.array(opt_motif_losses_intensities)
-        )
+    else:
+        opt_motif_losses_mz = np.array([])
+        opt_motif_losses_intensities = np.array([])
+
+
+    #opt_motif_spectrum = Spectrum(
+    #    mz = np.array(opt_motif_fragments_mz),
+    #    intensities = np.array(opt_motif_fragments_intensities),
+    #)
+
+    #if opt_motif_losses_mz and opt_motif_losses_intensities: # for some reasons it can be that losses have mz but no intensity for large numbers of extracted compounds
+    #    sorted_losses = sorted(zip(opt_motif_losses_mz, opt_motif_losses_intensities))
+    #    opt_motif_losses_mz, opt_motif_losses_intensities = zip(*sorted_losses)
+
+    #    opt_motif_spectrum.losses = Fragments(
+    #        mz=np.array(opt_motif_losses_mz),
+    #        intensities=np.array(opt_motif_losses_intensities)
+    #    )
+    opt_motif_spectrum = Mass2Motif(
+        frag_mz=np.array(opt_motif_fragments_mz),
+        frag_intensities=np.array(opt_motif_fragments_intensities),
+        loss_mz=np.array(opt_motif_losses_mz),
+        loss_intensities=np.array(opt_motif_losses_intensities)
+    )
 
     return opt_motif_spectrum
 
@@ -166,7 +184,8 @@ def optimize_motif_spectrum(motif_spectrum, hit_spectra, smiles_cluster, frag_er
     opt_motif_losses_mz, opt_motif_losses_intensities = motif_intersection_losses(motif_spectrum, common_losses, loss_err)
 
     opt_motif_spectrum = reconstruct_motif_spectrum(opt_motif_fragments_mz, opt_motif_fragments_intensities, opt_motif_losses_mz, opt_motif_losses_intensities)
-    opt_motif_spectrum.set("short_annotation", smiles_cluster)
+    opt_motif_spectrum.set("Auto_annotation", smiles_cluster)
+    opt_motif_spectrum.set("short_annotation", None)
     opt_motif_spectrum.set("charge", motif_spectrum.get("charge"))
     opt_motif_spectrum.set("ms2accuracy", motif_spectrum.get("ms2accuracy"))
     opt_motif_spectrum.set("motifset", motif_spectrum.get("motifset"))
@@ -208,18 +227,16 @@ def mask_fragments(spectrum, mask=1.0):
         masked_fragments_mz = [mask] + masked_fragments_mz
         masked_fragments_intensities = [retrieved_fragment_intensity] + masked_fragments_intensities
 
-        masked_spectrum = Spectrum(
-            mz=np.array(masked_fragments_mz),
-            intensities=np.array(masked_fragments_intensities),
+        masked_spectrum = Mass2Motif(
+            frag_mz=np.array(masked_fragments_mz),
+            frag_intensities=np.array(masked_fragments_intensities),
+            loss_mz=np.array(losses_mz),
+            loss_intensities=np.array(losses_intensities),
             metadata={
                 "id": identifier,
                 "precursor_mz": None
             }
         )
-
-        masked_spectrum.losses = Fragments(
-            mz=losses_mz,
-            intensities=losses_intensities)
 
         masked_spectra.append(masked_spectrum)
 
@@ -257,18 +274,16 @@ def mask_losses(spectrum, mask=0.0): # manually connecting mask_losses and mask 
         masked_losses_mz = [mask] + masked_losses_mz
         masked_losses_intensities = [retrieved_loss_intensity] + masked_losses_intensities
 
-        masked_spectrum = Spectrum(
-            mz=fragments_mz,
-            intensities=fragments_intensities,
+        masked_spectrum = Mass2Motif(
+            frag_mz=np.array(fragments_mz),
+            frag_intensities=np.array(fragments_intensities),
+            loss_mz=np.array(masked_losses_mz),
+            loss_intensities=np.array(masked_losses_intensities),
             metadata={
                 "id": identifier,
                 "precursor_mz": None
             }
         )
-
-        masked_spectrum.losses = Fragments(
-            mz=np.array(masked_losses_mz),
-            intensities=np.array(masked_losses_intensities))
 
         masked_spectra.append(masked_spectrum)
 
@@ -303,6 +318,29 @@ def mask_spectra(motif_spectra, masks=[-1.0,-1.0]): #BUG: if there are not fragm
 import warnings
 import logging
 
+def calc_similarity(embeddings_A, embeddings_B):
+    """calculates the cosine similarity of spectral embeddings
+    
+    ARGS:
+        embeddings_A (np.array): query spectral embeddings
+        embeddings_B (np.array): reference spectral embeddings
+        
+    RETURNS:
+        similarities_scores (list): list of lists with s2v similarity scores
+    """
+    if type(embeddings_B) == pd.core.series.Series:
+        embeddings_B = np.vstack(embeddings_B.to_numpy())
+
+    similarity_vectors = []
+    for embedding_A in embeddings_A:
+        similarity_scores = cosine_similarity_matrix(np.array([embedding_A]), embeddings_B)[0]
+        similarity_vectors.append(similarity_scores)
+    
+    similarities_matrix = pd.DataFrame( np.array(similarity_vectors).T, columns=range(len(embeddings_A)) )
+    
+    return similarities_matrix
+
+
 def calc_similarity_matrix(s2v_similarity, top_n_spectra, masked_spectra):
     """Calculates a similarity matrix between top hits."""
     
@@ -319,26 +357,9 @@ def calc_similarity_matrix(s2v_similarity, top_n_spectra, masked_spectra):
         embeddings_masked_spectra = calc_embeddings(s2v_similarity, masked_spectra)
 
         # Calculate similarity
-        masked_spectra_similarity = calc_similarity(embeddings_top_n_spectra, embeddings_masked_spectra)
+        masked_similarities = calc_similarity(embeddings_top_n_spectra, embeddings_masked_spectra)
 
-    return masked_spectra_similarity.T
-
-
-
-
-#def calc_similarity_matrix(s2v_similarity, top_n_spectra, masked_spectra):
-    """calculates a similarity matrix between top hits 
-    """
-    # calcuate embeddings
- #   embeddings_top_n_spectra = calc_embeddings(s2v_similarity, top_n_spectra)
-  #  embeddings_masked_spectra = calc_embeddings(s2v_similarity, masked_spectra)
-    # if there is a spec2vec warning (don't know how to catch thi s warning)
-    # --> write a warning that motif X couldn't be refined; because of spec2vec
-
-    #calculate similarity
-    #masked_spectra_similarity = calc_similarity(embeddings_top_n_spectra, embeddings_masked_spectra)
-
-    #return masked_spectra_similarity.T
+    return masked_similarities.T
 
 
 
@@ -347,7 +368,7 @@ def agglomerative_clustering(masked_spectra_similarity, cosine_similarity=0.6):
         cosine_distance = 1 - cosine_similarity
         cosine_distance_matrix = 1 - masked_spectra_similarity
         clustering = AgglomerativeClustering(
-            distance_threshold=cosine_distance,  
+            distance_threshold=cosine_distance,
             n_clusters= None,
             linkage="complete",
         )

@@ -153,7 +153,6 @@ def create_motif_spectra(motif_features, charge=1, motifset_name="unknown", sign
     motif_spectra = []
         
     for k, motif_k_features in enumerate(motif_features):
-        if any("frag" in feature[0] for feature in motif_k_features):
             motif_spectrum = create_spectrum(motif_k_features, k, charge=charge, motifset=motifset_name, significant_digits=significant_digits)
             motif_spectra.append(motif_spectrum)
 

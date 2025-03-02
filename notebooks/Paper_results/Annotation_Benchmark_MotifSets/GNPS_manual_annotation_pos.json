@@ -1,14 +1,20 @@
 {
         "gnps_motif_115.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1CCC2C(C1)CCC3C2CCC4C3CCC4"
+            ],
             "ANNOTATION": "Sterone steroid related"
         },
         "gnps_motif_8.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC(=O)NCCC1=CNC2=C1C=C(C=C2)OC"
+            ],
             "ANNOTATION": "2-(5-Methoxy-1H-indol-3-yl)ethyl substructure"
         },
         "gnps_motif_53.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1=C(NC=N1)CC(=O)O"
+            ],
             "ANNOTATION": "Imidazole group linked to a carboxylgroup through one CH2 group i.e. like in imidazole acetic acid"
         },
         "gnps_motif_47.m2m": {
@@ -58,15 +64,21 @@
             "ANNOTATION": "N-acetyl-4-piperidinecarboxylic acid substructure"
         },
         "gnps_motif_55.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1=CC(=C(C=C1)O)O"
+            ],
             "ANNOTATION": "Fragments indicative for dihydroxylated benzene ring substructure (MzCloud) \u2013 C6H5O2 fragment corresponds to positively charged fragment with two hydroxyl groups"
         },
         "gnps_motif_69.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CN(C)CC#CC=C1C2=CC=CC=C2C=CC3=CC=CC=C31.Cl"
+            ],
             "ANNOTATION": "H-dibenzo(a d)cyclohepten-5-ylidene substructure (and isomer with three connected benzene rings)"
         },
         "gnps_motif_68.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC(=O)NC1=CC2=C(C=C1)C3=CC=CC=C3C(=O)O2"
+            ],
             "ANNOTATION": "6-oxo-6H-benzo[c]chromen-3-yl substructure"
         },
         "gnps_motif_54.m2m": {
@@ -94,7 +106,9 @@
             "ANNOTATION": "Water loss - indicative of a free hydroxyl group \u2013 (in beer often seen in sugary structures)"
         },
         "gnps_motif_57.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1CCNC(C1)C(=O)O"
+            ],
             "ANNOTATION": "Fragment ions indicative for alkylamine substructure C5H10N (in beer often pipecolic acid [pipecolate])"
         },
         "gnps_motif_18.m2m": {
@@ -102,11 +116,15 @@
             "ANNOTATION": "Acetyl loss"
         },
         "gnps_motif_30.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC[C@H](C)C(=O)O[C@H]1C[C@H](C=C2[C@H]1[C@H]([C@H](C=C2)C)CC[C@@H]3C[C@H](CC(=O)O3)O)C"
+            ],
             "ANNOTATION": "Methylated [7 or 3 7] 2-(4-Hydroxy-6-oxotetrahydro-2H-pyran-2-yl)ethyl substructure"
         },
         "gnps_motif_24.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1=CC(=CC=C1C[C@@H](C(=O)O)N)O"
+            ],
             "ANNOTATION": "Fragments indicative for tyrosine related substructure (MzCloud)"
         },
         "gnps_motif_25.m2m": {
@@ -117,7 +135,7 @@
         },
         "gnps_motif_31.m2m": {
             "SMILES": [
-                "C1=CC(=CC=C1CCl)F"
+                "C1=CC(=CC=C1)F"
             ],
             "ANNOTATION": "Fluorobenzyl substructure"
         },
@@ -128,11 +146,15 @@
             "ANNOTATION": "(5-Hydroxy-2 2-dimethyl-4-oxo-3 4-dihydro-2H-chromen-7-yl)oxy substructure"
         },
         "gnps_motif_27.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC1=CC=C(C=C1)S(=O)(=O)NCC(=O)O"
+            ],
             "ANNOTATION": "(methylphenyl)sulfonylamino substructure"
         },
         "gnps_motif_33.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1CNCC2=CC=CC=C21"
+            ],
             "ANNOTATION": "tetrahydroisoquinoline substructure"
         },
         "gnps_motif_32.m2m": {
@@ -142,7 +164,9 @@
             "ANNOTATION": "Pregn-4 or 5-ene-3-dione substructure"
         },
         "gnps_motif_26.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1C2CN(CC1C3=CC=CC(=O)N3C2)C(=O)N"
+            ],
             "ANNOTATION": "6-oxo-7 11-diazatricyclo[7.3.1.0~2 7~]trideca-2 4-diene-11-carboxamide substructure"
         },
         "gnps_motif_170.m2m": {
@@ -158,11 +182,15 @@
             "ANNOTATION": "losses indicative for 4-oxo-1 4-dihydroquinoline-3-carboxylic acid substructure in GNPS"
         },
         "gnps_motif_36.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1=CC(=O)OC2=C1C=CC(=C2)OC(=O)C"
+            ],
             "ANNOTATION": "2-oxochromen-7-yl [mainly trimethylated] related substructure"
         },
         "gnps_motif_37.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1=CC=C(C=C1)/C=C/C=O"
+            ],
             "ANNOTATION": "Fragments indicative for cinnamic/hydroxycinnamic acid substructure"
         },
         "gnps_motif_23.m2m": {
@@ -178,7 +206,9 @@
             "ANNOTATION": "Amphotericin related"
         },
         "gnps_motif_35.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1CC(=O)N[C@@H]1C(=O)O"
+            ],
             "ANNOTATION": "Fragment ions indicative for pyroglutamic acid (pyroglutamate) or glutamine (both in MzCloud) \u2013 structure can be formed from glutamic acid (glutamate) in the mass spectrometer as well"
         },
         "gnps_motif_21.m2m": {
@@ -194,7 +224,9 @@
             "ANNOTATION": "4-keto-chlorobenzene substructure"
         },
         "gnps_motif_34.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1CC(NC1)[C@@H]2C3=C(CO2)C=C(C=C3)"
+            ],
             "ANNOTATION": "[1 3-dihydro-2-benzofuran-1-yl]pyrrolidine substructure"
         },
         "gnps_motif_39.m2m": {
@@ -216,23 +248,33 @@
             "ANNOTATION": "cinchonan-9-ol substructure"
         },
         "gnps_motif_38.m2m": {
-            "SMILES": [],
+            "SMILES": [
+
+            ],
             "ANNOTATION": "Loss of CH2O2 - indicative for underivatized carboxilic acid group"
         },
         "gnps_motif_12.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC(=O)NCCCCN"
+            ],
             "ANNOTATION": "Fragment ions indicative for C6H12NO substructure (in beer related to N-acetylputrescine - MzCloud)"
         },
         "gnps_motif_13.m2m": {
-            "SMILES": [],
+            "SMILES": [
+
+            ],
             "ANNOTATION": "Amine loss - Indicative for free NH2 group in fragmented molecule"
         },
         "gnps_motif_17.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC1=CC(=O)OC2=C3CCC(OC3=CC(=C12)OCC(=O)NCC(=O)O)(C)C"
+            ],
             "ANNOTATION": "C4H8 loss indicative for saturated C4-alkyl substructure (often tert-butyl group or loss from 8 8-Trimethyl-2-oxo-9 10-dihydro-2H 8H-pyrano[2 3-f]chromen-5-yl substructure)"
         },
         "gnps_motif_16.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "COC1=CC=C(C=C1)C2=CC(=O)OC3=C2C=CC(=C3)OC"
+            ],
             "ANNOTATION": "4-(4-Methoxyphenyl)-2-oxo-2H-chromen-7-yl]oxy relared substructure (or isomeric variants)"
         },
         "gnps_motif_14.m2m": {
@@ -242,7 +284,9 @@
             "ANNOTATION": "Aliphatic amine (NH3 loss indicates free NH2 group coupled to aliphatic chain)"
         },
         "gnps_motif_28.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC1=CC(=O)OC2=C1C=CC(=C2)"
+            ],
             "ANNOTATION": "2-oxochromen-7-yl [mainly dimethylated] related substructure"
         },
         "gnps_motif_29.m2m": {
@@ -252,15 +296,21 @@
             "ANNOTATION": "1-naphthalenamine substructure (or isomeric substructure)"
         },
         "gnps_motif_15.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "NCCCC(=O)O"
+            ],
             "ANNOTATION": "Fragments indicative for y-aminobutyric acid (amimobutyrate) substructure (MzCloud) \u2013 present in Beer 2 & Beer 3 \u2013 in beer 3 mainly based on C4H7O2 fragment"
         },
         "gnps_motif_1.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1CCC2C(C1)CCC3C2CCC4C3CCC4"
+            ],
             "ANNOTATION": "Sterone related"
         },
         "gnps_motif_72.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "N(CC)CC"
+            ],
             "ANNOTATION": "Diethylamino /dimethylaminoethyl substructure"
         },
         "gnps_motif_66.m2m": {
@@ -270,11 +320,15 @@
             "ANNOTATION": "Loss of [hexose-H2O] \u2013 indication of hexose conjugation (for example glucose)"
         },
         "gnps_motif_67.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1=CC(=CC=C1C2=COC3=CC(=CC(=C3C2=O)O)O)O"
+            ],
             "ANNOTATION": "genistein related"
         },
         "gnps_motif_73.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC1=CC(=O)OC2=C1C=CC(=C2C)OCC(=O)NCC3CCC(CC3)C(=O)O"
+            ],
             "ANNOTATION": "oxy]acetyl}amino)methyl]cyclohexanecarboxylic acid related Mass2Motif (losses)"
         },
         "gnps_motif_0.m2m": {
@@ -290,19 +344,27 @@
             "ANNOTATION": "Benzenesulfonylamide related fragments and losses"
         },
         "gnps_motif_59.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1=CC=C(C=C1)C[C@@H](C(=O)O)N"
+            ],
             "ANNOTATION": "Fragments indicative for [phenylalanine-CHOOH] based substructure"
         },
         "gnps_motif_65.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CCOC(=O)COC1=C(C2=C(C=C1)C3=C(CCC3)C(=O)O2)C"
+            ],
             "ANNOTATION": "oxo-1 2 3 4-tetrahydrocyclopenta[c]chromen-7-yl substructure"
         },
         "gnps_motif_71.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC1=C(C=CC2=C1OC(=O)C3=CC=CC=C23)OC(C4=CC=CC=C4)C(=O)O"
+            ],
             "ANNOTATION": "4-Methyl-6-oxo-6H-benzo[c]chromen-3-yl substructure"
         },
         "gnps_motif_70.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1CNCCN1"
+            ],
             "ANNOTATION": "indicative of piperazine substructure (or related N-containing ring structures for C2H5N loss only)"
         },
         "gnps_motif_64.m2m": {
@@ -318,11 +380,16 @@
             "ANNOTATION": "Fragments indicative for asparagine substructure (MzCloud) \u2013 prevalent in Beer 3"
         },
         "gnps_motif_3.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC(C)C[C@@H](C(=O)O)N"
+            ],
             "ANNOTATION": "nitrogen containing substructure [C5H12N] (in beer related to Leucine)"
         },
         "gnps_motif_7.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C1C[C@H](NC1)C(=O)O",
+                "C(C[C@@H](C(=O)O)N)CN"
+            ],
             "ANNOTATION": "Small nitrogen containing fragment ion \u2013 often proline or ornithine derived \u2013 most abundant fragment in beer data"
         },
         "gnps_motif_60.m2m": {
@@ -332,11 +399,15 @@
             "ANNOTATION": "Quinazolinol substructure (or formed after fragmentation event of dihydro analogue)"
         },
         "gnps_motif_48.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "OP(O)(=O)O"
+            ],
             "ANNOTATION": "Fragment ion indicative for conjugation of a phosphate group (H4O4P)"
         },
         "gnps_motif_49.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "CC(=O)O"
+            ],
             "ANNOTATION": "Loss possibly indicative of carboxylic acid group with 1-carbon attached"
         },
         "gnps_motif_61.m2m": {
@@ -347,7 +418,7 @@
         },
         "gnps_motif_6.m2m": {
             "SMILES": [
-                "C1CCCC1-C2CCCCC2"
+                "c1ccccc1-c2ccccc2"
             ],
             "ANNOTATION": "Diphenyl substructure"
         },
@@ -358,7 +429,9 @@
             "ANNOTATION": "Fragment and loss of [proline-H2O] - indicative for conjugated proline or arginine/ornithine \u2013 EF fits"
         },
         "gnps_motif_63.m2m": {
-            "SMILES": [],
+            "SMILES": [
+                "C[C@@H](C(=O)NCC1=CC=CC=C1OC)N2C(=O)[C@@]3(C4=C(CCN3C2=O)C5=C(N4)C=CC(=C5)OC)C"
+            ],
             "ANNOTATION": "8-methoxy-11b-methyl-1 3-dioxo-5 6 11 11b-tetrahydro-1H-imidazo[1' 5':1 2]pyrido[3 4-b]indol-2(3H)-yl)propanamide substructure"
         },
         "gnps_motif_62.m2m": {

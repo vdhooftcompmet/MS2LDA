@@ -20,7 +20,7 @@
     },
     "urine_mass2motif_104.m2m": {
         "SMILES": [
-             
+             "C1=CNC2=CC(=C(C=C21)O)O"
         ],
         "ANNOTATION": "5 6-dihydroxyindole related (fragments would fit substructure - indole related)",
         "PUBCHEMID":[]
@@ -55,6 +55,7 @@
     },
     "urine_mass2motif_117.m2m": {
         "SMILES": [
+            "CCCC(CC(=O)[O-])(C[N+](C)(C)C)O"
         ],
         "ANNOTATION": "Loss based Mass2Motif - different losses combined including 133 - C6H15NO2 e.g. from propylcarnitine",
         "PUBCHEMID":[]
@@ -68,7 +69,7 @@
     },
     "urine_mass2motif_122.m2m": {
         "SMILES": [
-              
+              "CC(=O)NC1=CC=C(C=C1)OC(=O)[C@H](CS)NC(=O)C"
         ],
         "ANNOTATION": "Paracetamol mercapturate related (i.e. metabolites containing N-acetylcysteine adduct with paracetamol)",
         "PUBCHEMID":[]
@@ -82,14 +83,14 @@
     },
     "urine_mass2motif_128.m2m": {
         "SMILES": [
-            "C[N+]1(CCC[C@H]1C(=O)[O-])C "
+            "C[N+]1(CCC[C@H]1C(=O)[O-])C"
         ],
         "ANNOTATION": "Mostly proline betaine C13 isotope related Mass2Motif",
         "PUBCHEMID":[115244]
     },
     "urine_mass2motif_130.m2m": {
         "SMILES": [
-              
+              "CCOCCOCCO"
         ],
         "ANNOTATION": "Polyethylene glycol related Mass2Motif – C6H13O3 fragment and smaller fragments present in PEG related compounds",
         "PUBCHEMID":[]
@@ -110,14 +111,14 @@
     },
     "urine_mass2motif_137.m2m": {
         "SMILES": [
-              
+              "C1CCC2C(C1)CCC3C2CCC4C3CCC4"
         ],
         "ANNOTATION": "Steroid related (including C8H11O fragment",
         "PUBCHEMID":[]
     },
     "urine_mass2motif_138.m2m": {
         "SMILES": [
-              
+              "C1=C(NC=N1)CCO"
         ],
         "ANNOTATION": "ethanolimidazole substructure related Mass2Motif",
         "PUBCHEMID":[]
@@ -131,7 +132,7 @@
     },
     "urine_mass2motif_147.m2m": {
         "SMILES": [
-              
+              "OP(O)(=O)O"
         ],
         "ANNOTATION": "Fragment ion indicative for conjugation of a phosphate group (H4O4P)",
         "PUBCHEMID":[]
@@ -187,7 +188,7 @@
     },
     "urine_mass2motif_164.m2m": {
         "SMILES": [
-              
+              "C1=CC=C(C=C1)C[C@@H](C(=O)O)N"
         ],
         "ANNOTATION": "[Phenylalanine-CHOOH] related Mass2Motif",
         "PUBCHEMID":[]
@@ -208,14 +209,14 @@
     },
     "urine_mass2motif_169.m2m": {
         "SMILES": [
-              
+              "CN(C)CCCC1(C2=C(CO1)C=C(C=C2)C#N)C3=CC=C(C=C3)F"
         ],
         "ANNOTATION": "Includes but not restricted to citalopram [fluor] related fragments (i.e. 109.0470)",
         "PUBCHEMID":[]
     },
     "urine_mass2motif_173.m2m": {
         "SMILES": [
-              
+              "C(C(=O)O)C(CC(=O)O)(C(=O)O)O"
         ],
         "ANNOTATION": "Cytoplex (citric acid based) plasticer related losses",
         "PUBCHEMID":[]
@@ -271,14 +272,14 @@
     },
     "urine_mass2motif_186.m2m": {
         "SMILES": [
-              
+              "CN(C)CCC=C1C2=CC=CC=C2C=CC3=CC=CC=C31"
         ],
         "ANNOTATION": "Mixed motif of Cyclobenzaprine related metabolites (urine 02) and unclear cores (other urines)",
         "PUBCHEMID":[]
     },
     "urine_mass2motif_187.m2m": {
         "SMILES": [
-              
+              "C1=C(NC=N1)CC(=O)O"
         ],
         "ANNOTATION": "Mass2Motif related to Imidazole group linked to a carboxylgroup through one CH2 group i.e. like in imidazole acetic acid",
         "PUBCHEMID":[]
@@ -355,14 +356,14 @@
     },
     "urine_mass2motif_210.m2m": {
         "SMILES": [
-              
+              "CCCCC1=NC(=C(N1CC2=CC=C(C=C2)C3=CC=CC=C3C4=NNN=N4)CO)Cl"
         ],
         "ANNOTATION": "Sartan related (includes antihypertensives such as losartan)",
         "PUBCHEMID":[]
     },
     "urine_mass2motif_211.m2m": {
         "SMILES": [
-              
+              "CN1CCC=C(C1)C(=O)O"
         ],
         "ANNOTATION": "13C isotope motif of unknown core possibly Arecaidine (chewing nut metabolit",
         "PUBCHEMID":[]
@@ -460,7 +461,7 @@
     },
     "urine_mass2motif_239.m2m": {
         "SMILES": [
-              
+              "CC(=O)NC1=CC=C(C=C1)O"
         ],
         "ANNOTATION": "aracetamol related Mass2Motif (C13 isotope features and fragments)",
         "PUBCHEMID":[]
@@ -474,7 +475,7 @@
     },
     "urine_mass2motif_241.m2m": {
         "SMILES": [
-              
+              "C([C@@H]1[C@H]([C@@H]([C@H](C(O1)O)O)O)O)O"
         ],
         "ANNOTATION": "Loss of [hexose-H2O] – indication of hexose conjugation (for example glucose)",
         "PUBCHEMID":[]
@@ -502,7 +503,7 @@
     },
     "urine_mass2motif_247.m2m": {
         "SMILES": [
-              
+              "CCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C"
         ],
         "ANNOTATION": "Isotopes of Acylcarnitines related Mass2Motif",
         "PUBCHEMID":[]
@@ -544,7 +545,7 @@
     },
     "urine_mass2motif_261.m2m": {
         "SMILES": [
-              
+              "CN(C)CCC(C1=CC=C(C=C1)Cl)C2=CC=CC=N2"
         ],
         "ANNOTATION": "Dechloronated substructure of Chlorphenamine related",
         "PUBCHEMID":[]
@@ -572,7 +573,7 @@
     },
     "urine_mass2motif_269.m2m": {
         "SMILES": [
-              
+              "C1=CC2=C(C=C1O)C(=CN2)CCN"
         ],
         "ANNOTATION": "Mixed motif with serotonin-based drug Motif (urine 49) and random other cores (other urines)",
         "PUBCHEMID":[]
@@ -586,7 +587,7 @@
     },
     "urine_mass2motif_271.m2m": {
         "SMILES": [
-              
+              "C1CCC2C(C1)CCC3C2CCC4C3CCC4"
         ],
         "ANNOTATION": "Fragments indicative for presence of steroid backbone",
         "PUBCHEMID":[]
@@ -607,7 +608,7 @@
     },
     "urine_mass2motif_278.m2m": {
         "SMILES": [
-              
+              "N=C(NCCCC(O)C(O)=O)N(C([2H])([2H])[2H])C([2H])([2H])[2H]"
         ],
         "ANNOTATION": "Dimethylated guanidino group related",
         "PUBCHEMID":[]
@@ -621,7 +622,7 @@
     },
     "urine_mass2motif_281.m2m": {
         "SMILES": [
-              
+              "COC(=O)[C@H](C1=CC=CC=C1Cl)N2CCC3=C(C2)C=CS3"
         ],
         "ANNOTATION": "Mixed motif of Clopidogrel (urine 93) and a mix of other cores (no well defined ones in several mtbs)",
         "PUBCHEMID":[]
@@ -649,7 +650,10 @@
     },
     "urine_mass2motif_286.m2m": {
         "SMILES": [
-              
+              "C1C[C@H](NC1)C(=O)O",
+              "C(C[C@@H](C(=O)O)N)CNC(=O)N",
+              "CC(C)(C)OC(=O)N[C@@H](CCCN)C(=O)O",
+              "C(C[C@@H](C(=O)O)N)CN=C(N)N"
         ],
         "ANNOTATION": "C4H8N based Mass2Motif - indicative for proline arginine ornitine citrulline and N-containing ring structures",
         "PUBCHEMID":[]
@@ -719,7 +723,7 @@
     },
     "urine_mass2motif_38.m2m": {
         "SMILES": [
-              
+              "CN1C=NC=C1CCN"
         ],
         "ANNOTATION": "methylethylimidazole substructure (i.e. from 3-methylhistamine)",
         "PUBCHEMID":[]
@@ -817,7 +821,7 @@
     },
     "urine_mass2motif_68.m2m": {
         "SMILES": [
-              
+              "C=CC1=CC=CC=C1"
         ],
         "ANNOTATION": "Alkyl aromatic substructure – indicative for aromatic ring with 2-carbon alkyl chain attached i.e. phenylethene fragment",
         "PUBCHEMID":[]
@@ -831,7 +835,7 @@
     },
     "urine_mass2motif_72.m2m": {
         "SMILES": [
-              
+              "C1C(C(C(C(O1)O)O)O)O"
         ],
         "ANNOTATION": "Pentose loss",
         "PUBCHEMID":[]
@@ -873,7 +877,7 @@
     },
     "urine_mass2motif_90.m2m": {
         "SMILES": [
-              
+              "CC(=O)N[C@@H]1[C@H](C[C@](O[C@H]1[C@@H]([C@@H](CO)O)O)(C(=O)O)O)O"
         ],
         "ANNOTATION": "N-acetylneuramic acid and hydroxybenzoyl related",
         "PUBCHEMID":[]

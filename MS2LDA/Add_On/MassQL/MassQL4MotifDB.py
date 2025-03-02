@@ -4,10 +4,8 @@ import numpy as np
 import pandas as pd
 import json
 
+
 from matchms import Spectrum, Fragments
-
-
-# from matchms import Spectrum, Fragments
 
 def motifs2motifDB(spectra):
     """converts a set of motif spectra into a MassQL dataframe format
