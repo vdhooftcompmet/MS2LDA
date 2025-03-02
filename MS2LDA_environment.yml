@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - python>=3.11
+  - python>=3.10
   - ipython>=8.26.0
   - jupyterlab>=4.2.4
   - matplotlib>=3.9.1
@@ -20,7 +20,7 @@ dependencies:
   - matchms>=0.27.0
   - numba>=0.57.1
   - llvmlite>=0.43.0
-  - numpy==1.26.4
+  - numpy>=1.23,<1.25
   - plotly>=5.23.0
   - pyarrow>=17.0.0
   - pymzml>=2.5.10
@@ -35,4 +35,4 @@ dependencies:
       - spec2vec>=0.8.0
       - PyQt6>=6.7.1
       - faiss-cpu==1.10.0
-
+      - git+https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git
