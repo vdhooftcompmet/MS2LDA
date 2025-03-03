@@ -160,7 +160,8 @@ def toggle_advanced_settings(n_clicks, is_open):
     State("fp-threshold", "value"),
     State("motif-parameter", "value"),
     State("s2v-model-path", "value"),
-    State("s2v-library-path", "value"),
+    State("s2v-library-embeddings", "value"),
+    State("s2v-library-db", "value"),
     prevent_initial_call=True,
 )
 def handle_run_or_load(
@@ -203,7 +204,8 @@ def handle_run_or_load(
         fp_threshold,
         motif_parameter,
         s2v_model_path,
-        s2v_library_path,
+        s2v_library_embeddings,
+        s2v_library_db,
 ):
     """
     This callback either (1) runs MS2LDA from scratch on the uploaded data (when Run Analysis clicked),
@@ -270,7 +272,8 @@ def handle_run_or_load(
             "cosine_similarity": ann_cosine_sim,
             "n_mols_retrieved": top_n,
             "s2v_model_path": s2v_model_path,
-            "s2v_library_path": s2v_library_path,
+            "s2v_library_embeddings": s2v_library_embeddings,
+            "s2v_library_db": s2v_library_db,
         }
         model_parameters = {
             "rm_top": model_rm_top,
@@ -777,7 +780,7 @@ def compute_motif_degrees(lda_dict, p_low, p_high, o_low, o_high):
 def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thresh, active_tab,
                                 screening_data, optimized_motifs_data):
     if active_tab != 'motif-rankings-tab' or not lda_dict_data:
-        return "", ""
+        return [], [], ""
 
     p_low, p_high = probability_thresh
     o_low, o_high = overlap_thresh
