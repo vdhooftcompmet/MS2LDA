@@ -1053,7 +1053,14 @@ def create_motif_rankings_tab():
                                 'whiteSpace': 'normal',
                                 'textAlign': 'left',
                             },
-                            style_data_conditional=[],
+                            style_data_conditional=[
+                                {
+                                    'if': {'column_id': 'Motif'},
+                                    'cursor': 'pointer',
+                                    'textDecoration': 'underline',
+                                    'color': 'blue'
+                                },
+                            ],
                             style_header={
                                 'backgroundColor': 'rgb(230, 230, 230)',
                                 'fontWeight': 'bold'
