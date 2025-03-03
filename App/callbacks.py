@@ -28,6 +28,7 @@ from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
 from MS2LDA.run import filetype_check
 from MS2LDA.run import load_s2v_model
+from Mass2Motif import Mass2Motif
 from app_instance import app
 
 # Hardcode the path for .m2m references
@@ -445,7 +446,6 @@ def handle_run_or_load(
 
 # -------------------------------- CYTOSCAPE NETWORK --------------------------------
 
-
 # Callback to create Cytoscape elements
 @app.callback(
     Output("cytoscape-network-container", "children"),
@@ -463,21 +463,24 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, e
 
     spectra = []
     for s in optimized_motifs_data:
-        spectrum = Spectrum(
-            mz=np.array(s["mz"], dtype=float),
-            intensities=np.array(s["intensities"], dtype=float),
+        # Prepare the losses, if any, from s["metadata"]
+        if "losses" in s["metadata"]:
+            losses_list = s["metadata"]["losses"]
+            loss_mz = [loss["loss_mz"] for loss in losses_list]
+            loss_intensities = [loss["loss_intensity"] for loss in losses_list]
+        else:
+            loss_mz = []
+            loss_intensities = []
+
+        # Create Mass2Motif object with both fragments and losses
+        spectrum = Mass2Motif(
+            frag_mz=np.array(s["mz"], dtype=float),
+            frag_intensities=np.array(s["intensities"], dtype=float),
+            loss_mz=np.array(loss_mz, dtype=float),
+            loss_intensities=np.array(loss_intensities, dtype=float),
             metadata=s["metadata"],
         )
-        if "losses" in s["metadata"]:
-            losses = s["metadata"]["losses"]
-            mz = [loss["loss_mz"] for loss in losses]
-            intensities = [loss["loss_intensity"] for loss in losses]
-            spectrum.losses = Fragments(
-                mz=np.array(mz, dtype=float),
-                intensities=np.array(intensities, dtype=float),
-            )
-        else:
-            spectrum.losses = None
+
         spectra.append(spectrum)
 
     smiles_clusters = clustered_smiles_data
@@ -895,7 +898,6 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
 
     row_count_message = f"{len(df)} motif(s) pass the filter"
     return table_data, table_columns, row_count_message
-
 
 
 @app.callback(
@@ -1582,9 +1584,10 @@ def filter_and_normalize_spectra(spectrum_list):
     Input("compute-screening-button", "n_clicks"),
     State("m2m-folders-checklist", "value"),
     State("optimized-motifs-store", "data"),
+    State("s2v-model-path", "value"),
     prevent_initial_call=True,
 )
-def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data):
+def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data, path_model):
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
 
@@ -1628,7 +1631,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
 
     # load spec2vec
     print("loading s2v")
-    s2v_sim, _ = load_s2v_model()
+    s2v_sim = load_s2v_model(path_model=path_model)
     print("loaded s2v")
     progress_val = 60
 
