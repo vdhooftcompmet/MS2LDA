@@ -227,7 +227,7 @@ def create_run_analysis_tab():
                                                             dbc.Input(
                                                                 id="prep-min-mz",
                                                                 type="number",
-                                                                value=0,  # default
+                                                                value=0,
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -244,7 +244,7 @@ def create_run_analysis_tab():
                                                             dbc.Input(
                                                                 id="prep-max-mz",
                                                                 type="number",
-                                                                value=2000,  # default
+                                                                value=2000,
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -629,7 +629,6 @@ def create_run_analysis_tab():
                                                         target="train-workers-tooltip",
                                                         placement="right",
                                                     ),
-                                                    # n_iterations Moved Above
                                                 ],
                                                 width=6,
                                             ),
@@ -648,7 +647,7 @@ def create_run_analysis_tab():
                                                             dbc.Input(
                                                                 id="prep-sigdig",
                                                                 type="number",
-                                                                value=2,  # default
+                                                                value=2,
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -1273,7 +1272,7 @@ def create_screening_tab():
                 id="screening-results-table",
                 columns=[
                     {"name": "User Motif ID", "id": "user_motif_id"},
-                    {"name": "User ShortAnno", "id": "user_short_annotation"},
+                    {"name": "User AutoAnno", "id": "user_auto_annotation"},
                     {"name": "Reference Motif ID", "id": "ref_motif_id"},
                     {"name": "Ref ShortAnno", "id": "ref_short_annotation"},
                     {"name": "Ref MotifSet", "id": "ref_motifset"},
@@ -1287,7 +1286,6 @@ def create_screening_tab():
                     "backgroundColor": "rgb(230, 230, 230)",
                     "fontWeight": "bold",
                 },
-                # NEW: make user_motif_id visually clickable
                 style_data_conditional=[
                     {
                         'if': {'column_id': 'user_motif_id'},

@@ -967,8 +967,8 @@ def display_overlap_filter(overlap_range):
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
-    State('optimized-motifs-store', 'data'),  # NEW STATE for short_annotation
-    State('screening-fullresults-store', 'data'),  # NEW STATE for screening hits
+    State('optimized-motifs-store', 'data'),
+    State('screening-fullresults-store', 'data'),
     prevent_initial_call=True,
 )
 def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
@@ -1077,13 +1077,11 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
             pass
 
     spec2vec_container = []
-    # Insert user short annotation if present
-    user_short_anno_text = ""
+    auto_anno_text = ""
     if optimized_motifs_data and motif_idx < len(optimized_motifs_data):
-        # Attempt to read user short annotation from metadata
         meta_anno = optimized_motifs_data[motif_idx]['metadata'].get('auto_annotation', "")
         if meta_anno:
-            user_short_anno_text = f"User ShortAnno: {meta_anno}"
+            auto_anno_text = f"Auto Annotations: {meta_anno}"
 
     if clustered_smiles_data and motif_idx < len(clustered_smiles_data):
         smiles_list = clustered_smiles_data[motif_idx]
@@ -1112,8 +1110,8 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
                 ))
 
     # If we have a user short annotation, display it right after the SMILES image
-    if user_short_anno_text:
-        spec2vec_container.append(html.Div(user_short_anno_text, style={"marginTop": "10px"}))
+    if auto_anno_text:
+        spec2vec_container.append(html.Div(auto_anno_text, style={"marginTop": "10px"}))
 
     # Doc-Topic Probability / Overlap filter & doc table
     doc2spec_index = lda_dict_data["doc_to_spec_index"]
@@ -1227,6 +1225,11 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
     if screening_data:
         try:
             scdf = pd.read_json(screening_data, orient="records")
+            if "user_auto_annotation" in scdf.columns:
+                scdf["user_auto_annotation"] = scdf["user_auto_annotation"].apply(
+                    lambda x: ", ".join(x) if isinstance(x, list) else str(x)
+                )
+
             hits_df = scdf[scdf['user_motif_id'] == motif_name].copy()
             hits_df = hits_df.sort_values('score', ascending=False)
             if not hits_df.empty:
@@ -1651,7 +1654,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
     results = []
     for user_i, user_sp in enumerate(user_motifs):
         user_id = user_sp.get("id", "")
-        user_anno = user_sp.get("short_annotation", "")
+        user_anno = user_sp.metadata.get("auto_annotation", "")
         for ref_j, ref_sp in enumerate(all_refs):
             score = sim_matrix.iloc[ref_j, user_i]
             ref_id = ref_sp.get("id", "")
@@ -1660,7 +1663,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
 
             results.append({
                 "user_motif_id": user_id,
-                "user_short_annotation": user_anno,
+                "user_auto_annotation": user_anno,
                 "ref_motif_id": ref_id,
                 "ref_short_annotation": ref_anno,
                 "ref_motifset": ref_motifset,
@@ -1699,6 +1702,12 @@ def filter_screening_results(fullresults_json, threshold):
     # The "FutureWarning" can appear for read_json on raw strings.
     # We can ignore or wrap with io.StringIO. For now, ignoring is fine.
     df = pd.read_json(fullresults_json, orient="records")
+
+    # Convert any list in user_auto_annotation to a comma-joined string
+    if "user_auto_annotation" in df.columns:
+        df["user_auto_annotation"] = df["user_auto_annotation"].apply(
+            lambda x: ", ".join(x) if isinstance(x, list) else str(x)
+        )
 
     filtered = df[df["score"] >= threshold].copy()
     filtered = filtered.sort_values("score", ascending=False)
