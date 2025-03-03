@@ -38,7 +38,7 @@ from MS2LDA.Add_On.MassQL.MassQL4MotifDB import motifs2motifDB
 from MS2LDA.Add_On.MassQL.MassQL4MotifDB import store_motifDB
 from MS2LDA.Add_On.MassQL.MassQL4MotifDB import store_motifDB_excel
 
-from massql import msql_engine
+from massql4motifs import msql_engine
 
 from MS2LDA.Add_On.Fingerprints.FP_annotation import tanimoto_similarity
 
