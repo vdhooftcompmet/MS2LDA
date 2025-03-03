@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import json
 
-#from matchms import Spectrum, Fragments
+from MS2LDA.Mass2Motif import Mass2Motif
 
 def motifs2motifDB(spectra):
     """converts a set of motif spectra into a MassQL dataframe format
@@ -166,9 +166,11 @@ def motifDB2motifs(motifDB_ms2, filter_table=None):
         property = motif.property
 
 
-        motif_spectrum = Spectrum(
-            mz=fragments_mz,
-            intensities=fragments_intensities,
+        motif_spectrum = Mass2Motif(
+            frag_mz=fragments_mz,
+            frag_intensities=fragments_intensities,
+            loss_mz=losses_mz,
+            loss_intensities=losses_intensities,
             metadata = {
                 "id": name,
                 "charge": charge,
@@ -191,11 +193,6 @@ def motifDB2motifs(motifDB_ms2, filter_table=None):
                 "auto_annotation": auto_annotation,
                 "property": property,
             }
-        )
-
-        motif_spectrum.losses = Fragments(
-            mz=losses_mz,
-            intensities=losses_intensities
         )
 
         motif_spectra.append(motif_spectrum)
