@@ -1743,27 +1743,26 @@ def save_screening_results(csv_click, json_click, table_data):
     [
         State("motif-rankings-table", "data"),
         State("screening-results-table", "data"),
+        State("motif-rankings-table", "derived_viewport_data"),
     ],
     prevent_initial_call=True,
 )
-def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, screening_data):
-    # Check if anything actually triggered
+def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, screening_data, ranking_dv_data):
     ctx = dash.callback_context
     if not ctx.triggered:
         raise dash.exceptions.PreventUpdate
 
-    # If user clicked a motif in the Motif Rankings table
     triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
     if triggered_id == "motif-rankings-table":
-        if ranking_active_cell and ranking_data:
+        if ranking_active_cell and ranking_dv_data:
             col_id = ranking_active_cell["column_id"]
             row_id = ranking_active_cell["row"]
             if col_id == "Motif":
-                motif = ranking_data[row_id]["Motif"]
-                return motif
+                motif_markdown = ranking_dv_data[row_id]["Motif"]
+                return motif_markdown
         raise dash.exceptions.PreventUpdate
 
-    # If user clicked a motif in the Screening table
     elif triggered_id == "screening-results-table":
         if screening_active_cell and screening_data:
             col_id = screening_active_cell["column_id"]
