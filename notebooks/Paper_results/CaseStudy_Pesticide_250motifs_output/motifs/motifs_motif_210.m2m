@@ -4,7 +4,7 @@
 #NAME motifs_motif_210
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['CN1COCN(Cc2cnc(Cl)s2)C1=N[N+](=O)[O-]']
+#AUTO_ANNOTATION ['O=C(O)CCCCC(=O)O', 'COc1ccc(N2C(=O)c3cc(I)ccc3NC2c2ccc(C)o2)cc1', 'Cc1ccc(C(C)C)c(OCCSc2nc(N)cc(N)n2)c1', 'COc1ccc(C=Nn2c(C)cc(C)c(C#N)c2=O)c2ccccc12']
 #COMMENT None
 fragment_131.967,1.0
 fragment_169.054,0.359559563030861

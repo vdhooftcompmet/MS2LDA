@@ -4,7 +4,7 @@
 #NAME motifs_motif_225
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['NCCCCNCCCN', 'C=CC(=O)Nc1cc(Nc2ncc(C(=O)OC(C)C)c(-c3cn(C)c4ccccc34)n2)c(OC)cc1N(C)CCN(C)C', 'COc1ccc2c(c1)CC(C(=O)Nc1ccc(-c3cn[nH]c3)cc1OCCN(C)C)CO2', 'C=CC(=O)Nc1cc(Nc2nccc(-c3c[nH]c4ccccc34)n2)c(OC)cc1N(C)CCN(C)C', 'CCCCCCCCCCCCCCCCCC(=O)NC(C(=O)O)C(C)C', 'CCCCNc1nc(N)c2[nH]c(=O)n(Cc3ccc(OCCN(C)C)nc3)c2n1']
+#AUTO_ANNOTATION ['NCCCCNCCCN', 'C=CC(=O)Nc1cc(Nc2ncc(C(=O)OC(C)C)c(-c3cn(C)c4ccccc34)n2)c(OC)cc1N(C)CCN(C)C', 'COc1ccc2c(c1)CC(C(=O)Nc1ccc(-c3cn[nH]c3)cc1OCCN(C)C)CO2', 'C=CC(=O)Nc1cc(Nc2nccc(-c3c[nH]c4ccccc34)n2)c(OC)cc1N(C)CCN(C)C', 'CCCCCCCCCCCCCCCCCC(=O)NC(C(=O)O)C(C)C', 'CCCCNc1nc(N)c2[nH]c(=O)n(Cc3ccc(OCCN(C)C)nc3)c2n1', 'CC(C)C(N=C(O)CN)C(=O)O', 'COc1cc(N(C)CCN(C)C)c(N)cc1Nc1nccc(-c2cn(C)c3ccccc23)n1', 'C=CC(=O)Nc1cccc(-n2c(=O)cc(C)c3cnc(Nc4ccc(OCCN(C)C)cc4OC)nc32)c1', 'CNCCCN1c2ccccc2CCc2ccccc21']
 #COMMENT None
 fragment_72.08,1.0
 fragment_84.044,0.39456811193480545

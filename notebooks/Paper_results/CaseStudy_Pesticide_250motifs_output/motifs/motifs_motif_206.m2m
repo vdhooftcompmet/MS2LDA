@@ -4,7 +4,7 @@
 #NAME motifs_motif_206
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['CCC(=O)Nc1ccc(Cl)c(Cl)c1', 'CCCN(C(=O)CC)c1nc(-c2cccc(Br)c2)cs1', 'CC(C)(C)[Si](C)(C)Oc1ccc2oc(=O)c3c(c2c1)CCCN3']
+#AUTO_ANNOTATION ['CCC(=O)Nc1ccc(Cl)c(Cl)c1', 'CCCN(C(=O)CC)c1nc(-c2cccc(Br)c2)cs1', 'CC(C)(C)[Si](C)(C)Oc1ccc2oc(=O)c3c(c2c1)CCCN3', 'CCC(=O)Nc1c2c(nn1-c1cccc(Cl)c1)C[S+]([O-])C2', 'C#CCN1C(=O)COc2cc(F)c(N3C(=O)C4=C(CCCC4)C3=O)cc21', 'Cc1cc(N)no1']
 #COMMENT None
 fragment_147.711,0.5478984922529967
 fragment_346.909,0.12772505824184968

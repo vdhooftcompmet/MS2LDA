@@ -354,7 +354,7 @@ def handle_run_or_load(
 
         clustered_smiles_data = []
         for mot in optimized_motifs:
-            ann = mot.get("short_annotation")
+            ann = mot.get("auto_annotation")
             if isinstance(ann, list):
                 clustered_smiles_data.append(ann)
             elif ann is None:
@@ -813,12 +813,9 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
             except ValueError:
                 pass
 
-        if (
-            optimized_motifs_data
-            and motif_idx is not None
-            and 0 <= motif_idx < len(optimized_motifs_data)
-        ):
-            short_anno = optimized_motifs_data[motif_idx]["metadata"].get("short_annotation", "")
+        if optimized_motifs_data and motif_idx is not None and 0 <= motif_idx < len(optimized_motifs_data):
+            # short_annotation might be list of SMILES or None
+            short_anno = optimized_motifs_data[motif_idx]["metadata"].get("auto_annotation", "")
             if isinstance(short_anno, list):
                 short_anno_str = ", ".join(short_anno)
             elif isinstance(short_anno, str):
@@ -1082,7 +1079,7 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
     user_short_anno_text = ""
     if optimized_motifs_data and motif_idx < len(optimized_motifs_data):
         # Attempt to read user short annotation from metadata
-        meta_anno = optimized_motifs_data[motif_idx]['metadata'].get('short_annotation', "")
+        meta_anno = optimized_motifs_data[motif_idx]['metadata'].get('auto_annotation', "")
         if meta_anno:
             user_short_anno_text = f"User ShortAnno: {meta_anno}"
 

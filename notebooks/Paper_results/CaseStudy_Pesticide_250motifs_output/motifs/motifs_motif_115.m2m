@@ -4,7 +4,7 @@
 #NAME motifs_motif_115
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['CCSCCSP(=O)(OC)OC', 'COc1c2occc2cc2ccc(=O)oc12', 'COC(=O)c1[nH]c(=NC(=O)CCCCCNc2ccc3c(cc2=O)C(NC(C)=O)CCc2cc(OC)c(OC)c(OC)c2-3)sc1-c1ccccc1', 'CCCCCCCCCCCCCCCCCCCCCCCC(=O)O']
+#AUTO_ANNOTATION ['O=C(C=Cc1ccc(O)c(O)c1)OC1CC(O)(C(=O)O)CC(O)C1O', 'CCSCCSP(=S)(OC)OC', 'COc1cc2oc(=O)ccc2cc1O', 'CCSCCSP(=O)(OC)OC', 'COc1c2occc2cc2ccc(=O)oc12', 'COC(=O)c1[nH]c(=NC(=O)CCCCCNc2ccc3c(cc2=O)C(NC(C)=O)CCc2cc(OC)c(OC)c(OC)c2-3)sc1-c1ccccc1', 'CCCCCCCCCCCCCCCCCCCCCCCC(=O)O', 'O=C(O)CC(O)(CC(=O)O)C(=O)O', 'CCOP(=S)(OCC)SCCSCC', 'CCOC(=O)c1c(C)n(CCSCC)c2c1cc(O)c1ccccc12']
 #COMMENT None
 fragment_89.038,0.4158125197664078
 fragment_208.016,1.0

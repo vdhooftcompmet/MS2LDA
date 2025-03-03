@@ -77,19 +77,21 @@ def calc_similarity_faiss(embeddings_A, embeddings_B, k=None):
     return similarities, indices
     
 
-def get_library_matches_per_motif(similarities, indices, db_path, motif_number=0, top_n=10, unique_mols=False):
+def get_library_matches_per_motif(similarities, indices, db_path, motif_number=0, top_n=10, unique_mols=True):
     """Return similarity scores, SMILES, and spectra for top n matches for one motif."""
     top_smiles = []
     top_spectra = []
     top_scores = []
     top_inchikeys = []
 
-    for i in range(top_n):
+    i = 0  # Index for iterating over ranked molecules
+    while len(top_smiles) < top_n and i < indices.shape[1]:  # Ensure we collect 10 molecules
         score = similarities[motif_number, i]
         spectrum_id = indices[motif_number, i]
         spectrum_data = load_spectrum_from_db(db_path, spectrum_id)
         if spectrum_data is None:
-            continue
+            i += 1
+            continue  # Skip missing data
 
         smi = spectrum_data['smiles']
         spectrum = spectrum_data['spectrum']
@@ -99,18 +101,20 @@ def get_library_matches_per_motif(similarities, indices, db_path, motif_number=0
             inchi = MolToInchi(mol)
             inchikey = InchiToInchiKey(inchi)
             if inchikey in top_inchikeys:
-                continue
+                i += 1
+                continue  # Skip duplicates
             else:
                 top_inchikeys.append(inchikey)
 
+        # Add the molecule to the results
         top_scores.append(score)
         top_smiles.append(smi)
         top_spectra.append(spectrum)
 
-        if len(top_smiles) >= top_n:
-            break
+        i += 1  # Move to the next candidate
 
     return top_smiles, top_spectra, top_scores
+
 
 def get_library_matches(similarities, indices, db_path, top_n=10, unique_mols=True):
     """Return similarity scores, SMILES, and spectra for top n matches for all motifs."""

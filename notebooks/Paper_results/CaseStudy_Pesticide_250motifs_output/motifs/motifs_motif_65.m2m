@@ -4,7 +4,7 @@
 #NAME motifs_motif_65
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['C=CC(=C)CCC=C(C)C']
+#AUTO_ANNOTATION ['CC(C)C(N=C(O)Cc1c[nH]c2ccccc12)C(=O)O', 'COc1ccc2[nH]cc(CCN)c2c1', 'O=C(O)CCC(N=C(O)Cc1c[nH]c2ccccc12)C(=O)O', 'CCC(C)C(=O)C(O)Cc1c[nH]c2ccccc12', 'CC(N=C(O)Cc1c[nH]c2ccccc12)C(=O)O', 'CN(C)Cc1c[nH]c2ccccc12']
 #COMMENT None
 fragment_116.049,0.10899668278135737
 fragment_130.065,0.09319295256066439

@@ -19,8 +19,13 @@
             "O=C(O)CC(=O)O",
             "Cc1ccc(CN(Cc2cc(=O)n3nc(C(C)C)sc3n2)CC(C)C)cc1",
             "CC(NC(=O)C(C#N)=Cc1cccc(Br)n1)c1ccccc1",
-            "Cc1ccc(CSc2nc3c(c(O)nc(=O)n3C)n2CC(=N)O)cc1",
-            "COc1ccc(C(=O)c2ccccc2-c2ccc3c(c2)S(=O)(=O)Cc2cc(C(=O)NCc4ccc(C)cc4)sc2-3)cc1"
+            "COc1ccc(C(=O)c2ccccc2-c2ccc3c(c2)S(=O)(=O)Cc2cc(C(=O)NCc4ccc(C)cc4)sc2-3)cc1",
+            "CC(C)(CO)C(O)C(=O)NCCCO",
+            "NCCC(Oc1ccc(C(F)(F)F)cc1)c1ccccc1",
+            "Cc1ccccc1CSc1nc2c(O)ncnc2n1-c1ccccc1",
+            "CCOC(=O)CSc1nc2c(c(O)nc(=O)n2C)n1Cc1cccc(C)c1",
+            "CC(=O)CSc1nc2c(c(O)nc(=O)n2C)n1Cc1cccc(C)c1",
+            "CCCCOc1nc(N)c2c(n1)N(Cc1cccc(CN3CCCC3)c1)CC(=O)N2"
         ]
     },
     "gnps_motif_115.m2m": {
@@ -49,10 +54,7 @@
             "CC(=O)C(C)=O",
             "CC(=O)OCCOCCOCCOC(C)=O",
             "CCOc1cc(C=NNC(=O)CC2(C)OCCO2)ccc1OCc1ccccc1",
-            "Cc1cc2c(F)c(Oc3ncnn4cc(OCC(C)OC(=O)C(C)N)c(C)c34)ccc2[nH]1",
-            "CCCCOCCOCCOC(C)=O",
-            "COc1cc(C2NCCC3(OCCO3)C2(C)C)cc(OC)c1OC",
-            "CC(=O)OCCN(CCOC(C)=O)c1ccc(N=Nc2ccc([N+](=O)[O-])cc2C#N)cc1"
+            "Cc1cc2c(F)c(Oc3ncnn4cc(OCC(C)OC(=O)C(C)N)c(C)c34)ccc2[nH]1"
         ]
     },
     "gnps_motif_16.m2m": {
@@ -305,8 +307,7 @@
     "gnps_motif_55.m2m": {
         "SMILES": [
             "O=c1ccn(C2CC(O)C(COP(=O)(O)OP(=O)(O)OP(=O)(O)O)O2)c(=O)[nH]1",
-            "Cc1cn(C2CC(O)C(COP(=O)(O)OP(=O)(O)OC3OC(CO)C(O)C(O)C3O)O2)c(=O)[nH]c1=O",
-            "O=c1ccn(C2CC(O)C(COP(=O)(O)O)O2)c(=O)[nH]1"
+            "Cc1cn(C2CC(O)C(COP(=O)(O)OP(=O)(O)OC3OC(CO)C(O)C(O)C3O)O2)c(=O)[nH]c1=O"
         ]
     },
     "gnps_motif_56.m2m": {
@@ -326,7 +327,10 @@
             "CC(=O)OC1CC2CCC1(C)C2(C)C",
             "NC(CSSCC(N)C(=O)O)C(=O)O",
             "CCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
-            "CCCCCCCCCCC(=O)NC(CCCCN)C(=O)O"
+            "CCCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
+            "CCCCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
+            "CN1CCCC1Cc1c[nH]c2ccc(CCS(=O)(=O)c3ccccc3)cc12",
+            "CC1(C)CCC2(C(=O)O)CCC3(C)C(=CCC4C5(C)CCC(O)C(C)(C)C5CCC43C)C2C1"
         ]
     },
     "gnps_motif_58.m2m": {

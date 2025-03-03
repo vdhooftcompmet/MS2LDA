@@ -4,7 +4,7 @@
 #NAME motifs_motif_191
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['O=P(c1ccccc1)(c1ccccc1)c1ccccc1']
+#AUTO_ANNOTATION ['CC(=O)OCCc1ccc(O)c(O)c1', 'O=C(OC1C(Oc2c(-c3ccc(O)c(O)c3)oc3cc(O)cc(O)c3c2=O)OC(CO)C(O)C1O)c1cc(O)c(O)c(O)c1', 'Cc1c(O)c(C)c2occ(Cc3ccc4c(c3)OCO4)c(=O)c2c1O', 'Cc1ccc(NC(=O)C(C)C)cc1C1CCN(Cc2ccc(Oc3ccc(F)c(F)c3)cc2)CC1', 'CC(=O)OC1CC2CCC1(C)C2(C)C']
 #COMMENT None
 fragment_166.062,0.30147914167336864
 fragment_209.081,0.5612798613479494
