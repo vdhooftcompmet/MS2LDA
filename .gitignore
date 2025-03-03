@@ -1,5 +1,5 @@
 #models/
-.DS_Store/
+.DS_Store
 *cpython*
 
 # Byte-compiled / optimized / DLL files

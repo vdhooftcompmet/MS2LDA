@@ -971,9 +971,16 @@ def create_motif_rankings_tab():
                     [
                         dcc.Markdown(
                             """
-                            This tab displays your motifs in a ranked table, based on how frequently they appear 
-                            in your data and their average probabilities. You can filter the table by probability or overlap thresholds 
-                            to highlight motifs of interest. Clicking on a motif in the table takes you to detailed information about that motif.
+                            This tab displays your motifs in a ranked table based on how many documents meet 
+                            the selected Probability and Overlap ranges. For each motif, we compute a `Degree` 
+                            representing the number of documents where the motif’s doc-topic probability and overlap 
+                            score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability` 
+                            and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters, 
+                            so they can be quite high if the motif strongly dominates the docs where it appears. 
+                            
+                            Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap. 
+                            _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row 
+                            takes you to a detailed view of that motif.
                             """
                         )
                     ],
@@ -982,7 +989,6 @@ def create_motif_rankings_tab():
 
                 dbc.Row([
                     dbc.Col([
-                        # Row for the sliders and their displays
                         dbc.Row(
                             [
                                 dbc.Col(
@@ -993,7 +999,7 @@ def create_motif_rankings_tab():
                                             min=0,
                                             max=1,
                                             step=0.01,
-                                            value=[0.1, 1],
+                                            value=[0, 1],
                                             marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
                                             tooltip={"always_visible": False, "placement": "top"},
                                             allowCross=False
@@ -1010,7 +1016,7 @@ def create_motif_rankings_tab():
                                             min=0,
                                             max=1,
                                             step=0.01,
-                                            value=[0.3, 1],
+                                            value=[0, 1],
                                             marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
                                             tooltip={"always_visible": False, "placement": "top"},
                                             allowCross=False
@@ -1021,6 +1027,7 @@ def create_motif_rankings_tab():
                                 )
                             ]
                         ),
+                        html.Div(id="motif-rankings-count", style={"marginTop": "10px"}),
                         html.Div(id="motif-rankings-table-container", style={"marginTop": "20px"})
                     ], width=12),
                 ]),
