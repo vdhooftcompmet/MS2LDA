@@ -316,6 +316,11 @@ def show_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, sa
         mass_to_charge = motif_spectra[m].peaks.mz
         intensities = motif_spectra[m].peaks.intensities
 
+        loss_to_charge_opt = opt_motif_spectra[m].losses.mz
+        loss_intensities_opt = opt_motif_spectra[m].losses.intensities
+        loss_to_charge = motif_spectra[m].losses.mz
+        loss_intensities = motif_spectra[m].losses.intensities
+
         # Convert SMILES -> RDKit mols
         mols = []
         for smi in clustered_smiles[m]:
@@ -346,21 +351,21 @@ def show_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, sa
         fig = plt.figure(figsize=(10, 6), facecolor='none', edgecolor='none')
 
         # Top subplot: molecule grid
-        ax_top = fig.add_subplot(2, 1, 1)
+        ax_top = fig.add_subplot(3, 1, 1)
         ax_top.imshow(pil_img)
         ax_top.axis("off")
         top_pos = ax_top.get_position()
-        ax_top.set_position([top_pos.x0, top_pos.y0 - 0.1, top_pos.width, top_pos.height])
+        ax_top.set_position([top_pos.x0, top_pos.y0, top_pos.width, top_pos.height])
 
         # Bottom subplot: motif vs. optimized motif
-        ax_bot = fig.add_subplot(2, 1, 2)
+        ax_bot = fig.add_subplot(3, 1, 3)
         if len(mass_to_charge):
             ax_bot.stem(mass_to_charge, intensities,
                         basefmt="k-", markerfmt="", linefmt="black",
                         label=f"motif_{m}")
         if len(mass_to_charge_opt) > 0:
             ax_bot.stem(mass_to_charge_opt, intensities_opt,
-                        basefmt="k-", markerfmt="", linefmt="red",
+                        basefmt="k-", markerfmt="", linefmt="#FF9E01",
                         label=f"opt motif_{m}")
 
         ax_bot.set_ylim(0,)
@@ -374,6 +379,45 @@ def show_annotated_motifs(opt_motif_spectra, motif_spectra, clustered_smiles, sa
         ax_bot.spines['bottom'].set_linewidth(1.5)
         ax_bot.tick_params(axis='both', which='major', direction='out',
                            length=6, width=1.5, color='black')
+        
+
+        # middel suplot: motif vs optimized motif losses
+        ax_midd = fig.add_subplot(3,1,2)
+        if len(loss_to_charge):
+            ax_midd.stem(loss_to_charge, loss_intensities,
+                        basefmt="k-", markerfmt="", linefmt="black", bottom=0,
+                        label=f"motif_{m}")
+        if len(loss_to_charge_opt) > 0:
+            ax_midd.stem(loss_to_charge_opt, loss_intensities_opt,
+                        basefmt="k-", markerfmt="", linefmt="#3979A9", bottom=0,
+                        label=f"opt motif_{m}")
+        # Ensure stems originate from the x-axis (y=0)
+        ax_midd.axhline(y=0, color="black", linewidth=1.5)  # Explicitly draw x-axis
+
+        # Only set ylim if there are valid intensities
+        if any(loss_intensities):
+            ax_midd.set_ylim(0, max(loss_intensities) * 1.1)  
+        else:
+            ax_midd.set_ylim(0, 1)  # Default if no data
+            
+        ax_midd.yaxis.set_label_position("right")
+        ax_midd.xaxis.set_label_position("top")
+        ax_midd.set_xlabel('loss', fontsize=12)
+        ax_midd.set_ylabel('Intensity', fontsize=12)
+        ax_midd.invert_xaxis()
+        ax_midd.invert_yaxis()
+        ax_midd.xaxis.tick_top()
+        ax_midd.yaxis.tick_right()
+        
+        ax_midd.spines['left'].set_visible(False)
+        ax_midd.spines['bottom'].set_visible(False)
+        ax_midd.spines['right'].set_color('black')
+        ax_midd.spines['top'].set_color('black')
+        ax_midd.spines['right'].set_linewidth(1.5)
+        ax_midd.spines['top'].set_linewidth(1.5)
+        ax_midd.tick_params(axis='both', which='major', direction='out',
+                           length=6, width=1.5, color='black')
+        
         plt.legend(loc="best")
 
         # Save or close

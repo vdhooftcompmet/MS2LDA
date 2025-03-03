@@ -4,7 +4,7 @@
 #NAME motifs_motif_226
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['FC(F)C(F)(F)OCC(Cn1cncn1)c1ccc(Cl)cc1Cl']
+#AUTO_ANNOTATION ['FC(F)C(F)(F)OCC(Cn1cncn1)c1ccc(Cl)cc1Cl', 'Clc1ccc(COC(Cn2ccnc2)c2ccc(Cl)cc2Cl)c(Cl)c1', 'O=C(Cn1cncn1)c1ccc(Cl)cc1Cl', 'CCCC(Cn1cncn1)c1ccc(Cl)cc1Cl', 'O=C(CCN1CCN(C(=O)OCc2cc(Cl)cc(Cl)c2)CC1)c1ccc2[nH]c(=O)oc2c1', 'O=C1CC2Sc3ccccc3N=C2N1Cc1c(Cl)cccc1Cl', 'Clc1ccc(C2(Cn3cncn3)OCCO2)c(Cl)c1', 'CCCC1COC(Cn2cncn2)(c2ccc(Cl)cc2Cl)O1']
 #COMMENT None
 fragment_70.04,0.21044390470049665
 fragment_82.065,0.09505991100729193

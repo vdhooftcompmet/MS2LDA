@@ -4,7 +4,7 @@
 #NAME motifs_motif_36
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['Nc1cccc2[nH]ccc12', 'O=P(O)(O)OC1C(OP(=O)(O)O)C(OP(=O)(O)O)C(OP(=O)(O)O)C(OP(=O)(O)O)C1OP(=O)(O)O', 'NCC(=O)NCC(=O)O']
+#AUTO_ANNOTATION ['Nc1cccc2[nH]ccc12', 'O=P(O)(O)OC1C(OP(=O)(O)O)C(OP(=O)(O)O)C(OP(=O)(O)O)C(OP(=O)(O)O)C1OP(=O)(O)O', 'NCC(=O)NCC(=O)O', 'CC(C)c1ccc(CO)cc1', 'CC(C)c1ccc(CN(C(=O)c2ccc(C(C)(C)C)cc2)C2CCS(=O)(=O)C2)cc1', 'NC(=O)CC(N)C(=O)O']
 #COMMENT None
 fragment_119.085,0.5606171388127794
 fragment_131.085,0.5025377703052624

@@ -4,7 +4,7 @@
 #NAME motifs_motif_33
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['CN(CC(=O)N(Cc1ccc(C2CCCCC2)cc1)c1ccc(C(=O)NO)cc1)S(=O)(=O)c1c(F)c(F)c(F)c(F)c1F', 'CN(CC(=O)N(Cc1ccc(C2CCCCC2)cc1)c1ccc(C(=O)O)c(O)c1)S(=O)(=O)c1c(F)c(F)c(F)c(F)c1F', 'CN(CC(=O)N(Cc1ccc(C2CCCCC2)cc1)c1ccc(C(=O)O)cc1)S(=O)(=O)c1c(F)c(F)c(F)c(F)c1F']
+#AUTO_ANNOTATION ['CC(C)CC(NC(=O)C(NC(=O)C(N)C(C)O)C(C)C)C(=O)O', 'CCc1cc2c(cc1CC)CC(NCC(O)c1ccc(O)c3[nH]c(=O)ccc13)C2', 'O=C(O)C(O)C(O)C(=O)O', 'CC(C)=CCCC(C)(OC1OC(CO)C(O)C(O)C1O)C1CCC2(C)C1C(O)CC1C3(C)CCC(O)C(C)(C)C3C(O)CC12C']
 #COMMENT None
 fragment_123.013,0.17402063481316474
 fragment_172.133,0.1480322208529346

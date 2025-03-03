@@ -4,7 +4,7 @@
 #NAME motifs_motif_239
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['COC(=O)c1ccc(I)cc1S(=O)(=O)NC(=O)Nc1nc(C)nc(OC)n1', 'Cn1cnc2c(O)nc(O)nc21', 'CCc1cc(C(N)=S)ccn1', 'COC(=O)c1sccc1S(=O)(=O)NC(=O)Nc1nc(C)nc(OC)n1']
+#AUTO_ANNOTATION ['COC(=O)c1ccc(I)cc1S(=O)(=O)NC(=O)Nc1nc(C)nc(OC)n1', 'Cn1cnc2c(O)nc(O)nc21', 'CCc1cc(C(N)=S)ccn1', 'COC(=O)c1sccc1S(=O)(=O)NC(=O)Nc1nc(C)nc(OC)n1', 'Cn1cnc2nc(O)nc(O)c21', 'Cn1c(=O)[nH]c2nc[nH]c2c1=O', 'COC(=O)c1ccccc1S(=O)(=O)NC(=O)Nc1nc(C)nc(OC)n1', 'CC1(C)CCC2(C)CCC3(C)C(=CCC4C5(C)CCC(O)C(C)(C(=O)O)C5CCC43C)C2C1', 'Cn1c(=O)[nH]c(=O)c2[nH]cnc21']
 #COMMENT None
 fragment_42.034,0.26206942783730713
 fragment_104.049,0.26869187980954523

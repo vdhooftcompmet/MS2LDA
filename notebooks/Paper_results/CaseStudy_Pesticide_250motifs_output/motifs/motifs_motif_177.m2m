@@ -4,7 +4,7 @@
 #NAME motifs_motif_177
 #ANNOTATION None
 #SHORT_ANNOTATION None
-#AUTO_ANNOTATION ['CCNc1nc(NCC)nc(SC)n1', 'CCNc1nc(NC(C)C(C)C)nc(SC)n1', 'CCNc1nc(NC(C)C)nc(SC)n1']
+#AUTO_ANNOTATION ['CCNc1nc(Cl)nc(NC(C)C)n1', 'CCNc1nc(NCC)nc(OC)n1', 'CCNc1nc(Cl)nc(NC(C)(C)C#N)n1', 'COC(=O)c1cccc(C)c1S(=O)(=O)NC(=O)Nc1nc(OCC(F)(F)F)nc(N(C)C)n1', 'Nc1ccc(N=Nc2ccccc2)c(N)n1']
 #COMMENT None
 fragment_68.024,0.3059170506169243
 fragment_71.06,0.17159915912289667
