@@ -164,7 +164,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="s2v-model-path",
                                         type="text",
-                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model",
+                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
                                     ),
                                 ],
                                 className="mb-3",
@@ -177,15 +177,27 @@ def create_run_analysis_tab():
                             ),
                             dbc.InputGroup(
                                 [
-                                    dbc.InputGroupText("S2V Library Path", id="s2v-library-tooltip"),
+                                    dbc.InputGroupText("S2V Library Embeddings", id="s2v-library-embeddings-tooltip"),
                                     dbc.Input(
-                                        id="s2v-library-path",
+                                        id="s2v-library-embeddings",
                                         type="text",
-                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/positive_s2v_library.pkl",
+                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
                                     ),
                                 ],
                                 className="mb-3",
-                                id="s2v-library-inputgroup",
+                                id="s2v-library-embeddings-ig",
+                            ),
+                            dbc.InputGroup(
+                                [
+                                    dbc.InputGroupText("S2V Library DB", id="s2v-library-db-tooltip"),
+                                    dbc.Input(
+                                        id="s2v-library-db",
+                                        type="text",
+                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db",
+                                    ),
+                                ],
+                                className="mb-3",
+                                id="s2v-library-db-ig",
                             ),
                             dbc.Tooltip(
                                 "Pickled library embeddings for Spec2Vec. Provide full path.",
@@ -215,7 +227,7 @@ def create_run_analysis_tab():
                                                             dbc.Input(
                                                                 id="prep-min-mz",
                                                                 type="number",
-                                                                value=0,  # default
+                                                                value=0,
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -232,7 +244,7 @@ def create_run_analysis_tab():
                                                             dbc.Input(
                                                                 id="prep-max-mz",
                                                                 type="number",
-                                                                value=2000,  # default
+                                                                value=2000,
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -617,7 +629,6 @@ def create_run_analysis_tab():
                                                         target="train-workers-tooltip",
                                                         placement="right",
                                                     ),
-                                                    # n_iterations Moved Above
                                                 ],
                                                 width=6,
                                             ),
@@ -636,7 +647,7 @@ def create_run_analysis_tab():
                                                             dbc.Input(
                                                                 id="prep-sigdig",
                                                                 type="number",
-                                                                value=2,  # default
+                                                                value=2,
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -1028,7 +1039,33 @@ def create_motif_rankings_tab():
                             ]
                         ),
                         html.Div(id="motif-rankings-count", style={"marginTop": "10px"}),
-                        html.Div(id="motif-rankings-table-container", style={"marginTop": "20px"})
+                        dash_table.DataTable(
+                            id='motif-rankings-table',
+                            data=[],
+                            columns=[],
+                            sort_action='native',
+                            filter_action='native',
+                            page_size=20,
+                            style_table={'overflowX': 'auto'},
+                            style_cell={
+                                'minWidth': '150px', 'width': '200px', 'maxWidth': '400px',
+                                'whiteSpace': 'normal',
+                                'textAlign': 'left',
+                            },
+                            style_data_conditional=[
+                                {
+                                    'if': {'column_id': 'Motif'},
+                                    'cursor': 'pointer',
+                                    'textDecoration': 'underline',
+                                    'color': 'blue'
+                                },
+                            ],
+                            style_header={
+                                'backgroundColor': 'rgb(230, 230, 230)',
+                                'fontWeight': 'bold'
+                            },
+                        ),
+
                     ], width=12),
                 ]),
             ]),
@@ -1235,7 +1272,7 @@ def create_screening_tab():
                 id="screening-results-table",
                 columns=[
                     {"name": "User Motif ID", "id": "user_motif_id"},
-                    {"name": "User ShortAnno", "id": "user_short_annotation"},
+                    {"name": "User AutoAnno", "id": "user_auto_annotation"},
                     {"name": "Reference Motif ID", "id": "ref_motif_id"},
                     {"name": "Ref ShortAnno", "id": "ref_short_annotation"},
                     {"name": "Ref MotifSet", "id": "ref_motifset"},
@@ -1249,7 +1286,6 @@ def create_screening_tab():
                     "backgroundColor": "rgb(230, 230, 230)",
                     "fontWeight": "bold",
                 },
-                # NEW: make user_motif_id visually clickable
                 style_data_conditional=[
                     {
                         'if': {'column_id': 'user_motif_id'},

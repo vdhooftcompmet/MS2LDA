@@ -21,17 +21,28 @@ from rdkit import Chem
 from rdkit.Chem.Draw import MolsToGridImage
 
 import MS2LDA
+from MS2LDA.Add_On.MassQL.MassQL4MotifDB import load_motifDB, motifDB2motifs
 from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings
 from MS2LDA.Add_On.Spec2Vec.annotation_refined import calc_similarity
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
-from MS2LDA.motif_parser import load_m2m_folder
 from MS2LDA.run import filetype_check
 from MS2LDA.run import load_s2v_model
+from Mass2Motif import Mass2Motif
 from app_instance import app
 
 # Hardcode the path for .m2m references
 MOTIFDB_FOLDER = "../MS2LDA/MotifDB"
+
+
+def load_motifset_file(json_path):
+    """
+    Loads a single JSON motifset file.
+    Returns a list of motifs in the file as matchms Spectra.
+    """
+    ms1_df, ms2_df = load_motifDB(json_path)
+    motifs = motifDB2motifs(ms2_df, ms2_df)
+    return motifs
 
 
 # Callback to show/hide tab contents based on active tab
@@ -150,7 +161,8 @@ def toggle_advanced_settings(n_clicks, is_open):
     State("fp-threshold", "value"),
     State("motif-parameter", "value"),
     State("s2v-model-path", "value"),
-    State("s2v-library-path", "value"),
+    State("s2v-library-embeddings", "value"),
+    State("s2v-library-db", "value"),
     prevent_initial_call=True,
 )
 def handle_run_or_load(
@@ -193,7 +205,8 @@ def handle_run_or_load(
         fp_threshold,
         motif_parameter,
         s2v_model_path,
-        s2v_library_path,
+        s2v_library_embeddings,
+        s2v_library_db,
 ):
     """
     This callback either (1) runs MS2LDA from scratch on the uploaded data (when Run Analysis clicked),
@@ -260,7 +273,8 @@ def handle_run_or_load(
             "cosine_similarity": ann_cosine_sim,
             "n_mols_retrieved": top_n,
             "s2v_model_path": s2v_model_path,
-            "s2v_library_path": s2v_library_path,
+            "s2v_library_embeddings": s2v_library_embeddings,
+            "s2v_library_db": s2v_library_db,
         }
         model_parameters = {
             "rm_top": model_rm_top,
@@ -432,7 +446,6 @@ def handle_run_or_load(
 
 # -------------------------------- CYTOSCAPE NETWORK --------------------------------
 
-
 # Callback to create Cytoscape elements
 @app.callback(
     Output("cytoscape-network-container", "children"),
@@ -450,22 +463,25 @@ def update_cytoscape(optimized_motifs_data, clustered_smiles_data, active_tab, e
 
     spectra = []
     for s in optimized_motifs_data:
-        spectrum = Spectrum(
-            mz=np.array(s["mz"], dtype=float),
-            intensities=np.array(s["intensities"], dtype=float),
+        # Prepare the losses, if any, from s["metadata"]
+        if "losses" in s["metadata"]:
+            losses_list = s["metadata"]["losses"]
+            loss_mz = [loss["loss_mz"] for loss in losses_list]
+            loss_intensities = [loss["loss_intensity"] for loss in losses_list]
+        else:
+            loss_mz = []
+            loss_intensities = []
+
+        # Create Mass2Motif object with both fragments and losses
+        spectrum = Mass2Motif(
+            frag_mz=np.array(s["mz"], dtype=float),
+            frag_intensities=np.array(s["intensities"], dtype=float),
+            loss_mz=np.array(loss_mz, dtype=float),
+            loss_intensities=np.array(loss_intensities, dtype=float),
             metadata=s["metadata"],
         )
-        if "losses" in s["metadata"]:
-            losses = s["metadata"]["losses"]
-            mz = [loss["loss_mz"] for loss in losses]
-            intensities = [loss["loss_intensity"] for loss in losses]
-            spectrum.losses = Fragments(
-                mz=np.array(mz, dtype=float),
-                intensities=np.array(intensities, dtype=float),
-            )
-        else:
-            spectrum.losses = None
-        spectra.append(spectrum) # needs to be a Mass2Motif object
+
+        spectra.append(spectrum)
 
     smiles_clusters = clustered_smiles_data
 
@@ -754,42 +770,20 @@ def compute_motif_degrees(lda_dict, p_low, p_high, o_low, o_high):
 
 
 @app.callback(
-    Output("motif-rankings-state", "data"),
-    [
-        Input("motif-rankings-table", "page_current"),
-        Input("motif-rankings-table", "sort_by"),
-        Input("motif-rankings-table", "filter_query"),
-    ],
-    [
-        State("tabs", "value"),
-        State("lda-dict-store", "data"),
-    ],
-    prevent_initial_call=True,
-)
-def store_motif_ranking_table_state(page_current, sort_by, filter_query, current_tab, lda_dict_data):
-    if current_tab not in ["motif-rankings-tab", "motif-details-tab"] or not lda_dict_data:
-        return None
-    return {
-        "page_current": page_current,
-        "sort_by": sort_by,
-        "filter_query": filter_query,
-    }
-
-@app.callback(
-    Output('motif-rankings-table-container', 'children'),
-    Output('motif-rankings-count', 'children'),
-    Input('lda-dict-store', 'data'),
-    Input('probability-thresh', 'value'),
-    Input('overlap-thresh', 'value'),
-    Input('tabs', 'value'),
-    State('screening-fullresults-store', 'data'),
-    State('optimized-motifs-store', 'data'),
-    State('motif-rankings-state', 'data'),
+    Output("motif-rankings-table", "data"),
+    Output("motif-rankings-table", "columns"),
+    Output("motif-rankings-count", "children"),
+    Input("lda-dict-store", "data"),
+    Input("probability-thresh", "value"),
+    Input("overlap-thresh", "value"),
+    Input("tabs", "value"),
+    State("screening-fullresults-store", "data"),
+    State("optimized-motifs-store", "data"),
 )
 def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thresh, active_tab,
-                                screening_data, optimized_motifs_data, ranking_state):
+                                screening_data, optimized_motifs_data):
     if active_tab != 'motif-rankings-tab' or not lda_dict_data:
-        return "", ""
+        return [], [], ""
 
     p_low, p_high = probability_thresh
     o_low, o_high = overlap_thresh
@@ -826,7 +820,6 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
             # short_annotation might be list of SMILES or None
             short_anno = optimized_motifs_data[motif_idx]["metadata"].get("auto_annotation", "")
             if isinstance(short_anno, list):
-                # Join them into one string
                 short_anno_str = ", ".join(short_anno)
             elif isinstance(short_anno, str):
                 short_anno_str = short_anno
@@ -870,70 +863,41 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
     # Filter out motifs that have no docs passing, i.e. degree=0
     df = df[df['Degree'] > 0].copy()
 
-    style_data_conditional = [
+    table_data = df.to_dict("records")
+    table_columns = [
         {
-            'if': {'column_id': 'Motif'},
-            'cursor': 'pointer',
-            'textDecoration': 'underline',
-            'color': 'blue',
+            "name": "Motif",
+            "id": "Motif",
+        },
+        {
+            "name": "Degree",
+            "id": "Degree",
+            "type": "numeric",
+        },
+        {
+            "name": "Average Doc-Topic Probability",
+            "id": "Average Doc-Topic Probability",
+            "type": "numeric",
+            "format": {"specifier": ".4f"},
+        },
+        {
+            "name": "Average Overlap Score",
+            "id": "Average Overlap Score",
+            "type": "numeric",
+            "format": {"specifier": ".4f"},
+        },
+        {
+            "name": "Annotation",
+            "id": "Annotation",
+        },
+        {
+            "name": "ScreeningHits",
+            "id": "ScreeningHits",
         },
     ]
 
-    if ranking_state and active_tab in ["motif-rankings-tab", "motif-details-tab"]:
-        stored_page = ranking_state.get("page_current", 0)
-        stored_sort_by = ranking_state.get("sort_by", [])
-        stored_filter_query = ranking_state.get("filter_query", "")
-    else:
-        stored_page = 0
-        stored_sort_by = []
-        stored_filter_query = ""
-
-    table = dash_table.DataTable(
-        id='motif-rankings-table',
-        data=df.to_dict('records'),
-        columns=[
-            {'name': 'Motif', 'id': 'Motif'},
-            {'name': 'Degree', 'id': 'Degree', 'type': 'numeric'},
-            {'name': 'Average Doc-Topic Probability', 'id': 'Average Doc-Topic Probability', 'type': 'numeric',
-             'format': {'specifier': '.4f'}},
-            {'name': 'Average Overlap Score', 'id': 'Average Overlap Score', 'type': 'numeric',
-             'format': {'specifier': '.4f'}},
-            {'name': 'Annotation', 'id': 'Annotation'},
-            {'name': 'ScreeningHits', 'id': 'ScreeningHits'},
-        ],
-
-        # We keep sort/filter/pagination
-        sort_action='native',
-        filter_action='native',
-        page_size=20,
-
-        # If you want to store pagination, sort, filter state while the table is in memory
-        persistence=True,
-        persistence_type='memory',
-        persisted_props=["page_current", "sort_by", "filter_query"],
-
-        style_table={'overflowX': 'auto'},
-        style_cell={
-            'minWidth': '150px', 'width': '200px', 'maxWidth': '400px',
-            'whiteSpace': 'normal',
-            'textAlign': 'left',
-        },
-        style_data_conditional=[
-            {
-                'if': {'column_id': 'Motif'},
-                'cursor': 'pointer',
-                'textDecoration': 'underline',
-                'color': 'blue',
-            },
-        ],
-        style_header={
-            'backgroundColor': 'rgb(230, 230, 230)',
-            'fontWeight': 'bold'
-        },
-    )
-
     row_count_message = f"{len(df)} motif(s) pass the filter"
-    return table, row_count_message
+    return table_data, table_columns, row_count_message
 
 
 @app.callback(
@@ -1003,8 +967,8 @@ def display_overlap_filter(overlap_range):
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
-    State('optimized-motifs-store', 'data'),  # NEW STATE for short_annotation
-    State('screening-fullresults-store', 'data'),  # NEW STATE for screening hits
+    State('optimized-motifs-store', 'data'),
+    State('screening-fullresults-store', 'data'),
     prevent_initial_call=True,
 )
 def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
@@ -1113,13 +1077,11 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
             pass
 
     spec2vec_container = []
-    # Insert user short annotation if present
-    user_short_anno_text = ""
+    auto_anno_text = ""
     if optimized_motifs_data and motif_idx < len(optimized_motifs_data):
-        # Attempt to read user short annotation from metadata
         meta_anno = optimized_motifs_data[motif_idx]['metadata'].get('auto_annotation', "")
         if meta_anno:
-            user_short_anno_text = f"User ShortAnno: {meta_anno}"
+            auto_anno_text = f"Auto Annotations: {meta_anno}"
 
     if clustered_smiles_data and motif_idx < len(clustered_smiles_data):
         smiles_list = clustered_smiles_data[motif_idx]
@@ -1148,8 +1110,8 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
                 ))
 
     # If we have a user short annotation, display it right after the SMILES image
-    if user_short_anno_text:
-        spec2vec_container.append(html.Div(user_short_anno_text, style={"marginTop": "10px"}))
+    if auto_anno_text:
+        spec2vec_container.append(html.Div(auto_anno_text, style={"marginTop": "10px"}))
 
     # Doc-Topic Probability / Overlap filter & doc table
     doc2spec_index = lda_dict_data["doc_to_spec_index"]
@@ -1263,6 +1225,11 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
     if screening_data:
         try:
             scdf = pd.read_json(screening_data, orient="records")
+            if "user_auto_annotation" in scdf.columns:
+                scdf["user_auto_annotation"] = scdf["user_auto_annotation"].apply(
+                    lambda x: ", ".join(x) if isinstance(x, list) else str(x)
+                )
+
             hits_df = scdf[scdf['user_motif_id'] == motif_name].copy()
             hits_df = hits_df.sort_values('score', ascending=False)
             if not hits_df.empty:
@@ -1535,14 +1502,15 @@ def auto_scan_m2m_subfolders(tab_value):
     folder_options = []
     subfolder_data = {}
     for root, dirs, files in os.walk(MOTIFDB_FOLDER):
-        m2m_files = [f for f in files if f.endswith(".m2m")]
-        if m2m_files:
-            label = os.path.basename(root) or "Root"
-            folder_options.append({"label": label, "value": root})
-            subfolder_data[root] = {
-                "folder_label": label,
-                "count_m2m": len(m2m_files),
-            }
+        json_files = [f for f in files if f.startswith("Motifset") and f.endswith(".json")]
+        for jsonf in json_files:
+            fullpath = os.path.join(root, jsonf)
+            label = jsonf
+            ms1_df, ms2_df = load_motifDB(fullpath)
+            count_m2m = len(ms2_df["scan"].unique())
+            folder_options.append({"label": f"{label} ({count_m2m} motifs)", "value": fullpath})
+            subfolder_data[fullpath] = {"folder_label": label, "count_m2m": count_m2m}
+
     folder_options = sorted(folder_options, key=lambda x: x["label"].lower())
     return folder_options, subfolder_data
 
@@ -1619,9 +1587,10 @@ def filter_and_normalize_spectra(spectrum_list):
     Input("compute-screening-button", "n_clicks"),
     State("m2m-folders-checklist", "value"),
     State("optimized-motifs-store", "data"),
+    State("s2v-model-path", "value"),
     prevent_initial_call=True,
 )
-def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data):
+def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data, path_model):
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
 
@@ -1652,19 +1621,20 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
 
     # gather references
     all_refs = []
-    for folder_path in selected_folders:
-        these_refs = load_m2m_folder(folder_path)
+    for json_file_path in selected_folders:
+        these_refs = load_motifset_file(json_file_path)
         for r in these_refs:
-            r.set("source_folder", folder_path)
+            r.set("source_folder", json_file_path)
         all_refs.extend(these_refs)
+
     all_refs = filter_and_normalize_spectra(all_refs)
     if not all_refs:
-        return None, dbc.Alert("No valid references found in MotifDB folder!", color="warning"), 100, False
+        return None, dbc.Alert("No valid references found in the selected file(s)!", color="warning"), 100, False
     progress_val = 40
 
     # load spec2vec
     print("loading s2v")
-    s2v_sim = load_s2v_model()
+    s2v_sim = load_s2v_model(path_model=path_model)
     print("loaded s2v")
     progress_val = 60
 
@@ -1684,7 +1654,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
     results = []
     for user_i, user_sp in enumerate(user_motifs):
         user_id = user_sp.get("id", "")
-        user_anno = user_sp.get("short_annotation", "")
+        user_anno = user_sp.metadata.get("auto_annotation", "")
         for ref_j, ref_sp in enumerate(all_refs):
             score = sim_matrix.iloc[ref_j, user_i]
             ref_id = ref_sp.get("id", "")
@@ -1693,7 +1663,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
 
             results.append({
                 "user_motif_id": user_id,
-                "user_short_annotation": user_anno,
+                "user_auto_annotation": user_anno,
                 "ref_motif_id": ref_id,
                 "ref_short_annotation": ref_anno,
                 "ref_motifset": ref_motifset,
@@ -1733,6 +1703,12 @@ def filter_screening_results(fullresults_json, threshold):
     # We can ignore or wrap with io.StringIO. For now, ignoring is fine.
     df = pd.read_json(fullresults_json, orient="records")
 
+    # Convert any list in user_auto_annotation to a comma-joined string
+    if "user_auto_annotation" in df.columns:
+        df["user_auto_annotation"] = df["user_auto_annotation"].apply(
+            lambda x: ", ".join(x) if isinstance(x, list) else str(x)
+        )
+
     filtered = df[df["score"] >= threshold].copy()
     filtered = filtered.sort_values("score", ascending=False)
     table_data = filtered.to_dict("records")
@@ -1766,6 +1742,7 @@ def save_screening_results(csv_click, json_click, table_data):
     else:
         raise dash.exceptions.PreventUpdate
 
+
 @app.callback(
     Output("selected-motif-store", "data"),
     [
@@ -1773,41 +1750,28 @@ def save_screening_results(csv_click, json_click, table_data):
         Input("screening-results-table", "active_cell"),
     ],
     [
-        # Use derived_viewport_data and derived_viewport_indices
-        State("motif-rankings-table", "derived_viewport_data"),
-        State("motif-rankings-table", "derived_viewport_indices"),
+        State("motif-rankings-table", "data"),
         State("screening-results-table", "data"),
+        State("motif-rankings-table", "derived_viewport_data"),
     ],
     prevent_initial_call=True,
 )
-def on_motif_click(
-    ranking_active_cell, screening_active_cell,
-    ranking_viewport_data, ranking_viewport_indices,
-    screening_data
-):
-    if not dash.callback_context.triggered:
-        raise PreventUpdate
+def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, screening_data, ranking_dv_data):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise dash.exceptions.PreventUpdate
 
-    triggered_id = dash.callback_context.triggered[0]["prop_id"].split(".")[0]
+    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-    # If user clicked a row in the "motif-rankings-table"...
     if triggered_id == "motif-rankings-table":
-        if ranking_active_cell and ranking_viewport_data:
+        if ranking_active_cell and ranking_dv_data:
             col_id = ranking_active_cell["column_id"]
-            row_in_viewport = ranking_active_cell["row"]
-
-            # Only proceed if they clicked the "Motif" column
+            row_id = ranking_active_cell["row"]
             if col_id == "Motif":
-                # row_in_viewport is the index of the row *on this page*
-                # derived_viewport_data is the entire subset of data for the *current page*
-                # so we can directly do:
-                row_data = ranking_viewport_data[row_in_viewport]
-                motif_name = row_data["Motif"]
-                return motif_name
+                motif_markdown = ranking_dv_data[row_id]["Motif"]
+                return motif_markdown
+        raise dash.exceptions.PreventUpdate
 
-        raise PreventUpdate
-
-    # If user clicked in screening table...
     elif triggered_id == "screening-results-table":
         if screening_active_cell and screening_data:
             col_id = screening_active_cell["column_id"]
@@ -1815,7 +1779,7 @@ def on_motif_click(
             if col_id == "user_motif_id":
                 motif_id = screening_data[row_id]["user_motif_id"]
                 return motif_id
-        raise PreventUpdate
+        raise dash.exceptions.PreventUpdate
 
     else:
-        raise PreventUpdate
+        raise dash.exceptions.PreventUpdate
