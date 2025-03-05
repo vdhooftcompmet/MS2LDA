@@ -28,8 +28,8 @@ from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
 from MS2LDA.run import filetype_check
 from MS2LDA.run import load_s2v_model
-from Mass2Motif import Mass2Motif
-from app_instance import app
+from MS2LDA.Mass2Motif import Mass2Motif
+from App.app_instance import app
 
 # Hardcode the path for .m2m references
 MOTIFDB_FOLDER = "../MS2LDA/MotifDB"
