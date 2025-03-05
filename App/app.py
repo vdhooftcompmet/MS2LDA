@@ -2,6 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import html, dcc
 
 import layout as layout # without App.layout
+import callbacks  # noqa: F401 -- callbacks must be imported to register callbacks with the app
 from app_instance import app # Import the Dash app instance
 
 # Define the layout
