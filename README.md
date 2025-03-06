@@ -54,7 +54,7 @@ run_app.bat
 ./run_app.sh
 ```
 
-The Dash application will be accessible at `http://localhost:8051`.
+The Dash application will be accessible at `http://localhost:8050`.
 
 ## Notebooks
 
