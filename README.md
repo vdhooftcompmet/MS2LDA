@@ -4,7 +4,7 @@
 ![Maintainer](https://img.shields.io/badge/maintainer-Joe_Wandy-blue)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12625409.svg)](https://doi.org/10.5281/zenodo.11394248)
 
-Structure elucidation is a major bottleneck in analytical chemistry and its progress influences various research fields like natural product discovery and food safety. Mass spectrometry is one of the most used instruments for structure elucidation and identification due to its information-rich fragmentation patterns. To date, only a fraction of this information is understood and can be related to structural features. For molecular properties such as bioactivity, substructures are key components. This implementation of MS2LDA is based on the original version published in 2017 and offers automated annotation, visualization tools, and a database for discovered motifs (MotifDB).
+Structure elucidation is a major bottleneck in analytical chemistry and its progress influences various research fields like natural product discovery and food safety. Mass spectrometry is one of the most used instruments for structure elucidation and identification due to its information-rich fragmentation patterns. To date, only a fraction of this information is understood and can be related to structural features. For molecular properties such as bioactivity, substructures are key components. This implementation of MS2LDA is based on the [original version](https://www.pnas.org/doi/abs/10.1073/pnas.1608041113) published in 2016, but it has been improved to offer automated annotation, visualization tools, and a database for discovered motifs (MotifDB).
 
 ## Installation
 
