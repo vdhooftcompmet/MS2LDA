@@ -23,6 +23,28 @@ def create_run_analysis_tab():
             dbc.Row(
                 [
                     dbc.Col(
+                        dcc.Loading(
+                            id="download-s2v-spinner",
+                            type="circle",
+                            children=[
+                                dbc.Button(
+                                    "Download Spec2Vec Files",
+                                    id="download-s2v-button",
+                                    color="info",
+                                    className="mt-3"
+                                ),
+                                html.Div(id="download-s2v-status", style={"marginTop": "10px"})
+                            ]
+                        ),
+                        width=4,
+                    )
+                ],
+                justify="start",
+                className="g-3",
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(
                         [
                             dcc.Upload(
                                 id="upload-data",
@@ -790,6 +812,7 @@ def create_run_analysis_tab():
                                         "Run Analysis",
                                         id="run-button",
                                         color="primary",
+                                        disabled=True
                                     ),
                                 ],
                                 className="d-grid gap-2",

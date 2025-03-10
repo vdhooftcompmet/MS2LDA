@@ -126,8 +126,8 @@ def download_model_and_data(file_urls=[
     """Downloads the spec2vec model and the needed datasets for the automated annotation"""
 
     script_directory = os.path.dirname(os.path.abspath(__file__))
-    #relative_directory = f"Add_On/Spec2Vec/model_{mode}_mode"
-    relative_directory = f"Add_On/Spec2Vec/trash_{mode}"
+    relative_directory = f"Add_On/Spec2Vec/model_{mode}_mode"
+    #relative_directory = f"Add_On/Spec2Vec/trash_{mode}"
     save_directory = os.path.join(script_directory, relative_directory)
 
     os.makedirs(save_directory, exist_ok=True)
