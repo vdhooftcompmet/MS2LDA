@@ -825,7 +825,6 @@ def create_run_analysis_tab():
                 style={"border": "1px solid #ccc", "padding": "10px", "marginBottom": "20px"},
             ),
 
-            # Card 5: Final Run Analysis button
             dbc.Card(
                 [
                     dbc.CardHeader("Run Analysis"),
@@ -835,15 +834,22 @@ def create_run_analysis_tab():
                                 """
                                 Once everything is configured, click **Run Analysis** 
                                 to perform LDA on your spectra. Depending on the dataset 
-                                size and iterations, this can take a while.
+                                size and iterations, this can take a while. Please wait until the 
+                                progress indicator has finished to retrieve the results.
                                 """
                             ),
-                            dbc.Button(
-                                "Run Analysis",
-                                id="run-button",
-                                color="primary",
+                            dcc.Loading(
+                                id="run-analysis-spinner",
+                                type="circle",
+                                children=[
+                                    dbc.Button(
+                                        "Run Analysis",
+                                        id="run-button",
+                                        color="primary",
+                                    ),
+                                    html.Div(id="run-status", style={"marginTop": "20px"})
+                                ]
                             ),
-                            html.Div(id="run-status", style={"marginTop": "20px"}),
                         ]
                     ),
                 ],
