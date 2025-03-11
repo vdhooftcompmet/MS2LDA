@@ -1787,20 +1787,16 @@ def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, scr
 
 
 @app.callback(
+    Output("download-s2v-status", "children"),
     Output("s2v-download-complete", "data"),
-    Output("run-button", "disabled"),
     Input("download-s2v-button", "n_clicks"),
     prevent_initial_call=True,
 )
 def unlock_run_after_download(n_clicks):
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
-
     try:
-        download_model_and_data()  # uses default file_urls from the function
-        return "Spec2Vec model + data download complete."
+        msg = download_model_and_data()
+        return (msg, "Spec2Vec model + data download complete.")
     except Exception as e:
-        return f"Download failed: {str(e)}"
-
-    return True, False
-
+        return f"Download failed: {str(e)}", ""
