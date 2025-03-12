@@ -202,7 +202,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="s2v-model-path",
                                         type="text",
-                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
+                                        value="../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
                                     ),
                                 ],
                                 className="mb-3",
@@ -219,7 +219,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="s2v-library-embeddings",
                                         type="text",
-                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
+                                        value="../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
                                     ),
                                 ],
                                 className="mb-3",
@@ -231,7 +231,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="s2v-library-db",
                                         type="text",
-                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db",
+                                        value="../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db",
                                     ),
                                 ],
                                 className="mb-3",
