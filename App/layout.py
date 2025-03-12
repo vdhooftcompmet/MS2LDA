@@ -60,7 +60,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="n-motifs",
                                         type="number",
-                                        value=50,
+                                        value=200,
                                         min=1,
                                     ),
                                 ],
@@ -153,7 +153,7 @@ def create_run_analysis_tab():
                             dbc.InputGroup(
                                 [
                                     dbc.InputGroupText("Iterations", id="iterations-tooltip"),
-                                    dbc.Input(id="n-iterations", type="number", value=1000),
+                                    dbc.Input(id="n-iterations", type="number", value=10000),
                                 ],
                                 className="mb-3",
                                 id="iterations-inputgroup",
@@ -482,7 +482,7 @@ def create_run_analysis_tab():
                                                                     {"label": "best", "value": "best"},
                                                                     {"label": "biggest", "value": "biggest"},
                                                                 ],
-                                                                value="best",
+                                                                value="biggest",
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -642,7 +642,7 @@ def create_run_analysis_tab():
                                                             dbc.Input(
                                                                 id="train-parallel",
                                                                 type="number",
-                                                                value=1,
+                                                                value=3,
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -766,7 +766,7 @@ def create_run_analysis_tab():
                                                                     {"label": "pubchem", "value": "pubchem"},
                                                                     {"label": "ecfp", "value": "ecfp"},
                                                                 ],
-                                                                value="rdkit",
+                                                                value="maccs",
                                                             ),
                                                         ],
                                                         className="mb-2",
