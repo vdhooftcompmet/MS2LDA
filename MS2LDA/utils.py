@@ -118,10 +118,11 @@ def retrieve_spec4doc(doc2spec_map, ms2lda, doc_id):
 
 
 def download_model_and_data(file_urls=[
-    "https://zenodo.org/records/12625409/files/020724_Spec2Vec_pos_CleanedLibraries.model?download=1",
-    "https://zenodo.org/records/12625409/files/020724_Spec2Vec_pos_CleanedLibraries.model.syn1neg.npy?download=1",
-    "https://zenodo.org/records/12625409/files/020724_Spec2Vec_pos_CleanedLibraries.model.wv.vectors.npy?download=1",
-    "https://zenodo.org/records/12625409/files/positive_s2v_library.pkl?download=1",
+    "https://zenodo.org/records/15003249/files/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy?download=1",
+    "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model?download=1",
+    "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.syn1neg.npy?download=1",
+    "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.wv.vectors.npy?download=1",
+    "https://zenodo.org/records/15003249/files/150225_CombLibraries_spectra.db?download=1",
 ], mode="positive"):
     """Downloads the spec2vec model and data to Add_On/Spec2Vec/model_{mode}_mode.
        If a file already exists, it will be skipped.
