@@ -1,3 +1,9 @@
+# If running on mac, force single-thread numeric ops to avoid concurrency issues that leads to tomotopy crashing.
+import platform
+import os
+if platform.system() == "Darwin":
+    os.environ["OMP_NUM_THREADS"] = "1"
+
 import MS2LDA
 from MS2LDA.Preprocessing.load_and_clean import load_mgf
 from MS2LDA.Preprocessing.load_and_clean import load_mzml
