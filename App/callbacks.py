@@ -21,15 +21,16 @@ from rdkit import Chem
 from rdkit.Chem.Draw import MolsToGridImage
 
 import MS2LDA
+from App.app_instance import app
 from MS2LDA.Add_On.MassQL.MassQL4MotifDB import load_motifDB, motifDB2motifs
 from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings
 from MS2LDA.Add_On.Spec2Vec.annotation_refined import calc_similarity
+from MS2LDA.Mass2Motif import Mass2Motif
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
 from MS2LDA.run import filetype_check
 from MS2LDA.run import load_s2v_model
-from MS2LDA.Mass2Motif import Mass2Motif
-from App.app_instance import app
+from MS2LDA.utils import download_model_and_data
 
 # Hardcode the path for .m2m references
 MOTIFDB_FOLDER = "../MS2LDA/MotifDB"
@@ -1783,3 +1784,19 @@ def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, scr
 
     else:
         raise dash.exceptions.PreventUpdate
+
+
+@app.callback(
+    Output("download-s2v-status", "children"),
+    Output("s2v-download-complete", "data"),
+    Input("download-s2v-button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def unlock_run_after_download(n_clicks):
+    if not n_clicks:
+        raise dash.exceptions.PreventUpdate
+    try:
+        msg = download_model_and_data()
+        return (msg, "Spec2Vec model + data download complete.")
+    except Exception as e:
+        return f"Download failed: {str(e)}", ""

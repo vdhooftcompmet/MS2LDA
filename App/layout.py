@@ -7,22 +7,31 @@ def create_run_analysis_tab():
     tab = html.Div(
         id="run-analysis-tab-content",
         children=[
-            html.Div(
+            # Card 1: Intro / Explanation
+            dbc.Card(
                 [
-                    dcc.Markdown(
-                        """
-                        This tab allows you to run an MS2LDA analysis from scratch using a single uploaded data file. 
-                        You can control basic parameters like the number of motifs, polarity, and top N Spec2Vec matches, 
-                        as well as advanced settings (e.g., min_mz, max_mz). 
-                        When ready, click "Run Analysis" to generate the results and proceed to the other tabs for visualization.
-                        """
-                    )
+                    dbc.CardHeader("MS2LDA Run Analysis Overview"),
+                    dbc.CardBody(
+                        [
+                            dcc.Markdown(
+                                """
+                                This tab allows you to run an MS2LDA analysis from scratch using a single uploaded data file. 
+                                You can control basic parameters like the number of motifs, polarity, and top N Spec2Vec matches, 
+                                as well as advanced settings (e.g., min_mz, max_mz). 
+                                When ready, click "Run Analysis" to generate the results and proceed to the other tabs for visualization.
+                                """
+                            ),
+                        ]
+                    ),
                 ],
-                style={"margin-top": "20px", "margin-bottom": "20px"},
+                style={"border": "1px solid #ccc", "padding": "10px", "marginTop": "20px", "marginBottom": "20px"},
             ),
-            dbc.Row(
+
+            # Card 2: Data upload & basic MS2LDA parameters
+            dbc.Card(
                 [
-                    dbc.Col(
+                    dbc.CardHeader("Data Upload & Basic MS2LDA Parameters"),
+                    dbc.CardBody(
                         [
                             dcc.Upload(
                                 id="upload-data",
@@ -51,7 +60,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="n-motifs",
                                         type="number",
-                                        value=50,
+                                        value=200,
                                         min=1,
                                     ),
                                 ],
@@ -63,7 +72,6 @@ def create_run_analysis_tab():
                                 target="n-motifs-tooltip",
                                 placement="right",
                             ),
-
                             html.Div(
                                 [
                                     dbc.Label("Acquisition Type", id="acq-type-tooltip"),
@@ -85,7 +93,6 @@ def create_run_analysis_tab():
                                 target="acq-type-tooltip",
                                 placement="right",
                             ),
-
                             dbc.InputGroup(
                                 [
                                     dbc.InputGroupText("Top N Matches", id="topn-tooltip"),
@@ -101,7 +108,6 @@ def create_run_analysis_tab():
                                 target="topn-tooltip",
                                 placement="right",
                             ),
-
                             html.Div(
                                 [
                                     dbc.Label("Unique Molecules", id="uniqmols-tooltip"),
@@ -123,7 +129,6 @@ def create_run_analysis_tab():
                                 target="uniqmols-tooltip",
                                 placement="right",
                             ),
-
                             html.Div(
                                 [
                                     dbc.Label("Polarity", id="polarity-tooltip"),
@@ -148,7 +153,7 @@ def create_run_analysis_tab():
                             dbc.InputGroup(
                                 [
                                     dbc.InputGroupText("Iterations", id="iterations-tooltip"),
-                                    dbc.Input(id="n-iterations", type="number", value=1000),
+                                    dbc.Input(id="n-iterations", type="number", value=10000),
                                 ],
                                 className="mb-3",
                                 id="iterations-inputgroup",
@@ -158,13 +163,46 @@ def create_run_analysis_tab():
                                 target="iterations-tooltip",
                                 placement="right",
                             ),
+                        ]
+                    ),
+                ],
+                style={"border": "1px solid #ccc", "padding": "10px", "marginBottom": "20px"},
+            ),
+
+            # Card 3: Spec2Vec Setup
+            dbc.Card(
+                [
+                    dbc.CardHeader("Spec2Vec Setup"),
+                    dbc.CardBody(
+                        [
+                            dcc.Markdown(
+                                """
+                                **Spec2Vec** is used to annotate motifs by comparing them against a pretrained model 
+                                and library embeddings. You can download the necessary files here if you haven't already. 
+                                If the files already exist, the process will skip them.
+                                """
+                            ),
+                            dcc.Loading(
+                                id="download-s2v-spinner",
+                                type="circle",
+                                children=[
+                                    dbc.Button(
+                                        "Download Spec2Vec Files",
+                                        id="download-s2v-button",
+                                        color="info",
+                                        className="mt-3"
+                                    ),
+                                    html.Div(id="download-s2v-status", style={"marginTop": "10px"})
+                                ]
+                            ),
+                            html.Br(),
                             dbc.InputGroup(
                                 [
                                     dbc.InputGroupText("S2V Model Path", id="s2v-model-tooltip"),
                                     dbc.Input(
                                         id="s2v-model-path",
                                         type="text",
-                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
+                                        value="../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
                                     ),
                                 ],
                                 className="mb-3",
@@ -181,7 +219,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="s2v-library-embeddings",
                                         type="text",
-                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
+                                        value="../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
                                     ),
                                 ],
                                 className="mb-3",
@@ -193,7 +231,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="s2v-library-db",
                                         type="text",
-                                        value="../MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db",
+                                        value="../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db",
                                     ),
                                 ],
                                 className="mb-3",
@@ -203,6 +241,26 @@ def create_run_analysis_tab():
                                 "Pickled library embeddings for Spec2Vec. Provide full path.",
                                 target="s2v-library-tooltip",
                                 placement="right",
+                            ),
+                        ]
+                    ),
+                ],
+                style={"border": "1px solid #ccc", "padding": "10px", "marginBottom": "20px"},
+            ),
+
+            # Card 4: Advanced Settings
+            dbc.Card(
+                [
+                    dbc.CardHeader("Advanced Settings"),
+                    dbc.CardBody(
+                        [
+                            dcc.Markdown(
+                                """
+                                These parameters allow fine-grained control over MS2LDA preprocessing, 
+                                convergence criteria, and model hyperparameters. Generally, 
+                                you can leave them as defaults unless you want to experiment 
+                                with more specialized behaviors or custom thresholding.
+                                """
                             ),
                             dbc.Button(
                                 "Show/Hide Advanced Settings",
@@ -219,7 +277,6 @@ def create_run_analysis_tab():
                                         [
                                             dbc.Col(
                                                 [
-                                                    # Preprocessing
                                                     html.H6("Preprocessing"),
                                                     dbc.InputGroup(
                                                         [
@@ -257,8 +314,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("max_frags",
-                                                                               id="prep-maxfrags-tooltip"),
+                                                            dbc.InputGroupText("max_frags", id="prep-maxfrags-tooltip"),
                                                             dbc.Input(
                                                                 id="prep-max-frags",
                                                                 type="number",
@@ -275,8 +331,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("min_frags",
-                                                                               id="prep-minfrags-tooltip"),
+                                                            dbc.InputGroupText("min_frags", id="prep-minfrags-tooltip"),
                                                             dbc.Input(
                                                                 id="prep-min-frags",
                                                                 type="number",
@@ -293,8 +348,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("min_intensity",
-                                                                               id="prep-minint-tooltip"),
+                                                            dbc.InputGroupText("min_intensity", id="prep-minint-tooltip"),
                                                             dbc.Input(
                                                                 id="prep-min-intensity",
                                                                 type="number",
@@ -312,8 +366,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("max_intensity",
-                                                                               id="prep-maxint-tooltip"),
+                                                            dbc.InputGroupText("max_intensity", id="prep-maxint-tooltip"),
                                                             dbc.Input(
                                                                 id="prep-max-intensity",
                                                                 type="number",
@@ -334,12 +387,10 @@ def create_run_analysis_tab():
                                             ),
                                             dbc.Col(
                                                 [
-                                                    # Convergence
                                                     html.H6("Convergence"),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("step_size",
-                                                                               id="conv-stepsz-tooltip"),
+                                                            dbc.InputGroupText("step_size", id="conv-stepsz-tooltip"),
                                                             dbc.Input(
                                                                 id="conv-step-size",
                                                                 type="number",
@@ -356,8 +407,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("window_size",
-                                                                               id="conv-winsz-tooltip"),
+                                                            dbc.InputGroupText("window_size", id="conv-winsz-tooltip"),
                                                             dbc.Input(
                                                                 id="conv-window-size",
                                                                 type="number",
@@ -374,8 +424,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("threshold",
-                                                                               id="conv-thresh-tooltip"),
+                                                            dbc.InputGroupText("threshold", id="conv-thresh-tooltip"),
                                                             dbc.Input(
                                                                 id="conv-threshold",
                                                                 type="number",
@@ -397,14 +446,10 @@ def create_run_analysis_tab():
                                                             dbc.Select(
                                                                 id="conv-type",
                                                                 options=[
-                                                                    {"label": "perplexity_history",
-                                                                     "value": "perplexity_history"},
-                                                                    {"label": "entropy_history_doc",
-                                                                     "value": "entropy_history_doc"},
-                                                                    {"label": "entropy_history_topic",
-                                                                     "value": "entropy_history_topic"},
-                                                                    {"label": "log_likelihood_history",
-                                                                     "value": "log_likelihood_history"},
+                                                                    {"label": "perplexity_history", "value": "perplexity_history"},
+                                                                    {"label": "entropy_history_doc", "value": "entropy_history_doc"},
+                                                                    {"label": "entropy_history_topic", "value": "entropy_history_topic"},
+                                                                    {"label": "log_likelihood_history", "value": "log_likelihood_history"},
                                                                 ],
                                                                 value="perplexity_history",
                                                             ),
@@ -430,15 +475,14 @@ def create_run_analysis_tab():
                                                     html.H6("Annotation"),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("criterium",
-                                                                               id="ann-criterium-tooltip"),
+                                                            dbc.InputGroupText("criterium", id="ann-criterium-tooltip"),
                                                             dbc.Select(
                                                                 id="ann-criterium",
                                                                 options=[
                                                                     {"label": "best", "value": "best"},
                                                                     {"label": "biggest", "value": "biggest"},
                                                                 ],
-                                                                value="best",
+                                                                value="biggest",
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -451,8 +495,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("cosine_similarity",
-                                                                               id="ann-cossim-tooltip"),
+                                                            dbc.InputGroupText("cosine_similarity", id="ann-cossim-tooltip"),
                                                             dbc.Input(
                                                                 id="ann-cosine-sim",
                                                                 type="number",
@@ -595,12 +638,11 @@ def create_run_analysis_tab():
                                                     html.H6("Train"),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("parallel",
-                                                                               id="train-parallel-tooltip"),
+                                                            dbc.InputGroupText("parallel", id="train-parallel-tooltip"),
                                                             dbc.Input(
                                                                 id="train-parallel",
                                                                 type="number",
-                                                                value=1,
+                                                                value=3,
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -613,8 +655,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("workers",
-                                                                               id="train-workers-tooltip"),
+                                                            dbc.InputGroupText("workers", id="train-workers-tooltip"),
                                                             dbc.Input(
                                                                 id="train-workers",
                                                                 type="number",
@@ -642,8 +683,7 @@ def create_run_analysis_tab():
                                                     html.H6("Dataset"),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("sig_digits",
-                                                                               id="prep-sigdig-tooltip"),
+                                                            dbc.InputGroupText("sig_digits", id="prep-sigdig-tooltip"),
                                                             dbc.Input(
                                                                 id="prep-sigdig",
                                                                 type="number",
@@ -660,8 +700,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("charge",
-                                                                               id="dataset-charge-tooltip"),
+                                                            dbc.InputGroupText("charge", id="dataset-charge-tooltip"),
                                                             dbc.Input(
                                                                 id="dataset-charge",
                                                                 type="number",
@@ -678,8 +717,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("Run Name",
-                                                                               id="dataset-name-tooltip"),
+                                                            dbc.InputGroupText("Run Name", id="dataset-name-tooltip"),
                                                             dbc.Input(
                                                                 id="dataset-name",
                                                                 type="text",
@@ -696,8 +734,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("Output Folder",
-                                                                               id="dataset-outdir-tooltip"),
+                                                            dbc.InputGroupText("Output Folder", id="dataset-outdir-tooltip"),
                                                             dbc.Input(
                                                                 id="dataset-output-folder",
                                                                 type="text",
@@ -729,7 +766,7 @@ def create_run_analysis_tab():
                                                                     {"label": "pubchem", "value": "pubchem"},
                                                                     {"label": "ecfp", "value": "ecfp"},
                                                                 ],
-                                                                value="rdkit",
+                                                                value="maccs",
                                                             ),
                                                         ],
                                                         className="mb-2",
@@ -742,8 +779,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("fp threshold",
-                                                                               id="fp-threshold-tooltip"),
+                                                            dbc.InputGroupText("fp threshold", id="fp-threshold-tooltip"),
                                                             dbc.Input(
                                                                 id="fp-threshold",
                                                                 type="number",
@@ -761,8 +797,7 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("Motif Parameter",
-                                                                               id="motif-param-tooltip"),
+                                                            dbc.InputGroupText("Motif Parameter", id="motif-param-tooltip"),
                                                             dbc.Input(
                                                                 id="motif-parameter",
                                                                 type="number",
@@ -782,25 +817,44 @@ def create_run_analysis_tab():
                                             ),
                                         ]
                                     ),
-                                ],
+                                ]
                             ),
-                            html.Div(
-                                [
+                        ]
+                    ),
+                ],
+                style={"border": "1px solid #ccc", "padding": "10px", "marginBottom": "20px"},
+            ),
+
+            dbc.Card(
+                [
+                    dbc.CardHeader("Run Analysis"),
+                    dbc.CardBody(
+                        [
+                            dcc.Markdown(
+                                """
+                                Once everything is configured, click **Run Analysis** 
+                                to perform LDA on your spectra. Depending on the dataset 
+                                size and iterations, this can take a while. Please wait until the 
+                                progress indicator has finished to retrieve the results.
+                                """
+                            ),
+                            dcc.Loading(
+                                id="run-analysis-spinner",
+                                type="circle",
+                                children=[
                                     dbc.Button(
                                         "Run Analysis",
                                         id="run-button",
                                         color="primary",
                                     ),
-                                ],
-                                className="d-grid gap-2",
+                                    html.Div(id="run-status", style={"marginTop": "20px"})
+                                ]
                             ),
-                            html.Div(id="run-status", style={"marginTop": "20px"}),
-                        ],
-                        width=6,
-                    )
+                        ]
+                    ),
                 ],
-                justify="center",
-            )
+                style={"border": "1px solid #ccc", "padding": "10px", "marginBottom": "20px"},
+            ),
         ],
         style={"display": "block"},
     )

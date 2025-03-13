@@ -13,14 +13,14 @@ from matchms import set_matchms_logger_level; set_matchms_logger_level("ERROR")
 
 def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", significant_digits=2, charge=1, motifset="unknown"):
     """creates a spectrum from fragments and losses text representations like frag@123.45 or fragment_67.89
-    
+
     ARGS:
         motif_k_features (list): for motif number k all features in a unified representation
         k (int): motif id
         frag_tag (str): unified pre-fragments tag
         loss_tag (str): unified pre-loss tag
         significant_digits (int): number of significant digits that should be used for each fragment and loss
-        
+
     RETURNS:
         spectrum: matchms spectrum object
     """
@@ -65,7 +65,7 @@ def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", sig
 
 def match_frags_and_losses(motif_spectrum, analog_spectra):
     """matches fragments and losses between analog and motif spectrum and returns them
-    
+
     ARGS:
         motif_spectrum (matchms.spectrum.object): spectrum build from the found motif
         analog_spectra (list): list of matchms.spectrum.objects which normally are identified by Spec2Vec
@@ -73,7 +73,7 @@ def match_frags_and_losses(motif_spectrum, analog_spectra):
     RETURNS:
         matching_frags (list): a list of sets with fragments that are present in analog spectra and the motif spectra: each set represents one analog spectrum
         matching_losses (list) a list of sets with losses that are present in analog spectra and the motif spectra: each set represents one analog spectrum
-        
+
     """
 
     motif_frags = set(motif_spectrum.peaks.mz)
@@ -118,32 +118,45 @@ def retrieve_spec4doc(doc2spec_map, ms2lda, doc_id):
 
 
 def download_model_and_data(file_urls=[
-    "https://zenodo.org/records/12625409/files/020724_Spec2Vec_pos_CleanedLibraries.model?download=1",
-    "https://zenodo.org/records/12625409/files/020724_Spec2Vec_pos_CleanedLibraries.model.syn1neg.npy?download=1",
-    "https://zenodo.org/records/12625409/files/020724_Spec2Vec_pos_CleanedLibraries.model.wv.vectors.npy?download=1",
-    "https://zenodo.org/records/12625409/files/positive_s2v_library.pkl?download=1",
-    ], mode="positive"):
-    """Downloads the spec2vec model and the needed datasets for the automated annotation"""
+    "https://zenodo.org/records/15003249/files/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy?download=1",
+    "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model?download=1",
+    "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.syn1neg.npy?download=1",
+    "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.wv.vectors.npy?download=1",
+    "https://zenodo.org/records/15003249/files/150225_CombLibraries_spectra.db?download=1",
+], mode="positive"):
+    """Downloads the spec2vec model and data to Add_On/Spec2Vec/model_{mode}_mode.
+       If a file already exists, it will be skipped.
+    """
 
     script_directory = os.path.dirname(os.path.abspath(__file__))
-    #relative_directory = f"Add_On/Spec2Vec/model_{mode}_mode"
-    relative_directory = f"Add_On/Spec2Vec/trash_{mode}"
+    relative_directory = f"Add_On/Spec2Vec/model_{mode}_mode"
+    #relative_directory = f"Add_On/Spec2Vec/trash_{mode}"
     save_directory = os.path.join(script_directory, relative_directory)
 
     os.makedirs(save_directory, exist_ok=True)
-    print(save_directory)
+    download_count = 0
+    skip_count = 0
 
     for url in file_urls:
+        file_name = os.path.basename(url.split("?download")[0])
+        file_path = os.path.join(save_directory, file_name)
+
+        # Skip if file is present
+        if os.path.exists(file_path):
+            skip_count += 1
+            print(f"File {file_name} already exists, skipping download.")
+            continue
+
+        print(f"Downloading {file_name} ...")
         response = requests.get(url)
         if response.status_code == 200:
-        
-            file_name = os.path.basename(url.split("?download")[0])
-            file_path = os.path.join(save_directory, file_name)
-
             with open(file_path, 'wb') as file:
                 file.write(response.content)
-            print(f"Downloaded {file_name}")
+            download_count += 1
+            print(f"Downloaded {file_name} successfully.")
         else:
-            print(f"Failed to download {url}")
+            raise Exception(f"HTTP Error {response.status_code} while fetching {url}")
 
-            
+    return f"Done. Downloaded {download_count} files, skipped {skip_count} existing."
+
+

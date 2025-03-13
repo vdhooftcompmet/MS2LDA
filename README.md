@@ -30,7 +30,7 @@ conda activate MS2LDA_v2
 
 ### Step 4: Download models and datasets
 
-Download all required models and datasets from [Zenodo](https://zenodo.org/records/12625409).
+Download all required models and datasets from [Zenodo](https://zenodo.org/records/15003249).
 
 ## Running the Dash Application
 
