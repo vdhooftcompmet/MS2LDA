@@ -961,10 +961,13 @@ def display_overlap_filter(overlap_range):
     Output('motif-spectra-ids-store', 'data'),
     Output('spectra-table', 'data'),
     Output('spectra-table', 'columns'),
+    Output('motif-optimized-spectrum-container', 'children'),
+    Output('motif-raw-spectrum-container', 'children'),
     Input('selected-motif-store', 'data'),
     Input('probability-filter', 'value'),
     Input('doc-topic-filter', 'value'),
     Input('overlap-filter', 'value'),
+    Input('optimised-motif-fragloss-toggle', 'value'),
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
@@ -972,15 +975,25 @@ def display_overlap_filter(overlap_range):
     State('screening-fullresults-store', 'data'),
     prevent_initial_call=True,
 )
-def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
-                         lda_dict_data, clustered_smiles_data, spectra_data,
-                         optimized_motifs_data, screening_data):
+def update_motif_details(
+        selected_motif,
+        beta_range,
+        theta_range,
+        overlap_range,
+        optimised_fragloss_toggle,
+        lda_dict_data,
+        clustered_smiles_data,
+        spectra_data,
+        optimized_motifs_data,
+        screening_data
+):
     if not selected_motif or not lda_dict_data:
-        return '', '', '', '', [], [], []
+        raise PreventUpdate
 
     motif_name = selected_motif
+    motif_title = f"Motif Details: {motif_name}"
 
-    # Filter Beta (Topic-Word Probability)
+    # 1) Raw motif (LDA) using Probability Filter
     motif_data = lda_dict_data['beta'].get(motif_name, {})
     filtered_motif_data = {
         f: p for f, p in motif_data.items()
@@ -988,31 +1001,30 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
     }
     total_prob = sum(filtered_motif_data.values())
 
-    # Build a mini table for these features
     feature_table = pd.DataFrame({
         'Feature': filtered_motif_data.keys(),
         'Probability': filtered_motif_data.values(),
     }).sort_values(by='Probability', ascending=False)
 
-    feature_table_component = dash.dash_table.DataTable(
+    feature_table_component = dash_table.DataTable(
         data=feature_table.to_dict('records'),
         columns=[
             {'name': 'Feature', 'id': 'Feature'},
-            {'name': 'Probability', 'id': 'Probability', 'type': 'numeric', 'format': {'specifier': '.4f'}},
+            {'name': 'Probability', 'id': 'Probability', 'type': 'numeric',
+             'format': {'specifier': '.4f'}},
         ],
         style_table={'overflowX': 'auto'},
         style_cell={'textAlign': 'left'},
         page_size=10,
     )
 
-    # Bar Chart: Proportion in Motif vs. Overall
+    # 2) Proportion in Motif vs. Overall (no figure title)
     features_in_motif = list(filtered_motif_data.keys())
     total_feature_probs = {ft: 0.0 for ft in features_in_motif}
     for m_name, feature_probs in lda_dict_data['beta'].items():
         for ft, val in feature_probs.items():
             if ft in total_feature_probs:
                 total_feature_probs[ft] += val
-
     barplot1_df = pd.DataFrame({
         'Feature': features_in_motif,
         'Probability in Motif': [filtered_motif_data[ft] for ft in features_in_motif],
@@ -1033,23 +1045,21 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
         color='Type',
         orientation='h',
         barmode='group',
-        title='Proportion of Total Intensity Explained by This Motif (Top 10 Features)'
     )
     barplot1_fig.update_layout(
+        title=None,
         yaxis={'categoryorder': 'total ascending'},
         xaxis_title='Probability',
         yaxis_title='Feature',
         legend_title='',
     )
 
-    # Bar Chart: Counts of Features in Documents
-    # This second barplot shows how many docs in the ENTIRE dataset have each of these features
+    # 3) Counts of features in entire dataset (no figure title)
     feature_counts = {ft: 0 for ft in features_in_motif}
     for doc_name, w_counts in lda_dict_data['corpus'].items():
         for ft in features_in_motif:
             if ft in w_counts:
                 feature_counts[ft] += 1
-
     barplot2_df = pd.DataFrame({
         'Feature': features_in_motif,
         'Count': [feature_counts[ft] for ft in features_in_motif],
@@ -1060,31 +1070,31 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
         x='Count',
         y='Feature',
         orientation='h',
-        title='Counts of Features in Documents (Entire Dataset)',
     )
     barplot2_fig.update_layout(
+        title=None,
         yaxis={'categoryorder': 'total ascending'},
         xaxis_title='Number of Documents',
         yaxis_title='Feature',
     )
 
-    # Spec2Vec Matching Results
-    motif_idx = 0
+    # 4) Spec2Vec matching results
+    motif_idx = None
     if motif_name.startswith('motif_'):
-        motif_idx_str = motif_name.replace('motif_', '')
         try:
-            motif_idx = int(motif_idx_str)
-        except ValueError:
+            motif_idx = int(motif_name.replace('motif_', ''))
+        except:
             pass
 
     spec2vec_container = []
     auto_anno_text = ""
-    if optimized_motifs_data and motif_idx < len(optimized_motifs_data):
+    if (optimized_motifs_data and motif_idx is not None and
+            0 <= motif_idx < len(optimized_motifs_data)):
         meta_anno = optimized_motifs_data[motif_idx]['metadata'].get('auto_annotation', "")
         if meta_anno:
             auto_anno_text = f"Auto Annotations: {meta_anno}"
 
-    if clustered_smiles_data and motif_idx < len(clustered_smiles_data):
+    if clustered_smiles_data and motif_idx is not None and motif_idx < len(clustered_smiles_data):
         smiles_list = clustered_smiles_data[motif_idx]
         if smiles_list:
             spec2vec_container.append(html.H5('Spec2Vec Matching Results'))
@@ -1109,27 +1119,23 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
                     src="data:image/png;base64," + encoded,
                     style={"margin": "10px"}
                 ))
-
-    # If we have a user short annotation, display it right after the SMILES image
     if auto_anno_text:
         spec2vec_container.append(html.Div(auto_anno_text, style={"marginTop": "10px"}))
 
-    # Doc-Topic Probability / Overlap filter & doc table
-    doc2spec_index = lda_dict_data["doc_to_spec_index"]
+    # 5) Documents table
+    doc2spec_index = lda_dict_data.get("doc_to_spec_index", {})
     docs_for_this_motif = []
     for doc_name, topic_probs in lda_dict_data['theta'].items():
         doc_topic_prob = topic_probs.get(motif_name, 0.0)
         if doc_topic_prob <= 0:
             continue
         overlap_score = lda_dict_data['overlap_scores'][doc_name].get(motif_name, 0.0)
-
         if (theta_range[0] <= doc_topic_prob <= theta_range[1]) and (
                 overlap_range[0] <= overlap_score <= overlap_range[1]):
             real_idx = -1
             doc_idx_str = doc_name.replace("spec_", "")
             if doc_idx_str in doc2spec_index:
                 real_idx = doc2spec_index[doc_idx_str]
-            # gather metadata
             precursor_mz = None
             retention_time = None
             feature_id = None
@@ -1161,14 +1167,12 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
                 'Overlap Score': overlap_score,
             })
 
-    # Create output df for table
     doc_cols = [
         'DocName', 'SpecIndex', 'FeatureID', 'Scans', 'PrecursorMz', 'RetentionTime',
         'CollisionEnergy', 'IonMode', 'MsLevel', 'Doc-Topic Probability', 'Overlap Score'
     ]
     docs_df = pd.DataFrame(docs_for_this_motif, columns=doc_cols)
     if not docs_df.empty:
-        # Sort only if not empty
         docs_df = docs_df.sort_values(by='Doc-Topic Probability', ascending=False)
 
     table_data = docs_df.to_dict('records')
@@ -1186,42 +1190,9 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
          'format': {'specifier': '.4f'}},
         {'name': 'Overlap Score', 'id': 'Overlap Score', 'type': 'numeric', 'format': {'specifier': '.4f'}},
     ]
-
-    # Provide the list of SpecIndex for next/prev
     spectra_ids = docs_df['SpecIndex'].tolist() if not docs_df.empty else []
 
-    # Return the updated content
-    motif_title = f"Motif Details: {motif_name}"
-
-    # (1) Spec2Vec container
-    spec2vec_div = html.Div(spec2vec_container)
-
-    # (2) Features container => feature table, barplot1, then the “Counts of Features in Documents” barplot
-    features_div = html.Div([
-        # Table of motif features
-        html.Div([
-            html.H5("Motif Features Table"),
-            feature_table_component,
-            html.P(f"Total Probability (Filtered): {total_prob:.4f}")
-        ]),
-        html.H5("Proportion of Features in Motif vs. Overall"),
-        dcc.Graph(figure=barplot1_fig),
-        html.H5("Counts of Features in Documents (Entire Dataset)"),
-        dcc.Markdown(
-            """
-            This shows how many documents in the entire dataset contain each selected feature. 
-            It does **not** consider the doc-topic or overlap filters; it's purely a global count.
-            """
-        ),
-        dcc.Graph(figure=barplot2_fig),
-    ])
-
-    # (3) Documents container => doc table only
-    docs_div = html.Div([
-        html.P("Documents containing this motif are listed below (affected by doc-topic & overlap filters)."),
-    ])
-
-    # Build a small table for screening hits if present
+    # 6) Possibly screening info
     screening_box = ""
     if screening_data:
         try:
@@ -1230,7 +1201,6 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
                 scdf["user_auto_annotation"] = scdf["user_auto_annotation"].apply(
                     lambda x: ", ".join(x) if isinstance(x, list) else str(x)
                 )
-
             hits_df = scdf[scdf['user_motif_id'] == motif_name].copy()
             hits_df = hits_df.sort_values('score', ascending=False)
             if not hits_df.empty:
@@ -1258,16 +1228,125 @@ def update_motif_details(selected_motif, beta_range, theta_range, overlap_range,
                     })
         except:
             pass
+    spec2vec_div = html.Div(spec2vec_container + [screening_box])
 
-    # Combine final output
+    # 7) "Features" container
+    features_div = html.Div([
+        html.Div([
+            html.H5("Motif Features Table"),
+            feature_table_component,
+            html.P(f"Total Probability (Filtered): {total_prob:.4f}")
+        ]),
+        html.H5("Proportion of Features in Motif vs. Overall"),
+        dcc.Graph(figure=barplot1_fig),
+        html.H5("Counts of Features in Spectra (Entire Dataset)"),
+        dcc.Graph(figure=barplot2_fig),
+    ])
+
+    docs_div = html.Div([
+        html.P("Below is the table of MS2 documents for the motif, subject to doc-topic probability & overlap score.")
+    ])
+
+    # 8) Build the Optimised Motif bar plot with the toggle for "fragments" or "losses"
+    om_fig = go.Figure()
+    motif_idx_opt = motif_idx
+    if motif_idx_opt is not None and 0 <= motif_idx_opt < len(optimized_motifs_data):
+        om = optimized_motifs_data[motif_idx_opt]
+        # We'll read 'mz' + 'intensities' for fragments,
+        # 'metadata["losses"]' for losses, but the user picks which one to show.
+        raw_frag_mz = om.get("mz", [])
+        raw_frag_int = om.get("intensities", [])
+        raw_loss_mz = []
+        raw_loss_int = []
+        if "metadata" in om and "losses" in om["metadata"]:
+            for item in om["metadata"]["losses"]:
+                raw_loss_mz.append(item["loss_mz"])
+                raw_loss_int.append(item["loss_intensity"])
+
+        if optimised_fragloss_toggle == "fragments":
+            if raw_frag_mz:
+                om_fig.add_trace(go.Bar(
+                    x=raw_frag_mz,
+                    y=raw_frag_int,
+                    marker=dict(color="#1f77b4"),
+                    width=0.4,
+                    name="Optimised Fragments"
+                ))
+        else:
+            # user wants "losses"
+            if raw_loss_mz:
+                om_fig.add_trace(go.Bar(
+                    x=raw_loss_mz,
+                    y=raw_loss_int,
+                    marker=dict(color="#ff7f0e"),
+                    width=0.4,
+                    name="Optimised Losses"
+                ))
+
+    om_fig.update_layout(
+        title=None,  # no figure-level title
+        xaxis_title="m/z (Da)",
+        yaxis_title="Normalized Intensity",
+        bargap=0.2
+    )
+    optim_plot = dcc.Graph(figure=om_fig)
+
+    # 9) Build the RAW LDA Motif bar plot (with Probability Filter)
+    raw_fig = go.Figure()
+    raw_frag_mz = []
+    raw_frag_int = []
+    raw_loss_mz = []
+    raw_loss_int = []
+    for ft, val in filtered_motif_data.items():
+        if ft.startswith("frag@"):
+            try:
+                raw_frag_mz.append(float(ft.split("@")[1]))
+                raw_frag_int.append(val)
+            except:
+                pass
+        elif ft.startswith("loss@"):
+            try:
+                raw_loss_mz.append(float(ft.split("@")[1]))
+                raw_loss_int.append(val)
+            except:
+                pass
+
+    if raw_frag_mz:
+        raw_fig.add_trace(go.Bar(
+            x=raw_frag_mz,
+            y=raw_frag_int,
+            marker=dict(color="#1f77b4"),
+            width=0.4,
+            name="Raw LDA Fragments"
+        ))
+    if raw_loss_mz:
+        raw_fig.add_trace(go.Bar(
+            x=raw_loss_mz,
+            y=raw_loss_int,
+            marker=dict(color="#ff7f0e"),
+            width=0.4,
+            name="Raw LDA Losses"
+        ))
+
+    raw_fig.update_layout(
+        title=None,  # no figure-level title
+        xaxis_title="m/z (Da)",
+        yaxis_title="Probability",
+        bargap=0.2
+    )
+    raw_plot = dcc.Graph(figure=raw_fig)
+
+    # Return all items in the right order
     return (
-        motif_title,  # Motif Title
-        html.Div([spec2vec_div, screening_box]),  # Show the SMILES and user shortAnno, then screening hits
-        features_div,  # Features container
-        docs_div,  # Documents container
-        spectra_ids,  # motif-spectra-ids-store
-        table_data,  # Data for dash_table
-        table_columns,  # Columns for dash_table
+        motif_title,
+        spec2vec_div,
+        features_div,
+        docs_div,
+        spectra_ids,
+        table_data,
+        table_columns,
+        optim_plot,
+        raw_plot,
     )
 
 

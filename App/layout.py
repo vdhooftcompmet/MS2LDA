@@ -348,7 +348,8 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("min_intensity", id="prep-minint-tooltip"),
+                                                            dbc.InputGroupText("min_intensity",
+                                                                               id="prep-minint-tooltip"),
                                                             dbc.Input(
                                                                 id="prep-min-intensity",
                                                                 type="number",
@@ -366,7 +367,8 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("max_intensity", id="prep-maxint-tooltip"),
+                                                            dbc.InputGroupText("max_intensity",
+                                                                               id="prep-maxint-tooltip"),
                                                             dbc.Input(
                                                                 id="prep-max-intensity",
                                                                 type="number",
@@ -446,10 +448,14 @@ def create_run_analysis_tab():
                                                             dbc.Select(
                                                                 id="conv-type",
                                                                 options=[
-                                                                    {"label": "perplexity_history", "value": "perplexity_history"},
-                                                                    {"label": "entropy_history_doc", "value": "entropy_history_doc"},
-                                                                    {"label": "entropy_history_topic", "value": "entropy_history_topic"},
-                                                                    {"label": "log_likelihood_history", "value": "log_likelihood_history"},
+                                                                    {"label": "perplexity_history",
+                                                                     "value": "perplexity_history"},
+                                                                    {"label": "entropy_history_doc",
+                                                                     "value": "entropy_history_doc"},
+                                                                    {"label": "entropy_history_topic",
+                                                                     "value": "entropy_history_topic"},
+                                                                    {"label": "log_likelihood_history",
+                                                                     "value": "log_likelihood_history"},
                                                                 ],
                                                                 value="perplexity_history",
                                                             ),
@@ -495,7 +501,8 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("cosine_similarity", id="ann-cossim-tooltip"),
+                                                            dbc.InputGroupText("cosine_similarity",
+                                                                               id="ann-cossim-tooltip"),
                                                             dbc.Input(
                                                                 id="ann-cosine-sim",
                                                                 type="number",
@@ -734,7 +741,8 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("Output Folder", id="dataset-outdir-tooltip"),
+                                                            dbc.InputGroupText("Output Folder",
+                                                                               id="dataset-outdir-tooltip"),
                                                             dbc.Input(
                                                                 id="dataset-output-folder",
                                                                 type="text",
@@ -779,7 +787,8 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("fp threshold", id="fp-threshold-tooltip"),
+                                                            dbc.InputGroupText("fp threshold",
+                                                                               id="fp-threshold-tooltip"),
                                                             dbc.Input(
                                                                 id="fp-threshold",
                                                                 type="number",
@@ -797,7 +806,8 @@ def create_run_analysis_tab():
                                                     ),
                                                     dbc.InputGroup(
                                                         [
-                                                            dbc.InputGroupText("Motif Parameter", id="motif-param-tooltip"),
+                                                            dbc.InputGroupText("Motif Parameter",
+                                                                               id="motif-param-tooltip"),
                                                             dbc.Input(
                                                                 id="motif-parameter",
                                                                 type="number",
@@ -1133,137 +1143,166 @@ def create_motif_details_tab():
     tab = html.Div(
         id="motif-details-tab-content",
         children=[
+
+            # Brief high-level overview of the entire tab
             html.Div(
                 [
                     dcc.Markdown(
                         """
-                        This tab is organized into three main sections: (1) Motif Details, (2) Features in Motifs, and (3) Documents in Motifs. 
-
-                        In **Motif Details**, you'll see the Spec2Vec matching results for the selected motif.
-                        In **Features in Motifs**, a probability filter helps you select which motif features (fragments/losses) to show, 
-                        along with bar plots indicating how strongly these features belong to the motif and how often they appear in the dataset.
-                        Finally, **Documents in Motifs** displays the spectra containing this motif, with filters for document-topic probability and overlap score.
+                        This tab provides detailed insight into a selected MS2LDA motif, highlighting possible 
+                        chemical structures, motif composition, and the actual spectra that represent it. 
+                        The content is structured into three clear sections: Motif Details, Features in Motifs, 
+                        and Spectra in Motifs. Each section contains explanations to help interpret the results.
                         """
                     )
                 ],
                 style={"margin-top": "20px", "margin-bottom": "20px"},
             ),
-            html.Div(
-                [
-                    html.H4(id='motif-details-title'),
-                    dcc.Markdown(
-                        """
-                        This section shows SMILES structures found by comparing the motif’s pseudo-spectrum against an external library.
-                        You can view top matching compounds here and visually inspect their chemical structures.
-                        """
-                    ),
-                    # This container will be dynamically filled in the callback
-                    html.Div(id='motif-spec2vec-container'),
-                ],
-                style={
-                    "border": "1px dashed #999",
-                    "padding": "10px",
-                    "borderRadius": "5px",
-                    "margin-bottom": "5px"
-                },
-            ),
-            html.Div(
-                [
-                    html.H4("Features in Motifs"),
-                    dcc.Markdown(
-                        """
-                        The **Topic-Word Probability Filter** below controls which motif features (fragments/losses) are displayed 
-                        based on their probability (`beta`). After filtering, you’ll see a table of selected features plus 
-                        bar charts illustrating their distribution in the motif and the dataset.
-                        """
-                    ),
 
-                    dbc.Label("Topic-Word Probability Filter:"),
+            # ----------------------------------------------------------------
+            # 1. MOTIF DETAILS
+            # ----------------------------------------------------------------
+            html.Div([
+                html.H4(id='motif-details-title'),
+
+                html.Div([
+                    html.H5("Spec2Vec Matching Results"),
+                    dcc.Markdown(
+                        """
+                        The Spec2Vec matching results displayed here suggest chemical structures (SMILES strings) that closely match the selected motif. Spec2Vec calculates similarities by comparing motif pseudo-spectra against reference spectra from a known database. Matches shown here can help identify possible chemical identities or provide clues about structural characteristics represented by this motif.
+                        """
+                    ),
+                    html.Div(id='motif-spec2vec-container', style={"marginTop": "10px"}),
+                ], style={
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "15px"
+                }),
+
+                html.Div([
+                    html.H5("Optimised Motif Pseudo-Spectrum"),
+                    dcc.Markdown(
+                        """
+                        This plot shows the optimised pseudo-spectrum, which refines the raw motif by retaining only fragments or losses consistently found among the best Spec2Vec matches. Because it's derived from verified library spectra, the optimised motif doesn't rely on the probability thresholds used in the original LDA motif extraction. You can use the toggle below to switch between displaying fragments or losses, depending on the feature type you want to explore.
+                        """
+                    ),
+                    dbc.RadioItems(
+                        id='optimised-motif-fragloss-toggle',
+                        options=[
+                            {"label": "Fragments Only", "value": "fragments"},
+                            {"label": "Losses Only", "value": "losses"},
+                        ],
+                        value="fragments",
+                        inline=True,
+                    ),
+                    html.Div(id='motif-optimized-spectrum-container', style={"marginTop": "10px"}),
+                ], style={
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "15px"
+                }),
+
+            ], style={
+                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "margin-bottom": "20px"
+            }),
+
+            # ----------------------------------------------------------------
+            # 2. FEATURES IN MOTIFS
+            # ----------------------------------------------------------------
+            html.Div([
+                html.H4("Features in Motifs"),
+
+                html.Div([
+                    html.H5("Spectra-Peaks Probability Filter"),
+                    dcc.Markdown(
+                        """
+                        The slider below controls the minimum and maximum probability thresholds for selecting motif features (fragments and losses) identified by the LDA model. Setting a higher minimum value keeps only peaks strongly associated with the motif, providing a simpler representation. A lower minimum includes more peaks, potentially capturing additional detail but also introducing noise.
+                        """
+                    ),
+                    dbc.Label("Spectra-Peaks Probability Filter:"),
                     dcc.RangeSlider(
-                        id='probability-filter',
-                        min=0,
-                        max=1,
-                        step=0.01,
-                        value=[0, 1],
-                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
-                        allowCross=False
+                        id='probability-filter', min=0, max=1, step=0.01, value=[0, 1],
+                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
                     ),
                     html.Div(id='probability-filter-display', style={"marginTop": "10px"}),
+                ], style={
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "10px"
+                }),
 
-                    # This container will hold the feature table & first bar chart
-                    html.Div(id='motif-features-container'),
-                ],
-                style={
-                    "border": "1px dashed #999",
-                    "padding": "10px",
-                    "borderRadius": "5px",
-                    "margin-bottom": "5px"
-                },
-            ),
-            html.Div(
-                [
-                    html.H4("Documents in Motifs"),
+                html.Div([
+                    html.H5("Raw LDA Motif Pseudo-Spectrum (Filtered)"),
                     dcc.Markdown(
                         """
-                        This section shows spectra that include the current motif. 
-                        **Document-Topic Probability Filter** (theta) narrows the list by motif representation in each spectrum, 
-                        and **Overlap Score Filter** focuses on how closely the spectrum’s features match this motif’s top features.
+                        This plot visualizes the pseudo-spectrum of the raw motif after filtering peaks based on the selected probability thresholds. Peaks outside the defined range are removed, showing only the features most relevant according to the LDA model.
+                        """
+                    ),
+                    html.Div(id='motif-raw-spectrum-container', style={"marginTop": "10px"}),
+                ], style={
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "10px"
+                }),
+
+                html.Div([
+                    html.H5("Motif Features Table and Summary Plots"),
+                    dcc.Markdown(
+                        """
+                        The table below lists the motif features (fragments and losses) that passed the probability filter, including their probabilities within the motif. Accompanying bar plots illustrate two aspects: first, how uniquely associated each feature is with this motif compared to all motifs ("Proportion of Features in Motif vs. Overall"), and second, how frequently each feature appears across all spectra in the dataset ("Counts of Features in Spectra (Entire Dataset)").
+                        """
+                    ),
+                    html.Div(id='motif-features-container'),
+                ], style={
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "10px"
+                }),
+
+            ], style={
+                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "margin-bottom": "20px"
+            }),
+
+            # ----------------------------------------------------------------
+            # 3. SPECTRA IN MOTIFS
+            # ----------------------------------------------------------------
+            html.Div([
+                html.H4("Spectra in Motifs"),
+
+                html.Div([
+                    dcc.Markdown(
+                        """
+                        This section lists actual MS2 spectra from the dataset associated with the selected motif. Two adjustable sliders below control how these spectra are filtered. The Spectra-Motif Probability Filter determines the minimum and maximum probability a spectrum must have to be associated with this motif, while the Overlap Score Filter sets how closely the spectrum’s peaks must align with the motif features.
+
+                        Select a spectrum from the table or use the Next/Previous buttons to browse through them. Each selection updates the spectrum plot below, highlighting peaks matching features from the motif. This plot helps verify if the motif truly represents meaningful chemical information by directly comparing it against real experimental data.
                         """
                     ),
 
-                    dbc.Label("Document-Topic Probability Filter:"),
+                    dbc.Label("Spectra-Motif Probability Filter:"),
                     dcc.RangeSlider(
-                        id='doc-topic-filter',
-                        min=0,
-                        max=1,
-                        step=0.01,
-                        value=[0, 1],
-                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
-                        allowCross=False
+                        id='doc-topic-filter', min=0, max=1, step=0.01, value=[0, 1],
+                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
                     ),
                     html.Div(id='doc-topic-filter-display', style={"marginTop": "10px"}),
 
                     dbc.Label("Overlap Score Filter:"),
                     dcc.RangeSlider(
-                        id='overlap-filter',
-                        min=0,
-                        max=1,
-                        step=0.01,
-                        value=[0, 1],
-                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'},
-                        allowCross=False
+                        id='overlap-filter', min=0, max=1, step=0.01, value=[0, 1],
+                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
                     ),
                     html.Div(id='overlap-filter-display', style={"marginTop": "10px"}),
 
-                    # This container will hold the second bar chart & doc table
                     html.Div(id='motif-documents-container'),
 
                     dash_table.DataTable(
-                        id='spectra-table',
-                        data=[],
-                        columns=[],
-                        style_table={'overflowX': 'auto'},
-                        style_cell={'textAlign': 'left'},
-                        page_size=10,
-                        row_selectable='single',
-                        selected_rows=[0],
-                        hidden_columns=["SpecIndex"],
+                        id='spectra-table', data=[], columns=[],
+                        style_table={'overflowX': 'auto'}, style_cell={'textAlign': 'left'},
+                        page_size=10, row_selectable='single', selected_rows=[0], hidden_columns=["SpecIndex"]
                     ),
-
                     html.Div(id='spectrum-plot'),
 
                     html.Div([
                         dbc.Button('Previous', id='prev-spectrum', n_clicks=0, color="info"),
                         dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ms-2', color="info"),
                     ], className='mt-3'),
-                ],
-                style={
-                    "border": "1px dashed #999",
-                    "padding": "10px",
-                    "borderRadius": "5px",
-                    "margin-bottom": "5px"
-                },
-            ),
+                ], style={
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "15px"
+                }),
+
+            ], style={
+                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "margin-bottom": "20px"
+            }),
+
         ],
         style={"display": "none"},
     )
