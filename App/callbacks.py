@@ -33,7 +33,7 @@ from MS2LDA.run import load_s2v_model
 from MS2LDA.utils import download_model_and_data
 
 # Hardcode the path for .m2m references
-MOTIFDB_FOLDER = "../MS2LDA/MotifDB"
+MOTIFDB_FOLDER = "./MS2LDA/MotifDB"
 
 
 def load_motifset_file(json_path):
@@ -42,7 +42,7 @@ def load_motifset_file(json_path):
     Returns a list of motifs in the file as matchms Spectra.
     """
     ms1_df, ms2_df = load_motifDB(json_path)
-    motifs = motifDB2motifs(ms2_df, ms2_df)
+    motifs = motifDB2motifs(ms2_df)
     return motifs
 
 
