@@ -1268,8 +1268,8 @@ def update_motif_details(
                 om_fig.add_trace(go.Bar(
                     x=raw_frag_mz,
                     y=raw_frag_int,
-                    marker=dict(color="#1f77b4", line=dict(color='black', width=0.1)),
-                    width=0.4,
+                    marker=dict(color="#DC143C"),
+                    width=0.2,
                     name="Optimised Fragments"
                 ))
         else:
@@ -1277,8 +1277,8 @@ def update_motif_details(
                 om_fig.add_trace(go.Bar(
                     x=raw_loss_mz,
                     y=raw_loss_int,
-                    marker=dict(color="#ff7f0e", line=dict(color='black', width=0.1)),
-                    width=0.4,
+                    marker=dict(color="#ff7f0e"),
+                    width=0.2,
                     name="Optimised Losses"
                 ))
 
@@ -1316,8 +1316,8 @@ def update_motif_details(
             raw_fig.add_trace(go.Bar(
                 x=raw_frag_mz,
                 y=raw_frag_int,
-                marker=dict(color="#1f77b4", line=dict(color='black', width=0.1)),
-                width=0.4,
+                marker=dict(color="#DC143C"),
+                width=0.2,
                 name="Raw LDA Fragments"
             ))
     else:
@@ -1325,8 +1325,8 @@ def update_motif_details(
             raw_fig.add_trace(go.Bar(
                 x=raw_loss_mz,
                 y=raw_loss_int,
-                marker=dict(color="#ff7f0e", line=dict(color='black', width=0.1)),
-                width=0.4,
+                marker=dict(color="#ff7f0e"),
+                width=0.2,
                 name="Raw LDA Losses"
             ))
 
@@ -1397,7 +1397,6 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
     else:
         return current_index, dash.no_update
 
-
 @app.callback(
     Output('spectrum-plot', 'children'),
     Input('selected-spectrum-index', 'data'),
@@ -1416,7 +1415,6 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
         spectrum_id = spectra_ids[selected_index]
         # Get the actual spectrum dictionary
         spectrum_dict = spectra_data[spectrum_id]
-
         spectrum = Spectrum(
             mz=np.array(spectrum_dict['mz']),
             intensities=np.array(spectrum_dict['intensities']),
@@ -1450,18 +1448,22 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
             'intensity': spectrum.peaks.intensities,
         })
 
+        # Mark which peaks are "is_motif" (red) vs "non_motif" (gray).
         tolerance = 0.1
         spectrum_df['is_motif'] = False
         for mz_val in motif_mz_values:
             mask = np.abs(spectrum_df['mz'] - mz_val) <= tolerance
             spectrum_df.loc[mask, 'is_motif'] = True
 
-        colors = ['#DC143C' if is_motif else '#B0B0B0'
-                  for is_motif in spectrum_df['is_motif']]
+        colors = [
+            '#DC143C' if is_motif else '#B0B0B0'
+            for is_motif in spectrum_df['is_motif']
+        ]
 
-        parent_ion_present = False
+        # Check for parent ion. If found, remove it from the main bar so we can draw it separately in blue
         parent_ion_mz = None
         parent_ion_intensity = None
+        parent_ion_present = False
         if 'precursor_mz' in spectrum.metadata:
             try:
                 parent_ion_mz = float(spectrum.metadata['precursor_mz'])
@@ -1470,7 +1472,17 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
             except (ValueError, TypeError):
                 parent_ion_present = False
 
+        if parent_ion_present and parent_ion_mz is not None and parent_ion_intensity is not None:
+            remove_tolerance = 0.5
+            remove_mask = np.abs(spectrum_df['mz'] - parent_ion_mz) <= remove_tolerance
+            spectrum_df = spectrum_df.loc[~remove_mask].copy()
+            colors = [
+                '#DC143C' if is_motif else '#B0B0B0'
+                for is_motif in spectrum_df['is_motif']
+            ]
+
         fig = go.Figure()
+
         fig.add_trace(go.Bar(
             x=spectrum_df['mz'],
             y=spectrum_df['intensity'],
@@ -1479,10 +1491,12 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
             name='Peaks',
             hoverinfo='text',
             hovertext=[
-                f"Motif Peak: {motif}<br>m/z: {mz_val:.2f}<br>Intensity: {inten}"
-                for motif, mz_val, inten in zip(spectrum_df['is_motif'],
-                                                spectrum_df['mz'],
-                                                spectrum_df['intensity'])
+                f"Motif Peak: {is_motif}<br>m/z: {mz_val:.2f}<br>Intensity: {inten:.2f}"
+                for is_motif, mz_val, inten in zip(
+                    spectrum_df['is_motif'],
+                    spectrum_df['mz'],
+                    spectrum_df['intensity']
+                )
             ],
             opacity=0.9,
         ))
@@ -1495,49 +1509,40 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
                 width=0.4,
                 name='Parent Ion',
                 hoverinfo='text',
-                hovertext=[f"Parent Ion<br>m/z: {parent_ion_mz:.2f}<br>Intensity: {parent_ion_intensity}"],
+                hovertext=[f"Parent Ion<br>m/z: {parent_ion_mz:.2f}<br>Intensity: {parent_ion_intensity:.2f}"],
                 opacity=1.0,
             ))
 
-        if "losses" in spectrum.metadata and parent_ion_present:
-            precursor_mz = parent_ion_mz
-            for loss_item in spectrum.metadata["losses"]:
-                loss_mz = loss_item["loss_mz"]
-                loss_intensity = loss_item["loss_intensity"]
-                if not any(abs(loss_mz - val) <= tolerance for val in motif_loss_values):
-                    continue
-
-                corresponding_frag_mz = precursor_mz - loss_mz
-                frag_mask = (np.abs(spectrum_df['mz'] - corresponding_frag_mz) <= tolerance)
-                if not frag_mask.any():
-                    continue
-
-                frag_subset = spectrum_df.loc[frag_mask]
-                if frag_subset.empty:
-                    continue
-
-                closest_frag_mz = frag_subset['mz'].iloc[0]
-                closest_frag_intensity = frag_subset['intensity'].iloc[0]
-
-                fig.add_shape(
-                    type="line",
-                    x0=closest_frag_mz,
-                    y0=closest_frag_intensity,
-                    x1=precursor_mz,
-                    y1=closest_frag_intensity,
-                    line=dict(color="green", width=2, dash="dash"),
-                )
-                fig.add_annotation(
-                    x=(closest_frag_mz + precursor_mz) / 2,
-                    y=closest_frag_intensity,
-                    text=f"-{loss_mz:.2f}",
-                    showarrow=False,
-                    font=dict(family="Courier New, monospace", size=12, color="green"),
-                    bgcolor="rgba(255,255,255,0.7)",
-                    xanchor="center",
-                    yanchor="bottom",
-                    standoff=5,
-                )
+            if "losses" in spectrum.metadata:
+                loss_tol = 0.1
+                for loss_item in spectrum.metadata["losses"]:
+                    loss_mz = loss_item["loss_mz"]
+                    loss_intensity = loss_item["loss_intensity"]
+                    if any(abs(loss_mz - val) <= loss_tol for val in motif_loss_values):
+                        corresponding_frag_mz = parent_ion_mz - loss_mz
+                        frag_mask = (np.abs(spectrum_df['mz'] - corresponding_frag_mz) <= loss_tol)
+                        if frag_mask.any():
+                            closest_frag_mz = spectrum_df.loc[frag_mask, 'mz'].iloc[0]
+                            closest_frag_intensity = spectrum_df.loc[frag_mask, 'intensity'].iloc[0]
+                            fig.add_shape(
+                                type="line",
+                                x0=closest_frag_mz,
+                                y0=closest_frag_intensity,
+                                x1=parent_ion_mz,
+                                y1=closest_frag_intensity,
+                                line=dict(color="green", width=2, dash="dash"),
+                            )
+                            fig.add_annotation(
+                                x=(closest_frag_mz + parent_ion_mz) / 2,
+                                y=closest_frag_intensity,
+                                text=f"-{loss_mz:.2f}",
+                                showarrow=False,
+                                font=dict(family="Courier New, monospace", size=12, color="green"),
+                                bgcolor="rgba(255,255,255,0.7)",
+                                xanchor="center",
+                                yanchor="bottom",
+                                standoff=5,
+                            )
 
         fig.update_layout(
             title=f"Spectrum: {spectrum_id}",
