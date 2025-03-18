@@ -1232,6 +1232,15 @@ def create_motif_details_tab():
                         This plot visualizes the pseudo-spectrum of the raw motif after filtering peaks based on the selected probability thresholds. Peaks outside the defined range are removed, showing only the features most relevant according to the LDA model.
                         """
                     ),
+                    dbc.RadioItems(
+                        id='raw-motif-fragloss-toggle',
+                        options=[
+                            {"label": "Fragments Only", "value": "fragments"},
+                            {"label": "Losses Only", "value": "losses"},
+                        ],
+                        value="fragments",
+                        inline=True,
+                    ),
                     html.Div(id='motif-raw-spectrum-container', style={"marginTop": "10px"}),
                 ], style={
                     "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "10px"

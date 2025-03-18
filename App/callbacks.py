@@ -968,6 +968,7 @@ def display_overlap_filter(overlap_range):
     Input('doc-topic-filter', 'value'),
     Input('overlap-filter', 'value'),
     Input('optimised-motif-fragloss-toggle', 'value'),
+    Input('raw-motif-fragloss-toggle', 'value'),
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
@@ -981,6 +982,7 @@ def update_motif_details(
         theta_range,
         overlap_range,
         optimised_fragloss_toggle,
+        raw_motif_fragloss_toggle,
         lda_dict_data,
         clustered_smiles_data,
         spectra_data,
@@ -1018,7 +1020,7 @@ def update_motif_details(
         page_size=10,
     )
 
-    # 2) Proportion in Motif vs. Overall (no figure title)
+    # 2) Proportion in Motif vs. Overall
     features_in_motif = list(filtered_motif_data.keys())
     total_feature_probs = {ft: 0.0 for ft in features_in_motif}
     for m_name, feature_probs in lda_dict_data['beta'].items():
@@ -1054,7 +1056,7 @@ def update_motif_details(
         legend_title='',
     )
 
-    # 3) Counts of features in entire dataset (no figure title)
+    # 3) Counts of features in entire dataset
     feature_counts = {ft: 0 for ft in features_in_motif}
     for doc_name, w_counts in lda_dict_data['corpus'].items():
         for ft in features_in_motif:
@@ -1078,7 +1080,7 @@ def update_motif_details(
         yaxis_title='Feature',
     )
 
-    # 4) Spec2Vec matching results
+    # 4) Spec2vec matching results
     motif_idx = None
     if motif_name.startswith('motif_'):
         try:
@@ -1252,8 +1254,6 @@ def update_motif_details(
     motif_idx_opt = motif_idx
     if motif_idx_opt is not None and 0 <= motif_idx_opt < len(optimized_motifs_data):
         om = optimized_motifs_data[motif_idx_opt]
-        # We'll read 'mz' + 'intensities' for fragments,
-        # 'metadata["losses"]' for losses, but the user picks which one to show.
         raw_frag_mz = om.get("mz", [])
         raw_frag_int = om.get("intensities", [])
         raw_loss_mz = []
@@ -1268,68 +1268,70 @@ def update_motif_details(
                 om_fig.add_trace(go.Bar(
                     x=raw_frag_mz,
                     y=raw_frag_int,
-                    marker=dict(color="#1f77b4"),
+                    marker=dict(color="#1f77b4", line=dict(color='black', width=0.1)),
                     width=0.4,
                     name="Optimised Fragments"
                 ))
         else:
-            # user wants "losses"
             if raw_loss_mz:
                 om_fig.add_trace(go.Bar(
                     x=raw_loss_mz,
                     y=raw_loss_int,
-                    marker=dict(color="#ff7f0e"),
+                    marker=dict(color="#ff7f0e", line=dict(color='black', width=0.1)),
                     width=0.4,
                     name="Optimised Losses"
                 ))
 
     om_fig.update_layout(
-        title=None,  # no figure-level title
+        title=None,
         xaxis_title="m/z (Da)",
         yaxis_title="Normalized Intensity",
         bargap=0.2
     )
     optim_plot = dcc.Graph(figure=om_fig)
 
-    # 9) Build the RAW LDA Motif bar plot (with Probability Filter)
+    # 9) Build the RAW LDA Motif bar plot
     raw_fig = go.Figure()
     raw_frag_mz = []
     raw_frag_int = []
     raw_loss_mz = []
     raw_loss_int = []
+
     for ft, val in filtered_motif_data.items():
         if ft.startswith("frag@"):
             try:
-                raw_frag_mz.append(float(ft.split("@")[1]))
+                raw_frag_mz.append(float(ft.replace("frag@", "")))
                 raw_frag_int.append(val)
             except:
                 pass
         elif ft.startswith("loss@"):
             try:
-                raw_loss_mz.append(float(ft.split("@")[1]))
+                raw_loss_mz.append(float(ft.replace("loss@", "")))
                 raw_loss_int.append(val)
             except:
                 pass
 
-    if raw_frag_mz:
-        raw_fig.add_trace(go.Bar(
-            x=raw_frag_mz,
-            y=raw_frag_int,
-            marker=dict(color="#1f77b4"),
-            width=0.4,
-            name="Raw LDA Fragments"
-        ))
-    if raw_loss_mz:
-        raw_fig.add_trace(go.Bar(
-            x=raw_loss_mz,
-            y=raw_loss_int,
-            marker=dict(color="#ff7f0e"),
-            width=0.4,
-            name="Raw LDA Losses"
-        ))
+    if raw_motif_fragloss_toggle == "fragments":
+        if raw_frag_mz:
+            raw_fig.add_trace(go.Bar(
+                x=raw_frag_mz,
+                y=raw_frag_int,
+                marker=dict(color="#1f77b4", line=dict(color='black', width=0.1)),
+                width=0.4,
+                name="Raw LDA Fragments"
+            ))
+    else:
+        if raw_loss_mz:
+            raw_fig.add_trace(go.Bar(
+                x=raw_loss_mz,
+                y=raw_loss_int,
+                marker=dict(color="#ff7f0e", line=dict(color='black', width=0.1)),
+                width=0.4,
+                name="Raw LDA Losses"
+            ))
 
     raw_fig.update_layout(
-        title=None,  # no figure-level title
+        title=None,
         xaxis_title="m/z (Da)",
         yaxis_title="Probability",
         bargap=0.2
@@ -1833,10 +1835,12 @@ def save_screening_results(csv_click, json_click, table_data):
         State("motif-rankings-table", "data"),
         State("screening-results-table", "data"),
         State("motif-rankings-table", "derived_viewport_data"),
+        State("screening-results-table", "derived_viewport_data"),
     ],
     prevent_initial_call=True,
 )
-def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, screening_data, ranking_dv_data):
+def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, screening_data, ranking_dv_data,
+                   screening_dv_data):
     ctx = dash.callback_context
     if not ctx.triggered:
         raise dash.exceptions.PreventUpdate
@@ -1853,11 +1857,11 @@ def on_motif_click(ranking_active_cell, screening_active_cell, ranking_data, scr
         raise dash.exceptions.PreventUpdate
 
     elif triggered_id == "screening-results-table":
-        if screening_active_cell and screening_data:
+        if screening_active_cell and screening_dv_data:
             col_id = screening_active_cell["column_id"]
             row_id = screening_active_cell["row"]
             if col_id == "user_motif_id":
-                motif_id = screening_data[row_id]["user_motif_id"]
+                motif_id = screening_dv_data[row_id]["user_motif_id"]
                 return motif_id
         raise dash.exceptions.PreventUpdate
 
