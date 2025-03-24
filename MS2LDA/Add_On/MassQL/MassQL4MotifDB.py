@@ -48,12 +48,7 @@ def motifs2motifDB(spectra):
         feature_dict["paper_url"] = spectrum.get("paper_url")
         feature_dict["property"] = spectrum.get("property")
 
-        if spectrum.get("motifset"):
-            string_to_hash = spectrum.get("id") + spectrum.get("motifset")
-            byte_string = string_to_hash.encode("utf-8")
-            hash_id = hashlib.md5(byte_string, usedforsecurity=False).hexdigest()
-        else:
-            hash_id = random.getrandbits(128)
+        hash_id = random.getrandbits(128)
 
         feature_dict["scan"] = hash_id
         feature_dict["ms1scan"] = 0
@@ -161,6 +156,7 @@ def motifDB2motifs(motifDB_ms2, filter_table=None):
         auto_annotation = motif.auto_annotation
         property = motif.property
 
+        print(fragments_mz)
         motif_spectrum = Mass2Motif(
             frag_mz=fragments_mz,
             frag_intensities=fragments_intensities,
