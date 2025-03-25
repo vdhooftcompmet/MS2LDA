@@ -17,7 +17,7 @@ def motifs2motifDB(spectra):
         ms2_df (pd.dataframe): dataframe with ms2 (frag and loss) information
     """
 
-    def add_default_info(feature_dict, spectrum):
+    def add_default_info(feature_dict, spectrum, hash_id):
         """adds information about the motif like charge and its annotation as well as a hashed motif_id
 
         ARGS:
@@ -48,7 +48,6 @@ def motifs2motifDB(spectra):
         feature_dict["paper_url"] = spectrum.get("paper_url")
         feature_dict["property"] = spectrum.get("property")
 
-        hash_id = random.getrandbits(128)
 
         feature_dict["scan"] = hash_id
         feature_dict["ms1scan"] = 0
@@ -61,7 +60,7 @@ def motifs2motifDB(spectra):
 
     ms2mz_list = []
     for spectrum in spectra:
-
+        hash_id = random.getrandbits(128)
         if spectrum.peaks:
 
             fragments_mz = list(spectrum.peaks.mz)
@@ -76,7 +75,7 @@ def motifs2motifDB(spectra):
                 feature_dict["loss_mz"] = np.nan
                 feature_dict["loss_intens"] = np.nan
 
-                feature_dict = add_default_info(feature_dict, spectrum)
+                feature_dict = add_default_info(feature_dict, spectrum, hash_id)
 
                 ms2mz_list.append(feature_dict)
 
@@ -94,7 +93,7 @@ def motifs2motifDB(spectra):
                 feature_dict["loss_mz"] = losses_mz[i]
                 feature_dict["loss_intens"] = losses_intensities[i]
 
-                feature_dict = add_default_info(feature_dict, spectrum)
+                feature_dict = add_default_info(feature_dict, spectrum, hash_id)
 
                 ms2mz_list.append(feature_dict)
 
@@ -156,7 +155,6 @@ def motifDB2motifs(motifDB_ms2, filter_table=None):
         auto_annotation = motif.auto_annotation
         property = motif.property
 
-        print(fragments_mz)
         motif_spectrum = Mass2Motif(
             frag_mz=fragments_mz,
             frag_intensities=fragments_intensities,
