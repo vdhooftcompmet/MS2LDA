@@ -69,7 +69,8 @@ def run(dataset, n_motifs, n_iterations,
         annotation_parameters,
         preprocessing_parameters,
         motif_parameter,
-        fingerprint_parameters):
+        fingerprint_parameters,
+        save=True):
     """main function to run MS2LDA workflow in a jupyter notebook"""
 
     loaded_spectra = filetype_check(dataset=dataset)
@@ -96,18 +97,18 @@ def run(dataset, n_motifs, n_iterations,
     optimized_motifs = motif_optimization(motif_spectra, clustered_spectra, clustered_smiles, loss_err=1)
     motif_fps = calc_fingerprints(clustered_smiles, fp_type=fingerprint_parameters["fp_type"], threshold=fingerprint_parameters["threshold"])
 
+    if save:
+        store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, doc2spec_map, dataset_parameters["output_folder"])
 
-    store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, doc2spec_map, dataset_parameters["output_folder"])
-
-    # Save additional viz data
-    if n_motifs < 500:
-        save_visualization_data(
-            trained_ms2lda,
-            cleaned_spectra,
-            optimized_motifs,
-            doc2spec_map,
-            dataset_parameters["output_folder"]
-        )
+        # Save additional viz data
+        if n_motifs < 500:
+            save_visualization_data(
+                trained_ms2lda,
+                cleaned_spectra,
+                optimized_motifs,
+                doc2spec_map,
+                dataset_parameters["output_folder"]
+            )
 
     return motif_spectra, optimized_motifs, motif_fps
 
