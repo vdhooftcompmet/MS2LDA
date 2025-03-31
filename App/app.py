@@ -1,3 +1,4 @@
+import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
 
@@ -61,4 +62,7 @@ app.layout = dbc.Container(
 )
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    try:
+        app.run_server(debug=True)
+    except dash.exceptions.ObsoleteAttributeException:
+        app.run(debug=True)
