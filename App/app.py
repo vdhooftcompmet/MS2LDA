@@ -15,8 +15,9 @@ app.layout = dbc.Container(
                          style={'display': 'block', 'margin': 'auto'}),
                 dcc.Markdown("""
                 Developed by [Jonas Dietrich](https://github.com/j-a-dietrich),
-                [Rosina Torres Ortega](https://github.com/rtlortega), and 
-                [Joe Wandy](https://github.com/joewandy).
+                [Rosina Torres Ortega](https://github.com/rtlortega),  
+                [Joe Wandy](https://github.com/joewandy), and 
+                https://github.com/justinjjvanderhooft.
                 """, style={'textAlign': 'center'})
             ], width=True),
         ], align="end"),
