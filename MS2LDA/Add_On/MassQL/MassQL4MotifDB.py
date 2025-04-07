@@ -103,7 +103,7 @@ def motifs2motifDB(spectra):
     return ms1_df, ms2_df
 
 
-def motifDB2motifs(motifDB_ms2, filter_table=None):
+def motifDB2motifs(motifDB_ms2, filter_table=pd.DataFrame()):
     """converts a (filtered) MotifDB to motif spectra objects
 
     ARGS:
@@ -113,7 +113,7 @@ def motifDB2motifs(motifDB_ms2, filter_table=None):
     RETURNS (list): list of matchms spectra objects
     """
 
-    if filter_table:
+    if not filter_table.empty:
         filtered_motifs = filter_table["scan"].to_list()
         filtered_motifDB = motifDB_ms2[motifDB_ms2["scan"].isin(filtered_motifs)]
 
