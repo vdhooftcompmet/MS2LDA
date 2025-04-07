@@ -28,9 +28,8 @@ from MS2LDA.Add_On.Spec2Vec.annotation_refined import calc_similarity
 from MS2LDA.Mass2Motif import Mass2Motif
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
-from MS2LDA.run import filetype_check
-from MS2LDA.run import load_s2v_model
-from MS2LDA.utils import download_model_and_data
+from MS2LDA.run import filetype_check, load_s2v_model
+from MS2LDA.utils import download_model_and_data, create_spectrum
 
 # Hardcode the path for .m2m references
 MOTIFDB_FOLDER = "./MS2LDA/MotifDB"
@@ -1640,40 +1639,59 @@ def filter_and_normalize_spectra(spectrum_list):
     Output("compute-screening-button", "disabled"),
     Input("compute-screening-button", "n_clicks"),
     State("m2m-folders-checklist", "value"),
-    State("optimized-motifs-store", "data"),
+    State("lda-dict-store", "data"),
     State("s2v-model-path", "value"),
+    State("optimized-motifs-store", "data"),
     prevent_initial_call=True,
 )
-def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data, path_model):
+def compute_spec2vec_screening(n_clicks, selected_folders, lda_dict_data, path_model, optimized_motifs_data):
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
 
-    # Show please wait message
     message = dbc.Alert("Computing similarities... please wait (this may take a while).", color="info")
-    progress_val = 0  # doesn't work yet
+    progress_val = 0
     button_disabled = True
 
     # check input
     if not selected_folders:
         return None, dbc.Alert("No reference MotifDB set selected!", color="warning"), 100, False
-    if not optimized_motifs_data:
-        return None, dbc.Alert("No optimized motifs found! Please run MS2LDA or load your data first.",
-                               color="warning"), 100, False
+    if not lda_dict_data:
+        return None, dbc.Alert("No LDA results found! Please run MS2LDA or load your data first.", color="warning"), 100, False
 
-    progress_val = 10
-
-    # convert user motifs
+    # 1) Convert raw motifs from lda_dict_data['beta']
     user_motifs = []
-    for entry in optimized_motifs_data:
-        sp = make_spectrum_from_dict(entry)
-        if sp:
-            user_motifs.append(sp)
+    beta = lda_dict_data.get("beta", {})
+    if not beta:
+        return None, dbc.Alert("lda_dict_data['beta'] is empty or missing!", color="warning"), 100, False
+
+    for motif_name, feature_probs_dict in beta.items():
+        k = -1
+        if motif_name.startswith("motif_"):
+            try:
+                k = int(motif_name.replace("motif_", ""))
+            except ValueError:
+                pass
+
+        motif_features_list = list(feature_probs_dict.items())
+        raw_motif_spectrum = create_spectrum(
+            motif_features_list,
+            k if k >= 0 else 0,
+            frag_tag="frag@",
+            loss_tag="loss@",
+            significant_digits=2,
+            charge=1,
+            motifset="Raw_LDA_Motifs"
+        )
+        user_motifs.append(raw_motif_spectrum)
+
+    # 2) Filter & normalize the user_motifs
     user_motifs = filter_and_normalize_spectra(user_motifs)
     if not user_motifs:
         return None, dbc.Alert("No valid user motifs after normalization!", color="warning"), 100, False
+
     progress_val = 25
 
-    # gather references
+    # 3) Gather reference sets from selected_folders
     all_refs = []
     for json_file_path in selected_folders:
         these_refs = load_motifset_file(json_file_path)
@@ -1686,29 +1704,40 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
         return None, dbc.Alert("No valid references found in the selected file(s)!", color="warning"), 100, False
     progress_val = 40
 
-    # load spec2vec
+    # 4) Load Spec2Vec model
     print("loading s2v")
     s2v_sim = load_s2v_model(path_model=path_model)
     print("loaded s2v")
     progress_val = 60
 
-    # embeddings
+    # 5) Embeddings
     user_emb = calc_embeddings(s2v_sim, user_motifs)
     print("user_emb shape:", user_emb.shape)
     ref_emb = calc_embeddings(s2v_sim, all_refs)
     print("ref_emb shape:", ref_emb.shape)
     progress_val = 80
 
-    # similarity
+    # 6) Similarity
     sim_matrix = calc_similarity(user_emb, ref_emb)
     print("sim_matrix shape:", sim_matrix.shape)
     progress_val = 90
 
-    # build results
+    # 7) Build an optimized_anno_map
+    optimized_anno_map = {}
+    if optimized_motifs_data:
+        for om_entry in optimized_motifs_data:
+            om_meta = om_entry.get('metadata', {})
+            om_id = om_meta.get('id')        # e.g. "motif_0"
+            om_anno = om_meta.get('auto_annotation', "")
+            if om_id:
+                optimized_anno_map[om_id] = om_anno
+
+    # 8) Build results
     results = []
     for user_i, user_sp in enumerate(user_motifs):
         user_id = user_sp.get("id", "")
-        user_anno = user_sp.metadata.get("auto_annotation", "")
+        # Use annotation from optimized_anno_map if present
+        user_anno = optimized_anno_map.get(user_id, "")
         for ref_j, ref_sp in enumerate(all_refs):
             score = sim_matrix.iloc[ref_j, user_i]
             ref_id = ref_sp.get("id", "")
@@ -1727,7 +1756,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
     if not results:
         return None, dbc.Alert("No results after similarity!", color="warning"), 100, False
 
-    # sort descending
+    # Sort descending
     df = pd.DataFrame(results)
     df = df.sort_values("score", ascending=False)
     json_data = df.to_json(orient="records")
@@ -1739,8 +1768,8 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
     )
     button_disabled = False
 
-    # re-enable button
     return json_data, msg, progress_val, button_disabled
+
 
 
 @app.callback(
