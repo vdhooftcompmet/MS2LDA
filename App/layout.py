@@ -1241,7 +1241,7 @@ def create_motif_details_tab():
                     html.H5("Motif Features Table and Summary Plots"),
                     dcc.Markdown(
                         """
-                        The table below lists the motif features (fragments and losses) that passed the probability filter, including their probabilities within the motif. Accompanying bar plots illustrate two aspects: first, how uniquely associated each feature is with this motif compared to all motifs ("Proportion of Features in Motif vs. Overall"), and second, how frequently each feature appears across all spectra in the dataset ("Counts of Features in Spectra (Entire Dataset)").
+                        The table below lists the motif features (fragments and losses) that pass the probability filter, including their probabilities within the motif. Below it, a bar plot shows how frequently each feature appears **within the filtered set of documents** for this motif (i.e., documents whose doc-topic probability and overlap score both pass the current threshold ranges).
                         """
                     ),
                     html.Div(id='motif-features-container'),
