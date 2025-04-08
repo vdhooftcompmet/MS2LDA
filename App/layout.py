@@ -879,7 +879,7 @@ def create_load_results_tab():
                 [
                     dcc.Markdown(
                         """
-                        This tab allows you to load previously generated MS2LDA results (a JSON file). 
+                        This tab allows you to load previously generated MS2LDA results (a compressed JSON file). 
                         Once loaded, you can explore them immediately in the subsequent tabs. 
                         This is useful if you’ve run an analysis before and want to revisit or share the results.
                         """
