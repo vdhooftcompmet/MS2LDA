@@ -1,0 +1,48 @@
+{
+    "dataset_parameters": {
+        "acquisition_type": "DDA",
+        "charge": 1,
+        "significant_digits": 2,
+        "name": "ms2lda_cli_run",
+        "output_folder": "ms2lda_results"
+    },
+    "train_parameters": {
+        "parallel": 3,
+        "workers": 0
+    },
+    "model_parameters": {
+        "rm_top": 0,
+        "min_cf": 0,
+        "min_df": 3,
+        "alpha": 0.6,
+        "eta": 0.01,
+        "seed": 42
+    },
+    "convergence_parameters": {
+        "step_size": 50,
+        "window_size": 10,
+        "threshold": 0.005,
+        "type": "perplexity_history"
+    },
+    "annotation_parameters": {
+        "criterium": "biggest",
+        "cosine_similarity": 0.90,
+        "n_mols_retrieved": 5,
+        "s2v_model_path": "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
+        "s2v_library_embeddings": "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
+        "s2v_library_db": "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db"
+    },
+    "preprocessing_parameters": {
+        "min_mz": 0,
+        "max_mz": 2000,
+        "max_frags": 1000,
+        "min_frags": 5,
+        "min_intensity": 0.01,
+        "max_intensity": 1.0
+    },
+    "motif_parameter": 50,
+    "fingerprint_parameters": {
+        "fp_type": "maccs",
+        "threshold": 0.8
+    }
+}
