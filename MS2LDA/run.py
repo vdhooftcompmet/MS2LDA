@@ -292,24 +292,52 @@ def add_annotation(motif_spectra, clustered_smiles):
     return motif_spectra_
 #-------------------------------------------------------------------------------------------------------------------------------------------------#
 def store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, doc2spec_map, output_folder="MS2LDA_Results"):
+    """
+    Save MS2LDA results to a new folder. If 'output_folder' already exists,
+    we automatically create a new folder by appending '_1', '_2', etc.
+    """
     curr_dir = os.getcwd()
+
+    # Check if output_folder already exists
+    # increment suffix until we find a folder name that does not exist
+    if os.path.isdir(output_folder):
+        base = output_folder
+        i = 1
+        while os.path.isdir(f"{base}_{i}"):
+            i += 1
+        new_output_folder = f"{base}_{i}"
+        print(f"Warning: Folder '{base}' already exists. Creating new folder: '{new_output_folder}'.")
+        output_folder = new_output_folder
+
+    # Create the new folder
     os.mkdir(output_folder)
     os.chdir(output_folder)
+
+    # Store M2M files
     store_m2m_folder(motif_spectra, "motifs")
     print("m2m folder stored")
+
+    # Plot + save the convergence curve
     convergence_curve_fig = plot_convergence(convergence_curve)
-    convergence_curve_fig.savefig("convergence_curve.png",dpi=300, bbox_inches="tight", pad_inches=0.2)
+    convergence_curve_fig.savefig("convergence_curve.png", dpi=300, bbox_inches="tight", pad_inches=0.2)
+    plt.close(convergence_curve_fig)
     print("convergence curve stored")
+
+    # Create + save the network
     network_fig = create_network(optimized_motifs, significant_figures=2)
     nx.write_graphml(network_fig, "network.graphml")
     print("network stored")
+
+    # Save motif figures
     os.mkdir("motif_figures")
     show_annotated_motifs(optimized_motifs, motif_spectra, clustered_smiles, savefig="motif_figures")
 
+    # Save trained model + doc2spec_map
     trained_ms2lda.save("ms2lda.bin")
     with open("doc2spec_map.pkl", "wb") as outfile:
         pickle.dump(doc2spec_map, outfile)
 
+    # Save MotifDB outputs
     ms1_motifDB_opt, ms2_motifDB_opt = motifs2motifDB(optimized_motifs)
     store_motifDB(ms1_motifDB_opt, ms2_motifDB_opt, name="motifset_optimized.json")
     ms1_motifDB, ms2_motifDB = motifs2motifDB(motif_spectra)
