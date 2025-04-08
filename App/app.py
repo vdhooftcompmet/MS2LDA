@@ -17,7 +17,7 @@ app.layout = dbc.Container(
                 Developed by [Jonas Dietrich](https://github.com/j-a-dietrich),
                 [Rosina Torres Ortega](https://github.com/rtlortega),  
                 [Joe Wandy](https://github.com/joewandy), and 
-                https://github.com/justinjjvanderhooft.
+                [Justin van der Hooft](https://github.com/justinjjvanderhooft).
                 """, style={'textAlign': 'center'})
             ], width=True),
         ], align="end"),

@@ -1,4 +1,6 @@
 import base64
+import gzip
+import io
 import json
 import os
 import tempfile
@@ -28,9 +30,8 @@ from MS2LDA.Add_On.Spec2Vec.annotation_refined import calc_similarity
 from MS2LDA.Mass2Motif import Mass2Motif
 from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
-from MS2LDA.run import filetype_check
-from MS2LDA.run import load_s2v_model
-from MS2LDA.utils import download_model_and_data
+from MS2LDA.run import filetype_check, load_s2v_model
+from MS2LDA.utils import download_model_and_data, create_spectrum
 
 # Hardcode the path for .m2m references
 MOTIFDB_FOLDER = "./MS2LDA/MotifDB"
@@ -387,11 +388,9 @@ def handle_run_or_load(
                 spectra_data,
             )
         try:
-            content_type, content_string = results_contents.split(",")
-            decoded = base64.b64decode(content_string)
-            data = json.loads(decoded)
-        except Exception as e:
-            load_status = dbc.Alert(f"Error decoding or parsing the file: {str(e)}", color="danger")
+            data = parse_ms2lda_viz_file(results_contents)
+        except ValueError as e:
+            load_status = dbc.Alert(f"Error parsing the file: {str(e)}", color="danger")
             return (
                 run_status,
                 load_status,
@@ -443,6 +442,32 @@ def handle_run_or_load(
 
     else:
         raise dash.exceptions.PreventUpdate
+
+
+def parse_ms2lda_viz_file(base64_contents: str) -> dict:
+    """
+    Decode the given base64-encoded MS2LDA results file, which might be
+    gzipped JSON (.json.gz) or plain JSON (.json), and return the loaded dict.
+    Raises ValueError if decoding/parsing fails.
+    """
+    try:
+        # Split out the "data:application/json;base64," prefix
+        content_type, content_string = base64_contents.split(",")
+        # Decode from base64 -> raw bytes
+        decoded = base64.b64decode(content_string)
+
+        # Try reading as gzipped JSON
+        try:
+            with gzip.GzipFile(fileobj=io.BytesIO(decoded)) as gz:
+                data = json.loads(gz.read().decode("utf-8"))
+        except OSError:
+            # Not gzipped, parse as normal JSON
+            data = json.loads(decoded)
+
+        return data
+
+    except Exception as e:
+        raise ValueError(f"Error decoding or parsing MS2LDA viz file: {str(e)}")
 
 
 # -------------------------------- CYTOSCAPE NETWORK --------------------------------
@@ -1018,51 +1043,30 @@ def update_motif_details(
         page_size=10,
     )
 
-    # 2) Proportion in Motif vs. Overall (no figure title)
-    features_in_motif = list(filtered_motif_data.keys())
-    total_feature_probs = {ft: 0.0 for ft in features_in_motif}
-    for m_name, feature_probs in lda_dict_data['beta'].items():
-        for ft, val in feature_probs.items():
-            if ft in total_feature_probs:
-                total_feature_probs[ft] += val
-    barplot1_df = pd.DataFrame({
-        'Feature': features_in_motif,
-        'Probability in Motif': [filtered_motif_data[ft] for ft in features_in_motif],
-        'Total Probability': [total_feature_probs[ft] for ft in features_in_motif],
-    })
-    barplot1_df = barplot1_df.sort_values(by='Probability in Motif', ascending=False).head(10)
-    barplot1_df_long = pd.melt(
-        barplot1_df,
-        id_vars='Feature',
-        value_vars=['Total Probability', 'Probability in Motif'],
-        var_name='Type',
-        value_name='Probability'
-    )
-    barplot1_fig = px.bar(
-        barplot1_df_long,
-        x='Probability',
-        y='Feature',
-        color='Type',
-        orientation='h',
-        barmode='group',
-    )
-    barplot1_fig.update_layout(
-        title=None,
-        yaxis={'categoryorder': 'total ascending'},
-        xaxis_title='Probability',
-        yaxis_title='Feature',
-        legend_title='',
-    )
+    # 2) Counts of features in filtered documents
+    feature_counts = {ft: 0 for ft in filtered_motif_data.keys()}
 
-    # 3) Counts of features in entire dataset (no figure title)
-    feature_counts = {ft: 0 for ft in features_in_motif}
-    for doc_name, w_counts in lda_dict_data['corpus'].items():
-        for ft in features_in_motif:
+    # Collect docs that pass the current doc-topic probability + overlap filters
+    docs_for_this_motif = []
+    for doc_name, topic_probs in lda_dict_data['theta'].items():
+        doc_topic_prob = topic_probs.get(motif_name, 0.0)
+        if doc_topic_prob <= 0:
+            continue
+        overlap_score = lda_dict_data['overlap_scores'][doc_name].get(motif_name, 0.0)
+        if (theta_range[0] <= doc_topic_prob <= theta_range[1]) and (
+                overlap_range[0] <= overlap_score <= overlap_range[1]):
+            docs_for_this_motif.append(doc_name)
+
+    # Sum up the occurrences of each feature within these filtered docs only
+    for doc_name in docs_for_this_motif:
+        w_counts = lda_dict_data['corpus'].get(doc_name, {})
+        for ft in filtered_motif_data:
             if ft in w_counts:
                 feature_counts[ft] += 1
+
     barplot2_df = pd.DataFrame({
-        'Feature': features_in_motif,
-        'Count': [feature_counts[ft] for ft in features_in_motif],
+        'Feature': list(feature_counts.keys()),
+        'Count': list(feature_counts.values()),
     })
     barplot2_df = barplot2_df.sort_values(by='Count', ascending=False).head(10)
     barplot2_fig = px.bar(
@@ -1074,11 +1078,11 @@ def update_motif_details(
     barplot2_fig.update_layout(
         title=None,
         yaxis={'categoryorder': 'total ascending'},
-        xaxis_title='Number of Documents',
+        xaxis_title='Count within Filtered Motif Documents',
         yaxis_title='Feature',
     )
 
-    # 4) Spec2Vec matching results
+    # 3) Spec2Vec matching results
     motif_idx = None
     if motif_name.startswith('motif_'):
         try:
@@ -1122,9 +1126,9 @@ def update_motif_details(
     if auto_anno_text:
         spec2vec_container.append(html.Div(auto_anno_text, style={"marginTop": "10px"}))
 
-    # 5) Documents table
+    # 4) Documents table
     doc2spec_index = lda_dict_data.get("doc_to_spec_index", {})
-    docs_for_this_motif = []
+    docs_for_this_motif_records = []
     for doc_name, topic_probs in lda_dict_data['theta'].items():
         doc_topic_prob = topic_probs.get(motif_name, 0.0)
         if doc_topic_prob <= 0:
@@ -1153,7 +1157,7 @@ def update_motif_details(
                 ms_level = sp_meta.get('ms_level')
                 scans = sp_meta.get('scans')
 
-            docs_for_this_motif.append({
+            docs_for_this_motif_records.append({
                 'DocName': doc_name,
                 'SpecIndex': real_idx,
                 'FeatureID': feature_id,
@@ -1171,7 +1175,7 @@ def update_motif_details(
         'DocName', 'SpecIndex', 'FeatureID', 'Scans', 'PrecursorMz', 'RetentionTime',
         'CollisionEnergy', 'IonMode', 'MsLevel', 'Doc-Topic Probability', 'Overlap Score'
     ]
-    docs_df = pd.DataFrame(docs_for_this_motif, columns=doc_cols)
+    docs_df = pd.DataFrame(docs_for_this_motif_records, columns=doc_cols)
     if not docs_df.empty:
         docs_df = docs_df.sort_values(by='Doc-Topic Probability', ascending=False)
 
@@ -1192,7 +1196,7 @@ def update_motif_details(
     ]
     spectra_ids = docs_df['SpecIndex'].tolist() if not docs_df.empty else []
 
-    # 6) Possibly screening info
+    # 5) Add screening info
     screening_box = ""
     if screening_data:
         try:
@@ -1230,16 +1234,14 @@ def update_motif_details(
             pass
     spec2vec_div = html.Div(spec2vec_container + [screening_box])
 
-    # 7) "Features" container
+    # 6) "Features" container
     features_div = html.Div([
         html.Div([
             html.H5("Motif Features Table"),
             feature_table_component,
             html.P(f"Total Probability (Filtered): {total_prob:.4f}")
         ]),
-        html.H5("Proportion of Features in Motif vs. Overall"),
-        dcc.Graph(figure=barplot1_fig),
-        html.H5("Counts of Features in Spectra (Entire Dataset)"),
+        html.H5("Counts of Features within Filtered Motif Documents"),
         dcc.Graph(figure=barplot2_fig),
     ])
 
@@ -1247,13 +1249,11 @@ def update_motif_details(
         html.P("Below is the table of MS2 documents for the motif, subject to doc-topic probability & overlap score.")
     ])
 
-    # 8) Build the Optimised Motif bar plot with the toggle for "fragments" or "losses"
+    # 7) Build the Optimised Motif bar plot with the toggle for "fragments" or "losses"
     om_fig = go.Figure()
     motif_idx_opt = motif_idx
     if motif_idx_opt is not None and 0 <= motif_idx_opt < len(optimized_motifs_data):
         om = optimized_motifs_data[motif_idx_opt]
-        # We'll read 'mz' + 'intensities' for fragments,
-        # 'metadata["losses"]' for losses, but the user picks which one to show.
         raw_frag_mz = om.get("mz", [])
         raw_frag_int = om.get("intensities", [])
         raw_loss_mz = []
@@ -1284,29 +1284,29 @@ def update_motif_details(
                 ))
 
     om_fig.update_layout(
-        title=None,  # no figure-level title
+        title=None,
         xaxis_title="m/z (Da)",
         yaxis_title="Normalized Intensity",
         bargap=0.2
     )
     optim_plot = dcc.Graph(figure=om_fig)
 
-    # 9) Build the RAW LDA Motif bar plot (with Probability Filter)
+    # 8) Build the RAW LDA Motif bar plot (with Probability Filter)
     raw_fig = go.Figure()
     raw_frag_mz = []
     raw_frag_int = []
     raw_loss_mz = []
     raw_loss_int = []
     for ft, val in filtered_motif_data.items():
-        if ft.startswith("frag@"):
+        if ft.startswith('frag@'):
             try:
-                raw_frag_mz.append(float(ft.split("@")[1]))
+                raw_frag_mz.append(float(ft.replace('frag@', '')))
                 raw_frag_int.append(val)
             except:
                 pass
-        elif ft.startswith("loss@"):
+        elif ft.startswith('loss@'):
             try:
-                raw_loss_mz.append(float(ft.split("@")[1]))
+                raw_loss_mz.append(float(ft.replace('loss@', '')))
                 raw_loss_int.append(val)
             except:
                 pass
@@ -1329,14 +1329,13 @@ def update_motif_details(
         ))
 
     raw_fig.update_layout(
-        title=None,  # no figure-level title
+        title=None,
         xaxis_title="m/z (Da)",
         yaxis_title="Probability",
         bargap=0.2
     )
     raw_plot = dcc.Graph(figure=raw_fig)
 
-    # Return all items in the right order
     return (
         motif_title,
         spec2vec_div,
@@ -1666,40 +1665,65 @@ def filter_and_normalize_spectra(spectrum_list):
     Output("compute-screening-button", "disabled"),
     Input("compute-screening-button", "n_clicks"),
     State("m2m-folders-checklist", "value"),
-    State("optimized-motifs-store", "data"),
+    State("lda-dict-store", "data"),
     State("s2v-model-path", "value"),
+    State("optimized-motifs-store", "data"),
     prevent_initial_call=True,
 )
-def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data, path_model):
+def compute_spec2vec_screening(n_clicks, selected_folders, lda_dict_data, path_model, optimized_motifs_data):
     if not n_clicks:
         raise dash.exceptions.PreventUpdate
 
-    # Show please wait message
     message = dbc.Alert("Computing similarities... please wait (this may take a while).", color="info")
-    progress_val = 0  # doesn't work yet
+    progress_val = 0
     button_disabled = True
 
     # check input
     if not selected_folders:
         return None, dbc.Alert("No reference MotifDB set selected!", color="warning"), 100, False
-    if not optimized_motifs_data:
-        return None, dbc.Alert("No optimized motifs found! Please run MS2LDA or load your data first.",
+    if not lda_dict_data:
+        return None, dbc.Alert("No LDA results found! Please run MS2LDA or load your data first.",
                                color="warning"), 100, False
 
-    progress_val = 10
-
-    # convert user motifs
+    # 1) Convert raw motifs from lda_dict_data['beta']
     user_motifs = []
-    for entry in optimized_motifs_data:
-        sp = make_spectrum_from_dict(entry)
-        if sp:
-            user_motifs.append(sp)
+    beta = lda_dict_data.get("beta", {})
+    if not beta:
+        return None, dbc.Alert("lda_dict_data['beta'] is empty or missing!", color="warning"), 100, False
+
+    # Get run parameters used for this ms2lda anlaysis
+    run_params = lda_dict_data.get("run_parameters", {})
+    charge_to_use = run_params.get("dataset_parameters", {}).get("charge", 1)
+    sig_digits_to_use = run_params.get("dataset_parameters", {}).get("significant_digits", 2)
+
+    for motif_name, feature_probs_dict in beta.items():
+        k = -1
+        if motif_name.startswith("motif_"):
+            try:
+                k = int(motif_name.replace("motif_", ""))
+            except ValueError:
+                pass
+
+        motif_features_list = list(feature_probs_dict.items())
+        raw_motif_spectrum = create_spectrum(
+            motif_features_list,
+            k if k >= 0 else 0,
+            frag_tag="frag@",
+            loss_tag="loss@",
+            significant_digits=sig_digits_to_use,
+            charge=charge_to_use,
+            motifset=motif_name
+        )
+        user_motifs.append(raw_motif_spectrum)
+
+    # 2) Filter & normalize the user_motifs
     user_motifs = filter_and_normalize_spectra(user_motifs)
     if not user_motifs:
         return None, dbc.Alert("No valid user motifs after normalization!", color="warning"), 100, False
+
     progress_val = 25
 
-    # gather references
+    # 3) Gather reference sets from selected_folders
     all_refs = []
     for json_file_path in selected_folders:
         these_refs = load_motifset_file(json_file_path)
@@ -1712,29 +1736,40 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
         return None, dbc.Alert("No valid references found in the selected file(s)!", color="warning"), 100, False
     progress_val = 40
 
-    # load spec2vec
+    # 4) Load Spec2Vec model
     print("loading s2v")
     s2v_sim = load_s2v_model(path_model=path_model)
     print("loaded s2v")
     progress_val = 60
 
-    # embeddings
+    # 5) Embeddings
     user_emb = calc_embeddings(s2v_sim, user_motifs)
     print("user_emb shape:", user_emb.shape)
     ref_emb = calc_embeddings(s2v_sim, all_refs)
     print("ref_emb shape:", ref_emb.shape)
     progress_val = 80
 
-    # similarity
+    # 6) Similarity
     sim_matrix = calc_similarity(user_emb, ref_emb)
     print("sim_matrix shape:", sim_matrix.shape)
     progress_val = 90
 
-    # build results
+    # 7) Build an optimized_anno_map
+    optimized_anno_map = {}
+    if optimized_motifs_data:
+        for om_entry in optimized_motifs_data:
+            om_meta = om_entry.get('metadata', {})
+            om_id = om_meta.get('id')  # e.g. "motif_0"
+            om_anno = om_meta.get('auto_annotation', "")
+            if om_id:
+                optimized_anno_map[om_id] = om_anno
+
+    # 8) Build results
     results = []
     for user_i, user_sp in enumerate(user_motifs):
         user_id = user_sp.get("id", "")
-        user_anno = user_sp.metadata.get("auto_annotation", "")
+        # Use annotation from optimized_anno_map if present
+        user_anno = optimized_anno_map.get(user_id, "")
         for ref_j, ref_sp in enumerate(all_refs):
             score = sim_matrix.iloc[ref_j, user_i]
             ref_id = ref_sp.get("id", "")
@@ -1753,7 +1788,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
     if not results:
         return None, dbc.Alert("No results after similarity!", color="warning"), 100, False
 
-    # sort descending
+    # Sort descending
     df = pd.DataFrame(results)
     df = df.sort_values("score", ascending=False)
     json_data = df.to_json(orient="records")
@@ -1765,7 +1800,6 @@ def compute_spec2vec_screening(n_clicks, selected_folders, optimized_motifs_data
     )
     button_disabled = False
 
-    # re-enable button
     return json_data, msg, progress_val, button_disabled
 
 

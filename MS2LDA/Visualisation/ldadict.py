@@ -1,3 +1,4 @@
+import gzip
 import hashlib
 import json
 import os
@@ -181,7 +182,8 @@ def save_visualization_data(
         filename="ms2lda_viz.json",
         min_prob_to_keep_beta=1e-3,
         min_prob_to_keep_phi=1e-2,
-        min_prob_to_keep_theta=1e-2
+        min_prob_to_keep_theta=1e-2,
+        run_parameters=None
 ):
     """
     Creates the final data structure needed by the MS2LDA UI
@@ -292,12 +294,14 @@ def save_visualization_data(
         "optimized_motifs_data": optimized_motifs_data,
         "lda_dict": lda_dict,
         "spectra_data": spectra_data,
+        "run_parameters": run_parameters if run_parameters else {},
     }
 
-    # 7) Save to <output_folder>/<filename>
+    # 7) Compress & Save as .json.gz
     os.makedirs(output_folder, exist_ok=True)
-    outpath = os.path.join(output_folder, filename)
-    with open(outpath, "w") as f:
-        json.dump(final_data, f, indent=2)
+    outpath = os.path.join(output_folder, filename + ".gz")  # e.g. ms2lda_viz.json.gz
+    with gzip.open(outpath, "wt", encoding="utf-8") as gz_file:
+        json.dump(final_data, gz_file, indent=2)
 
-    print(f"Visualization data saved to: {outpath}")
+    print(f"Visualization data saved (gzipped) to: {outpath}")
+
