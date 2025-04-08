@@ -1664,6 +1664,11 @@ def compute_spec2vec_screening(n_clicks, selected_folders, lda_dict_data, path_m
     if not beta:
         return None, dbc.Alert("lda_dict_data['beta'] is empty or missing!", color="warning"), 100, False
 
+    # Get run parameters used for this ms2lda anlaysis
+    run_params = lda_dict_data.get("run_parameters", {})
+    charge_to_use = run_params.get("dataset_parameters", {}).get("charge", 1)
+    sig_digits_to_use = run_params.get("dataset_parameters", {}).get("significant_digits", 2)
+
     for motif_name, feature_probs_dict in beta.items():
         k = -1
         if motif_name.startswith("motif_"):
@@ -1678,9 +1683,9 @@ def compute_spec2vec_screening(n_clicks, selected_folders, lda_dict_data, path_m
             k if k >= 0 else 0,
             frag_tag="frag@",
             loss_tag="loss@",
-            significant_digits=2,
-            charge=1,
-            motifset="Raw_LDA_Motifs"
+            significant_digits=sig_digits_to_use,
+            charge=charge_to_use,
+            motifset=motif_name
         )
         user_motifs.append(raw_motif_spectrum)
 

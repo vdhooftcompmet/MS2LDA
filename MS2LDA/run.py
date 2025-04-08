@@ -77,7 +77,7 @@ def run(dataset, n_motifs, n_iterations,
     cleaned_spectra = clean_spectra(loaded_spectra, preprocessing_parameters)
     print("Cleaning spectra ...", len(cleaned_spectra), "spectra left")
     feature_words = features_to_words(spectra=cleaned_spectra, significant_figures=dataset_parameters["significant_digits"], acquisition_type=dataset_parameters["acquisition_type"]) # significant digits need to be added in dash.
-    
+
     # Modeling
     ms2lda = define_model(n_motifs=n_motifs, model_parameters=model_parameters)
     trained_ms2lda, convergence_curve = train_model(ms2lda, feature_words, iterations=n_iterations, train_parameters=train_parameters, convergence_parameters=convergence_parameters)
@@ -102,12 +102,27 @@ def run(dataset, n_motifs, n_iterations,
 
         # Save additional viz data
         if n_motifs < 500:
+            # near the end of `run()` (or right before calling save_visualization_data)
+            parameters_for_viz = {
+                "dataset": dataset,
+                "n_motifs": n_motifs,
+                "n_iterations": n_iterations,
+                "dataset_parameters": dataset_parameters,
+                "train_parameters": train_parameters,
+                "model_parameters": model_parameters,
+                "convergence_parameters": convergence_parameters,
+                "annotation_parameters": annotation_parameters,
+                "motif_parameter": motif_parameter,
+                "preprocessing_parameters": preprocessing_parameters,
+                "fingerprint_parameters": fingerprint_parameters,
+            }
             save_visualization_data(
                 trained_ms2lda,
                 cleaned_spectra,
                 optimized_motifs,
                 doc2spec_map,
-                dataset_parameters["output_folder"]
+                dataset_parameters["output_folder"],
+                run_parameters=parameters_for_viz,
             )
 
     return motif_spectra, optimized_motifs, motif_fps
@@ -317,7 +332,7 @@ def filetype_check(dataset):
         else:
             raise TypeError("File format not supported. Only .mgf, .mzml, and .msp")
 
-    elif type(dataset) == list: 
+    elif type(dataset) == list:
         loaded_spectra = dataset
 
     else:
@@ -332,7 +347,7 @@ def s2v_annotation(motif_spectra, annotation_parameters):
 
     path_embeddings = annotation_parameters.get("s2v_library_embeddings")
     embeddings = np.load(path_embeddings)
-    
+
     path_db = annotation_parameters.get("s2v_library_db")
     path_embeddings = annotation_parameters.get("s2v_library_embeddings")
 

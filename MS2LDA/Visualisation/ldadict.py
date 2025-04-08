@@ -181,7 +181,8 @@ def save_visualization_data(
         filename="ms2lda_viz.json",
         min_prob_to_keep_beta=1e-3,
         min_prob_to_keep_phi=1e-2,
-        min_prob_to_keep_theta=1e-2
+        min_prob_to_keep_theta=1e-2,
+        run_parameters=None
 ):
     """
     Creates the final data structure needed by the MS2LDA UI
@@ -292,6 +293,7 @@ def save_visualization_data(
         "optimized_motifs_data": optimized_motifs_data,
         "lda_dict": lda_dict,
         "spectra_data": spectra_data,
+        "run_parameters": run_parameters if run_parameters else {},
     }
 
     # 7) Save to <output_folder>/<filename>
