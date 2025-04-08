@@ -1,4 +1,6 @@
 import base64
+import gzip
+import io
 import json
 import os
 import tempfile
@@ -386,11 +388,9 @@ def handle_run_or_load(
                 spectra_data,
             )
         try:
-            content_type, content_string = results_contents.split(",")
-            decoded = base64.b64decode(content_string)
-            data = json.loads(decoded)
-        except Exception as e:
-            load_status = dbc.Alert(f"Error decoding or parsing the file: {str(e)}", color="danger")
+            data = parse_ms2lda_viz_file(results_contents)
+        except ValueError as e:
+            load_status = dbc.Alert(f"Error parsing the file: {str(e)}", color="danger")
             return (
                 run_status,
                 load_status,
@@ -442,6 +442,32 @@ def handle_run_or_load(
 
     else:
         raise dash.exceptions.PreventUpdate
+
+
+def parse_ms2lda_viz_file(base64_contents: str) -> dict:
+    """
+    Decode the given base64-encoded MS2LDA results file, which might be
+    gzipped JSON (.json.gz) or plain JSON (.json), and return the loaded dict.
+    Raises ValueError if decoding/parsing fails.
+    """
+    try:
+        # Split out the "data:application/json;base64," prefix
+        content_type, content_string = base64_contents.split(",")
+        # Decode from base64 -> raw bytes
+        decoded = base64.b64decode(content_string)
+
+        # Try reading as gzipped JSON
+        try:
+            with gzip.GzipFile(fileobj=io.BytesIO(decoded)) as gz:
+                data = json.loads(gz.read().decode("utf-8"))
+        except OSError:
+            # Not gzipped, parse as normal JSON
+            data = json.loads(decoded)
+
+        return data
+
+    except Exception as e:
+        raise ValueError(f"Error decoding or parsing MS2LDA viz file: {str(e)}")
 
 
 # -------------------------------- CYTOSCAPE NETWORK --------------------------------
@@ -1656,7 +1682,8 @@ def compute_spec2vec_screening(n_clicks, selected_folders, lda_dict_data, path_m
     if not selected_folders:
         return None, dbc.Alert("No reference MotifDB set selected!", color="warning"), 100, False
     if not lda_dict_data:
-        return None, dbc.Alert("No LDA results found! Please run MS2LDA or load your data first.", color="warning"), 100, False
+        return None, dbc.Alert("No LDA results found! Please run MS2LDA or load your data first.",
+                               color="warning"), 100, False
 
     # 1) Convert raw motifs from lda_dict_data['beta']
     user_motifs = []
@@ -1732,7 +1759,7 @@ def compute_spec2vec_screening(n_clicks, selected_folders, lda_dict_data, path_m
     if optimized_motifs_data:
         for om_entry in optimized_motifs_data:
             om_meta = om_entry.get('metadata', {})
-            om_id = om_meta.get('id')        # e.g. "motif_0"
+            om_id = om_meta.get('id')  # e.g. "motif_0"
             om_anno = om_meta.get('auto_annotation', "")
             if om_id:
                 optimized_anno_map[om_id] = om_anno
@@ -1774,7 +1801,6 @@ def compute_spec2vec_screening(n_clicks, selected_folders, lda_dict_data, path_m
     button_disabled = False
 
     return json_data, msg, progress_val, button_disabled
-
 
 
 @app.callback(
