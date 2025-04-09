@@ -1856,6 +1856,34 @@ def save_screening_results(csv_click, json_click, table_data):
     else:
         raise dash.exceptions.PreventUpdate
 
+@app.callback(
+    Output("download-motifranking-csv", "data"),
+    Output("download-motifranking-json", "data"),
+    Input("save-motifranking-csv", "n_clicks"),
+    Input("save-motifranking-json", "n_clicks"),
+    State("motif-rankings-table", "data"),
+    prevent_initial_call=True,
+)
+
+def save_motifranking_results(csv_click, json_click, table_data):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise dash.exceptions.PreventUpdate
+
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    if not table_data:
+        return no_update, no_update
+
+    df = pd.DataFrame(table_data)
+    if button_id == "save-motifranking-csv":
+        return dcc.send_data_frame(df.to_csv, "motifranking_results.csv", index=False), no_update
+    elif button_id == "save-motifranking-json":
+        out_str = df.to_json(orient="records")
+        return no_update, dict(content=out_str, filename="motifranking_results.json")
+    else:
+        raise dash.exceptions.PreventUpdate
+
+
 
 @app.callback(
     Output("selected-motif-store", "data"),

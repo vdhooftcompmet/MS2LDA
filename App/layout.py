@@ -1129,14 +1129,18 @@ def create_motif_rankings_tab():
                                 'fontWeight': 'bold'
                             },
                         ),
-
+                        dbc.Button("Save to CSV", id="save-motifranking-csv", color="secondary", className="mt-2"),
+                        dbc.Button("Save to JSON", id="save-motifranking-json", color="secondary", className="ms-2 mt-2"),
+                        dcc.Download(id="download-motifranking-csv"),
+                        dcc.Download(id="download-motifranking-json"),
                     ], width=12),
                 ]),
             ]),
         ],
-        style={"display": "none"}
+        style={"display": "none"},
     )
     return tab
+
 
 
 def create_motif_details_tab():

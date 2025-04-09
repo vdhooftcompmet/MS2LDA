@@ -28,9 +28,27 @@ conda env create -f MS2LDA_environment.yml
 conda activate MS2LDA_v2
 ```
 
-### Step 4: Download models and datasets
+### Step 4: Download models idependly and datasets
 
 Download all required models and datasets from [Zenodo](https://zenodo.org/records/15003249).
+
+## Running in the simplest way - command line
+
+Example usage:
+
+(run analysis only)
+
+$ ./run_analysis.sh --dataset datasets/mushroom_spectra.mgf --n-motifs 200 --n-iterations 5000 --output-folder cli_results
+
+
+(run analysis + download spec2vec)
+
+$ ./run_analysis.sh --dataset datasets/mushroom_spectra.mgf --n-motifs 200 --n-iterations 5000 --output-folder cli_results --download-spec2vec
+
+
+(run analysis using a config file), for further details check the json file
+
+$ ./run_analysis.sh --dataset datasets/mushroom_spectra.mgf --n-motifs 200 --n-iterations 5000 --output-folder test_results --config default_config.json
 
 ## Running the Dash Application
 
@@ -61,7 +79,7 @@ The Dash application will be accessible at `http://localhost:8050`.
 The repository includes a `notebooks` folder containing various Jupyter notebooks organized into subfolders:
 
 - **MotifSets**: Utilities for converting old motif formats to new.
-- **Paper_results**: Notebooks and data used for reproducing analyses and results described in MS2LDA publications.
+- **Paper_Results**: Notebooks and data used for reproducing analyses and results described in MS2LDA publications.
 - `Spec2Vec` includes notebooks for creating reference spectral libraries and retraining Spec2Vec embeddings.
 - `Tutorial` provides introductory materials and example usage.
 
