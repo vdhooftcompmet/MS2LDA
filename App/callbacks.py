@@ -14,8 +14,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 import tomotopy as tp
 from dash import Input, Output, State, no_update, dcc
-from dash import dash_table
-from dash import html
+from dash import dash_table, html, ALL
 from dash.exceptions import PreventUpdate
 from matchms import Fragments
 from matchms import Spectrum
@@ -932,7 +931,7 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
 
 
 @app.callback(
-    Output('tabs', 'value'),
+    Output('tabs', 'value', allow_duplicate=True),
     Input('selected-motif-store', 'data'),
     prevent_initial_call=True,
 )
@@ -1891,7 +1890,7 @@ def save_motifranking_results(csv_click, json_click, table_data):
 
 
 @app.callback(
-    Output("selected-motif-store", "data"),
+    Output("selected-motif-store", "data", allow_duplicate=True),
     [
         Input("motif-rankings-table", "active_cell"),
         Input("screening-results-table", "active_cell"),
@@ -1959,6 +1958,260 @@ def display_parentmass_range(value):
 
 
 @app.callback(
+    Output("search-tab-selected-spectrum-details-store", "data"),
+    Output("search-tab-spectrum-details-container", "style"),
+    Output("search-tab-selected-motif-id-for-plot-store", "data", allow_duplicate=True),
+    Input("spectra-search-results-table", "selected_rows"),
+    State("spectra-search-results-table", "data"),
+    prevent_initial_call=True,
+)
+def handle_spectrum_selection(selected_rows, table_data):
+    if not selected_rows or not table_data:
+        # If selection is cleared (or no valid data), hide details and clear stores
+        return None, {"marginTop": "20px", "display": "none"}, None
+
+    selected_row_index = selected_rows[0]
+    if selected_row_index >= len(table_data):
+        return None, {"marginTop": "20px", "display": "none"}, None
+
+    selected_spectrum_data_from_table = table_data[selected_row_index]
+
+    container_style = {"marginTop": "20px", "display": "block"}
+
+    # selected_spectrum_data_from_table already contains original_spec_index
+    return selected_spectrum_data_from_table, container_style, None # MODIFIED (return None for motif store)
+
+
+@app.callback(
+    Output("search-tab-associated-motifs-list", "children"),
+    Input("search-tab-selected-spectrum-details-store", "data"),
+    State("lda-dict-store", "data"),
+    prevent_initial_call=True,
+)
+def show_associated_motifs(spectrum_info, lda_dict_data):
+    if not spectrum_info:
+        raise PreventUpdate
+
+    spec_id = spectrum_info.get("spec_id")
+    if not spec_id or not lda_dict_data:
+        return "No motifs to display."
+
+    doc_theta = lda_dict_data["theta"].get(spec_id, {})
+    if not doc_theta:
+        return "No motifs found for this spectrum."
+
+    # Sort by descending probability
+    motif_probs = sorted(doc_theta.items(), key=lambda x: x[1], reverse=True)
+
+    if not motif_probs:
+        return "No motifs (above threshold) for this spectrum."
+
+    # Build a list of clickable motif name + "Details" button
+    layout_items = []
+    for motif_id, prob in motif_probs:
+        if prob < 0.01:
+            continue
+        motif_label = f"{motif_id} (Prob: {prob:.3f})"
+        layout_items.append(
+            html.Div([
+                dbc.Button(
+                    motif_label,
+                    id={"type": "search-tab-motif-link", "index": motif_id},
+                    color="secondary",
+                    size="sm",
+                    className="me-2",
+                ),
+                dbc.Button(
+                    "Details ↗",
+                    id={"type": "search-tab-motif-details-btn", "index": motif_id},
+                    size="sm",
+                    outline=True,
+                    color="info",
+                    className="me-2",
+                ),
+            ],
+            className="d-flex align-items-center mb-1")
+        )
+
+    if not layout_items:
+        return "No motifs (above threshold) for this spectrum."
+
+    return layout_items
+
+
+@app.callback(
+    Output("selected-motif-store", "data", allow_duplicate=True),
+    Output("tabs", "value", allow_duplicate=True),
+    Input({"type": "search-tab-motif-details-btn", "index": ALL}, "n_clicks"),
+    prevent_initial_call=True,
+)
+def jump_to_motif_details(n_clicks_list):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise PreventUpdate
+    triggered_id_str = ctx.triggered[0]["prop_id"].split(".")[0]
+    pmid = json.loads(triggered_id_str)
+    motif_id = pmid["index"]
+
+    # Set that motif ID as the 'selected-motif-store'
+    # Then switch tabs to "motif-details-tab"
+    return motif_id, "motif-details-tab"
+
+
+@app.callback(
+    Output("search-tab-selected-motif-id-for-plot-store", "data", allow_duplicate=True),
+    Input({"type": "search-tab-motif-link", "index": ALL}, "n_clicks"),
+    prevent_initial_call=True,
+)
+def update_selected_motif_for_plot(n_clicks_list):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise PreventUpdate
+
+    import json
+    triggered_id_str = ctx.triggered[0]["prop_id"].split(".")[0]
+    pmid = json.loads(triggered_id_str)
+    motif_id = pmid["index"]
+
+    return motif_id
+
+
+@app.callback(
+    Output("search-tab-spectrum-plot-container", "children"),
+    Input("search-tab-selected-spectrum-details-store", "data"),
+    Input("search-tab-selected-motif-id-for-plot-store", "data"),
+    State("spectra-store", "data"),
+    State("lda-dict-store", "data"),
+    prevent_initial_call=True,
+)
+def update_search_tab_spectrum_plot(spectrum_info, motif_for_plot, all_spectra_data, lda_dict_data):
+    """
+    Renders a Plotly bar chart of the selected spectrum, optionally highlighting
+    the currently chosen motif's features (fragments/losses).
+    Adapts the logic from 'update_spectrum_plot' in Motif Details.
+    """
+    if not spectrum_info:
+        raise PreventUpdate
+
+    spec_idx = spectrum_info.get("original_spec_index", None)
+    if spec_idx is None or spec_idx < 0 or spec_idx >= len(all_spectra_data):
+        return html.Div("Invalid spectrum index.", style={"color": "red"})
+
+    spec_dict = all_spectra_data[spec_idx]
+    meta = spec_dict.get("metadata", {})
+    parent_ion = meta.get("precursor_mz", None)
+
+    # Convert to a matchms Spectrum or just use data arrays
+    sp = Spectrum(
+        mz=np.array(spec_dict["mz"], dtype=float),
+        intensities=np.array(spec_dict["intensities"], dtype=float),
+        metadata=meta,
+    )
+
+    # We'll also handle losses if present
+    loss_data = meta.get("losses", [])
+
+    # We'll build a Plotly figure with optional highlighting
+    import plotly.graph_objs as go
+
+    tolerance = 0.02  # Da tolerance for matching motif features
+    highlighted_indices = set()
+
+    # If we have a chosen motif, parse its features from lda_dict_data
+    if motif_for_plot and motif_for_plot in lda_dict_data["beta"]:
+        motif_features = lda_dict_data["beta"][motif_for_plot]
+
+        # optional minimal threshold
+        # e.g. only keep features with prob > 1e-3
+        motif_features = {k: v for k,v in motif_features.items() if v > 1e-3}
+
+        # separate out frag vs loss
+        frag_mzs = []
+        loss_mzs = []
+        for feat, prob in motif_features.items():
+            if feat.startswith("frag@"):
+                try:
+                    frag_mzs.append(float(feat.replace("frag@", "")))
+                except ValueError:
+                    pass
+            elif feat.startswith("loss@"):
+                try:
+                    loss_mzs.append(float(feat.replace("loss@", "")))
+                except ValueError:
+                    pass
+
+        # Mark the relevant fragment peaks in sp for highlighting
+        # We'll do a simple tolerance check
+        for i, peak_mz in enumerate(sp.peaks.mz):
+            for target_mz in frag_mzs:
+                if abs(peak_mz - target_mz) <= tolerance:
+                    highlighted_indices.add(i)
+                    break
+
+        # Mark relevant losses?
+        if parent_ion is not None:
+            for i, peak_mz in enumerate(sp.peaks.mz):
+                for target_loss_mz in loss_mzs:
+                    # parent_ion - target_loss_mz ~ peak_mz
+                    if abs((parent_ion - target_loss_mz) - peak_mz) <= tolerance:
+                        highlighted_indices.add(i)
+                        break
+
+    # Build the bar chart
+    bar_colors = []
+    for i, mzval in enumerate(sp.peaks.mz):
+        if i in highlighted_indices:
+            bar_colors.append("#FF0000")  # highlight color
+        else:
+            bar_colors.append("#7f7f7f")   # default gray
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        x=sp.peaks.mz,
+        y=sp.peaks.intensities,
+        marker=dict(color=bar_colors),
+        width=1.5,
+        hovertext=[
+            f"m/z: {mzval:.4f}<br>Intensity: {intval:.3g}"
+            for mzval, intval in zip(sp.peaks.mz, sp.peaks.intensities)
+        ],
+        hoverinfo="text",
+    ))
+
+    # Optionally highlight parent ion if present
+    if parent_ion is not None:
+        fig.add_shape(
+            type="line",
+            x0=parent_ion,
+            x1=parent_ion,
+            y0=0,
+            y1=max(sp.peaks.intensities)*1.05,
+            line=dict(color="blue", dash="dash", width=2),
+        )
+        fig.add_annotation(
+            x=parent_ion,
+            y=max(sp.peaks.intensities)*1.06,
+            text=f"Parent Ion {parent_ion:.2f}",
+            showarrow=False,
+            font=dict(color="blue", size=10),
+            xanchor="center",
+        )
+
+    fig.update_layout(
+        title=f"Spectrum: {meta.get('id','Unknown')} — "
+              f"Highlighted Motif: {motif_for_plot or 'None'}",
+        xaxis_title="m/z (Da)",
+        yaxis_title="Intensity",
+        bargap=0.2,
+        template="plotly_white",
+        margin=dict(l=40, r=30, t=60, b=40),
+    )
+
+    return dcc.Graph(figure=fig)
+
+
+@app.callback(
     Output("spectra-search-results-table", "data"),
     Output("spectra-search-status-message", "children"),  # NEW OUTPUT
     Input("spectra-store", "data"),
@@ -1975,7 +2228,7 @@ def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
     pmass_low, pmass_high = parent_mass_range
 
     filtered_rows = []
-    for spec_dict in spectra_data:
+    for i, spec_dict in enumerate(spectra_data):
         meta = spec_dict.get("metadata", {})
         pmass = meta.get("precursor_mz", None)
         if pmass is None:
@@ -2000,6 +2253,7 @@ def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
             "feature_id": meta.get("feature_id", ""),
             "fragments": ", ".join(frag_list),
             "losses": ", ".join(loss_list),
+            "original_spec_index": i,  # Store the original index for later use
         })
 
     # Build a simple status message

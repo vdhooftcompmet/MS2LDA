@@ -1457,6 +1457,48 @@ def create_spectra_search_tab():
                 page_size=20,
                 style_table={"overflowX": "auto"},
                 style_cell={"textAlign": "left", "whiteSpace": "normal"},
+                row_selectable="single",
+            ),
+
+            # Add a container for the selected spectrum details
+            dcc.Store(id="search-tab-selected-spectrum-details-store"),
+            dcc.Store(id="search-tab-selected-motif-id-for-plot-store"),
+
+            # Add a container for the spectrum details
+            html.Div(
+                id="search-tab-spectrum-details-container",
+                style={"marginTop": "20px", "display": "none"},
+                children=[
+                    html.H4("Spectrum Details"),
+
+                    # Associated Motifs
+                    html.Div([
+                        html.H5("Associated Motifs"),
+                        html.Div(
+                            id="search-tab-associated-motifs-list",
+                            style={"marginTop": "10px"},
+                        ),
+                    ], style={
+                        "border": "1px dashed #ccc",
+                        "padding": "10px",
+                        "borderRadius": "5px",
+                        "marginBottom": "15px"
+                    }),
+
+                    # Spectrum Plot
+                    html.Div([
+                        html.H5("Spectrum Plot"),
+                        html.Div(
+                            id="search-tab-spectrum-plot-container",
+                            style={"marginTop": "10px"},
+                        ),
+                    ], style={
+                        "border": "1px dashed #ccc",
+                        "padding": "10px",
+                        "borderRadius": "5px",
+                        "marginBottom": "15px"
+                    }),
+                ],
             ),
         ],
     )
