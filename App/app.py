@@ -33,6 +33,7 @@ app.layout = dbc.Container(
                 dcc.Tab(label="Motif Rankings", value="motif-rankings-tab", id="motif-rankings-tab"),
                 dcc.Tab(label="Motif Details", value="motif-details-tab", id="motif-details-tab"),
                 dcc.Tab(label="Screening", value="screening-tab", id="screening-tab"),
+                dcc.Tab(label="Spectra Search", value="search-spectra-tab", id="search-spectra-tab"),
             ],
             className="mt-3",
         ),
@@ -44,6 +45,7 @@ app.layout = dbc.Container(
         layout.create_motif_rankings_tab(),
         layout.create_motif_details_tab(),
         layout.create_screening_tab(),
+        layout.create_spectra_search_tab(),
 
         # Hidden storage
         dcc.Store(id='motif-spectra-ids-store'),

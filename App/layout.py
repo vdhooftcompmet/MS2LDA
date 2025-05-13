@@ -1052,7 +1052,7 @@ def create_motif_rankings_tab():
                             score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability` 
                             and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters, 
                             so they can be quite high if the motif strongly dominates the docs where it appears. 
-                            
+
                             Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap. 
                             _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row 
                             takes you to a detailed view of that motif.
@@ -1398,3 +1398,66 @@ def create_screening_tab():
             dcc.Download(id="download-screening-json"),
         ],
     )
+
+
+def create_spectra_search_tab():
+    tab = html.Div(
+        id="search-spectra-tab-content",
+        style={"display": "none"},
+        children=[
+            html.H3("Search by Fragment/Loss or Parent Mass"),
+
+            dbc.Row([
+                dbc.Col([
+                    dbc.Label("Fragment or Loss Contains:"),
+                    dbc.Input(
+                        id="spectra-search-fragloss-input",
+                        type="text",
+                        placeholder="e.g. frag@150 or loss@40",
+                    ),
+                    # ADD THIS TOOLTIP:
+                    dbc.Tooltip(
+                        "Enter a partial fragment (e.g., 'frag@150.1') or loss (e.g., 'loss@40.2'). "
+                        "The search is case-insensitive and matches any part of the feature string.",
+                        target="spectra-search-fragloss-input",
+                    ),
+                ], width=4),
+
+                dbc.Col([
+                    dbc.Label("Parent Mass Range:"),
+                    dcc.RangeSlider(
+                        id="spectra-search-parentmass-slider",
+                        min=0,
+                        max=2000,
+                        step=1,
+                        value=[0, 2000],
+                        marks={0: "0", 500: "500", 1000: "1000", 1500: "1500", 2000: "2000"},
+                        allowCross=False,
+                    ),
+                    html.Div(id="spectra-search-parentmass-slider-display", style={"marginTop": "10px"}),
+                ], width=8),
+            ], style={"marginTop": "20px"}),
+
+            # ADD STATUS MESSAGE DIV HERE
+            html.Div(
+                id="spectra-search-status-message",
+                style={"marginTop": "10px", "fontStyle": "italic", "color": "#555"},
+            ),
+
+            dash_table.DataTable(
+                id="spectra-search-results-table",
+                columns=[
+                    {"name": "Spectrum ID",   "id": "spec_id"},
+                    {"name": "Parent Mass",  "id": "parent_mass"},
+                    {"name": "Feature ID",   "id": "feature_id"},
+                    {"name": "Fragments",    "id": "fragments"},
+                    {"name": "Losses",       "id": "losses"},
+                ],
+                data=[],
+                page_size=20,
+                style_table={"overflowX": "auto"},
+                style_cell={"textAlign": "left", "whiteSpace": "normal"},
+            ),
+        ],
+    )
+    return tab

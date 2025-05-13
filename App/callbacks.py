@@ -55,6 +55,7 @@ def load_motifset_file(json_path):
     Output("motif-rankings-tab-content", "style"),
     Output("motif-details-tab-content", "style"),
     Output("screening-tab-content", "style"),
+    Output("search-spectra-tab-content", "style"),
     Input("tabs", "value"),
 )
 def toggle_tab_content(active_tab):
@@ -64,6 +65,7 @@ def toggle_tab_content(active_tab):
     motif_rankings_style = {"display": "none"}
     motif_details_style = {"display": "none"}
     screening_style = {"display": "none"}
+    search_spectra_style = {"display": "none"}
 
     if active_tab == "run-analysis-tab":
         run_style = {"display": "block"}
@@ -77,6 +79,8 @@ def toggle_tab_content(active_tab):
         motif_details_style = {"display": "block"}
     elif active_tab == "screening-tab":
         screening_style = {"display": "block"}
+    elif active_tab == "search-spectra-tab":
+        search_spectra_style = {"display": "block"}
 
     return (
         run_style,
@@ -85,6 +89,7 @@ def toggle_tab_content(active_tab):
         motif_rankings_style,
         motif_details_style,
         screening_style,
+        search_spectra_style,
     )
 
 
@@ -1941,3 +1946,74 @@ def unlock_run_after_download(n_clicks):
         return (msg, "Spec2Vec model + data download complete.")
     except Exception as e:
         return f"Download failed: {str(e)}", ""
+
+
+@app.callback(
+    Output("spectra-search-parentmass-slider-display", "children"),
+    Input("spectra-search-parentmass-slider", "value"),
+)
+def display_parentmass_range(value):
+    if value:
+        return f"Selected Parent Mass Range: {value[0]:.2f} - {value[1]:.2f}"
+    return "Selected Parent Mass Range: N/A"
+
+
+@app.callback(
+    Output("spectra-search-results-table", "data"),
+    Output("spectra-search-status-message", "children"),  # NEW OUTPUT
+    Input("spectra-store", "data"),
+    Input("spectra-search-fragloss-input", "value"),
+    Input("spectra-search-parentmass-slider", "value"),
+    prevent_initial_call=True,
+)
+def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
+    if not spectra_data:
+        raise PreventUpdate
+
+    # Prepare query and parent mass bounds
+    query = (search_text or "").strip().lower()
+    pmass_low, pmass_high = parent_mass_range
+
+    filtered_rows = []
+    for spec_dict in spectra_data:
+        meta = spec_dict.get("metadata", {})
+        pmass = meta.get("precursor_mz", None)
+        if pmass is None:
+            continue
+        if not (pmass_low <= pmass <= pmass_high):
+            continue
+
+        frag_list = [f"frag@{mzval:.4g}" for mzval in spec_dict["mz"]]
+        loss_list = []
+        if "losses" in meta:
+            for loss_item in meta["losses"]:
+                loss_list.append(f"loss@{loss_item['loss_mz']:.4g}")
+
+        if query:
+            combined = frag_list + loss_list
+            if not any(query in x.lower() for x in combined):
+                continue
+
+        filtered_rows.append({
+            "spec_id": meta.get("id", ""),
+            "parent_mass": pmass,
+            "feature_id": meta.get("feature_id", ""),
+            "fragments": ", ".join(frag_list),
+            "losses": ", ".join(loss_list),
+        })
+
+    # Build a simple status message
+    status_msg = ""
+    default_range = (0, 2000)
+    # Check if user has any actual filter
+    is_filtered = (query != "") or (pmass_low != default_range[0] or pmass_high != default_range[1])
+
+    if filtered_rows:
+        status_msg = f"Showing {len(filtered_rows)} matching spectra."
+    else:
+        if is_filtered:
+            status_msg = "No spectra found matching your criteria."
+        else:
+            status_msg = ""  # No filters active yet
+
+    return filtered_rows, status_msg
