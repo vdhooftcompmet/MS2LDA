@@ -1266,9 +1266,16 @@ def create_motif_details_tab():
                 html.Div([
                     dcc.Markdown(
                         """
-                        This section lists actual MS2 spectra from the dataset associated with the selected motif. Two adjustable sliders below control how these spectra are filtered. The Spectra-Motif Probability Filter determines the minimum and maximum probability a spectrum must have to be associated with this motif, while the Overlap Score Filter sets how closely the spectrum’s peaks must align with the motif features.
-
-                        Select a spectrum from the table or use the Next/Previous buttons to browse through them. Each selection updates the spectrum plot below, highlighting peaks matching features from the motif. This plot helps verify if the motif truly represents meaningful chemical information by directly comparing it against real experimental data.
+                        This section lists MS2 spectra linked to the selected motif. Use the
+                        sliders to filter spectra by motif probability and overlap score. When
+                        you pick a spectrum (or use the navigation buttons) the plot underneath
+                        updates.  
+                        
+                        Peaks matching fragment or neutral-loss features of the motif turn
+                        red. For every neutral-loss match, a green dashed line connects the
+                        fragment peak to the precursor ion and is annotated with the
+                        loss value. All remaining peaks are grey. The plot lets you judge whether the 
+                        motif's characteristic features are genuinely present in the experimental spectrum.
                         """
                     ),
 
@@ -1501,12 +1508,12 @@ def create_spectra_search_tab():
                         html.H5("Spectrum Plot with Motif Highlighting"),
                         dcc.Markdown(
                             """
-                            The bar chart shows the MS/MS spectrum. Peaks that
-                            match fragment or neutral-loss features of the
-                            currently selected motif are coloured red; all
-                            others remain grey. A dashed blue line marks the
-                            precursor ion. Hover over any bar to view the exact
-                            m/z and intensity.
+                            The bar chart displays the full MS/MS spectrum of the
+                            selected document. Peaks whose m/z matches **fragment** features of the current motif
+                            are coloured red. Peaks whose m/z matches a **neutral-loss** feature are also red and
+                            are connected to the precursor ion by a green dashed line labelled with the neutral-loss 
+                            value (for example "-18.01"). All other peaks remain grey. A vertical blue dashed line 
+                            indicates the precursor ion. Hover over a bar to read the exact m/z and intensity.
                             """,
                         ),
                         html.Div(
