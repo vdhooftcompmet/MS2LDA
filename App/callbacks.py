@@ -933,11 +933,15 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
 @app.callback(
     Output('tabs', 'value', allow_duplicate=True),
     Input('selected-motif-store', 'data'),
+    State('tabs', 'value'),  # New State
     prevent_initial_call=True,
 )
-def activate_motif_details_tab(selected_motif):
+def activate_motif_details_tab(selected_motif, current_active_tab):
     if selected_motif:
-        return 'motif-details-tab'
+        if current_active_tab == "search-spectra-tab":
+            return dash.no_update  # Stay on search tab
+        else:
+            return 'motif-details-tab'  # Go to motif details
     else:
         return dash.no_update
 
@@ -1860,6 +1864,7 @@ def save_screening_results(csv_click, json_click, table_data):
     else:
         raise dash.exceptions.PreventUpdate
 
+
 @app.callback(
     Output("download-motifranking-csv", "data"),
     Output("download-motifranking-json", "data"),
@@ -1868,7 +1873,6 @@ def save_screening_results(csv_click, json_click, table_data):
     State("motif-rankings-table", "data"),
     prevent_initial_call=True,
 )
-
 def save_motifranking_results(csv_click, json_click, table_data):
     ctx = dash.callback_context
     if not ctx.triggered:
@@ -1886,7 +1890,6 @@ def save_motifranking_results(csv_click, json_click, table_data):
         return no_update, dict(content=out_str, filename="motifranking_results.json")
     else:
         raise dash.exceptions.PreventUpdate
-
 
 
 @app.callback(
@@ -1979,7 +1982,7 @@ def handle_spectrum_selection(selected_rows, table_data):
     container_style = {"marginTop": "20px", "display": "block"}
 
     # selected_spectrum_data_from_table already contains original_spec_index
-    return selected_spectrum_data_from_table, container_style, None # MODIFIED (return None for motif store)
+    return selected_spectrum_data_from_table, container_style, None  # MODIFIED (return None for motif store)
 
 
 @app.callback(
@@ -2030,7 +2033,7 @@ def show_associated_motifs(spectrum_info, lda_dict_data):
                     className="me-2",
                 ),
             ],
-            className="d-flex align-items-center mb-1")
+                className="d-flex align-items-center mb-1")
         )
 
     if not layout_items:
@@ -2049,13 +2052,31 @@ def jump_to_motif_details(n_clicks_list):
     ctx = dash.callback_context
     if not ctx.triggered:
         raise PreventUpdate
-    triggered_id_str = ctx.triggered[0]["prop_id"].split(".")[0]
-    pmid = json.loads(triggered_id_str)
-    motif_id = pmid["index"]
 
-    # Set that motif ID as the 'selected-motif-store'
-    # Then switch tabs to "motif-details-tab"
-    return motif_id, "motif-details-tab"
+    actual_click_detected = False
+    motif_id_from_click = None
+
+    for i, n_clicks_val in enumerate(n_clicks_list):
+        if n_clicks_val is not None and n_clicks_val > 0:
+            # This indicates a genuine click on one of the buttons.
+            # Get the ID of the exact button that was clicked.
+            # The triggered_id_str will be like: '{"index":"motif_X","type":"search-tab-motif-details-btn"}.n_clicks'
+            triggered_id_str = ctx.triggered[0]["prop_id"].split(".")[0]
+            try:
+                pmid = json.loads(triggered_id_str)  # pmid = parsed motif id (dict)
+                motif_id_from_click = pmid["index"]
+                actual_click_detected = True
+                break  # Process the first genuine click
+            except Exception as e:
+                # Log error or handle appropriately
+                print(f"Error parsing button ID in jump_to_motif_details: {e}")
+                raise PreventUpdate
+
+    if actual_click_detected and motif_id_from_click:
+        return motif_id_from_click, "motif-details-tab"
+    else:
+        # No genuine click was found (e.g., callback triggered by component creation/update)
+        raise PreventUpdate
 
 
 @app.callback(
@@ -2123,7 +2144,7 @@ def update_search_tab_spectrum_plot(spectrum_info, motif_for_plot, all_spectra_d
 
         # optional minimal threshold
         # e.g. only keep features with prob > 1e-3
-        motif_features = {k: v for k,v in motif_features.items() if v > 1e-3}
+        motif_features = {k: v for k, v in motif_features.items() if v > 1e-3}
 
         # separate out frag vs loss
         frag_mzs = []
@@ -2163,7 +2184,7 @@ def update_search_tab_spectrum_plot(spectrum_info, motif_for_plot, all_spectra_d
         if i in highlighted_indices:
             bar_colors.append("#FF0000")  # highlight color
         else:
-            bar_colors.append("#7f7f7f")   # default gray
+            bar_colors.append("#7f7f7f")  # default gray
 
     fig = go.Figure()
 
@@ -2186,12 +2207,12 @@ def update_search_tab_spectrum_plot(spectrum_info, motif_for_plot, all_spectra_d
             x0=parent_ion,
             x1=parent_ion,
             y0=0,
-            y1=max(sp.peaks.intensities)*1.05,
+            y1=max(sp.peaks.intensities) * 1.05,
             line=dict(color="blue", dash="dash", width=2),
         )
         fig.add_annotation(
             x=parent_ion,
-            y=max(sp.peaks.intensities)*1.06,
+            y=max(sp.peaks.intensities) * 1.06,
             text=f"Parent Ion {parent_ion:.2f}",
             showarrow=False,
             font=dict(color="blue", size=10),
@@ -2199,7 +2220,7 @@ def update_search_tab_spectrum_plot(spectrum_info, motif_for_plot, all_spectra_d
         )
 
     fig.update_layout(
-        title=f"Spectrum: {meta.get('id','Unknown')} — "
+        title=f"Spectrum: {meta.get('id', 'Unknown')} — "
               f"Highlighted Motif: {motif_for_plot or 'None'}",
         xaxis_title="m/z (Da)",
         yaxis_title="Intensity",
