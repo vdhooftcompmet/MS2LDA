@@ -1514,7 +1514,7 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
     Output('spectrum-plot', 'children'),
     Input('selected-spectrum-index', 'data'),
     Input('probability-filter', 'value'),
-    State('motif-spectra-ids-store', 'data'),
+    Input('motif-spectra-ids-store', 'data'),
     State('spectra-store', 'data'),
     State('lda-dict-store', 'data'),
     State('selected-motif-store', 'data'),
