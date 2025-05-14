@@ -885,7 +885,7 @@ def create_load_results_tab():
                         """
                     )
                 ],
-                style={"margin-top": "20px", "margin-bottom": "20px"},
+                style={"marginTop": "20px", "marginBottom": "20px"},
             ),
             dbc.Row(
                 [
@@ -951,7 +951,7 @@ def create_cytoscape_network_tab():
                         """
                     )
                 ],
-                style={"margin-top": "20px", "margin-bottom": "20px"},
+                style={"marginTop": "20px", "marginBottom": "20px"},
             ),
             dbc.Row(
                 [
@@ -1059,7 +1059,7 @@ def create_motif_rankings_tab():
                             """
                         )
                     ],
-                    style={"margin-top": "20px", "margin-bottom": "20px"},
+                    style={"marginTop": "20px", "marginBottom": "20px"},
                 ),
 
                 dbc.Row([
@@ -1160,7 +1160,7 @@ def create_motif_details_tab():
                         """
                     )
                 ],
-                style={"margin-top": "20px", "margin-bottom": "20px"},
+                style={"marginTop": "20px", "marginBottom": "20px"},
             ),
 
             # ----------------------------------------------------------------
@@ -1178,7 +1178,7 @@ def create_motif_details_tab():
                     ),
                     html.Div(id='motif-spec2vec-container', style={"marginTop": "10px"}),
                 ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "15px"
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "15px"
                 }),
 
                 html.Div([
@@ -1199,11 +1199,11 @@ def create_motif_details_tab():
                     ),
                     html.Div(id='motif-optimized-spectrum-container', style={"marginTop": "10px"}),
                 ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "15px"
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "15px"
                 }),
 
             ], style={
-                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "margin-bottom": "20px"
+                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "marginBottom": "20px"
             }),
 
             # ----------------------------------------------------------------
@@ -1226,7 +1226,7 @@ def create_motif_details_tab():
                     ),
                     html.Div(id='probability-filter-display', style={"marginTop": "10px"}),
                 ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "10px"
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "10px"
                 }),
 
                 html.Div([
@@ -1238,7 +1238,7 @@ def create_motif_details_tab():
                     ),
                     html.Div(id='motif-raw-spectrum-container', style={"marginTop": "10px"}),
                 ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "10px"
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "10px"
                 }),
 
                 html.Div([
@@ -1250,11 +1250,11 @@ def create_motif_details_tab():
                     ),
                     html.Div(id='motif-features-container'),
                 ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "10px"
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "10px"
                 }),
 
             ], style={
-                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "margin-bottom": "20px"
+                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "marginBottom": "20px"
             }),
 
             # ----------------------------------------------------------------
@@ -1300,11 +1300,11 @@ def create_motif_details_tab():
                         dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ms-2', color="info"),
                     ], className='mt-3'),
                 ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "15px"
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "15px"
                 }),
 
             ], style={
-                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "margin-bottom": "20px"
+                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "marginBottom": "20px"
             }),
 
         ],
@@ -1328,7 +1328,7 @@ def create_screening_tab():
                         in the table below, and you can use the slider to filter the table by minimum similarity score.
                     """),
                 ],
-                style={"margin-top": "20px", "margin-bottom": "20px"},
+                style={"marginTop": "20px", "marginBottom": "20px"},
             ),
             html.Hr(),
             html.H4("Reference Motif Sets Found"),
