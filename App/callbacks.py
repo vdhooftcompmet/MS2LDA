@@ -2292,3 +2292,21 @@ def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
             status_msg = ""  # No filters active yet
 
     return filtered_rows, status_msg
+
+
+app.clientside_callback(
+    """
+    function(style) {
+        if (style && style.display === "block") {
+            const el = document.getElementById('search-tab-spectrum-details-container');
+            if (el) {
+                // slight delay so the layout has finished updating
+                setTimeout(() => el.scrollIntoView({behavior: 'smooth', block: 'start'}), 50);
+            }
+        }
+        return '';
+    }
+    """,
+    Output("search-scroll-dummy", "children"),
+    Input("search-tab-spectrum-details-container", "style"),
+)

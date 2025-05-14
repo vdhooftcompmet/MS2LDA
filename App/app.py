@@ -60,6 +60,9 @@ app.layout = dbc.Container(
         dcc.Store(id="motif-rankings-state", data=None, storage_type="memory"),
         dcc.Store(id="s2v-download-complete", data=False),
 
+        # hidden output used only to trigger the client-side scroll
+        html.Div(id="search-scroll-dummy", style={"display": "none"}),
+
     ],
     fluid=False,
 )

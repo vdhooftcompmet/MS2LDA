@@ -1469,11 +1469,22 @@ def create_spectra_search_tab():
                 id="search-tab-spectrum-details-container",
                 style={"marginTop": "20px", "display": "none"},
                 children=[
-                    html.H4("Spectrum Details"),
+                    html.H4("Spectrum Details (Selected Spectrum)"),
 
                     # Associated Motifs
                     html.Div([
-                        html.H5("Associated Motifs"),
+                        html.H5("Motifs Associated with the Selected Spectrum"),
+                        dcc.Markdown(
+                            """
+                            The table lists Mass2Motifs predicted to be present
+                            in the spectrum, ranked by their document–topic
+                            probability.  
+                            • Click a motif's name to highlight its features in
+                              the plot below.  
+                            • Click **Details ↗** to jump to the Motif Details
+                              tab for a full breakdown.
+                            """,
+                        ),
                         html.Div(
                             id="search-tab-associated-motifs-list",
                             style={"marginTop": "10px"},
@@ -1487,7 +1498,17 @@ def create_spectra_search_tab():
 
                     # Spectrum Plot
                     html.Div([
-                        html.H5("Spectrum Plot"),
+                        html.H5("Spectrum Plot with Motif Highlighting"),
+                        dcc.Markdown(
+                            """
+                            The bar chart shows the MS/MS spectrum. Peaks that
+                            match fragment or neutral-loss features of the
+                            currently selected motif are coloured red; all
+                            others remain grey. A dashed blue line marks the
+                            precursor ion. Hover over any bar to view the exact
+                            m/z and intensity.
+                            """,
+                        ),
                         html.Div(
                             id="search-tab-spectrum-plot-container",
                             style={"marginTop": "10px"},
