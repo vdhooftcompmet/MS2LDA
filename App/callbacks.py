@@ -14,11 +14,11 @@ import plotly.express as px
 import plotly.graph_objs as go
 import tomotopy as tp
 from dash import Input, Output, State, no_update, dcc
-from dash import dash_table
-from dash import html
+from dash import dash_table, html, ALL
 from dash.exceptions import PreventUpdate
 from matchms import Fragments
 from matchms import Spectrum
+from plotly.subplots import make_subplots
 from rdkit import Chem
 from rdkit.Chem.Draw import MolsToGridImage
 
@@ -32,6 +32,369 @@ from MS2LDA.Preprocessing.load_and_clean import clean_spectra
 from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
 from MS2LDA.run import filetype_check, load_s2v_model
 from MS2LDA.utils import download_model_and_data, create_spectrum
+
+# Cache for consistent motif colors
+MOTIF_COLOR_CACHE = {}
+
+
+def calculate_motif_shares(spec_dict, lda_dict_data, tolerance=0.02):
+    """
+    For one spectrum, compute each motif's share of every peak.
+
+    Args:
+        spec_dict (dict): The spectrum dictionary
+        lda_dict_data (dict): The LDA model data
+        tolerance (float): m/z tolerance for matching (default: 0.02 Da)
+
+    Returns:
+        list: A list the same length as spec_dict["mz"]; each element is either
+              None (no motif matches) or a dict mapping motif_id -> share (floats summing to 1)
+    """
+    meta = spec_dict.get("metadata", {})
+    doc_id = meta.get("id", f"spec_{meta.get('index', 0)}")
+    parent_mz = meta.get("precursor_mz")
+
+    # Get the theta vector for this document
+    theta = lda_dict_data.get("theta", {}).get(doc_id, {})
+    if not theta:
+        return [None] * len(spec_dict["mz"])
+
+    # Extract all motifs with non-zero theta for this document
+    relevant_motifs = {m: t for m, t in theta.items() if t > 0}
+    if not relevant_motifs:
+        return [None] * len(spec_dict["mz"])
+
+    # Build lookup dictionaries for each motif's fragments and losses
+    motif_fragments = {}
+    motif_losses = {}
+
+    for motif_id, theta_val in relevant_motifs.items():
+        if motif_id not in lda_dict_data.get("beta", {}):
+            continue
+
+        beta = lda_dict_data["beta"][motif_id]
+        frag_dict = {}
+        loss_dict = {}
+
+        for ft, prob in beta.items():
+            if ft.startswith("frag@"):
+                try:
+                    mz = float(ft.replace("frag@", ""))
+                    frag_dict[mz] = prob
+                except ValueError:
+                    pass
+            elif ft.startswith("loss@"):
+                try:
+                    mz = float(ft.replace("loss@", ""))
+                    loss_dict[mz] = prob
+                except ValueError:
+                    pass
+
+        motif_fragments[motif_id] = frag_dict
+        motif_losses[motif_id] = loss_dict
+
+    # Calculate motif shares for each peak
+    mz_arr = np.array(spec_dict["mz"], dtype=float)
+    shares = []
+
+    for i, mz_val in enumerate(mz_arr):
+        # Find matching motifs for this peak (fragment or loss)
+        matches = {}
+
+        # Check fragment matches
+        for motif_id, frags in motif_fragments.items():
+            for frag_mz, beta_val in frags.items():
+                if abs(mz_val - frag_mz) <= tolerance:
+                    # Responsibility = theta[m] * beta[m,f]
+                    matches[motif_id] = matches.get(motif_id, 0) + (theta[motif_id] * beta_val)
+
+        # Check loss matches if parent_mz is available
+        if parent_mz is not None:
+            for motif_id, losses in motif_losses.items():
+                for loss_mz, beta_val in losses.items():
+                    # Check if this peak corresponds to a loss
+                    if abs((parent_mz - loss_mz) - mz_val) <= tolerance:
+                        # Responsibility = theta[m] * beta[m,l]
+                        matches[motif_id] = matches.get(motif_id, 0) + (theta[motif_id] * beta_val)
+
+        # If no matches, this peak isn't claimed by any motif
+        if not matches:
+            shares.append(None)
+            continue
+
+        # Normalize the responsibilities to sum to 1
+        total = sum(matches.values())
+        if total > 0:
+            normalized = {m: v / total for m, v in matches.items()}
+            shares.append(normalized)
+        else:
+            shares.append(None)
+
+    return shares
+
+
+def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
+                       probability_range=(0, 1), tolerance=0.02, mode='both', highlight_mode='single', show_parent_ion=True):
+    """
+    Return a Plotly Figure for one MS/MS spectrum.
+
+    Args:
+        spec_dict (dict): The spectrum dictionary
+        motif_id (str): The motif ID to highlight (used when highlight_mode='single')
+        lda_dict_data (dict): The LDA model data
+        probability_range (tuple): Range of probabilities to filter motif features
+        tolerance (float): m/z tolerance for matching
+        mode (str): 'both', 'fragments', or 'losses'
+        highlight_mode (str): 'single', 'all', or 'none'
+        show_parent_ion (bool): Whether to display the parent ion marker
+
+    Returns:
+        go.Figure: A Plotly figure object
+    """
+    meta = spec_dict.get("metadata", {})
+    parent_mz = meta.get("precursor_mz")
+    spectrum_id = meta.get("id", "Unknown")
+
+    mz_arr = np.array(spec_dict["mz"], dtype=float)
+    int_arr = np.array(spec_dict["intensities"], dtype=float)
+
+    fig = go.Figure()
+
+    # Fast path for 'none' mode - everything is grey
+    if highlight_mode == 'none':
+        fig.add_trace(go.Bar(
+            x=mz_arr,
+            y=int_arr,
+            marker=dict(color='#7f7f7f', line=dict(color='white', width=0)),
+            width=0.3,
+            hoverinfo='text',
+            hovertext=[f"m/z: {mz_val:.4f}<br>Intensity: {inten:.3g}"
+                       for mz_val, inten in zip(mz_arr, int_arr)],
+            opacity=0.9,
+            name="Peaks",
+        ))
+
+    # Single motif highlighting mode (original behavior)
+    elif highlight_mode == 'single':
+        frag_mzs = []
+        loss_mzs = []
+        if motif_id and lda_dict_data and motif_id in lda_dict_data.get("beta", {}):
+            motif_feats = {
+                k: v for k, v in lda_dict_data["beta"][motif_id].items()
+                if probability_range[0] <= v <= probability_range[1]
+            }
+            for ft in motif_feats:
+                if ft.startswith("frag@"):
+                    try:
+                        frag_mzs.append(float(ft.replace("frag@", "")))
+                    except ValueError:
+                        pass
+                elif ft.startswith("loss@"):
+                    try:
+                        loss_mzs.append(float(ft.replace("loss@", "")))
+                    except ValueError:
+                        pass
+
+        frag_match_idx = set()
+        loss_match_idx = set()
+        for i, mz_val in enumerate(mz_arr):
+            if mode in ("both", "fragments") and any(abs(mz_val - t) <= tolerance for t in frag_mzs):
+                frag_match_idx.add(i)
+            if mode in ("both", "losses") and parent_mz is not None \
+               and any(abs((parent_mz - l) - mz_val) <= tolerance for l in loss_mzs):
+                loss_match_idx.add(i)
+
+        bar_colors = [
+            '#FF0000' if i in frag_match_idx or i in loss_match_idx else '#7f7f7f'
+            for i in range(len(mz_arr))
+        ]
+
+        fig.add_trace(go.Bar(
+            x=mz_arr,
+            y=int_arr,
+            marker=dict(color=bar_colors, line=dict(color='white', width=0)),
+            width=0.3,
+            hoverinfo='text',
+            hovertext=[f"m/z: {mz_val:.4f}<br>Intensity: {inten:.3g}"
+                       for mz_val, inten in zip(mz_arr, int_arr)],
+            opacity=0.9,
+            name="Peaks",
+        ))
+
+        # visualise neutral-loss for single motif
+        if parent_mz is not None and loss_mzs and mode in ("both", "losses"):
+            for loss_val in loss_mzs:
+                frag_mz = parent_mz - loss_val
+                # find closest plotted peak within the tolerance
+                idx = np.argmin(np.abs(mz_arr - frag_mz))
+                if abs(mz_arr[idx] - frag_mz) <= tolerance:
+                    y_val = int_arr[idx]
+                    fig.add_shape(
+                        type="line",
+                        x0=mz_arr[idx], y0=y_val,
+                        x1=parent_mz, y1=y_val,
+                        line=dict(color="rgba(0,128,0,0.4)", dash="dash", width=1),
+                    )
+                    fig.add_annotation(
+                        x=(mz_arr[idx] + parent_mz) / 2,
+                        y=y_val,
+                        text=f"-{loss_val:.2f}",
+                        showarrow=False,
+                        font=dict(size=10, color="green"),
+                        bgcolor="rgba(255,255,255,0.7)",
+                        xanchor="center",
+                    )
+
+    # All motifs highlighting mode (stacked bars)
+    elif highlight_mode == 'all':
+        # Calculate motif shares for each peak
+        peak_shares = calculate_motif_shares(spec_dict, lda_dict_data, tolerance)
+
+        # Get all unique motifs that appear in any peak
+        all_motifs = set()
+        for shares in peak_shares:
+            if shares:
+                all_motifs.update(shares.keys())
+
+        # Sort motifs for consistent ordering
+        sorted_motifs = sorted(all_motifs)
+
+        # Create a color for each motif (cached for consistency)
+        import plotly.colors
+
+        for m in sorted_motifs:
+            if m not in MOTIF_COLOR_CACHE:
+                # Get the next color from Plotly's qualitative palette (cycling if needed)
+                palette = plotly.colors.qualitative.Plotly
+                MOTIF_COLOR_CACHE[m] = palette[hash(m) % len(palette)]
+
+        # Create a trace for unassigned peaks
+        unassigned_y = np.zeros_like(int_arr)
+        for i, shares in enumerate(peak_shares):
+            if shares is None:
+                unassigned_y[i] = int_arr[i]
+
+        if np.any(unassigned_y > 0):
+            fig.add_trace(go.Bar(
+                x=mz_arr,
+                y=unassigned_y,
+                marker=dict(color='#7f7f7f', line=dict(color='white', width=0)),
+                width=0.3,
+                hoverinfo='text',
+                hovertext=[f"m/z: {mz:.4f}<br>Intensity: {inten:.3g}<br>Unassigned"
+                           for mz, inten in zip(mz_arr, unassigned_y) if inten > 0],
+                opacity=0.9,
+                name="Unassigned",
+            ))
+
+        # Create a trace for each motif
+        for motif in sorted_motifs:
+            motif_y = np.zeros_like(int_arr)
+
+            for i, shares in enumerate(peak_shares):
+                if shares and motif in shares:
+                    motif_y[i] = int_arr[i] * shares[motif]
+
+            if np.any(motif_y > 0):
+                fig.add_trace(go.Bar(
+                    x=mz_arr,
+                    y=motif_y,
+                    marker=dict(color=MOTIF_COLOR_CACHE[motif], line=dict(color='white', width=0)),
+                    width=0.3,
+                    hoverinfo='text',
+                    hovertext=[f"m/z: {mz:.4f}<br>Intensity: {inten:.3g}<br>Motif: {motif}<br>Share: {shares[motif]:.2f}"
+                               if shares and motif in shares else ""
+                               for mz, inten, shares in zip(mz_arr, int_arr, peak_shares) if inten > 0],
+                    opacity=0.9,
+                    name=f"{motif}",
+                ))
+
+        # Set barmode to stack
+        fig.update_layout(barmode="stack")
+
+        # Add neutral loss connectors for peaks with motif matches
+        if parent_mz is not None and mode in ("both", "losses"):
+            # Get all loss m/z values from all motifs
+            all_losses = set()
+            for m in sorted_motifs:
+                if m in lda_dict_data.get("beta", {}):
+                    for ft, prob in lda_dict_data["beta"][m].items():
+                        if ft.startswith("loss@") and probability_range[0] <= prob <= probability_range[1]:
+                            try:
+                                all_losses.add(float(ft.replace("loss@", "")))
+                            except ValueError:
+                                pass
+
+            for loss_val in all_losses:
+                frag_mz = parent_mz - loss_val
+                # find closest plotted peak within the tolerance
+                idx = np.argmin(np.abs(mz_arr - frag_mz))
+                if abs(mz_arr[idx] - frag_mz) <= tolerance and peak_shares[idx] is not None:
+                    # Find the dominant motif for this loss
+                    dominant_motif = max(peak_shares[idx].items(), key=lambda x: x[1])[0]
+                    y_val = int_arr[idx]
+
+                    fig.add_shape(
+                        type="line",
+                        x0=mz_arr[idx], y0=y_val,
+                        x1=parent_mz, y1=y_val,
+                        line=dict(color="rgba(0,128,0,0.4)", dash="dash", width=1),
+                    )
+                    fig.add_annotation(
+                        x=(mz_arr[idx] + parent_mz) / 2,
+                        y=y_val,
+                        text=f"-{loss_val:.2f}",
+                        showarrow=False,
+                        font=dict(size=10, color="green"),
+                        bgcolor="rgba(255,255,255,0.7)",
+                        xanchor="center",
+                    )
+
+    # Add precursor ion marker for all modes if show_parent_ion is True
+    if parent_mz is not None and show_parent_ion:
+        fig.add_shape(
+            type="line",
+            x0=parent_mz, x1=parent_mz,
+            y0=0, y1=int_arr.max() * 1.05,
+            line=dict(color="blue", dash="dash", width=2),
+        )
+        fig.add_annotation(
+            x=parent_mz,
+            y=int_arr.max() * 1.06,
+            text=f"Parent Ion {parent_mz:.2f}",
+            showarrow=False,
+            font=dict(size=10, color="blue"),
+            xanchor="center",
+        )
+
+    # Set title based on highlight mode
+    if highlight_mode == 'single':
+        title = f"Spectrum: {spectrum_id} — Highlighted Motif: {motif_id or 'None'}"
+    elif highlight_mode == 'all':
+        title = f"Spectrum: {spectrum_id} — All Motifs"
+    else:  # 'none'
+        title = f"Spectrum: {spectrum_id} — No Highlighting"
+
+    fig.update_layout(
+        title=title,
+        xaxis_title="m/z (Da)",
+        hovermode="closest",
+    )
+    apply_common_layout(fig, ytitle="Intensity")
+    return fig
+
+
+def apply_common_layout(fig: go.Figure, ytitle: str | None = None) -> None:
+    """Apply the shared template, font, margins and bargap to a Plotly figure."""
+    fig.update_layout(
+        template="plotly_white",
+        font=dict(size=12),
+        margin=dict(l=40, r=30, t=30, b=40),
+        bargap=0.35,
+    )
+    if ytitle is not None:
+        fig.update_yaxes(title_text=ytitle)
+
 
 # Hardcode the path for .m2m references
 MOTIFDB_FOLDER = "./MS2LDA/MotifDB"
@@ -55,6 +418,7 @@ def load_motifset_file(json_path):
     Output("motif-rankings-tab-content", "style"),
     Output("motif-details-tab-content", "style"),
     Output("screening-tab-content", "style"),
+    Output("search-spectra-tab-content", "style"),
     Input("tabs", "value"),
 )
 def toggle_tab_content(active_tab):
@@ -64,6 +428,7 @@ def toggle_tab_content(active_tab):
     motif_rankings_style = {"display": "none"}
     motif_details_style = {"display": "none"}
     screening_style = {"display": "none"}
+    search_spectra_style = {"display": "none"}
 
     if active_tab == "run-analysis-tab":
         run_style = {"display": "block"}
@@ -77,6 +442,8 @@ def toggle_tab_content(active_tab):
         motif_details_style = {"display": "block"}
     elif active_tab == "screening-tab":
         screening_style = {"display": "block"}
+    elif active_tab == "search-spectra-tab":
+        search_spectra_style = {"display": "block"}
 
     return (
         run_style,
@@ -85,6 +452,7 @@ def toggle_tab_content(active_tab):
         motif_rankings_style,
         motif_details_style,
         screening_style,
+        search_spectra_style,
     )
 
 
@@ -927,13 +1295,17 @@ def update_motif_rankings_table(lda_dict_data, probability_thresh, overlap_thres
 
 
 @app.callback(
-    Output('tabs', 'value'),
+    Output('tabs', 'value', allow_duplicate=True),
     Input('selected-motif-store', 'data'),
+    State('tabs', 'value'),  # New State
     prevent_initial_call=True,
 )
-def activate_motif_details_tab(selected_motif):
+def activate_motif_details_tab(selected_motif, current_active_tab):
     if selected_motif:
-        return 'motif-details-tab'
+        if current_active_tab == "search-spectra-tab":
+            return dash.no_update  # Stay on search tab
+        else:
+            return 'motif-details-tab'  # Go to motif details
     else:
         return dash.no_update
 
@@ -986,13 +1358,13 @@ def display_overlap_filter(overlap_range):
     Output('motif-spectra-ids-store', 'data'),
     Output('spectra-table', 'data'),
     Output('spectra-table', 'columns'),
-    Output('motif-optimized-spectrum-container', 'children'),
-    Output('motif-raw-spectrum-container', 'children'),
+    Output('motif-dual-spectrum-container', 'children'),
     Input('selected-motif-store', 'data'),
     Input('probability-filter', 'value'),
     Input('doc-topic-filter', 'value'),
     Input('overlap-filter', 'value'),
     Input('optimised-motif-fragloss-toggle', 'value'),
+    Input('dual-plot-bar-width-slider', 'value'),
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
@@ -1006,6 +1378,7 @@ def update_motif_details(
         theta_range,
         overlap_range,
         optimised_fragloss_toggle,
+        bar_width,
         lda_dict_data,
         clustered_smiles_data,
         spectra_data,
@@ -1018,30 +1391,12 @@ def update_motif_details(
     motif_name = selected_motif
     motif_title = f"Motif Details: {motif_name}"
 
-    # 1) Raw motif (LDA) using Probability Filter
+    # 1) Raw motif (LDA) – first cut by feature-probability slider
     motif_data = lda_dict_data['beta'].get(motif_name, {})
     filtered_motif_data = {
         f: p for f, p in motif_data.items()
         if beta_range[0] <= p <= beta_range[1]
     }
-    total_prob = sum(filtered_motif_data.values())
-
-    feature_table = pd.DataFrame({
-        'Feature': filtered_motif_data.keys(),
-        'Probability': filtered_motif_data.values(),
-    }).sort_values(by='Probability', ascending=False)
-
-    feature_table_component = dash_table.DataTable(
-        data=feature_table.to_dict('records'),
-        columns=[
-            {'name': 'Feature', 'id': 'Feature'},
-            {'name': 'Probability', 'id': 'Probability', 'type': 'numeric',
-             'format': {'specifier': '.4f'}},
-        ],
-        style_table={'overflowX': 'auto'},
-        style_cell={'textAlign': 'left'},
-        page_size=10,
-    )
 
     # 2) Counts of features in filtered documents
     feature_counts = {ft: 0 for ft in filtered_motif_data.keys()}
@@ -1064,22 +1419,50 @@ def update_motif_details(
             if ft in w_counts:
                 feature_counts[ft] += 1
 
+    # SECOND cut → keep a feature only if it appears in ≥1 passing document
+    filtered_motif_data = {f: p for f, p in filtered_motif_data.items() if feature_counts.get(f, 0) > 0}
+
+    # rebuild summary table
+    total_prob = sum(filtered_motif_data.values())
+
+    feature_table = pd.DataFrame({
+        'Feature': filtered_motif_data.keys(),
+        'Probability': filtered_motif_data.values(),
+    }).sort_values(by='Probability', ascending=False)
+
+    feature_table_component = dash_table.DataTable(
+        data=feature_table.to_dict('records'),
+        columns=[
+            {'name': 'Feature', 'id': 'Feature'},
+            {'name': 'Probability', 'id': 'Probability', 'type': 'numeric',
+             'format': {'specifier': '.4f'}},
+        ],
+        style_table={'overflowX': 'auto'},
+        style_cell={'textAlign': 'left'},
+        page_size=10,
+    )
+
+    # rebuild bar-plot dataframe and drop zero-count rows
     barplot2_df = pd.DataFrame({
         'Feature': list(feature_counts.keys()),
         'Count': list(feature_counts.values()),
     })
-    barplot2_df = barplot2_df.sort_values(by='Count', ascending=False).head(10)
+    barplot2_df = (
+        barplot2_df[barplot2_df['Count'] > 0]
+        .sort_values(by='Count', ascending=False)
+    )
+    # Vertical bar chart
     barplot2_fig = px.bar(
         barplot2_df,
-        x='Count',
-        y='Feature',
-        orientation='h',
+        x='Feature',
+        y='Count',
     )
     barplot2_fig.update_layout(
         title=None,
-        yaxis={'categoryorder': 'total ascending'},
-        xaxis_title='Count within Filtered Motif Documents',
-        yaxis_title='Feature',
+        xaxis_title='Feature',
+        yaxis_title='Count within Filtered Motif Documents',
+        bargap=0.3,
+        font=dict(size=12)
     )
 
     # 3) Spec2Vec matching results
@@ -1249,92 +1632,116 @@ def update_motif_details(
         html.P("Below is the table of MS2 documents for the motif, subject to doc-topic probability & overlap score.")
     ])
 
-    # 7) Build the Optimised Motif bar plot with the toggle for "fragments" or "losses"
-    om_fig = go.Figure()
+    # 7) Build the dual motif pseudo-spectrum plot
     motif_idx_opt = motif_idx
+
+    # Prepare data for optimized motif
+    raw_frag_mz = []
+    raw_frag_int = []
+    raw_loss_mz = []
+    raw_loss_int = []
+
     if motif_idx_opt is not None and 0 <= motif_idx_opt < len(optimized_motifs_data):
         om = optimized_motifs_data[motif_idx_opt]
         raw_frag_mz = om.get("mz", [])
         raw_frag_int = om.get("intensities", [])
-        raw_loss_mz = []
-        raw_loss_int = []
         if "metadata" in om and "losses" in om["metadata"]:
             for item in om["metadata"]["losses"]:
                 raw_loss_mz.append(item["loss_mz"])
                 raw_loss_int.append(item["loss_intensity"])
 
-        if optimised_fragloss_toggle == "fragments":
-            if raw_frag_mz:
-                om_fig.add_trace(go.Bar(
-                    x=raw_frag_mz,
-                    y=raw_frag_int,
-                    marker=dict(color="#1f77b4"),
-                    width=0.4,
-                    name="Optimised Fragments"
-                ))
-        else:
-            # user wants "losses"
-            if raw_loss_mz:
-                om_fig.add_trace(go.Bar(
-                    x=raw_loss_mz,
-                    y=raw_loss_int,
-                    marker=dict(color="#ff7f0e"),
-                    width=0.4,
-                    name="Optimised Losses"
-                ))
+    # Prepare data for raw LDA motif
+    raw_lda_frag_mz = []
+    raw_lda_frag_int = []
+    raw_lda_loss_mz = []
+    raw_lda_loss_int = []
 
-    om_fig.update_layout(
-        title=None,
-        xaxis_title="m/z (Da)",
-        yaxis_title="Normalized Intensity",
-        bargap=0.2
-    )
-    optim_plot = dcc.Graph(figure=om_fig)
-
-    # 8) Build the RAW LDA Motif bar plot (with Probability Filter)
-    raw_fig = go.Figure()
-    raw_frag_mz = []
-    raw_frag_int = []
-    raw_loss_mz = []
-    raw_loss_int = []
     for ft, val in filtered_motif_data.items():
         if ft.startswith('frag@'):
             try:
-                raw_frag_mz.append(float(ft.replace('frag@', '')))
-                raw_frag_int.append(val)
+                raw_lda_frag_mz.append(float(ft.replace('frag@', '')))
+                raw_lda_frag_int.append(val)
             except:
                 pass
         elif ft.startswith('loss@'):
             try:
-                raw_loss_mz.append(float(ft.replace('loss@', '')))
-                raw_loss_int.append(val)
+                raw_lda_loss_mz.append(float(ft.replace('loss@', '')))
+                raw_lda_loss_int.append(val)
             except:
                 pass
 
-    if raw_frag_mz:
-        raw_fig.add_trace(go.Bar(
-            x=raw_frag_mz,
-            y=raw_frag_int,
-            marker=dict(color="#1f77b4"),
-            width=0.4,
-            name="Raw LDA Fragments"
-        ))
-    if raw_loss_mz:
-        raw_fig.add_trace(go.Bar(
-            x=raw_loss_mz,
-            y=raw_loss_int,
-            marker=dict(color="#ff7f0e"),
-            width=0.4,
-            name="Raw LDA Losses"
-        ))
+    # Calculate common x-axis range
+    all_x_vals = raw_frag_mz + raw_loss_mz + raw_lda_frag_mz + raw_lda_loss_mz
+    common_max = max(all_x_vals) if all_x_vals else 0
+    fig_combined = make_subplots(rows=2, shared_xaxes=True,
+                                 row_heights=[0.55, 0.45],
+                                 vertical_spacing=0.04)
 
-    raw_fig.update_layout(
-        title=None,
-        xaxis_title="m/z (Da)",
-        yaxis_title="Probability",
-        bargap=0.2
-    )
-    raw_plot = dcc.Graph(figure=raw_fig)
+    # Optimised motif
+    if optimised_fragloss_toggle == "both":
+        if raw_frag_mz:
+            fig_combined.add_bar(row=1, col=1,
+                                 x=raw_frag_mz,
+                                 y=raw_frag_int,
+                                 marker_color="#1f77b4",
+                                 width=bar_width,
+                                 name="Optimised Fragments")
+        if raw_loss_mz:
+            fig_combined.add_bar(row=1, col=1,
+                                 x=raw_loss_mz,
+                                 y=raw_loss_int,
+                                 marker_color="#ff7f0e",
+                                 width=bar_width,
+                                 name="Optimised Losses")
+    elif optimised_fragloss_toggle == "fragments" and raw_frag_mz:
+        fig_combined.add_bar(row=1, col=1,
+                             x=raw_frag_mz,
+                             y=raw_frag_int,
+                             marker_color="#1f77b4",
+                             width=bar_width,
+                             name="Optimised Fragments")
+    elif optimised_fragloss_toggle == "losses" and raw_loss_mz:
+        fig_combined.add_bar(row=1, col=1,
+                             x=raw_loss_mz,
+                             y=raw_loss_int,
+                             marker_color="#ff7f0e",
+                             width=bar_width,
+                             name="Optimised Losses")
+
+    # Raw LDA motif
+    if optimised_fragloss_toggle in ("both", "fragments") and raw_lda_frag_mz:
+        fig_combined.add_bar(
+            row=2, col=1,
+            x=raw_lda_frag_mz,
+            y=raw_lda_frag_int,
+            marker_color="#1f77b4",
+            width=bar_width,
+            name="Raw Fragments",
+        )
+
+    if optimised_fragloss_toggle in ("both", "losses") and raw_lda_loss_mz:
+        fig_combined.add_bar(
+            row=2, col=1,
+            x=raw_lda_loss_mz,
+            y=raw_lda_loss_int,
+            marker_color="#ff7f0e",
+            width=bar_width,
+            name="Raw Losses",
+        )
+
+    # Shared x-range:
+    fig_combined.update_xaxes(range=[0, common_max * 1.1])
+
+    # Row-specific y-axis titles:
+    fig_combined.update_yaxes(title_text="Rel. Intensity", row=1, col=1)
+    fig_combined.update_yaxes(title_text="Probability", autorange="reversed", row=2, col=1)
+
+    # Add title to the plot
+    fig_combined.update_layout(title_text=f"Dual Motif Pseudo-Spectrum for {motif_name}")
+
+    apply_common_layout(fig_combined)  # new helper
+
+    dual_plot = dcc.Graph(figure=fig_combined)
 
     return (
         motif_title,
@@ -1344,8 +1751,7 @@ def update_motif_details(
         spectra_ids,
         table_data,
         table_columns,
-        optim_plot,
-        raw_plot,
+        dual_plot,
     )
 
 
@@ -1399,167 +1805,35 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
     Output('spectrum-plot', 'children'),
     Input('selected-spectrum-index', 'data'),
     Input('probability-filter', 'value'),
-    State('motif-spectra-ids-store', 'data'),
+    Input('spectrum-fragloss-toggle', 'value'),
+    Input('spectrum-highlight-mode', 'value'),
+    Input('spectrum-show-parent-ion', 'value'),
+    Input('motif-spectra-ids-store', 'data'),
     State('spectra-store', 'data'),
     State('lda-dict-store', 'data'),
     State('selected-motif-store', 'data'),
 )
-def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra_data, lda_dict_data, selected_motif):
+def update_spectrum_plot(selected_index, probability_range, fragloss_mode, highlight_mode, show_parent_ion, spectra_ids, spectra_data, lda_dict_data, selected_motif):
     if spectra_ids and spectra_data and lda_dict_data and selected_motif:
         if selected_index is None or selected_index < 0 or selected_index >= len(spectra_ids):
             return html.Div("Selected spectrum index is out of range.")
 
-        # Retrieve matching spectrum data
         spectrum_id = spectra_ids[selected_index]
-        # Get the actual spectrum dictionary
         spectrum_dict = spectra_data[spectrum_id]
 
-        spectrum = Spectrum(
-            mz=np.array(spectrum_dict['mz']),
-            intensities=np.array(spectrum_dict['intensities']),
-            metadata=spectrum_dict['metadata'],
+        # Only pass the selected motif when in 'single' mode
+        motif_to_highlight = selected_motif if highlight_mode == 'single' else None
+
+        fig = make_spectrum_plot(
+            spectrum_dict,
+            motif_to_highlight,
+            lda_dict_data,
+            probability_range=probability_range,
+            mode=fragloss_mode,
+            highlight_mode=highlight_mode,
+            show_parent_ion=show_parent_ion,
         )
-
-        motif_data = lda_dict_data['beta'].get(selected_motif, {})
-        filtered_motif_data = {
-            feature: prob for feature, prob in motif_data.items()
-            if probability_range[0] <= prob <= probability_range[1]
-        }
-
-        motif_mz_values = []
-        motif_loss_values = []
-        for feature in filtered_motif_data:
-            if feature.startswith('frag@'):
-                try:
-                    mz_value = float(feature.replace('frag@', ''))
-                    motif_mz_values.append(mz_value)
-                except ValueError:
-                    pass
-            elif feature.startswith('loss@'):
-                try:
-                    loss_value = float(feature.replace('loss@', ''))
-                    motif_loss_values.append(loss_value)
-                except ValueError:
-                    pass
-
-        spectrum_df = pd.DataFrame({
-            'mz': spectrum.peaks.mz,
-            'intensity': spectrum.peaks.intensities,
-        })
-
-        tolerance = 0.1
-        spectrum_df['is_motif'] = False
-        for mz_val in motif_mz_values:
-            mask = np.abs(spectrum_df['mz'] - mz_val) <= tolerance
-            spectrum_df.loc[mask, 'is_motif'] = True
-
-        colors = ['#DC143C' if is_motif else '#B0B0B0'
-                  for is_motif in spectrum_df['is_motif']]
-
-        parent_ion_present = False
-        parent_ion_mz = None
-        parent_ion_intensity = None
-        if 'precursor_mz' in spectrum.metadata:
-            try:
-                parent_ion_mz = float(spectrum.metadata['precursor_mz'])
-                parent_ion_intensity = float(spectrum.metadata.get('parent_intensity', spectrum_df['intensity'].max()))
-                parent_ion_present = True
-            except (ValueError, TypeError):
-                parent_ion_present = False
-
-        fig = go.Figure()
-        fig.add_trace(go.Bar(
-            x=spectrum_df['mz'],
-            y=spectrum_df['intensity'],
-            marker=dict(color=colors, line=dict(color='white', width=0)),
-            width=0.2,
-            name='Peaks',
-            hoverinfo='text',
-            hovertext=[
-                f"Motif Peak: {motif}<br>m/z: {mz_val:.2f}<br>Intensity: {inten}"
-                for motif, mz_val, inten in zip(spectrum_df['is_motif'],
-                                                spectrum_df['mz'],
-                                                spectrum_df['intensity'])
-            ],
-            opacity=0.9,
-        ))
-
-        if parent_ion_present and parent_ion_mz is not None and parent_ion_intensity is not None:
-            fig.add_trace(go.Bar(
-                x=[parent_ion_mz],
-                y=[parent_ion_intensity],
-                marker=dict(color='#0000FF', line=dict(color='white', width=0)),
-                width=0.4,
-                name='Parent Ion',
-                hoverinfo='text',
-                hovertext=[f"Parent Ion<br>m/z: {parent_ion_mz:.2f}<br>Intensity: {parent_ion_intensity}"],
-                opacity=1.0,
-            ))
-
-        if "losses" in spectrum.metadata and parent_ion_present:
-            precursor_mz = parent_ion_mz
-            for loss_item in spectrum.metadata["losses"]:
-                loss_mz = loss_item["loss_mz"]
-                loss_intensity = loss_item["loss_intensity"]
-                if not any(abs(loss_mz - val) <= tolerance for val in motif_loss_values):
-                    continue
-
-                corresponding_frag_mz = precursor_mz - loss_mz
-                frag_mask = (np.abs(spectrum_df['mz'] - corresponding_frag_mz) <= tolerance)
-                if not frag_mask.any():
-                    continue
-
-                frag_subset = spectrum_df.loc[frag_mask]
-                if frag_subset.empty:
-                    continue
-
-                closest_frag_mz = frag_subset['mz'].iloc[0]
-                closest_frag_intensity = frag_subset['intensity'].iloc[0]
-
-                fig.add_shape(
-                    type="line",
-                    x0=closest_frag_mz,
-                    y0=closest_frag_intensity,
-                    x1=precursor_mz,
-                    y1=closest_frag_intensity,
-                    line=dict(color="green", width=2, dash="dash"),
-                )
-                fig.add_annotation(
-                    x=(closest_frag_mz + precursor_mz) / 2,
-                    y=closest_frag_intensity,
-                    text=f"-{loss_mz:.2f}",
-                    showarrow=False,
-                    font=dict(family="Courier New, monospace", size=12, color="green"),
-                    bgcolor="rgba(255,255,255,0.7)",
-                    xanchor="center",
-                    yanchor="bottom",
-                    standoff=5,
-                )
-
-        fig.update_layout(
-            title=f"Spectrum: {spectrum_id}",
-            xaxis_title='m/z',
-            yaxis_title='Intensity',
-            bargap=0.1,
-            barmode='overlay',
-            paper_bgcolor='white',
-            plot_bgcolor='white',
-            legend=dict(
-                title='Peak Types',
-                orientation='h',
-                yanchor='bottom',
-                y=1.02,
-                xanchor='right',
-                x=1
-            ),
-            margin=dict(l=50, r=50, t=80, b=50),
-            hovermode='closest',
-        )
-
-        return dcc.Graph(
-            figure=fig,
-            style={'width': '100%', 'height': '600px', 'margin': 'auto'}
-        )
+        return dcc.Graph(figure=fig, style={'width': '100%', 'height': '600px', 'margin': 'auto'})
 
     return ""
 
@@ -1856,6 +2130,7 @@ def save_screening_results(csv_click, json_click, table_data):
     else:
         raise dash.exceptions.PreventUpdate
 
+
 @app.callback(
     Output("download-motifranking-csv", "data"),
     Output("download-motifranking-json", "data"),
@@ -1864,7 +2139,6 @@ def save_screening_results(csv_click, json_click, table_data):
     State("motif-rankings-table", "data"),
     prevent_initial_call=True,
 )
-
 def save_motifranking_results(csv_click, json_click, table_data):
     ctx = dash.callback_context
     if not ctx.triggered:
@@ -1884,9 +2158,8 @@ def save_motifranking_results(csv_click, json_click, table_data):
         raise dash.exceptions.PreventUpdate
 
 
-
 @app.callback(
-    Output("selected-motif-store", "data"),
+    Output("selected-motif-store", "data", allow_duplicate=True),
     [
         Input("motif-rankings-table", "active_cell"),
         Input("screening-results-table", "active_cell"),
@@ -1941,3 +2214,360 @@ def unlock_run_after_download(n_clicks):
         return (msg, "Spec2Vec model + data download complete.")
     except Exception as e:
         return f"Download failed: {str(e)}", ""
+
+
+@app.callback(
+    Output("spectra-search-parentmass-slider-display", "children"),
+    Input("spectra-search-parentmass-slider", "value"),
+)
+def display_parentmass_range(value):
+    if value:
+        return f"Selected Parent Mass Range: {value[0]:.2f} - {value[1]:.2f}"
+    return "Selected Parent Mass Range: N/A"
+
+
+@app.callback(
+    Output("search-tab-selected-spectrum-details-store", "data"),
+    Output("search-tab-spectrum-details-container", "style"),
+    Output("search-tab-selected-motif-id-for-plot-store", "data", allow_duplicate=True),
+    Input("spectra-search-results-table", "active_cell"),
+    State("spectra-search-results-table", "data"),
+    prevent_initial_call=True,
+)
+def handle_spectrum_selection(active_cell, table_data):
+    if not active_cell or not table_data:
+        return None, {"marginTop": "20px", "display": "none"}, None
+
+    if active_cell.get("column_id") != "spec_id":
+        # Clicked some other column – ignore
+        raise dash.exceptions.PreventUpdate
+
+    row_idx = active_cell.get("row", -1)
+    if row_idx < 0 or row_idx >= len(table_data):
+        return None, {"marginTop": "20px", "display": "none"}, None
+
+    selected_spectrum = table_data[row_idx]
+
+    container_style = {"marginTop": "20px", "display": "block"}
+    return selected_spectrum, container_style, None
+
+
+@app.callback(
+    Output("search-highlight-mode", "data"),
+    Output("search-highlight-all-btn", "active"),
+    Output("search-highlight-none-btn", "active"),
+    Input("search-highlight-all-btn", "n_clicks"),
+    Input("search-highlight-none-btn", "n_clicks"),
+    State("search-highlight-mode", "data"),
+    prevent_initial_call=True,
+)
+def update_highlight_mode(all_clicks, none_clicks, current_mode):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        return current_mode, current_mode == "all", current_mode == "none"
+
+    btn = ctx.triggered[0]["prop_id"].split(".")[0]
+    if btn == "search-highlight-all-btn":
+        return "all", True, False
+    if btn == "search-highlight-none-btn":
+        return "none", False, True
+
+    return current_mode, current_mode == "all", current_mode == "none"
+
+
+@app.callback(
+    Output("search-tab-spectrum-title", "children"),
+    Input("search-tab-selected-spectrum-details-store", "data"),
+    prevent_initial_call=True,
+)
+def update_spectrum_title(spectrum_info):
+    if not spectrum_info:
+        return "Spectrum Details (No Spectrum Selected)"
+
+    spec_id = spectrum_info.get("spec_id", "Unknown")
+    return f"Spectrum Details: {spec_id}"
+
+
+@app.callback(
+    Output("search-tab-associated-motifs-list", "children"),
+    Input("search-tab-selected-spectrum-details-store", "data"),
+    State("lda-dict-store", "data"),
+    prevent_initial_call=True,
+)
+def show_associated_motifs(spectrum_info, lda_dict_data):
+    if not spectrum_info:
+        raise PreventUpdate
+
+    spec_id = spectrum_info.get("spec_id")
+    if not spec_id or not lda_dict_data:
+        return "No motifs to display."
+
+    doc_theta = lda_dict_data["theta"].get(spec_id, {})
+    if not doc_theta:
+        return "No motifs found for this spectrum."
+
+    # Sort by descending probability
+    motif_probs = sorted(doc_theta.items(), key=lambda x: x[1], reverse=True)
+
+    if not motif_probs:
+        return "No motifs (above threshold) for this spectrum."
+
+    # Build a list of clickable motif name + "Details" button
+    layout_items = []
+    for motif_id, prob in motif_probs:
+        if prob < 0.01:
+            continue
+        motif_label = f"{motif_id} (Prob: {prob:.3f})"
+        layout_items.append(
+            html.Div([
+                dbc.Button(
+                    motif_label,
+                    id={"type": "search-tab-motif-link", "index": motif_id},
+                    color="secondary",
+                    size="sm",
+                    className="me-2",
+                ),
+                dbc.Button(
+                    "Motif Details ↗",
+                    id={"type": "search-tab-motif-details-btn", "index": motif_id},
+                    size="sm",
+                    outline=True,
+                    color="info",
+                    className="me-2",
+                ),
+            ],
+                className="d-flex align-items-center mb-1")
+        )
+
+    if not layout_items:
+        return "No motifs (above threshold) for this spectrum."
+
+    return layout_items
+
+
+@app.callback(
+    Output("selected-motif-store", "data", allow_duplicate=True),
+    Output("tabs", "value", allow_duplicate=True),
+    Input({"type": "search-tab-motif-details-btn", "index": ALL}, "n_clicks"),
+    prevent_initial_call=True,
+)
+def jump_to_motif_details(n_clicks_list):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise PreventUpdate
+
+    actual_click_detected = False
+    motif_id_from_click = None
+
+    for i, n_clicks_val in enumerate(n_clicks_list):
+        if n_clicks_val is not None and n_clicks_val > 0:
+            # This indicates a genuine click on one of the buttons.
+            # Get the ID of the exact button that was clicked.
+            # The triggered_id_str will be like: '{"index":"motif_X","type":"search-tab-motif-details-btn"}.n_clicks'
+            triggered_id_str = ctx.triggered[0]["prop_id"].split(".")[0]
+            try:
+                pmid = json.loads(triggered_id_str)  # pmid = parsed motif id (dict)
+                motif_id_from_click = pmid["index"]
+                actual_click_detected = True
+                break  # Process the first genuine click
+            except Exception as e:
+                # Log error or handle appropriately
+                print(f"Error parsing button ID in jump_to_motif_details: {e}")
+                raise PreventUpdate
+
+    if actual_click_detected and motif_id_from_click:
+        return motif_id_from_click, "motif-details-tab"
+    else:
+        # No genuine click was found (e.g., callback triggered by component creation/update)
+        raise PreventUpdate
+
+
+@app.callback(
+    Output("search-tab-selected-motif-id-for-plot-store", "data", allow_duplicate=True),
+    Output("search-highlight-mode", "data", allow_duplicate=True),
+    Input({"type": "search-tab-motif-link", "index": ALL}, "n_clicks"),
+    prevent_initial_call=True,
+)
+def update_selected_motif_for_plot(n_clicks_list):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise PreventUpdate
+
+    import json
+    motif_id = json.loads(ctx.triggered[0]["prop_id"].split(".")[0])["index"]
+    return motif_id, "single"
+
+
+@app.callback(
+    Output("tabs", "value", allow_duplicate=True),
+    Output("search-tab-selected-spectrum-details-store", "data", allow_duplicate=True),
+    Output("search-tab-selected-motif-id-for-plot-store", "data"),
+    Output("search-tab-spectrum-details-container", "style", allow_duplicate=True),
+    Input("jump-to-search-btn", "n_clicks"),
+    State("selected-spectrum-index", "data"),
+    State("motif-spectra-ids-store", "data"),
+    State("spectra-store", "data"),
+    State("selected-motif-store", "data"),
+    prevent_initial_call=True,
+)
+def jump_to_search_tab(n_clicks, selected_spectrum_index, motif_spectra_ids, spectra_store, selected_motif):
+    """
+    Handles the "Spectrum Details ↗" button click in the Motif Details tab.
+    Switches to the Search Spectra tab with the same spectrum selected and the same motif highlighted.
+    """
+    if not n_clicks:
+        raise PreventUpdate
+
+    # Defensive bounds-check
+    if (selected_spectrum_index is None or
+            selected_spectrum_index < 0 or
+            selected_spectrum_index >= len(motif_spectra_ids)):
+        raise PreventUpdate
+
+    # Get the real spectrum index
+    spec_idx = motif_spectra_ids[selected_spectrum_index]
+
+    # Shallow copy to avoid mutating the cache
+    spectrum_info = spectra_store[spec_idx].copy()
+
+    # Add the extra keys the search tab expects if they're not already there
+    if "spec_id" not in spectrum_info:
+        if "metadata" in spectrum_info and "id" in spectrum_info["metadata"]:
+            spectrum_info["spec_id"] = spectrum_info["metadata"]["id"]
+        else:
+            spectrum_info["spec_id"] = f"spec_{spec_idx}"
+
+    if "original_spec_index" not in spectrum_info:
+        spectrum_info["original_spec_index"] = spec_idx
+
+    container_style = {"marginTop": "20px", "display": "block"}
+    return "search-spectra-tab", spectrum_info, selected_motif, container_style
+
+
+@app.callback(
+    Output("search-tab-spectrum-plot-container", "children"),
+    Input("search-tab-selected-spectrum-details-store", "data"),
+    Input("search-tab-selected-motif-id-for-plot-store", "data"),
+    Input("search-fragloss-toggle", "value"),
+    Input("search-highlight-mode", "data"),
+    Input("search-show-parent-ion", "value"),
+    State("spectra-store", "data"),
+    State("lda-dict-store", "data"),
+    prevent_initial_call=True,
+)
+def update_search_tab_spectrum_plot(spectrum_info, motif_for_plot,
+                                    fragloss_mode, highlight_mode, show_parent_ion,
+                                    all_spectra_data, lda_dict_data):
+    if not spectrum_info:
+        raise PreventUpdate
+
+    idx = spectrum_info.get("original_spec_index", -1)
+    if idx < 0 or idx >= len(all_spectra_data):
+        return html.Div("Invalid spectrum index.", style={"color": "red"})
+
+    spec_dict = all_spectra_data[idx]
+    motif_to_highlight = motif_for_plot if highlight_mode == "single" else None
+
+    fig = make_spectrum_plot(
+        spec_dict,
+        motif_to_highlight,
+        lda_dict_data,
+        mode=fragloss_mode,
+        highlight_mode=highlight_mode,
+        show_parent_ion=show_parent_ion,
+    )
+    return dcc.Graph(figure=fig)
+
+
+@app.callback(
+    Output("spectra-search-results-table", "data"),
+    Output("spectra-search-status-message", "children"),  # NEW OUTPUT
+    Input("spectra-store", "data"),
+    Input("spectra-search-fragloss-input", "value"),
+    Input("spectra-search-parentmass-slider", "value"),
+    prevent_initial_call=True,
+)
+def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
+    if not spectra_data:
+        raise PreventUpdate
+
+    # Prepare query and parent mass bounds
+    query = (search_text or "").strip().lower()
+    pmass_low, pmass_high = parent_mass_range
+
+    filtered_rows = []
+    for i, spec_dict in enumerate(spectra_data):
+        meta = spec_dict.get("metadata", {})
+        pmass = meta.get("precursor_mz", None)
+        if pmass is None:
+            continue
+        if not (pmass_low <= pmass <= pmass_high):
+            continue
+
+        frag_list = [f"frag@{mzval:.4g}" for mzval in spec_dict["mz"]]
+        loss_list = []
+        if "losses" in meta:
+            for loss_item in meta["losses"]:
+                loss_list.append(f"loss@{loss_item['loss_mz']:.4g}")
+
+        if query:
+            combined = frag_list + loss_list
+            if not any(query in x.lower() for x in combined):
+                continue
+
+        filtered_rows.append({
+            "spec_id": meta.get("id", ""),
+            "parent_mass": pmass,
+            "feature_id": meta.get("feature_id", ""),
+            "fragments": ", ".join(frag_list),
+            "losses": ", ".join(loss_list),
+            "original_spec_index": i,  # Store the original index for later use
+        })
+
+    # Build a simple status message
+    status_msg = ""
+    default_range = (0, 2000)
+    # Check if user has any actual filter
+    is_filtered = (query != "") or (pmass_low != default_range[0] or pmass_high != default_range[1])
+
+    if filtered_rows:
+        status_msg = f"Showing {len(filtered_rows)} matching spectra."
+    else:
+        if is_filtered:
+            status_msg = "No spectra found matching your criteria."
+        else:
+            status_msg = ""  # No filters active yet
+
+    return filtered_rows, status_msg
+
+
+app.clientside_callback(
+    """
+    function(style) {
+        if (style && style.display === "block") {
+            const el = document.getElementById('search-tab-spectrum-details-container');
+            if (el) {
+                // slight delay so the layout has finished updating
+                setTimeout(() => el.scrollIntoView({behavior: 'smooth', block: 'start'}), 50);
+            }
+        }
+        return '';
+    }
+    """,
+    Output("search-scroll-dummy", "children"),
+    Input("search-tab-spectrum-details-container", "style"),
+)
+
+app.clientside_callback(
+    """
+    function(style) {
+        if (style && style.display === "block") {
+            // give Dash a tick to render, then scroll
+            setTimeout(() => window.scrollTo({top: 0, behavior: 'smooth'}), 50);
+        }
+        return '';
+    }
+    """,
+    Output("motif-details-scroll-dummy", "children"),
+    Input("motif-details-tab-content", "style"),
+)

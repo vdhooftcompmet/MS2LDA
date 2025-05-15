@@ -885,7 +885,7 @@ def create_load_results_tab():
                         """
                     )
                 ],
-                style={"margin-top": "20px", "margin-bottom": "20px"},
+                style={"marginTop": "20px", "marginBottom": "20px"},
             ),
             dbc.Row(
                 [
@@ -951,7 +951,7 @@ def create_cytoscape_network_tab():
                         """
                     )
                 ],
-                style={"margin-top": "20px", "margin-bottom": "20px"},
+                style={"marginTop": "20px", "marginBottom": "20px"},
             ),
             dbc.Row(
                 [
@@ -1052,14 +1052,14 @@ def create_motif_rankings_tab():
                             score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability` 
                             and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters, 
                             so they can be quite high if the motif strongly dominates the docs where it appears. 
-                            
+
                             Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap. 
                             _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row 
                             takes you to a detailed view of that motif.
                             """
                         )
                     ],
-                    style={"margin-top": "20px", "margin-bottom": "20px"},
+                    style={"marginTop": "20px", "marginBottom": "20px"},
                 ),
 
                 dbc.Row([
@@ -1130,7 +1130,8 @@ def create_motif_rankings_tab():
                             },
                         ),
                         dbc.Button("Save to CSV", id="save-motifranking-csv", color="secondary", className="mt-2"),
-                        dbc.Button("Save to JSON", id="save-motifranking-json", color="secondary", className="ms-2 mt-2"),
+                        dbc.Button("Save to JSON", id="save-motifranking-json", color="secondary",
+                                   className="ms-2 mt-2"),
                         dcc.Download(id="download-motifranking-csv"),
                         dcc.Download(id="download-motifranking-json"),
                     ], width=12),
@@ -1140,7 +1141,6 @@ def create_motif_rankings_tab():
         style={"display": "none"},
     )
     return tab
-
 
 
 def create_motif_details_tab():
@@ -1160,7 +1160,7 @@ def create_motif_details_tab():
                         """
                     )
                 ],
-                style={"margin-top": "20px", "margin-bottom": "20px"},
+                style={"marginTop": "20px", "marginBottom": "20px"},
             ),
 
             # ----------------------------------------------------------------
@@ -1178,32 +1178,54 @@ def create_motif_details_tab():
                     ),
                     html.Div(id='motif-spec2vec-container', style={"marginTop": "10px"}),
                 ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "15px"
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "15px"
                 }),
 
                 html.Div([
-                    html.H5("Optimised Motif Pseudo-Spectrum"),
+                    html.H5("Optimised vs Raw Motif Pseudo-Spectra"),
+
                     dcc.Markdown(
                         """
-                        This plot shows the optimised pseudo-spectrum, which refines the raw motif by retaining only fragments or losses consistently found among the best Spec2Vec matches. Because it's derived from verified library spectra, the optimised motif doesn't rely on the probability thresholds used in the original LDA motif extraction. You can use the toggle below to switch between displaying fragments or losses, depending on the feature type you want to explore.
+                        This view compares two aligned versions of the selected Mass2Motif, highlighting changes made during optimisation.
+
+                        The **top panel** displays the optimised pseudo-spectrum (relative intensity scale). It is constructed by aggregating fragments or losses consistently matched across high-quality library spectra identified by Spec2Vec. Being library-derived, this optimised spectrum is independent of the LDA probability thresholds and typically provides a cleaner representation.
+
+                        The **bottom panel** shows the raw LDA pseudo-spectrum (probability scale), filtered according to your chosen thresholds. Higher bars indicate peaks strongly associated with this motif according to the LDA topic model.
+
+                        Both panels share the same m/z axis, making it easy to spot retained or removed peaks during optimisation. Use the toggle below to switch between fragment and loss views.
                         """
                     ),
+
                     dbc.RadioItems(
-                        id='optimised-motif-fragloss-toggle',
+                        id="optimised-motif-fragloss-toggle",
                         options=[
+                            {"label": "Fragments + Losses", "value": "both"},
                             {"label": "Fragments Only", "value": "fragments"},
                             {"label": "Losses Only", "value": "losses"},
                         ],
-                        value="fragments",
+                        value="both",
                         inline=True,
                     ),
-                    html.Div(id='motif-optimized-spectrum-container', style={"marginTop": "10px"}),
+                    dbc.Label("Bar / Line Thickness"),
+                    dcc.Slider(
+                        id="dual-plot-bar-width-slider",
+                        min=0.1,
+                        max=2.0,
+                        step=0.1,
+                        value=0.8,
+                        marks={0.1: "0.1", 0.5: "0.5", 1: "1", 1.5: "1.5", 2.0: "2"},
+                        tooltip={"always_visible": False, "placement": "top"},
+                    ),
+                    html.Div(id='motif-dual-spectrum-container', style={"marginTop": "10px"}),
                 ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "15px"
+                    "border": "1px dashed #ccc",
+                    "padding": "10px",
+                    "borderRadius": "5px",
+                    "marginBottom": "15px"
                 }),
 
             ], style={
-                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "margin-bottom": "20px"
+                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "marginBottom": "20px"
             }),
 
             # ----------------------------------------------------------------
@@ -1225,54 +1247,11 @@ def create_motif_details_tab():
                         marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
                     ),
                     html.Div(id='probability-filter-display', style={"marginTop": "10px"}),
-                ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "10px"
-                }),
 
-                html.Div([
-                    html.H5("Raw LDA Motif Pseudo-Spectrum (Filtered)"),
-                    dcc.Markdown(
-                        """
-                        This plot visualizes the pseudo-spectrum of the raw motif after filtering peaks based on the selected probability thresholds. Peaks outside the defined range are removed, showing only the features most relevant according to the LDA model.
-                        """
-                    ),
-                    html.Div(id='motif-raw-spectrum-container', style={"marginTop": "10px"}),
-                ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "10px"
-                }),
+                    dcc.Markdown("Document-level filters (apply to table **and** bar-plot):",
+                                 style={"marginTop": "15px"}),
 
-                html.Div([
-                    html.H5("Motif Features Table and Summary Plots"),
-                    dcc.Markdown(
-                        """
-                        The table below lists the motif features (fragments and losses) that pass the probability filter, including their probabilities within the motif. Below it, a bar plot shows how frequently each feature appears **within the filtered set of documents** for this motif (i.e., documents whose doc-topic probability and overlap score both pass the current threshold ranges).
-                        """
-                    ),
-                    html.Div(id='motif-features-container'),
-                ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "10px"
-                }),
-
-            ], style={
-                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "margin-bottom": "20px"
-            }),
-
-            # ----------------------------------------------------------------
-            # 3. SPECTRA IN MOTIFS
-            # ----------------------------------------------------------------
-            html.Div([
-                html.H4("Spectra in Motifs"),
-
-                html.Div([
-                    dcc.Markdown(
-                        """
-                        This section lists actual MS2 spectra from the dataset associated with the selected motif. Two adjustable sliders below control how these spectra are filtered. The Spectra-Motif Probability Filter determines the minimum and maximum probability a spectrum must have to be associated with this motif, while the Overlap Score Filter sets how closely the spectrum’s peaks must align with the motif features.
-
-                        Select a spectrum from the table or use the Next/Previous buttons to browse through them. Each selection updates the spectrum plot below, highlighting peaks matching features from the motif. This plot helps verify if the motif truly represents meaningful chemical information by directly comparing it against real experimental data.
-                        """
-                    ),
-
-                    dbc.Label("Spectra-Motif Probability Filter:"),
+                    dbc.Label("Motif Probability (θ) Filter:"),
                     dcc.RangeSlider(
                         id='doc-topic-filter', min=0, max=1, step=0.01, value=[0, 1],
                         marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
@@ -1285,6 +1264,46 @@ def create_motif_details_tab():
                         marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
                     ),
                     html.Div(id='overlap-filter-display', style={"marginTop": "10px"}),
+                ], style={
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "10px"
+                }),
+
+                html.Div([
+                    html.H5("Motif Features Table and Summary Plots"),
+                    dcc.Markdown(
+                        """
+                        The table below lists the motif features (fragments and losses) that pass the probability filter, including their probabilities within the motif. Below it, a bar plot shows how frequently each feature appears **within the filtered set of documents** for this motif (i.e., documents whose doc-topic probability and overlap score both pass the current threshold ranges).
+                        """
+                    ),
+                    html.Div(id='motif-features-container'),
+                ], style={
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "10px"
+                }),
+
+            ], style={
+                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "marginBottom": "20px"
+            }),
+
+            # ----------------------------------------------------------------
+            # 3. SPECTRA IN MOTIFS
+            # ----------------------------------------------------------------
+            html.Div([
+                html.H4("Spectra in Motifs"),
+
+                html.Div([
+                    dcc.Markdown(
+                        """
+                        This section lists MS2 spectra linked to the selected motif. When
+                        you pick a spectrum (or use the navigation buttons) the plot underneath
+                        updates.  
+
+                        Peaks matching fragment or neutral-loss features of the motif turn
+                        red. For every neutral-loss match, a green dashed line connects the
+                        fragment peak to the precursor ion and is annotated with the
+                        loss value. All remaining peaks are grey. The plot lets you judge whether the 
+                        motif's characteristic features are genuinely present in the experimental spectrum.
+                        """
+                    ),
 
                     html.Div(id='motif-documents-container'),
 
@@ -1293,18 +1312,50 @@ def create_motif_details_tab():
                         style_table={'overflowX': 'auto'}, style_cell={'textAlign': 'left'},
                         page_size=10, row_selectable='single', selected_rows=[0], hidden_columns=["SpecIndex"]
                     ),
+                    dbc.RadioItems(
+                        id="spectrum-highlight-mode",
+                        options=[
+                            {"label": "Active motif only", "value": "single"},
+                            {"label": "All motifs", "value": "all"},
+                            {"label": "None", "value": "none"},
+                        ],
+                        value="single",
+                        inline=True,
+                    ),
+                    dbc.RadioItems(
+                        id="spectrum-fragloss-toggle",
+                        options=[
+                            {"label": "Fragments + Losses", "value": "both"},
+                            {"label": "Fragments Only", "value": "fragments"},
+                            {"label": "Losses Only", "value": "losses"},
+                        ],
+                        value="both",
+                        inline=True,
+                    ),
+                    dbc.Checkbox(
+                        id="spectrum-show-parent-ion",
+                        label="Show Parent Ion",
+                        value=True,
+                        className="mt-2",
+                    ),
                     html.Div(id='spectrum-plot'),
 
                     html.Div([
                         dbc.Button('Previous', id='prev-spectrum', n_clicks=0, color="info"),
                         dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ms-2', color="info"),
+                        dbc.Button(
+                            "Spectrum Details ↗",
+                            id="jump-to-search-btn",
+                            color="primary",
+                            className="ms-2"
+                        ),
                     ], className='mt-3'),
                 ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "margin-bottom": "15px"
+                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "15px"
                 }),
 
             ], style={
-                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "margin-bottom": "20px"
+                "border": "1px dashed #999", "padding": "15px", "borderRadius": "5px", "marginBottom": "20px"
             }),
 
         ],
@@ -1328,7 +1379,7 @@ def create_screening_tab():
                         in the table below, and you can use the slider to filter the table by minimum similarity score.
                     """),
                 ],
-                style={"margin-top": "20px", "margin-bottom": "20px"},
+                style={"marginTop": "20px", "marginBottom": "20px"},
             ),
             html.Hr(),
             html.H4("Reference Motif Sets Found"),
@@ -1398,3 +1449,129 @@ def create_screening_tab():
             dcc.Download(id="download-screening-json"),
         ],
     )
+
+
+def create_spectra_search_tab():
+    tab = html.Div(
+        id="search-spectra-tab-content",
+        style={"display": "none"},
+        children=[
+            html.H3("Search by Fragment/Loss or Parent Mass"),
+
+            # -------  SEARCH FORM  -------
+            dbc.Row([
+                dbc.Col([
+                    dbc.Label("Fragment or Loss Contains:"),
+                    dbc.Input(
+                        id="spectra-search-fragloss-input",
+                        type="text",
+                        placeholder="e.g. frag@150 or loss@40",
+                    ),
+                    dbc.Tooltip(
+                        "Enter a partial fragment (e.g. 'frag@150.1') or loss "
+                        "(e.g. 'loss@40.2'). The search is case-insensitive.",
+                        target="spectra-search-fragloss-input",
+                    ),
+                ], width=4),
+
+                dbc.Col([
+                    dbc.Label("Parent Mass Range:"),
+                    dcc.RangeSlider(
+                        id="spectra-search-parentmass-slider",
+                        min=0, max=2000, step=1,
+                        value=[0, 2000],
+                        marks={0: "0", 500: "500", 1000: "1000", 1500: "1500", 2000: "2000"},
+                        allowCross=False,
+                    ),
+                    html.Div(id="spectra-search-parentmass-slider-display",
+                             style={"marginTop": "10px"}),
+                ], width=8),
+            ], style={"marginTop": "20px"}),
+
+            html.Div(id="spectra-search-status-message",
+                     style={"marginTop": "10px", "fontStyle": "italic", "color": "#555"}),
+
+            dash_table.DataTable(
+                id="spectra-search-results-table",
+                columns=[
+                    {"name": "Spectrum ID", "id": "spec_id"},
+                    {"name": "Parent Mass", "id": "parent_mass"},
+                    {"name": "Feature ID", "id": "feature_id"},
+                    {"name": "Fragments", "id": "fragments"},
+                    {"name": "Losses", "id": "losses"},
+                ],
+                page_size=20,
+                style_table={"overflowX": "auto"},
+                style_cell={"textAlign": "left", "whiteSpace": "normal"},
+                style_data_conditional=[
+                    {
+                        'if': {'column_id': 'spec_id'},
+                        'cursor': 'pointer',
+                        'textDecoration': 'underline',
+                        'color': 'blue',
+                    },
+                ],
+            ),
+
+            # ----------  DETAILS ----------
+            dcc.Store(id="search-tab-selected-spectrum-details-store"),
+            dcc.Store(id="search-tab-selected-motif-id-for-plot-store"),
+            dcc.Store(id="search-highlight-mode", data="all"),
+
+            html.Div(
+                id="search-tab-spectrum-details-container",
+                style={"marginTop": "20px", "display": "none"},
+                children=[
+
+                    html.H4(id="search-tab-spectrum-title"),
+
+                    # === Combined controls + plot ===
+                    html.Div([
+                        dbc.ButtonGroup([
+                            dbc.Button("All motifs",
+                                       id="search-highlight-all-btn",
+                                       color="primary", outline=True,
+                                       active=True, className="me-1"),
+                            dbc.Button("None",
+                                       id="search-highlight-none-btn",
+                                       color="primary", outline=True,
+                                       active=False),
+                        ], className="me-2"),
+
+                        dbc.RadioItems(
+                            id="search-fragloss-toggle",
+                            options=[
+                                {"label": "Fragments + Losses", "value": "both"},
+                                {"label": "Fragments Only", "value": "fragments"},
+                                {"label": "Losses Only", "value": "losses"},
+                            ],
+                            value="both",
+                            inline=True,
+                            style={"marginLeft": "10px"},
+                        ),
+
+                        dbc.Checkbox(
+                            id="search-show-parent-ion",
+                            label="Show Parent Ion",
+                            value=True,
+                            className="ms-3",
+                        ),
+                    ], className="d-flex align-items-center flex-wrap mb-2"),
+
+                    html.Div([
+                        html.H5("Individual motifs (probability):"),
+                        html.Div(id="search-tab-associated-motifs-list",
+                                 style={"marginTop": "5px"}),
+                    ], style={
+                        "border": "1px dashed #ccc",
+                        "padding": "10px",
+                        "borderRadius": "5px",
+                        "marginBottom": "15px"
+                    }),
+
+                    html.Div(id="search-tab-spectrum-plot-container"),
+                ],
+            ),
+        ],
+    )
+    return tab

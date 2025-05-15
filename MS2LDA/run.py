@@ -98,7 +98,10 @@ def run(dataset, n_motifs, n_iterations,
     motif_fps = calc_fingerprints(clustered_smiles, fp_type=fingerprint_parameters["fp_type"], threshold=fingerprint_parameters["threshold"])
 
     if save:
-        store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve, clustered_smiles, doc2spec_map, dataset_parameters["output_folder"])
+        actual_output_folder = store_results(
+            trained_ms2lda, motif_spectra, optimized_motifs, convergence_curve,
+            clustered_smiles, doc2spec_map, dataset_parameters["output_folder"]
+        )
 
         # Save additional viz data
         if n_motifs < 500:
@@ -121,7 +124,7 @@ def run(dataset, n_motifs, n_iterations,
                 cleaned_spectra,
                 optimized_motifs,
                 doc2spec_map,
-                dataset_parameters["output_folder"],
+                actual_output_folder,
                 run_parameters=parameters_for_viz,
             )
 
@@ -295,6 +298,9 @@ def store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_c
     """
     Save MS2LDA results to a new folder. If 'output_folder' already exists,
     we automatically create a new folder by appending '_1', '_2', etc.
+
+    Returns:
+        str: The actual output folder name used (which may be different from the input if renamed)
     """
     curr_dir = os.getcwd()
 
@@ -344,6 +350,8 @@ def store_results(trained_ms2lda, motif_spectra, optimized_motifs, convergence_c
     store_motifDB(ms1_motifDB, ms2_motifDB, name="motifset.json")
 
     os.chdir(curr_dir)
+
+    return output_folder
 
 
 
