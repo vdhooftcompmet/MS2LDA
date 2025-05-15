@@ -62,6 +62,8 @@ app.layout = dbc.Container(
 
         # hidden output used only to trigger the client-side scroll
         html.Div(id="search-scroll-dummy", style={"display": "none"}),
+        # hidden output used only to trigger client-side scroll
+        html.Div(id="motif-details-scroll-dummy", style={"display": "none"}),
 
     ],
     fluid=False,

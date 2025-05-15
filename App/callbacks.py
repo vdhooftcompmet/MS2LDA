@@ -2268,3 +2268,17 @@ app.clientside_callback(
     Output("search-scroll-dummy", "children"),
     Input("search-tab-spectrum-details-container", "style"),
 )
+
+app.clientside_callback(
+    """
+    function(style) {
+        if (style && style.display === "block") {
+            // give Dash a tick to render, then scroll
+            setTimeout(() => window.scrollTo({top: 0, behavior: 'smooth'}), 50);
+        }
+        return '';
+    }
+    """,
+    Output("motif-details-scroll-dummy", "children"),
+    Input("motif-details-tab-content", "style"),
+)
