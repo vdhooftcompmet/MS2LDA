@@ -1204,6 +1204,16 @@ def create_motif_details_tab():
                         value="both",
                         inline=True,
                     ),
+                    dbc.Label("Bar / Line Thickness"),
+                    dcc.Slider(
+                        id="dual-plot-bar-width-slider",
+                        min=0.1,
+                        max=2.0,
+                        step=0.1,
+                        value=0.8,
+                        marks={0.1: "0.1", 0.5: "0.5", 1: "1", 1.5: "1.5", 2.0: "2"},
+                        tooltip={"always_visible": False, "placement": "top"},
+                    ),
                     html.Div(id='motif-dual-spectrum-container', style={"marginTop": "10px"}),
                 ], style={
                     "border": "1px dashed #ccc",
@@ -1315,6 +1325,12 @@ def create_motif_details_tab():
                     html.Div([
                         dbc.Button('Previous', id='prev-spectrum', n_clicks=0, color="info"),
                         dbc.Button('Next', id='next-spectrum', n_clicks=0, className='ms-2', color="info"),
+                        dbc.Button(
+                            "Spectrum Details ↗",
+                            id="jump-to-search-btn",
+                            color="primary",
+                            className="ms-2"
+                        ),
                     ], className='mt-3'),
                 ], style={
                     "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "15px"

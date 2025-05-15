@@ -1123,6 +1123,7 @@ def display_overlap_filter(overlap_range):
     Input('doc-topic-filter', 'value'),
     Input('overlap-filter', 'value'),
     Input('optimised-motif-fragloss-toggle', 'value'),
+    Input('dual-plot-bar-width-slider', 'value'),
     State('lda-dict-store', 'data'),
     State('clustered-smiles-store', 'data'),
     State('spectra-store', 'data'),
@@ -1136,6 +1137,7 @@ def update_motif_details(
         theta_range,
         overlap_range,
         optimised_fragloss_toggle,
+        bar_width,
         lda_dict_data,
         clustered_smiles_data,
         spectra_data,
@@ -1441,28 +1443,28 @@ def update_motif_details(
                                  x=raw_frag_mz,
                                  y=raw_frag_int,
                                  marker_color="#1f77b4",
-                                 width=0.8,
+                                 width=bar_width,
                                  name="Optimised Fragments")
         if raw_loss_mz:
             fig_combined.add_bar(row=1, col=1,
                                  x=raw_loss_mz,
                                  y=raw_loss_int,
                                  marker_color="#ff7f0e",
-                                 width=0.8,
+                                 width=bar_width,
                                  name="Optimised Losses")
     elif optimised_fragloss_toggle == "fragments" and raw_frag_mz:
         fig_combined.add_bar(row=1, col=1,
                              x=raw_frag_mz,
                              y=raw_frag_int,
                              marker_color="#1f77b4",
-                             width=0.8,
+                             width=bar_width,
                              name="Optimised Fragments")
     elif optimised_fragloss_toggle == "losses" and raw_loss_mz:
         fig_combined.add_bar(row=1, col=1,
                              x=raw_loss_mz,
                              y=raw_loss_int,
                              marker_color="#ff7f0e",
-                             width=0.8,
+                             width=bar_width,
                              name="Optimised Losses")
 
     # Raw LDA motif
@@ -1472,7 +1474,7 @@ def update_motif_details(
             x=raw_lda_frag_mz,
             y=raw_lda_frag_int,
             marker_color="#1f77b4",
-            width=0.8,
+            width=bar_width,
             name="Raw Fragments",
         )
 
@@ -1482,7 +1484,7 @@ def update_motif_details(
             x=raw_lda_loss_mz,
             y=raw_lda_loss_int,
             marker_color="#ff7f0e",
-            width=0.8,
+            width=bar_width,
             name="Raw Losses",
         )
 
@@ -2040,7 +2042,7 @@ def show_associated_motifs(spectrum_info, lda_dict_data):
                     className="me-2",
                 ),
                 dbc.Button(
-                    "Details ↗",
+                    "Motif Details ↗",
                     id={"type": "search-tab-motif-details-btn", "index": motif_id},
                     size="sm",
                     outline=True,
@@ -2110,6 +2112,52 @@ def update_selected_motif_for_plot(n_clicks_list):
     motif_id = pmid["index"]
 
     return motif_id
+
+
+@app.callback(
+    Output("tabs", "value", allow_duplicate=True),
+    Output("search-tab-selected-spectrum-details-store", "data", allow_duplicate=True),
+    Output("search-tab-selected-motif-id-for-plot-store", "data"),
+    Output("search-tab-spectrum-details-container", "style", allow_duplicate=True),
+    Input("jump-to-search-btn", "n_clicks"),
+    State("selected-spectrum-index", "data"),
+    State("motif-spectra-ids-store", "data"),
+    State("spectra-store", "data"),
+    State("selected-motif-store", "data"),
+    prevent_initial_call=True,
+)
+def jump_to_search_tab(n_clicks, selected_spectrum_index, motif_spectra_ids, spectra_store, selected_motif):
+    """
+    Handles the "Spectrum Details ↗" button click in the Motif Details tab.
+    Switches to the Search Spectra tab with the same spectrum selected and the same motif highlighted.
+    """
+    if not n_clicks:
+        raise PreventUpdate
+
+    # Defensive bounds-check
+    if (selected_spectrum_index is None or
+            selected_spectrum_index < 0 or
+            selected_spectrum_index >= len(motif_spectra_ids)):
+        raise PreventUpdate
+
+    # Get the real spectrum index
+    spec_idx = motif_spectra_ids[selected_spectrum_index]
+
+    # Shallow copy to avoid mutating the cache
+    spectrum_info = spectra_store[spec_idx].copy()
+
+    # Add the extra keys the search tab expects if they're not already there
+    if "spec_id" not in spectrum_info:
+        if "metadata" in spectrum_info and "id" in spectrum_info["metadata"]:
+            spectrum_info["spec_id"] = spectrum_info["metadata"]["id"]
+        else:
+            spectrum_info["spec_id"] = f"spec_{spec_idx}"
+
+    if "original_spec_index" not in spectrum_info:
+        spectrum_info["original_spec_index"] = spec_idx
+
+    container_style = {"marginTop": "20px", "display": "block"}
+    return "search-spectra-tab", spectrum_info, selected_motif, container_style
 
 
 @app.callback(
