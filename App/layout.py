@@ -1311,6 +1311,16 @@ def create_motif_details_tab():
                         page_size=10, row_selectable='single', selected_rows=[0], hidden_columns=["SpecIndex"]
                     ),
                     dbc.RadioItems(
+                        id="spectrum-highlight-mode",
+                        options=[
+                            {"label": "Active motif only", "value": "single"},
+                            {"label": "All motifs",        "value": "all"},
+                            {"label": "None",              "value": "none"},
+                        ],
+                        value="single",
+                        inline=True,
+                    ),
+                    dbc.RadioItems(
                         id="spectrum-fragloss-toggle",
                         options=[
                             {"label": "Fragments + Losses", "value": "both"},
@@ -1319,6 +1329,12 @@ def create_motif_details_tab():
                         ],
                         value="both",
                         inline=True,
+                    ),
+                    dbc.Checkbox(
+                        id="spectrum-show-parent-ion",
+                        label="Show Parent Ion",
+                        value=True,
+                        className="mt-2",
                     ),
                     html.Div(id='spectrum-plot'),
 
@@ -1507,6 +1523,22 @@ def create_spectra_search_tab():
                     # Associated Motifs
                     html.Div([
                         html.H5("Motifs Associated with the Selected Spectrum"),
+                        dbc.Select(
+                            id="search-highlight-mode",
+                            options=[
+                                {"label": "All motifs", "value": "all"},
+                                {"label": "Single motif (choose below)", "value": "single"},
+                                {"label": "None", "value": "none"},
+                            ],
+                            value="all",
+                            style={"width": "250px"},
+                        ),
+                        dbc.Checkbox(
+                            id="search-show-parent-ion",
+                            label="Show Parent Ion",
+                            value=True,
+                            className="mt-2",
+                        ),
                         dcc.Markdown(
                             """
                             The table lists Mass2Motifs predicted to be present
