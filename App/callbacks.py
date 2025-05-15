@@ -18,6 +18,7 @@ from dash import dash_table, html, ALL
 from dash.exceptions import PreventUpdate
 from matchms import Fragments
 from matchms import Spectrum
+from plotly.subplots import make_subplots
 from rdkit import Chem
 from rdkit.Chem.Draw import MolsToGridImage
 
@@ -81,7 +82,7 @@ def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
         x=mz_arr,
         y=int_arr,
         marker=dict(color=bar_colors, line=dict(color='white', width=0)),
-        width=0.4,
+        width=0.8,
         hoverinfo='text',
         hovertext=[f"m/z: {mz_val:.4f}<br>Intensity: {inten:.3g}"
                    for mz_val, inten in zip(mz_arr, int_arr)],
@@ -132,14 +133,22 @@ def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
     fig.update_layout(
         title=f"Spectrum: {meta.get('id', 'Unknown')} — Highlighted Motif: {motif_id or 'None'}",
         xaxis_title="m/z (Da)",
-        yaxis_title="Intensity",
-        bargap=0.3,
-        template="plotly_white",
-        margin=dict(l=40, r=30, t=60, b=40),
         hovermode="closest",
-        font=dict(size=12)
     )
+    apply_common_layout(fig, ytitle="Intensity")
     return fig
+
+
+def apply_common_layout(fig: go.Figure, ytitle: str | None = None) -> None:
+    """Apply the shared template, font, margins and bargap to a Plotly figure."""
+    fig.update_layout(
+        template="plotly_white",
+        font=dict(size=12),
+        margin=dict(l=40, r=30, t=30, b=40),
+        bargap=0.3,
+    )
+    if ytitle is not None:
+        fig.update_yaxes(title_text=ytitle)
 
 
 # Hardcode the path for .m2m references
@@ -1104,8 +1113,7 @@ def display_overlap_filter(overlap_range):
     Output('motif-spectra-ids-store', 'data'),
     Output('spectra-table', 'data'),
     Output('spectra-table', 'columns'),
-    Output('motif-optimized-spectrum-container', 'children'),
-    Output('motif-raw-spectrum-container', 'children'),
+    Output('motif-dual-spectrum-container', 'children'),
     Input('selected-motif-store', 'data'),
     Input('probability-filter', 'value'),
     Input('doc-topic-filter', 'value'),
@@ -1377,115 +1385,116 @@ def update_motif_details(
         html.P("Below is the table of MS2 documents for the motif, subject to doc-topic probability & overlap score.")
     ])
 
-    # 7) Build the Optimised Motif bar plot with the toggle for "fragments" or "losses"
-    om_fig = go.Figure()
+    # 7) Build the dual motif pseudo-spectrum plot
     motif_idx_opt = motif_idx
+
+    # Prepare data for optimized motif
+    raw_frag_mz = []
+    raw_frag_int = []
+    raw_loss_mz = []
+    raw_loss_int = []
+
     if motif_idx_opt is not None and 0 <= motif_idx_opt < len(optimized_motifs_data):
         om = optimized_motifs_data[motif_idx_opt]
         raw_frag_mz = om.get("mz", [])
         raw_frag_int = om.get("intensities", [])
-        raw_loss_mz = []
-        raw_loss_int = []
         if "metadata" in om and "losses" in om["metadata"]:
             for item in om["metadata"]["losses"]:
                 raw_loss_mz.append(item["loss_mz"])
                 raw_loss_int.append(item["loss_intensity"])
 
-        if optimised_fragloss_toggle == "fragments":
-            if raw_frag_mz:
-                om_fig.add_trace(go.Bar(
-                    x=raw_frag_mz,
-                    y=raw_frag_int,
-                    marker=dict(color="#1f77b4"),
-                    width=0.4,
-                    name="Optimised Fragments"
-                ))
-        else:
-            # user wants "losses"
-            if raw_loss_mz:
-                om_fig.add_trace(go.Bar(
-                    x=raw_loss_mz,
-                    y=raw_loss_int,
-                    marker=dict(color="#ff7f0e"),
-                    width=0.4,
-                    name="Optimised Losses"
-                ))
+    # Prepare data for raw LDA motif
+    raw_lda_frag_mz = []
+    raw_lda_frag_int = []
+    raw_lda_loss_mz = []
+    raw_lda_loss_int = []
 
-    om_fig.update_layout(
-        title=None,
-        xaxis_title="m/z (Da)",
-        yaxis_title="Normalized Intensity",
-        bargap=0.3,
-        font=dict(size=12)
-    )
-
-    # 8) Build the RAW LDA Motif bar plot (with Probability Filter)
-    raw_fig = go.Figure()
-    raw_frag_mz = []
-    raw_frag_int = []
-    raw_loss_mz = []
-    raw_loss_int = []
     for ft, val in filtered_motif_data.items():
         if ft.startswith('frag@'):
             try:
-                raw_frag_mz.append(float(ft.replace('frag@', '')))
-                raw_frag_int.append(val)
+                raw_lda_frag_mz.append(float(ft.replace('frag@', '')))
+                raw_lda_frag_int.append(val)
             except:
                 pass
         elif ft.startswith('loss@'):
             try:
-                raw_loss_mz.append(float(ft.replace('loss@', '')))
-                raw_loss_int.append(val)
+                raw_lda_loss_mz.append(float(ft.replace('loss@', '')))
+                raw_lda_loss_int.append(val)
             except:
                 pass
 
-    if raw_frag_mz:
-        raw_fig.add_trace(go.Bar(
-            x=raw_frag_mz,
-            y=raw_frag_int,
-            marker=dict(color="#1f77b4"),
-            width=0.4,
-            name="Raw LDA Fragments"
-        ))
-    if raw_loss_mz:
-        raw_fig.add_trace(go.Bar(
-            x=raw_loss_mz,
-            y=raw_loss_int,
-            marker=dict(color="#ff7f0e"),
-            width=0.4,
-            name="Raw LDA Losses"
-        ))
+    # Calculate common x-axis range
+    all_x_vals = raw_frag_mz + raw_loss_mz + raw_lda_frag_mz + raw_lda_loss_mz
+    common_max = max(all_x_vals) if all_x_vals else 0
+    fig_combined = make_subplots(rows=2, shared_xaxes=True,
+                                 row_heights=[0.55, 0.45],
+                                 vertical_spacing=0.04)
 
-    raw_fig.update_layout(
-        title=None,
-        xaxis_title="m/z (Da)",
-        yaxis_title="Probability",
-        bargap=0.3,
-        font=dict(size=12)
-    )
+    # Optimised motif
+    if optimised_fragloss_toggle == "both":
+        if raw_frag_mz:
+            fig_combined.add_bar(row=1, col=1,
+                                 x=raw_frag_mz,
+                                 y=raw_frag_int,
+                                 marker_color="#1f77b4",
+                                 width=0.8,
+                                 name="Optimised Fragments")
+        if raw_loss_mz:
+            fig_combined.add_bar(row=1, col=1,
+                                 x=raw_loss_mz,
+                                 y=raw_loss_int,
+                                 marker_color="#ff7f0e",
+                                 width=0.8,
+                                 name="Optimised Losses")
+    elif optimised_fragloss_toggle == "fragments" and raw_frag_mz:
+        fig_combined.add_bar(row=1, col=1,
+                             x=raw_frag_mz,
+                             y=raw_frag_int,
+                             marker_color="#1f77b4",
+                             width=0.8,
+                             name="Optimised Fragments")
+    elif optimised_fragloss_toggle == "losses" and raw_loss_mz:
+        fig_combined.add_bar(row=1, col=1,
+                             x=raw_loss_mz,
+                             y=raw_loss_int,
+                             marker_color="#ff7f0e",
+                             width=0.8,
+                             name="Optimised Losses")
 
-    # Align the x-axis range between the two pseudo-spectra
-    om_x_vals = []
-    raw_x_vals = []
-    if motif_idx_opt is not None and 0 <= motif_idx_opt < len(optimized_motifs_data):
-        om_obj = optimized_motifs_data[motif_idx_opt]
-        om_x_vals.extend(om_obj.get("mz", []))
-        if "metadata" in om_obj and "losses" in om_obj["metadata"]:
-            for item_ in om_obj["metadata"]["losses"]:
-                om_x_vals.append(item_["loss_mz"])
+    # Raw LDA motif
+    if optimised_fragloss_toggle in ("both", "fragments") and raw_lda_frag_mz:
+        fig_combined.add_bar(
+            row=2, col=1,
+            x=raw_lda_frag_mz,
+            y=raw_lda_frag_int,
+            marker_color="#1f77b4",
+            width=0.8,
+            name="Raw Fragments",
+        )
 
-    raw_x_vals.extend(raw_frag_mz)
-    raw_x_vals.extend(raw_loss_mz)
-    common_max = 0
-    if om_x_vals or raw_x_vals:
-        combined_vals = om_x_vals + raw_x_vals
-        common_max = max(combined_vals)
+    if optimised_fragloss_toggle in ("both", "losses") and raw_lda_loss_mz:
+        fig_combined.add_bar(
+            row=2, col=1,
+            x=raw_lda_loss_mz,
+            y=raw_lda_loss_int,
+            marker_color="#ff7f0e",
+            width=0.8,
+            name="Raw Losses",
+        )
 
-    om_fig.update_xaxes(range=[0, common_max * 1.1])
-    raw_fig.update_xaxes(range=[0, common_max * 1.1])
+    # Shared x-range:
+    fig_combined.update_xaxes(range=[0, common_max * 1.1])
 
-    optim_plot = dcc.Graph(figure=om_fig)
-    raw_plot = dcc.Graph(figure=raw_fig)
+    # Row-specific y-axis titles:
+    fig_combined.update_yaxes(title_text="Rel. Intensity", row=1, col=1)
+    fig_combined.update_yaxes(title_text="Probability", autorange="reversed", row=2, col=1)
+
+    # Add title to the plot
+    fig_combined.update_layout(title_text=f"Dual Motif Pseudo-Spectrum for {motif_name}")
+
+    apply_common_layout(fig_combined)  # new helper
+
+    dual_plot = dcc.Graph(figure=fig_combined)
 
     return (
         motif_title,
@@ -1495,8 +1504,7 @@ def update_motif_details(
         spectra_ids,
         table_data,
         table_columns,
-        optim_plot,
-        raw_plot,
+        dual_plot,
     )
 
 

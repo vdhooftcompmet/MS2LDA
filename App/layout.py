@@ -1182,24 +1182,34 @@ def create_motif_details_tab():
                 }),
 
                 html.Div([
-                    html.H5("Optimised Motif Pseudo-Spectrum"),
+                    html.H5("Dual Motif Pseudo-Spectrum (Optimised ↑  |  Raw ↑)"),
                     dcc.Markdown(
                         """
-                        This plot shows the optimised pseudo-spectrum, which refines the raw motif by retaining only fragments or losses consistently found among the best Spec2Vec matches. Because it's derived from verified library spectra, the optimised motif doesn't rely on the probability thresholds used in the original LDA motif extraction. You can use the toggle below to switch between displaying fragments or losses, depending on the feature type you want to explore.
+                        This visualization presents two complementary views of the selected Mass2Motif with their m/z positions perfectly aligned, allowing you to compare what has been retained or removed during optimization.
+
+                        The top panel shows the optimised pseudo-spectrum with relative intensity values. This refined representation is derived from analyzing the best-matching library spectra via Spec2Vec, retaining only those fragment or neutral-loss peaks that consistently appear across library hits. Since it's derived from verified library spectra, the optimised motif operates independently of the probability thresholds used in the original LDA motif extraction, typically resulting in a cleaner representation.
+
+                        The bottom panel displays the raw LDA pseudo-spectrum filtered according to the probability thresholds you've selected. The peaks are visualized on a probability scale, with taller bars indicating features the topic model identifies as particularly characteristic of this motif.
+
+                        With both panels sharing the same x-axis, you can easily identify which peaks are preserved during optimization and whether any high-probability LDA peaks were excluded. Use the toggle below to switch between displaying fragments and losses in both panels.
                         """
                     ),
                     dbc.RadioItems(
-                        id='optimised-motif-fragloss-toggle',
+                        id="optimised-motif-fragloss-toggle",
                         options=[
-                            {"label": "Fragments Only", "value": "fragments"},
-                            {"label": "Losses Only", "value": "losses"},
+                            {"label": "Fragments + Losses", "value": "both"},
+                            {"label": "Fragments Only",     "value": "fragments"},
+                            {"label": "Losses Only",        "value": "losses"},
                         ],
-                        value="fragments",
+                        value="both",
                         inline=True,
                     ),
-                    html.Div(id='motif-optimized-spectrum-container', style={"marginTop": "10px"}),
+                    html.Div(id='motif-dual-spectrum-container', style={"marginTop": "10px"}),
                 ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "15px"
+                    "border": "1px dashed #ccc",
+                    "padding": "10px",
+                    "borderRadius": "5px",
+                    "marginBottom": "15px"
                 }),
 
             ], style={
@@ -1245,17 +1255,6 @@ def create_motif_details_tab():
                     "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "10px"
                 }),
 
-                html.Div([
-                    html.H5("Raw LDA Motif Pseudo-Spectrum (Filtered)"),
-                    dcc.Markdown(
-                        """
-                        This plot visualizes the pseudo-spectrum of the raw motif after filtering peaks based on the selected probability thresholds. Peaks outside the defined range are removed, showing only the features most relevant according to the LDA model.
-                        """
-                    ),
-                    html.Div(id='motif-raw-spectrum-container', style={"marginTop": "10px"}),
-                ], style={
-                    "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "10px"
-                }),
 
                 html.Div([
                     html.H5("Motif Features Table and Summary Plots"),
