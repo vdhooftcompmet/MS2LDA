@@ -1518,21 +1518,39 @@ def create_spectra_search_tab():
                 id="search-tab-spectrum-details-container",
                 style={"marginTop": "20px", "display": "none"},
                 children=[
-                    html.H4("Spectrum Details (Selected Spectrum)"),
+                    html.H4(id="search-tab-spectrum-title"),
 
                     # Associated Motifs
                     html.Div([
                         html.H5("Motifs Associated with the Selected Spectrum"),
-                        dbc.Select(
-                            id="search-highlight-mode",
-                            options=[
-                                {"label": "All motifs", "value": "all"},
-                                {"label": "Single motif (choose below)", "value": "single"},
-                                {"label": "None", "value": "none"},
-                            ],
-                            value="all",
-                            style={"width": "250px"},
-                        ),
+                        html.Div([
+                            dbc.ButtonGroup([
+                                dbc.Button(
+                                    "All motifs",
+                                    id="search-highlight-all-btn",
+                                    color="primary",
+                                    outline=True,
+                                    active=True,
+                                    className="me-1",
+                                ),
+                                dbc.Button(
+                                    "Single motif",
+                                    id="search-highlight-single-btn",
+                                    color="primary",
+                                    outline=True,
+                                    active=False,
+                                    className="me-1",
+                                ),
+                                dbc.Button(
+                                    "None",
+                                    id="search-highlight-none-btn",
+                                    color="primary",
+                                    outline=True,
+                                    active=False,
+                                ),
+                            ]),
+                            dcc.Store(id="search-highlight-mode", data="all"),
+                        ], className="mb-3"),
                         dbc.Checkbox(
                             id="search-show-parent-ion",
                             label="Show Parent Ion",
@@ -1541,13 +1559,24 @@ def create_spectra_search_tab():
                         ),
                         dcc.Markdown(
                             """
-                            The table lists Mass2Motifs predicted to be present
-                            in the spectrum, ranked by their document–topic
-                            probability.  
-                            • Click a motif's name to highlight its features in
-                              the plot below.  
-                            • Click **Details ↗** to jump to the Motif Details
-                              tab for a full breakdown.
+                            The table below displays Mass2Motifs that are predicted to be present in this spectrum, 
+                            ranked by their document-topic probability. These motifs represent common fragmentation 
+                            patterns found across multiple spectra in your dataset.
+
+                            Each motif contributes to explaining different parts of the spectrum. You can interact 
+                            with the motifs in several ways:
+
+                            • Click a motif's name to highlight its features in the plot below. This helps you 
+                              visualize which peaks in the spectrum are explained by that specific motif.
+
+                            • Click the "Motif Details" button to navigate to the Motif Details tab, where you 
+                              can explore the motif's composition, occurrence patterns, and other spectra that 
+                              contain this motif.
+
+                            Use the buttons above to control how motifs are displayed in the spectrum plot:
+                            • "All motifs" - Shows all motifs with different colors
+                            • "Single motif" - Highlights only the selected motif
+                            • "None" - Shows the raw spectrum without highlighting
                             """,
                         ),
                         html.Div(
@@ -1566,12 +1595,24 @@ def create_spectra_search_tab():
                         html.H5("Spectrum Plot with Motif Highlighting"),
                         dcc.Markdown(
                             """
-                            The bar chart displays the full MS/MS spectrum of the
-                            selected document. Peaks whose m/z matches **fragment** features of the current motif
-                            are coloured red. Peaks whose m/z matches a **neutral-loss** feature are also red and
-                            are connected to the precursor ion by a green dashed line labelled with the neutral-loss 
-                            value (for example "-18.01"). All other peaks remain grey. A vertical blue dashed line 
-                            indicates the precursor ion. Hover over a bar to read the exact m/z and intensity.
+                            The bar chart displays the full MS/MS spectrum of the selected document. How peaks are 
+                            colored depends on the highlighting mode selected:
+
+                            **When "Single motif" is selected:**
+                            • Peaks whose m/z matches **fragment** features of the selected motif are colored red
+                            • Peaks whose m/z matches a **neutral-loss** feature are also red
+                            • All other peaks remain grey
+
+                            **When "All motifs" is selected:**
+                            • Each motif is assigned a unique color
+                            • Peaks are divided into colored slices proportional to each motif's contribution
+                            • Peaks not claimed by any motif remain grey
+
+                            **For all modes:**
+                            • Neutral losses are connected to the precursor ion by a green dashed line labelled with 
+                              the neutral-loss value (for example "-18.01")
+                            • A vertical blue dashed line indicates the precursor ion (when enabled)
+                            • Hover over a bar to read the exact m/z, intensity, and motif information
                             """,
                         ),
                         html.Div(

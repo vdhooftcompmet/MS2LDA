@@ -306,7 +306,7 @@ def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
                                if shares and motif in shares else ""
                                for mz, inten, shares in zip(mz_arr, int_arr, peak_shares) if inten > 0],
                     opacity=0.9,
-                    name=f"Motif {motif}",
+                    name=f"{motif}",
                 ))
 
         # Set barmode to stack
@@ -2252,6 +2252,47 @@ def handle_spectrum_selection(selected_rows, table_data):
 
 
 @app.callback(
+    Output("search-highlight-mode", "data"),
+    Output("search-highlight-all-btn", "active"),
+    Output("search-highlight-single-btn", "active"),
+    Output("search-highlight-none-btn", "active"),
+    Input("search-highlight-all-btn", "n_clicks"),
+    Input("search-highlight-single-btn", "n_clicks"),
+    Input("search-highlight-none-btn", "n_clicks"),
+    State("search-highlight-mode", "data"),
+    prevent_initial_call=True,
+)
+def update_highlight_mode(all_clicks, single_clicks, none_clicks, current_mode):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        return current_mode, current_mode == "all", current_mode == "single", current_mode == "none"
+
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if button_id == "search-highlight-all-btn":
+        return "all", True, False, False
+    elif button_id == "search-highlight-single-btn":
+        return "single", False, True, False
+    elif button_id == "search-highlight-none-btn":
+        return "none", False, False, True
+
+    return current_mode, current_mode == "all", current_mode == "single", current_mode == "none"
+
+
+@app.callback(
+    Output("search-tab-spectrum-title", "children"),
+    Input("search-tab-selected-spectrum-details-store", "data"),
+    prevent_initial_call=True,
+)
+def update_spectrum_title(spectrum_info):
+    if not spectrum_info:
+        return "Spectrum Details (No Spectrum Selected)"
+
+    spec_id = spectrum_info.get("spec_id", "Unknown")
+    return f"Spectrum Details: {spec_id}"
+
+
+@app.callback(
     Output("search-tab-associated-motifs-list", "children"),
     Input("search-tab-selected-spectrum-details-store", "data"),
     State("lda-dict-store", "data"),
@@ -2413,7 +2454,7 @@ def jump_to_search_tab(n_clicks, selected_spectrum_index, motif_spectra_ids, spe
     Output("search-tab-spectrum-plot-container", "children"),
     Input("search-tab-selected-spectrum-details-store", "data"),
     Input("search-tab-selected-motif-id-for-plot-store", "data"),
-    Input("search-highlight-mode", "value"),
+    Input("search-highlight-mode", "data"),
     Input("search-show-parent-ion", "value"),
     State("spectra-store", "data"),
     State("lda-dict-store", "data"),
