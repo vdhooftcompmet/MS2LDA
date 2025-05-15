@@ -32,6 +32,7 @@ from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
 from MS2LDA.run import filetype_check, load_s2v_model
 from MS2LDA.utils import download_model_and_data, create_spectrum
 
+
 def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
                        probability_range=(0, 1), tolerance=0.02):
     """
@@ -99,7 +100,7 @@ def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
                 fig.add_shape(
                     type="line",
                     x0=mz_arr[idx], y0=y_val,
-                    x1=parent_mz,  y1=y_val,
+                    x1=parent_mz, y1=y_val,
                     line=dict(color="green", dash="dash", width=2),
                 )
                 fig.add_annotation(
@@ -132,12 +133,14 @@ def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
         title=f"Spectrum: {meta.get('id', 'Unknown')} — Highlighted Motif: {motif_id or 'None'}",
         xaxis_title="m/z (Da)",
         yaxis_title="Intensity",
-        bargap=0.2,
+        bargap=0.3,
         template="plotly_white",
         margin=dict(l=40, r=30, t=60, b=40),
         hovermode="closest",
+        font=dict(size=12)
     )
     return fig
+
 
 # Hardcode the path for .m2m references
 MOTIFDB_FOLDER = "./MS2LDA/MotifDB"
@@ -1133,30 +1136,12 @@ def update_motif_details(
     motif_name = selected_motif
     motif_title = f"Motif Details: {motif_name}"
 
-    # 1) Raw motif (LDA) using Probability Filter
+    # 1) Raw motif (LDA) – first cut by feature-probability slider
     motif_data = lda_dict_data['beta'].get(motif_name, {})
     filtered_motif_data = {
         f: p for f, p in motif_data.items()
         if beta_range[0] <= p <= beta_range[1]
     }
-    total_prob = sum(filtered_motif_data.values())
-
-    feature_table = pd.DataFrame({
-        'Feature': filtered_motif_data.keys(),
-        'Probability': filtered_motif_data.values(),
-    }).sort_values(by='Probability', ascending=False)
-
-    feature_table_component = dash_table.DataTable(
-        data=feature_table.to_dict('records'),
-        columns=[
-            {'name': 'Feature', 'id': 'Feature'},
-            {'name': 'Probability', 'id': 'Probability', 'type': 'numeric',
-             'format': {'specifier': '.4f'}},
-        ],
-        style_table={'overflowX': 'auto'},
-        style_cell={'textAlign': 'left'},
-        page_size=10,
-    )
 
     # 2) Counts of features in filtered documents
     feature_counts = {ft: 0 for ft in filtered_motif_data.keys()}
@@ -1179,22 +1164,50 @@ def update_motif_details(
             if ft in w_counts:
                 feature_counts[ft] += 1
 
+    # SECOND cut → keep a feature only if it appears in ≥1 passing document
+    filtered_motif_data = {f: p for f, p in filtered_motif_data.items() if feature_counts.get(f, 0) > 0}
+
+    # rebuild summary table
+    total_prob = sum(filtered_motif_data.values())
+
+    feature_table = pd.DataFrame({
+        'Feature': filtered_motif_data.keys(),
+        'Probability': filtered_motif_data.values(),
+    }).sort_values(by='Probability', ascending=False)
+
+    feature_table_component = dash_table.DataTable(
+        data=feature_table.to_dict('records'),
+        columns=[
+            {'name': 'Feature', 'id': 'Feature'},
+            {'name': 'Probability', 'id': 'Probability', 'type': 'numeric',
+             'format': {'specifier': '.4f'}},
+        ],
+        style_table={'overflowX': 'auto'},
+        style_cell={'textAlign': 'left'},
+        page_size=10,
+    )
+
+    # rebuild bar-plot dataframe and drop zero-count rows
     barplot2_df = pd.DataFrame({
         'Feature': list(feature_counts.keys()),
         'Count': list(feature_counts.values()),
     })
-    barplot2_df = barplot2_df.sort_values(by='Count', ascending=False).head(10)
+    barplot2_df = (
+        barplot2_df[barplot2_df['Count'] > 0]
+        .sort_values(by='Count', ascending=False)
+    )
+    # Vertical bar chart
     barplot2_fig = px.bar(
         barplot2_df,
-        x='Count',
-        y='Feature',
-        orientation='h',
+        x='Feature',
+        y='Count',
     )
     barplot2_fig.update_layout(
         title=None,
-        yaxis={'categoryorder': 'total ascending'},
-        xaxis_title='Count within Filtered Motif Documents',
-        yaxis_title='Feature',
+        xaxis_title='Feature',
+        yaxis_title='Count within Filtered Motif Documents',
+        bargap=0.3,
+        font=dict(size=12)
     )
 
     # 3) Spec2Vec matching results
@@ -1402,9 +1415,9 @@ def update_motif_details(
         title=None,
         xaxis_title="m/z (Da)",
         yaxis_title="Normalized Intensity",
-        bargap=0.2
+        bargap=0.3,
+        font=dict(size=12)
     )
-    optim_plot = dcc.Graph(figure=om_fig)
 
     # 8) Build the RAW LDA Motif bar plot (with Probability Filter)
     raw_fig = go.Figure()
@@ -1447,8 +1460,31 @@ def update_motif_details(
         title=None,
         xaxis_title="m/z (Da)",
         yaxis_title="Probability",
-        bargap=0.2
+        bargap=0.3,
+        font=dict(size=12)
     )
+
+    # Align the x-axis range between the two pseudo-spectra
+    om_x_vals = []
+    raw_x_vals = []
+    if motif_idx_opt is not None and 0 <= motif_idx_opt < len(optimized_motifs_data):
+        om_obj = optimized_motifs_data[motif_idx_opt]
+        om_x_vals.extend(om_obj.get("mz", []))
+        if "metadata" in om_obj and "losses" in om_obj["metadata"]:
+            for item_ in om_obj["metadata"]["losses"]:
+                om_x_vals.append(item_["loss_mz"])
+
+    raw_x_vals.extend(raw_frag_mz)
+    raw_x_vals.extend(raw_loss_mz)
+    common_max = 0
+    if om_x_vals or raw_x_vals:
+        combined_vals = om_x_vals + raw_x_vals
+        common_max = max(combined_vals)
+
+    om_fig.update_xaxes(range=[0, common_max * 1.1])
+    raw_fig.update_xaxes(range=[0, common_max * 1.1])
+
+    optim_plot = dcc.Graph(figure=om_fig)
     raw_plot = dcc.Graph(figure=raw_fig)
 
     return (

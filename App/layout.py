@@ -1225,6 +1225,22 @@ def create_motif_details_tab():
                         marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
                     ),
                     html.Div(id='probability-filter-display', style={"marginTop": "10px"}),
+
+                    dcc.Markdown("Document-level filters (apply to table **and** bar-plot):", style={"marginTop": "15px"}),
+
+                    dbc.Label("Motif Probability (θ) Filter:"),
+                    dcc.RangeSlider(
+                        id='doc-topic-filter', min=0, max=1, step=0.01, value=[0, 1],
+                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
+                    ),
+                    html.Div(id='doc-topic-filter-display', style={"marginTop": "10px"}),
+
+                    dbc.Label("Overlap Score Filter:"),
+                    dcc.RangeSlider(
+                        id='overlap-filter', min=0, max=1, step=0.01, value=[0, 1],
+                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
+                    ),
+                    html.Div(id='overlap-filter-display', style={"marginTop": "10px"}),
                 ], style={
                     "border": "1px dashed #ccc", "padding": "10px", "borderRadius": "5px", "marginBottom": "10px"
                 }),
@@ -1266,11 +1282,10 @@ def create_motif_details_tab():
                 html.Div([
                     dcc.Markdown(
                         """
-                        This section lists MS2 spectra linked to the selected motif. Use the
-                        sliders to filter spectra by motif probability and overlap score. When
+                        This section lists MS2 spectra linked to the selected motif. When
                         you pick a spectrum (or use the navigation buttons) the plot underneath
                         updates.  
-                        
+
                         Peaks matching fragment or neutral-loss features of the motif turn
                         red. For every neutral-loss match, a green dashed line connects the
                         fragment peak to the precursor ion and is annotated with the
@@ -1278,20 +1293,6 @@ def create_motif_details_tab():
                         motif's characteristic features are genuinely present in the experimental spectrum.
                         """
                     ),
-
-                    dbc.Label("Spectra-Motif Probability Filter:"),
-                    dcc.RangeSlider(
-                        id='doc-topic-filter', min=0, max=1, step=0.01, value=[0, 1],
-                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
-                    ),
-                    html.Div(id='doc-topic-filter-display', style={"marginTop": "10px"}),
-
-                    dbc.Label("Overlap Score Filter:"),
-                    dcc.RangeSlider(
-                        id='overlap-filter', min=0, max=1, step=0.01, value=[0, 1],
-                        marks={0: '0', 0.25: '0.25', 0.5: '0.5', 0.75: '0.75', 1: '1'}, allowCross=False
-                    ),
-                    html.Div(id='overlap-filter-display', style={"marginTop": "10px"}),
 
                     html.Div(id='motif-documents-container'),
 

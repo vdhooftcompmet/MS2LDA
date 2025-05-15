@@ -29,11 +29,11 @@ app.layout = dbc.Container(
             children=[
                 dcc.Tab(label="Run Analysis", value="run-analysis-tab", id="run-analysis-tab"),
                 dcc.Tab(label="Load Results", value="load-results-tab", id="load-results-tab"),
-                dcc.Tab(label="View Network", value="results-tab", id="results-tab"),
                 dcc.Tab(label="Motif Rankings", value="motif-rankings-tab", id="motif-rankings-tab"),
                 dcc.Tab(label="Motif Details", value="motif-details-tab", id="motif-details-tab"),
-                dcc.Tab(label="Screening", value="screening-tab", id="screening-tab"),
                 dcc.Tab(label="Spectra Search", value="search-spectra-tab", id="search-spectra-tab"),
+                dcc.Tab(label="View Network", value="results-tab", id="results-tab"),
+                dcc.Tab(label="Screening", value="screening-tab", id="screening-tab"),
             ],
             className="mt-3",
         ),
@@ -41,11 +41,11 @@ app.layout = dbc.Container(
         # Tabs for all the sections
         layout.create_run_analysis_tab(),
         layout.create_load_results_tab(),
-        layout.create_cytoscape_network_tab(),
         layout.create_motif_rankings_tab(),
         layout.create_motif_details_tab(),
-        layout.create_screening_tab(),
         layout.create_spectra_search_tab(),
+        layout.create_cytoscape_network_tab(),
+        layout.create_screening_tab(),
 
         # Hidden storage
         dcc.Store(id='motif-spectra-ids-store'),
