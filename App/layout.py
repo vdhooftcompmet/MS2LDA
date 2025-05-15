@@ -1300,6 +1300,16 @@ def create_motif_details_tab():
                         style_table={'overflowX': 'auto'}, style_cell={'textAlign': 'left'},
                         page_size=10, row_selectable='single', selected_rows=[0], hidden_columns=["SpecIndex"]
                     ),
+                    dbc.RadioItems(
+                        id="spectrum-fragloss-toggle",
+                        options=[
+                            {"label": "Fragments + Losses", "value": "both"},
+                            {"label": "Fragments Only",     "value": "fragments"},
+                            {"label": "Losses Only",        "value": "losses"},
+                        ],
+                        value="both",
+                        inline=True,
+                    ),
                     html.Div(id='spectrum-plot'),
 
                     html.Div([

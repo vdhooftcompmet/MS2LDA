@@ -35,7 +35,7 @@ from MS2LDA.utils import download_model_and_data, create_spectrum
 
 
 def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
-                       probability_range=(0, 1), tolerance=0.02):
+                       probability_range=(0, 1), tolerance=0.02, mode='both'):
     """
     Return a Plotly Figure for one MS/MS spectrum.
     Peaks matching fragment or loss features of the given motif_id
@@ -67,22 +67,26 @@ def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
                 except ValueError:
                     pass
 
-    highlight_idx = set()
+    frag_match_idx = set()
+    loss_match_idx = set()
     for i, mz_val in enumerate(mz_arr):
-        if any(abs(mz_val - t) <= tolerance for t in frag_mzs):
-            highlight_idx.add(i)
-        if parent_mz is not None and any(abs((parent_mz - l) - mz_val) <= tolerance for l in loss_mzs):
-            highlight_idx.add(i)
+        if mode in ("both", "fragments") and any(abs(mz_val - t) <= tolerance for t in frag_mzs):
+            frag_match_idx.add(i)
+        if mode in ("both", "losses") and parent_mz is not None \
+           and any(abs((parent_mz - l) - mz_val) <= tolerance for l in loss_mzs):
+            loss_match_idx.add(i)
 
-    bar_colors = ['#FF0000' if i in highlight_idx else '#7f7f7f'
-                  for i in range(len(mz_arr))]
+    bar_colors = [
+        '#FF0000' if i in frag_match_idx else '#7f7f7f'
+        for i in range(len(mz_arr))
+    ]
 
     fig = go.Figure()
     fig.add_trace(go.Bar(
         x=mz_arr,
         y=int_arr,
         marker=dict(color=bar_colors, line=dict(color='white', width=0)),
-        width=0.8,
+        width=0.3,
         hoverinfo='text',
         hovertext=[f"m/z: {mz_val:.4f}<br>Intensity: {inten:.3g}"
                    for mz_val, inten in zip(mz_arr, int_arr)],
@@ -91,7 +95,7 @@ def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
     ))
 
     # visualise neutral-loss
-    if parent_mz is not None and loss_mzs:
+    if parent_mz is not None and loss_mzs and mode in ("both", "losses"):
         for loss_val in loss_mzs:
             frag_mz = parent_mz - loss_val
             # find closest plotted peak within the tolerance
@@ -102,7 +106,7 @@ def make_spectrum_plot(spec_dict, motif_id, lda_dict_data,
                     type="line",
                     x0=mz_arr[idx], y0=y_val,
                     x1=parent_mz, y1=y_val,
-                    line=dict(color="green", dash="dash", width=2),
+                    line=dict(color="rgba(0,128,0,0.4)", dash="dash", width=1),
                 )
                 fig.add_annotation(
                     x=(mz_arr[idx] + parent_mz) / 2,
@@ -145,7 +149,7 @@ def apply_common_layout(fig: go.Figure, ytitle: str | None = None) -> None:
         template="plotly_white",
         font=dict(size=12),
         margin=dict(l=40, r=30, t=30, b=40),
-        bargap=0.3,
+        bargap=0.35,
     )
     if ytitle is not None:
         fig.update_yaxes(title_text=ytitle)
@@ -1558,12 +1562,13 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
     Output('spectrum-plot', 'children'),
     Input('selected-spectrum-index', 'data'),
     Input('probability-filter', 'value'),
+    Input('spectrum-fragloss-toggle', 'value'),
     Input('motif-spectra-ids-store', 'data'),
     State('spectra-store', 'data'),
     State('lda-dict-store', 'data'),
     State('selected-motif-store', 'data'),
 )
-def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra_data, lda_dict_data, selected_motif):
+def update_spectrum_plot(selected_index, probability_range, fragloss_mode, spectra_ids, spectra_data, lda_dict_data, selected_motif):
     if spectra_ids and spectra_data and lda_dict_data and selected_motif:
         if selected_index is None or selected_index < 0 or selected_index >= len(spectra_ids):
             return html.Div("Selected spectrum index is out of range.")
@@ -1575,6 +1580,7 @@ def update_spectrum_plot(selected_index, probability_range, spectra_ids, spectra
             selected_motif,
             lda_dict_data,
             probability_range=probability_range,
+            mode=fragloss_mode,
         )
         return dcc.Graph(figure=fig, style={'width': '100%', 'height': '600px', 'margin': 'auto'})
 
