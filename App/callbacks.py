@@ -2230,25 +2230,26 @@ def display_parentmass_range(value):
     Output("search-tab-selected-spectrum-details-store", "data"),
     Output("search-tab-spectrum-details-container", "style"),
     Output("search-tab-selected-motif-id-for-plot-store", "data", allow_duplicate=True),
-    Input("spectra-search-results-table", "selected_rows"),
+    Input("spectra-search-results-table", "active_cell"),
     State("spectra-search-results-table", "data"),
     prevent_initial_call=True,
 )
-def handle_spectrum_selection(selected_rows, table_data):
-    if not selected_rows or not table_data:
-        # If selection is cleared (or no valid data), hide details and clear stores
+def handle_spectrum_selection(active_cell, table_data):
+    if not active_cell or not table_data:
         return None, {"marginTop": "20px", "display": "none"}, None
 
-    selected_row_index = selected_rows[0]
-    if selected_row_index >= len(table_data):
+    if active_cell.get("column_id") != "spec_id":
+        # Clicked some other column – ignore
+        raise dash.exceptions.PreventUpdate
+
+    row_idx = active_cell.get("row", -1)
+    if row_idx < 0 or row_idx >= len(table_data):
         return None, {"marginTop": "20px", "display": "none"}, None
 
-    selected_spectrum_data_from_table = table_data[selected_row_index]
+    selected_spectrum = table_data[row_idx]
 
     container_style = {"marginTop": "20px", "display": "block"}
-
-    # selected_spectrum_data_from_table already contains original_spec_index
-    return selected_spectrum_data_from_table, container_style, None  # MODIFIED (return None for motif store)
+    return selected_spectrum, container_style, None
 
 
 @app.callback(
