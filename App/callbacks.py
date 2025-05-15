@@ -2254,29 +2254,24 @@ def handle_spectrum_selection(selected_rows, table_data):
 @app.callback(
     Output("search-highlight-mode", "data"),
     Output("search-highlight-all-btn", "active"),
-    Output("search-highlight-single-btn", "active"),
     Output("search-highlight-none-btn", "active"),
     Input("search-highlight-all-btn", "n_clicks"),
-    Input("search-highlight-single-btn", "n_clicks"),
     Input("search-highlight-none-btn", "n_clicks"),
     State("search-highlight-mode", "data"),
     prevent_initial_call=True,
 )
-def update_highlight_mode(all_clicks, single_clicks, none_clicks, current_mode):
+def update_highlight_mode(all_clicks, none_clicks, current_mode):
     ctx = dash.callback_context
     if not ctx.triggered:
-        return current_mode, current_mode == "all", current_mode == "single", current_mode == "none"
+        return current_mode, current_mode == "all", current_mode == "none"
 
-    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    btn = ctx.triggered[0]["prop_id"].split(".")[0]
+    if btn == "search-highlight-all-btn":
+        return "all", True, False
+    if btn == "search-highlight-none-btn":
+        return "none", False, True
 
-    if button_id == "search-highlight-all-btn":
-        return "all", True, False, False
-    elif button_id == "search-highlight-single-btn":
-        return "single", False, True, False
-    elif button_id == "search-highlight-none-btn":
-        return "none", False, False, True
-
-    return current_mode, current_mode == "all", current_mode == "single", current_mode == "none"
+    return current_mode, current_mode == "all", current_mode == "none"
 
 
 @app.callback(
@@ -2388,6 +2383,7 @@ def jump_to_motif_details(n_clicks_list):
 
 @app.callback(
     Output("search-tab-selected-motif-id-for-plot-store", "data", allow_duplicate=True),
+    Output("search-highlight-mode", "data", allow_duplicate=True),
     Input({"type": "search-tab-motif-link", "index": ALL}, "n_clicks"),
     prevent_initial_call=True,
 )
@@ -2397,11 +2393,8 @@ def update_selected_motif_for_plot(n_clicks_list):
         raise PreventUpdate
 
     import json
-    triggered_id_str = ctx.triggered[0]["prop_id"].split(".")[0]
-    pmid = json.loads(triggered_id_str)
-    motif_id = pmid["index"]
-
-    return motif_id
+    motif_id = json.loads(ctx.triggered[0]["prop_id"].split(".")[0])["index"]
+    return motif_id, "single"
 
 
 @app.callback(
@@ -2454,34 +2447,31 @@ def jump_to_search_tab(n_clicks, selected_spectrum_index, motif_spectra_ids, spe
     Output("search-tab-spectrum-plot-container", "children"),
     Input("search-tab-selected-spectrum-details-store", "data"),
     Input("search-tab-selected-motif-id-for-plot-store", "data"),
+    Input("search-fragloss-toggle", "value"),
     Input("search-highlight-mode", "data"),
     Input("search-show-parent-ion", "value"),
     State("spectra-store", "data"),
     State("lda-dict-store", "data"),
     prevent_initial_call=True,
 )
-def update_search_tab_spectrum_plot(spectrum_info, motif_for_plot, highlight_mode, show_parent_ion, all_spectra_data, lda_dict_data):
-    """
-    Renders a Plotly bar chart of the selected spectrum, optionally highlighting
-    the currently chosen motif's features (fragments/losses).
-    Adapts the logic from 'update_spectrum_plot' in Motif Details.
-    """
+def update_search_tab_spectrum_plot(spectrum_info, motif_for_plot,
+                                    fragloss_mode, highlight_mode, show_parent_ion,
+                                    all_spectra_data, lda_dict_data):
     if not spectrum_info:
         raise PreventUpdate
 
-    spec_idx = spectrum_info.get("original_spec_index", None)
-    if spec_idx is None or spec_idx < 0 or spec_idx >= len(all_spectra_data):
+    idx = spectrum_info.get("original_spec_index", -1)
+    if idx < 0 or idx >= len(all_spectra_data):
         return html.Div("Invalid spectrum index.", style={"color": "red"})
 
-    spec_dict = all_spectra_data[spec_idx]
-
-    # Only pass the selected motif when in 'single' mode
-    motif_to_highlight = motif_for_plot if highlight_mode == 'single' else None
+    spec_dict = all_spectra_data[idx]
+    motif_to_highlight = motif_for_plot if highlight_mode == "single" else None
 
     fig = make_spectrum_plot(
         spec_dict,
         motif_to_highlight,
         lda_dict_data,
+        mode=fragloss_mode,
         highlight_mode=highlight_mode,
         show_parent_ion=show_parent_ion,
     )

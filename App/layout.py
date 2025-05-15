@@ -1456,6 +1456,7 @@ def create_spectra_search_tab():
         children=[
             html.H3("Search by Fragment/Loss or Parent Mass"),
 
+            # -------  SEARCH FORM  -------
             dbc.Row([
                 dbc.Col([
                     dbc.Label("Fragment or Loss Contains:"),
@@ -1464,10 +1465,9 @@ def create_spectra_search_tab():
                         type="text",
                         placeholder="e.g. frag@150 or loss@40",
                     ),
-                    # ADD THIS TOOLTIP:
                     dbc.Tooltip(
-                        "Enter a partial fragment (e.g., 'frag@150.1') or loss (e.g., 'loss@40.2'). "
-                        "The search is case-insensitive and matches any part of the feature string.",
+                        "Enter a partial fragment (e.g. 'frag@150.1') or loss "
+                        "(e.g. 'loss@40.2'). The search is case-insensitive.",
                         target="spectra-search-fragloss-input",
                     ),
                 ], width=4),
@@ -1476,155 +1476,96 @@ def create_spectra_search_tab():
                     dbc.Label("Parent Mass Range:"),
                     dcc.RangeSlider(
                         id="spectra-search-parentmass-slider",
-                        min=0,
-                        max=2000,
-                        step=1,
+                        min=0, max=2000, step=1,
                         value=[0, 2000],
                         marks={0: "0", 500: "500", 1000: "1000", 1500: "1500", 2000: "2000"},
                         allowCross=False,
                     ),
-                    html.Div(id="spectra-search-parentmass-slider-display", style={"marginTop": "10px"}),
+                    html.Div(id="spectra-search-parentmass-slider-display",
+                             style={"marginTop": "10px"}),
                 ], width=8),
             ], style={"marginTop": "20px"}),
 
-            # ADD STATUS MESSAGE DIV HERE
-            html.Div(
-                id="spectra-search-status-message",
-                style={"marginTop": "10px", "fontStyle": "italic", "color": "#555"},
-            ),
+            html.Div(id="spectra-search-status-message",
+                     style={"marginTop": "10px", "fontStyle": "italic", "color": "#555"}),
 
             dash_table.DataTable(
                 id="spectra-search-results-table",
                 columns=[
-                    {"name": "Spectrum ID",   "id": "spec_id"},
-                    {"name": "Parent Mass",  "id": "parent_mass"},
-                    {"name": "Feature ID",   "id": "feature_id"},
-                    {"name": "Fragments",    "id": "fragments"},
-                    {"name": "Losses",       "id": "losses"},
+                    {"name": "Spectrum ID",  "id": "spec_id"},
+                    {"name": "Parent Mass", "id": "parent_mass"},
+                    {"name": "Feature ID",  "id": "feature_id"},
+                    {"name": "Fragments",   "id": "fragments"},
+                    {"name": "Losses",      "id": "losses"},
                 ],
-                data=[],
                 page_size=20,
                 style_table={"overflowX": "auto"},
                 style_cell={"textAlign": "left", "whiteSpace": "normal"},
                 row_selectable="single",
             ),
 
-            # Add a container for the selected spectrum details
+            # ----------  DETAILS ----------
             dcc.Store(id="search-tab-selected-spectrum-details-store"),
             dcc.Store(id="search-tab-selected-motif-id-for-plot-store"),
+            dcc.Store(id="search-highlight-mode", data="all"),
 
-            # Add a container for the spectrum details
             html.Div(
                 id="search-tab-spectrum-details-container",
                 style={"marginTop": "20px", "display": "none"},
                 children=[
+
                     html.H4(id="search-tab-spectrum-title"),
 
-                    # Associated Motifs
+                    # === Combined controls + plot ===
                     html.Div([
-                        html.H5("Motifs Associated with the Selected Spectrum"),
-                        html.Div([
-                            dbc.ButtonGroup([
-                                dbc.Button(
-                                    "All motifs",
-                                    id="search-highlight-all-btn",
-                                    color="primary",
-                                    outline=True,
-                                    active=True,
-                                    className="me-1",
-                                ),
-                                dbc.Button(
-                                    "Single motif",
-                                    id="search-highlight-single-btn",
-                                    color="primary",
-                                    outline=True,
-                                    active=False,
-                                    className="me-1",
-                                ),
-                                dbc.Button(
-                                    "None",
-                                    id="search-highlight-none-btn",
-                                    color="primary",
-                                    outline=True,
-                                    active=False,
-                                ),
-                            ]),
-                            dcc.Store(id="search-highlight-mode", data="all"),
-                        ], className="mb-3"),
+                        # --- motif highlight buttons ---
+                        dbc.ButtonGroup([
+                            dbc.Button("All motifs",
+                                       id="search-highlight-all-btn",
+                                       color="primary", outline=True,
+                                       active=True, className="me-1"),
+                            dbc.Button("None",
+                                       id="search-highlight-none-btn",
+                                       color="primary", outline=True,
+                                       active=False),
+                        ], className="me-2"),
+
+                        # --- fragments / losses toggle ---
+                        dbc.RadioItems(
+                            id="search-fragloss-toggle",
+                            options=[
+                                {"label": "Fragments + Losses", "value": "both"},
+                                {"label": "Fragments Only",     "value": "fragments"},
+                                {"label": "Losses Only",        "value": "losses"},
+                            ],
+                            value="both",
+                            inline=True,
+                            style={"marginLeft": "10px"},
+                        ),
+
+                        # --- parent-ion checkbox ---
                         dbc.Checkbox(
                             id="search-show-parent-ion",
                             label="Show Parent Ion",
                             value=True,
-                            className="mt-2",
+                            className="ms-3",
                         ),
-                        dcc.Markdown(
-                            """
-                            The table below displays Mass2Motifs that are predicted to be present in this spectrum, 
-                            ranked by their document-topic probability. These motifs represent common fragmentation 
-                            patterns found across multiple spectra in your dataset.
+                    ], className="d-flex align-items-center flex-wrap mb-2"),
 
-                            Each motif contributes to explaining different parts of the spectrum. You can interact 
-                            with the motifs in several ways:
-
-                            • Click a motif's name to highlight its features in the plot below. This helps you 
-                              visualize which peaks in the spectrum are explained by that specific motif.
-
-                            • Click the "Motif Details" button to navigate to the Motif Details tab, where you 
-                              can explore the motif's composition, occurrence patterns, and other spectra that 
-                              contain this motif.
-
-                            Use the buttons above to control how motifs are displayed in the spectrum plot:
-                            • "All motifs" - Shows all motifs with different colors
-                            • "Single motif" - Highlights only the selected motif
-                            • "None" - Shows the raw spectrum without highlighting
-                            """,
-                        ),
-                        html.Div(
-                            id="search-tab-associated-motifs-list",
-                            style={"marginTop": "10px"},
-                        ),
-                    ], style={
-                        "border": "1px dashed #ccc",
-                        "padding": "10px",
-                        "borderRadius": "5px",
-                        "marginBottom": "15px"
-                    }),
-
-                    # Spectrum Plot
+                    # --- list of individual motifs ---
                     html.Div([
-                        html.H5("Spectrum Plot with Motif Highlighting"),
-                        dcc.Markdown(
-                            """
-                            The bar chart displays the full MS/MS spectrum of the selected document. How peaks are 
-                            colored depends on the highlighting mode selected:
-
-                            **When "Single motif" is selected:**
-                            • Peaks whose m/z matches **fragment** features of the selected motif are colored red
-                            • Peaks whose m/z matches a **neutral-loss** feature are also red
-                            • All other peaks remain grey
-
-                            **When "All motifs" is selected:**
-                            • Each motif is assigned a unique color
-                            • Peaks are divided into colored slices proportional to each motif's contribution
-                            • Peaks not claimed by any motif remain grey
-
-                            **For all modes:**
-                            • Neutral losses are connected to the precursor ion by a green dashed line labelled with 
-                              the neutral-loss value (for example "-18.01")
-                            • A vertical blue dashed line indicates the precursor ion (when enabled)
-                            • Hover over a bar to read the exact m/z, intensity, and motif information
-                            """,
-                        ),
-                        html.Div(
-                            id="search-tab-spectrum-plot-container",
-                            style={"marginTop": "10px"},
-                        ),
+                        html.H5("Individual motifs (probability):"),
+                        html.Div(id="search-tab-associated-motifs-list",
+                                 style={"marginTop": "5px"}),
                     ], style={
                         "border": "1px dashed #ccc",
                         "padding": "10px",
                         "borderRadius": "5px",
                         "marginBottom": "15px"
                     }),
+
+                    # --- spectrum plot ---
+                    html.Div(id="search-tab-spectrum-plot-container"),
                 ],
             ),
         ],
