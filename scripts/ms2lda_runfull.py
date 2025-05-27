@@ -97,6 +97,19 @@ def deep_update(source, overrides):
 
 def main():
     """Parses arguments, merges parameters, downloads data if requested, and runs MS2LDA."""
+
+    # EARLY EXIT: pure download mode triggered by --only-download
+    if "--only-download" in sys.argv:
+        try:
+            print("\n--- Downloading Spec2Vec Data (if missing) ---")
+            print(download_model_and_data(mode="positive"))  # TODO: support negative mode later
+            print("--------------------------------------------\n")
+        except Exception as e:
+            print(f"ERROR during download: {e}", file=sys.stderr)
+            traceback.print_exc()
+            sys.exit(1)
+        sys.exit(0)
+
     parser = argparse.ArgumentParser(
         description="Run MS2LDA analysis from the command line.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -133,9 +146,6 @@ def main():
             status_message = download_model_and_data(mode="positive")  # TODO: support negative mode later
             print(status_message)
             print("--------------------------------------------\n")
-            if args.only_download:
-                print("Download complete. Exiting as requested by --only-download.")
-                sys.exit(0)
         except Exception as e:
             print(f"\nERROR: Failed during Spec2Vec data download: {e}", file=sys.stderr)
             traceback.print_exc()

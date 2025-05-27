@@ -1,8 +1,8 @@
 #from rdkit import Chem
 #from matchms import Spectrum, Fragments
 #from matchms.filtering import normalize_intensities
-import requests
-import os
+import os, requests
+from tqdm import tqdm
 import numpy as np
 import hashlib
 from MS2LDA.Mass2Motif import Mass2Motif
@@ -124,16 +124,15 @@ def download_model_and_data(file_urls=[
     "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.wv.vectors.npy?download=1",
     "https://zenodo.org/records/15003249/files/150225_CombLibraries_spectra.db?download=1",
 ], mode="positive"):
-    """Downloads the spec2vec model and data to Add_On/Spec2Vec/model_{mode}_mode.
-       If a file already exists, it will be skipped.
+    """Downloads the Spec2Vec model/data to Add_On/Spec2Vec/model_{mode}_mode.
+       Skips files already present and shows a tqdm progress bar per file.
     """
 
-    script_directory = os.path.dirname(os.path.abspath(__file__))
-    relative_directory = f"Add_On/Spec2Vec/model_{mode}_mode"
-    #relative_directory = f"Add_On/Spec2Vec/trash_{mode}"
-    save_directory = os.path.join(script_directory, relative_directory)
 
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    save_directory = os.path.join(script_directory, f"Add_On/Spec2Vec/model_{mode}_mode")
     os.makedirs(save_directory, exist_ok=True)
+
     download_count = 0
     skip_count = 0
 
@@ -141,22 +140,35 @@ def download_model_and_data(file_urls=[
         file_name = os.path.basename(url.split("?download")[0])
         file_path = os.path.join(save_directory, file_name)
 
-        # Skip if file is present
         if os.path.exists(file_path):
             skip_count += 1
             print(f"File {file_name} already exists, skipping download.")
             continue
 
         print(f"Downloading {file_name} ...")
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(file_path, 'wb') as file:
-                file.write(response.content)
-            download_count += 1
-            print(f"Downloaded {file_name} successfully.")
-        else:
-            raise Exception(f"HTTP Error {response.status_code} while fetching {url}")
+        with requests.get(url, stream=True) as response:
+            if response.status_code != 200:
+                raise Exception(f"HTTP {response.status_code} while fetching {url}")
+
+            total = int(response.headers.get("content-length", 0))
+            with open(file_path, "wb") as fh, tqdm(
+                total=total or None,
+                unit="B",
+                unit_scale=True,
+                unit_divisor=1024,
+                desc=file_name,
+                initial=0,
+            ) as bar:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:                       # skip keep-alive chunks
+                        fh.write(chunk)
+                        bar.update(len(chunk))
+
+        download_count += 1
+        print(f"Downloaded {file_name} successfully.")
 
     return f"Done. Downloaded {download_count} files, skipped {skip_count} existing."
+
+
 
 
