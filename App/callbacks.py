@@ -1806,7 +1806,7 @@ def update_selected_spectrum(selected_rows, next_clicks, prev_clicks, selected_m
     Input('selected-spectrum-index', 'data'),
     Input('probability-filter', 'value'),
     Input('spectrum-fragloss-toggle', 'value'),
-    Input('spectrum-highlight-mode', 'value'),
+    Input('spectrum-highlight-mode', 'data'),
     Input('spectrum-show-parent-ion', 'value'),
     Input('motif-spectra-ids-store', 'data'),
     State('spectra-store', 'data'),
@@ -1837,6 +1837,101 @@ def update_spectrum_plot(selected_index, probability_range, fragloss_mode, highl
 
     return ""
 
+
+@app.callback(
+    Output("motif-details-associated-motifs-list", "children"),
+    Input("selected-spectrum-index", "data"),
+    Input("motif-spectra-ids-store", "data"),
+    State("spectra-store", "data"),
+    State("lda-dict-store", "data"),
+    State("selected-motif-store", "data"),
+    prevent_initial_call=True,
+)
+def show_motif_details_associated_motifs(selected_index, spectra_ids, spectra_data, lda_dict_data, selected_motif):
+    if not spectra_ids or not spectra_data or not lda_dict_data or selected_motif is None:
+        return "No motifs to display."
+
+    if selected_index is None or selected_index < 0 or selected_index >= len(spectra_ids):
+        return "Selected spectrum index is out of range."
+
+    spectrum_id = spectra_ids[selected_index]
+
+    doc_theta = lda_dict_data["theta"].get(spectrum_id, {})
+    if not doc_theta:
+        return "No motifs found for this spectrum."
+
+    # Sort by descending probability
+    motif_probs = sorted(doc_theta.items(), key=lambda x: x[1], reverse=True)
+
+    if not motif_probs:
+        return "No motifs (above threshold) for this spectrum."
+
+    # Build a list of clickable motif buttons
+    layout_items = []
+    for motif_id, prob in motif_probs:
+        if prob < 0.01:
+            continue
+
+        # Check if this is the currently selected motif
+        is_selected = (motif_id == selected_motif)
+
+        motif_label = f"{motif_id} (Prob: {prob:.3f})"
+        layout_items.append(
+            html.Div([
+                dbc.Button(
+                    motif_label,
+                    id={"type": "motif-details-motif-link", "index": motif_id},
+                    color="primary" if is_selected else "secondary",
+                    size="sm",
+                    className="me-2",
+                ),
+            ],
+                className="d-flex align-items-center mb-1")
+        )
+
+    if not layout_items:
+        return "No motifs (above threshold) for this spectrum."
+
+    return layout_items
+
+
+@app.callback(
+    Output("spectrum-highlight-mode", "data", allow_duplicate=True),
+    Output("selected-motif-store", "data", allow_duplicate=True),
+    Input({"type": "motif-details-motif-link", "index": ALL}, "n_clicks"),
+    prevent_initial_call=True,
+)
+def update_motif_details_selected_motif_for_plot(n_clicks_list):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise PreventUpdate
+
+    import json
+    motif_id = json.loads(ctx.triggered[0]["prop_id"].split(".")[0])["index"]
+    return "single", motif_id
+
+
+@app.callback(
+    Output("spectrum-highlight-mode", "data"),
+    Output("spectrum-highlight-all-btn", "active"),
+    Output("spectrum-highlight-none-btn", "active"),
+    Input("spectrum-highlight-all-btn", "n_clicks"),
+    Input("spectrum-highlight-none-btn", "n_clicks"),
+    State("spectrum-highlight-mode", "data"),
+    prevent_initial_call=True,
+)
+def update_motif_details_highlight_mode(all_clicks, none_clicks, current_mode):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        return current_mode, current_mode == "all", current_mode == "none"
+
+    btn = ctx.triggered[0]["prop_id"].split(".")[0]
+    if btn == "spectrum-highlight-all-btn":
+        return "all", True, False
+    if btn == "spectrum-highlight-none-btn":
+        return "none", False, True
+
+    return current_mode, current_mode == "all", current_mode == "none"
 
 # -------------------------------- SCREENING --------------------------------
 

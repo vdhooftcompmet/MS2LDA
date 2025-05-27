@@ -1312,32 +1312,46 @@ def create_motif_details_tab():
                         style_table={'overflowX': 'auto'}, style_cell={'textAlign': 'left'},
                         page_size=10, row_selectable='single', selected_rows=[0], hidden_columns=["SpecIndex"]
                     ),
-                    dbc.RadioItems(
-                        id="spectrum-highlight-mode",
-                        options=[
-                            {"label": "Active motif only", "value": "single"},
-                            {"label": "All motifs", "value": "all"},
-                            {"label": "None", "value": "none"},
-                        ],
-                        value="single",
-                        inline=True,
-                    ),
-                    dbc.RadioItems(
-                        id="spectrum-fragloss-toggle",
-                        options=[
-                            {"label": "Fragments + Losses", "value": "both"},
-                            {"label": "Fragments Only", "value": "fragments"},
-                            {"label": "Losses Only", "value": "losses"},
-                        ],
-                        value="both",
-                        inline=True,
-                    ),
-                    dbc.Checkbox(
-                        id="spectrum-show-parent-ion",
-                        label="Show Parent Ion",
-                        value=True,
-                        className="mt-2",
-                    ),
+                    html.Div([
+                        dbc.ButtonGroup([
+                            dbc.Button("All motifs",
+                                       id="spectrum-highlight-all-btn",
+                                       color="primary", outline=True,
+                                       active=False, className="me-1"),
+                            dbc.Button("None",
+                                       id="spectrum-highlight-none-btn",
+                                       color="primary", outline=True,
+                                       active=False),
+                        ], className="me-2"),
+
+                        dbc.RadioItems(
+                            id="spectrum-fragloss-toggle",
+                            options=[
+                                {"label": "Fragments + Losses", "value": "both"},
+                                {"label": "Fragments Only", "value": "fragments"},
+                                {"label": "Losses Only", "value": "losses"},
+                            ],
+                            value="both",
+                            inline=True,
+                            style={"marginLeft": "10px"},
+                        ),
+
+                        dbc.Checkbox(
+                            id="spectrum-show-parent-ion",
+                            label="Show Parent Ion",
+                            value=True,
+                            className="ms-3",
+                        ),
+                    ], className="d-flex align-items-center flex-wrap mb-2"),
+
+                    html.Div([
+                        html.H5("Individual motifs (probability):"),
+                        html.Div(id="motif-details-associated-motifs-list",
+                                 style={"marginTop": "5px"}),
+                    ]),
+
+                    # Hidden input to store the highlight mode
+                    dcc.Store(id="spectrum-highlight-mode", data="single"),
                     html.Div(id='spectrum-plot'),
 
                     html.Div([
