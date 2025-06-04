@@ -5,6 +5,10 @@ Command-line interface for running MS2LDA analysis.
 This script allows running the core MS2LDA workflow with specified parameters,
 optionally loading advanced settings from a JSON configuration file.
 It also provides an option to download necessary Spec2Vec data files.
+Adds a unified “aux-data” downloader that fetches:
+  • Spec2Vec positive-mode model + embeddings + DB
+  • The two fingerprint JARs (cdk-2.2.jar, jCMapperCLI.jar)
+  • All MotifDB JSON reference sets
 """
 
 import os
@@ -18,16 +22,18 @@ import argparse
 import json
 import sys
 import traceback
+from pathlib import Path
+from typing import List
+from tqdm import tqdm
 
-# Check if everything can be imported correctly
+import requests
+
 try:
     from MS2LDA.run import run as run_ms2lda
     from MS2LDA.utils import download_model_and_data
+    import MS2LDA  # locate package root
 except ModuleNotFoundError:
     print("ERROR: Could not import the MS2LDA package.", file=sys.stderr)
-    print("Please ensure that MS2LDA is installed correctly and that", file=sys.stderr)
-    print("you are running this script from the project root directory", file=sys.stderr)
-    print("or have set the PYTHONPATH environment variable.", file=sys.stderr)
     traceback.print_exc()
     sys.exit(1)
 
@@ -81,147 +87,219 @@ DEFAULT_PARAMS = {
     }
 }
 
+# ----------------------------------------------------------------------
+# Helper download functions
+# ----------------------------------------------------------------------
 
-def deep_update(source, overrides):
+
+def _github_file_download(repo: str, file_path: str, local_dst: Path) -> str:
     """
-    Helper function to deeply update nested dictionaries.
-    Modifies 'source' in place.
+    Download a single file from a public GitHub repo (main branch) **with a
+    tqdm progress-bar**, mirroring the behaviour of download_model_and_data().
+    Returns a status string.
     """
-    for key, value in overrides.items():
-        if isinstance(value, dict) and key in source and isinstance(source[key], dict):
-            deep_update(source[key], value)
+    api = f"https://raw.githubusercontent.com/{repo}/main/{file_path}"
+
+    # Skip if already present
+    if local_dst.exists():
+        return f"✓ {local_dst} (exists)"
+
+    # Stream download with progress bar
+    with requests.get(api, stream=True, timeout=300) as r:
+        r.raise_for_status()
+        total = int(r.headers.get("content-length", 0))
+
+        local_dst.parent.mkdir(parents=True, exist_ok=True)
+        with open(local_dst, "wb") as fh, tqdm(
+            total=total or None,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            desc=local_dst.name,
+            initial=0,
+        ) as bar:
+            for chunk in r.iter_content(chunk_size=8192):
+                if chunk:  # skip keep-alive chunks
+                    fh.write(chunk)
+                    bar.update(len(chunk))
+
+    return f"✓ {local_dst} (downloaded)"
+
+
+def _github_dir_download(repo: str, dir_path: str, local_dst: Path) -> List[str]:
+    """
+    Download every file in a directory of a public GitHub repo
+    using the Contents API. Returns status strings.
+    """
+    api = f"https://api.github.com/repos/{repo}/contents/{dir_path}?ref=main"
+    r = requests.get(api, timeout=60)
+    r.raise_for_status()
+    log: List[str] = []
+
+    for item in r.json():
+        if item["type"] != "file":
+            continue
+        tgt = local_dst / item["name"]
+        log.append(_github_file_download(repo, f"{dir_path}/{item['name']}", tgt))
+    return log
+
+
+def download_all_aux_data() -> str:
+    """
+    Download Spec2Vec assets, two FP-calculation JARs, and all MotifDB JSONs.
+    Returns a printable summary.
+    """
+    pkg_root = Path(MS2LDA.__file__).resolve().parent
+    repo = "vdhooftcompmet/MS2LDA"
+    summary: List[str] = []
+
+    # 1. Spec2Vec (positive mode)
+    summary.append("→ Spec2Vec assets:")
+    summary.append(download_model_and_data(mode="positive").strip())
+
+    # 2. Fingerprint JARs
+    summary.append("\n→ Fingerprint JARs:")
+    jar_base = pkg_root / "Add_On" / "Fingerprints" / "FP_calculation"
+    summary.append(
+        _github_file_download(
+            repo,
+            "MS2LDA/Add_On/Fingerprints/FP_calculation/cdk-2.2.jar",
+            jar_base / "cdk-2.2.jar",
+        )
+    )
+    summary.append(
+        _github_file_download(
+            repo,
+            "MS2LDA/Add_On/Fingerprints/FP_calculation/jCMapperCLI.jar",
+            jar_base / "jCMapperCLI.jar",
+        )
+    )
+
+    # 3. MotifDB JSONs
+    summary.append("\n→ MotifDB JSONs:")
+    motif_dst = pkg_root / "MotifDB"
+    summary.extend(_github_dir_download(repo, "MS2LDA/MotifDB", motif_dst))
+
+    return "\n".join(summary)
+
+
+def deep_update(src, upd):
+    for k, v in upd.items():
+        if isinstance(v, dict) and k in src and isinstance(src[k], dict):
+            deep_update(src[k], v)
         else:
-            source[key] = value
-    return source
+            src[k] = v
+    return src
+
+
+# ----------------------------------------------------------------------
+# CLI
+# ----------------------------------------------------------------------
 
 
 def main():
-    """Parses arguments, merges parameters, downloads data if requested, and runs MS2LDA."""
-
-    # EARLY EXIT: pure download mode triggered by --only-download
     if "--only-download" in sys.argv:
         try:
-            print("\n--- Downloading Spec2Vec Data (if missing) ---")
-            print(download_model_and_data(mode="positive"))  # TODO: support negative mode later
-            print("--------------------------------------------\n")
+            print("\n--- Downloading auxiliary MS2LDA data ---")
+            print(download_all_aux_data())
+            print("-----------------------------------------\n")
         except Exception as e:
             print(f"ERROR during download: {e}", file=sys.stderr)
             traceback.print_exc()
             sys.exit(1)
         sys.exit(0)
 
-    parser = argparse.ArgumentParser(
+    p = argparse.ArgumentParser(
         description="Run MS2LDA analysis from the command line.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    p.add_argument(
+        "--dataset", required=True, help="Input MS data file (.mgf, .mzml, .msp)"
+    )
+    p.add_argument(
+        "--n-motifs",
+        required=True,
+        type=int,
+        help="Number of motifs (topics) to discover.",
+    )
+    p.add_argument(
+        "--n-iterations",
+        required=True,
+        type=int,
+        help="Number of LDA training iterations.",
+    )
+    p.add_argument(
+        "--output-folder", required=True, help="Directory where results are saved."
+    )
+    p.add_argument(
+        "-c",
+        "--config",
+        type=str,
+        help="Optional JSON config file for advanced parameters.",
+    )
+    p.add_argument(
+        "--run-name", type=str, help="Optional run name (overrides default/config)."
+    )
+    p.add_argument(
+        "--download-data",
+        action="store_true",
+        help="Download auxiliary data before running.",
+    )
+    p.add_argument(
+        "--only-download",
+        action="store_true",
+        help="Just download auxiliary data then exit.",
     )
 
-    # Required arguments
-    parser.add_argument("--dataset", type=str, required=True,
-                        help="Path to the input mass spectrometry data file (e.g., .mgf, .mzml, .msp)")
-    parser.add_argument("--n-motifs", type=int, required=True,
-                        help="Number of motifs (topics) to discover.")
-    parser.add_argument("--n-iterations", type=int, required=True,
-                        help="Number of LDA training iterations.")
-    parser.add_argument("--output-folder", type=str, required=True,
-                        help="Path to the directory where results should be saved.")
+    args = p.parse_args()
 
-    # Optional arguments
-    parser.add_argument("-c", "--config", type=str, default=None,
-                        help="Path to an optional JSON configuration file for advanced parameters.")
-    parser.add_argument("--run-name", type=str, default=None,
-                        help="Optional name for the run (used in output filenames). Overrides default/config.")
-
-    # Utility arguments
-    parser.add_argument("--download-spec2vec", action="store_true",
-                        help="Download the required Spec2Vec model and data files before running the analysis.")
-    parser.add_argument("--only-download", action="store_true",
-                        help="Only perform the download specified by --download-spec2vec and then exit.")
-
-    args = parser.parse_args()
-
-    # Download Spec2Vec data if needed
-    if args.download_spec2vec:
+    if args.download_data:
         try:
-            print("\n--- Downloading Spec2Vec Data (if missing) ---")
-            status_message = download_model_and_data(mode="positive")  # TODO: support negative mode later
-            print(status_message)
-            print("--------------------------------------------\n")
+            print("\n--- Downloading auxiliary MS2LDA data ---")
+            print(download_all_aux_data())
+            print("-----------------------------------------\n")
         except Exception as e:
-            print(f"\nERROR: Failed during Spec2Vec data download: {e}", file=sys.stderr)
+            print(f"\nERROR: Failed during data download: {e}", file=sys.stderr)
             traceback.print_exc()
             sys.exit(1)
 
-    # Parameter Loading and Merging
-    current_params = DEFAULT_PARAMS.copy()  # Start with defaults
+    params = DEFAULT_PARAMS.copy()
+    if args.config and os.path.exists(args.config):
+        with open(args.config) as f:
+            params = deep_update(params, json.load(f))
 
-    # 1. Load from config file (if provided)
-    if args.config:
-        if not os.path.exists(args.config):
-            print(f"Warning: Configuration file specified but not found at {args.config}. Using defaults.",
-                  file=sys.stderr)
-        else:
-            with open(args.config, 'r') as f:
-                config_params = json.load(f)
-            print(f"Loaded configuration from: {args.config}")
-            # Deep update defaults with config file values
-            current_params = deep_update(current_params, config_params)
-
-    # 2. Override with specific required CLI arguments
-    current_params["dataset_parameters"]["output_folder"] = args.output_folder
+    params["dataset_parameters"]["output_folder"] = args.output_folder
     if args.run_name:
-        current_params["dataset_parameters"]["name"] = args.run_name
-    elif "name" not in current_params["dataset_parameters"] or current_params["dataset_parameters"]["name"] == \
-            DEFAULT_PARAMS["dataset_parameters"]["name"]:
-        if args.dataset:
-            base_name = os.path.splitext(os.path.basename(args.dataset))[0]
-            current_params["dataset_parameters"]["name"] = f"ms2lda_{base_name}"
+        params["dataset_parameters"]["name"] = args.run_name
+    elif (
+        params["dataset_parameters"]["name"]
+        == DEFAULT_PARAMS["dataset_parameters"]["name"]
+    ):
+        base = os.path.splitext(os.path.basename(args.dataset))[0]
+        params["dataset_parameters"]["name"] = f"ms2lda_{base}"
 
-    # Check if Spec2Vec files exist
-    s2v_model = current_params["annotation_parameters"].get("s2v_model_path")
-    s2v_embed = current_params["annotation_parameters"].get("s2v_library_embeddings")
-    s2v_db = current_params["annotation_parameters"].get("s2v_library_db")
+    print("\n--- Running MS2LDA with parameters ---")
+    print(json.dumps(params, indent=2))
+    print("--------------------------------------\n")
 
-    if not all(os.path.exists(p) for p in [s2v_model, s2v_embed, s2v_db]):
-        print("\nWarning: One or more specified Spec2Vec files do not exist:", file=sys.stderr)
-        print(f"  Model: {s2v_model} {'(Exists)' if os.path.exists(s2v_model) else '(Missing!)'}", file=sys.stderr)
-        print(f"  Embeddings: {s2v_embed} {'(Exists)' if os.path.exists(s2v_embed) else '(Missing!)'}", file=sys.stderr)
-        print(f"  DB: {s2v_db} {'(Exists)' if os.path.exists(s2v_db) else '(Missing!)'}", file=sys.stderr)
-        print("Annotation step might fail. Consider running with --download-spec2vec first.", file=sys.stderr)
-
-    print("\n--- Running MS2LDA with the following parameters ---")
-    print(f"Dataset: {args.dataset}")
-    print(f"Number of Motifs: {args.n_motifs}")
-    print(f"Number of Iterations: {args.n_iterations}")
-    print("Effective Parameters:")
-    print(json.dumps(current_params, indent=2))
-    print("----------------------------------------------------\n")
-
-    # Call MS2LDA Run
     try:
-        print("Starting MS2LDA analysis...")
-        # Pass CLI args directly, and unpacked dictionaries for the rest
         run_ms2lda(
             dataset=args.dataset,
             n_motifs=args.n_motifs,
             n_iterations=args.n_iterations,
-            dataset_parameters=current_params["dataset_parameters"],
-            train_parameters=current_params["train_parameters"],
-            model_parameters=current_params["model_parameters"],
-            convergence_parameters=current_params["convergence_parameters"],
-            annotation_parameters=current_params["annotation_parameters"],
-            preprocessing_parameters=current_params["preprocessing_parameters"],
-            motif_parameter=current_params["motif_parameter"],
-            fingerprint_parameters=current_params["fingerprint_parameters"],
-            save=True  # Explicitly save results from CLI run
+            dataset_parameters=params["dataset_parameters"],
+            train_parameters=params["train_parameters"],
+            model_parameters=params["model_parameters"],
+            convergence_parameters=params["convergence_parameters"],
+            annotation_parameters=params["annotation_parameters"],
+            preprocessing_parameters=params["preprocessing_parameters"],
+            motif_parameter=params["motif_parameter"],
+            fingerprint_parameters=params["fingerprint_parameters"],
+            save=True,
         )
         print("\nMS2LDA analysis completed successfully.")
-    except FileNotFoundError as e:
-        print(f"\nERROR: A required file was not found: {e}", file=sys.stderr)
-        print("This might be the input dataset or a Spec2Vec file. Please check paths.", file=sys.stderr)
-        traceback.print_exc()
-        sys.exit(1)
     except Exception as e:
-        print(f"\nERROR: An unexpected error occurred during MS2LDA execution: {e}", file=sys.stderr)
+        print(f"\nERROR: {e}", file=sys.stderr)
         traceback.print_exc()
         sys.exit(1)
 

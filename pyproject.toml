@@ -18,9 +18,24 @@ packages = [
 ]
 
 include = [
-  "MS2LDA/Spec2Vec/model_*",
-  "MS2LDA/MotifDB/*.json",
-  "LICENSE"
+  "LICENSE",
+  "README.md"
+]
+
+exclude = [
+  # Spec2Vec models (HUGE files, get them from Zenodo)
+  "MS2LDA/**/Spec2Vec/model_positive_mode/**",
+  "MS2LDA/**/Spec2Vec/model_negative_mode/**",
+
+  # Fingerprint JARs – 43 MB combined
+  "MS2LDA/Add_On/Fingerprints/FP_calculation/cdk-*.jar",
+  "MS2LDA/Add_On/Fingerprints/FP_calculation/jCMapperCLI.jar",
+
+  # Optional: strip heavy notebooks you don’t need in production
+  "MS2LDA/Add_On/Fingerprints/FP_calculation/*.ipynb",
+
+    # MotifDB entire folder (now fetched at runtime)
+  "MS2LDA/MotifDB/**"
 ]
 
 [tool.poetry.dependencies]
@@ -57,8 +72,8 @@ faiss-cpu  = "1.10.0"
 # cheminformatics (required)
 rdkit      = ">=2023.9.6,<2026"
 
-# git dependency (PyPI name inside the project is `massql`)
-massql = { git = "https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git" }
+# custom massql extension for MS2LDA
+massql4motifs = { git = "https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git" }
 
 # optional notebook tooling
 ipython    = { version = "^8.26.0", optional = true }
