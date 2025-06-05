@@ -72,12 +72,15 @@ class Mass2Motif:
 
     _peak_comments_mz_tolerance = 1e-05
 
-    def __init__(self, frag_mz: np.array,
-                 frag_intensities: np.array,
-                 loss_mz: np.array,
-                 loss_intensities: np.array,
-                 metadata: Optional[dict] = None,
-                 metadata_harmonization: bool = True):
+    def __init__(
+        self,
+        frag_mz: np.array,
+        frag_intensities: np.array,
+        loss_mz: np.array,
+        loss_intensities: np.array,
+        metadata: Optional[dict] = None,
+        metadata_harmonization: bool = True,
+    ):
         """
 
         Parameters
@@ -97,19 +100,16 @@ class Mass2Motif:
             self._metadata.harmonize_values()
         self.peaks = Fragments(mz=frag_mz, intensities=frag_intensities)
         self._losses = Fragments(mz=loss_mz, intensities=loss_intensities)
-        
 
     def __eq__(self, other):
-        return \
-            self.peaks == other.peaks and \
-            self._metadata == other._metadata
+        return self.peaks == other.peaks and self._metadata == other._metadata
 
     def __hash__(self):
         """Return a integer hash which is computed from both
         metadata (see .metadata_hash() method) and spectrum peaks
         (see .spectrum_hash() method)."""
         combined_hash = self.metadata_hash() + self.spectrum_hash()
-        return int.from_bytes(bytearray(combined_hash, 'utf-8'), 'big')
+        return int.from_bytes(bytearray(combined_hash, "utf-8"), "big")
 
     def __repr__(self):
         precursor_mz_str = f"{self.get('precursor_mz', 0.0):.2f}"
@@ -137,12 +137,14 @@ class Mass2Motif:
 
     def clone(self):
         """Return a deepcopy of the spectrum instance."""
-        clone = Mass2Motif(frag_mz=self.peaks.mz,
-                         frag_intensities=self.peaks.intensities,
-                         loss_mz=self._losses.mz,
-                         loss_intensities=self._losses.intensities,
-                         metadata=self._metadata.data,
-                         metadata_harmonization=False)
+        clone = Mass2Motif(
+            frag_mz=self.peaks.mz,
+            frag_intensities=self.peaks.intensities,
+            loss_mz=self._losses.mz,
+            loss_intensities=self._losses.intensities,
+            metadata=self._metadata.data,
+            metadata_harmonization=False,
+        )
         return clone
 
     def plot(self, figsize=(8, 6), dpi=200, **kwargs):
@@ -158,9 +160,7 @@ class Mass2Motif:
         ax = plot_spectrum(self, ax=ax, **kwargs)
         return fig, ax
 
-    def plot_against(self, other_spectrum,
-                     figsize=(8, 6), dpi=200,
-                     **spectrum_kws):
+    def plot_against(self, other_spectrum, figsize=(8, 6), dpi=200, **spectrum_kws):
         """Compare two spectra visually in a mirror plot.
 
         To visually compare the peaks of two spectra run
@@ -281,7 +281,9 @@ class Mass2Motif:
 
         def _append_new_comment(key):
             if new_key_comment is not None:
-                comment = "; ".join([new_key_comment, self.metadata["peak_comments"].get(key)])
+                comment = "; ".join(
+                    [new_key_comment, self.metadata["peak_comments"].get(key)]
+                )
             else:
                 comment = self.metadata["peak_comments"].get(key)
             return comment
@@ -289,7 +291,9 @@ class Mass2Motif:
         for key in list(self.metadata["peak_comments"].keys()):
             if key not in peaks.mz:
                 if np.isclose(key, peaks.mz, rtol=mz_tolerance).any():
-                    new_key = peaks.mz[np.isclose(key, peaks.mz, rtol=mz_tolerance).argmax()]
+                    new_key = peaks.mz[
+                        np.isclose(key, peaks.mz, rtol=mz_tolerance).argmax()
+                    ]
                     new_key_comment = self.metadata["peak_comments"].get(new_key, None)
                     new_key_comment = _append_new_comment(key)
                     self._metadata["peak_comments"][new_key] = new_key_comment

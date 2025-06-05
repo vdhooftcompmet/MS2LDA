@@ -1,17 +1,31 @@
-#from rdkit import Chem
-#from matchms import Spectrum, Fragments
-#from matchms.filtering import normalize_intensities
+# from rdkit import Chem
+# from matchms import Spectrum, Fragments
+# from matchms.filtering import normalize_intensities
 import os, requests
 from tqdm import tqdm
 import numpy as np
 import hashlib
+from pathlib import Path
 from MS2LDA.Mass2Motif import Mass2Motif
 
+# Package root for path resolution
+PKG_ROOT = Path(__file__).resolve().parent
 
-from matchms import set_matchms_logger_level; set_matchms_logger_level("ERROR")
+
+from matchms import set_matchms_logger_level
+
+set_matchms_logger_level("ERROR")
 
 
-def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", significant_digits=2, charge=1, motifset="unknown"):
+def create_spectrum(
+    motif_k_features,
+    k,
+    frag_tag="frag@",
+    loss_tag="loss@",
+    significant_digits=2,
+    charge=1,
+    motifset="unknown",
+):
     """creates a spectrum from fragments and losses text representations like frag@123.45 or fragment_67.89
 
     ARGS:
@@ -30,12 +44,24 @@ def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", sig
     loss_start = len(loss_tag)
 
     # extract fragments and losses
-    fragments = [ ( round(float(feature[frag_start:]),significant_digits), float(importance) ) for feature, importance in motif_k_features if feature.startswith(frag_tag) ]
-    losses = [ ( round(float(feature[loss_start:]),significant_digits), float(importance) ) for feature, importance in motif_k_features if feature.startswith(loss_tag) ]
+    fragments = [
+        (round(float(feature[frag_start:]), significant_digits), float(importance))
+        for feature, importance in motif_k_features
+        if feature.startswith(frag_tag)
+    ]
+    losses = [
+        (round(float(feature[loss_start:]), significant_digits), float(importance))
+        for feature, importance in motif_k_features
+        if feature.startswith(loss_tag)
+    ]
 
     # sort features based on mz value
-    sorted_fragments, sorted_fragments_intensities = zip(*sorted(fragments)) if fragments else (np.array([]), np.array([]))
-    sorted_losses, sorted_losses_intensities = zip(*sorted(losses)) if losses else (np.array([]), np.array([]))
+    sorted_fragments, sorted_fragments_intensities = (
+        zip(*sorted(fragments)) if fragments else (np.array([]), np.array([]))
+    )
+    sorted_losses, sorted_losses_intensities = (
+        zip(*sorted(losses)) if losses else (np.array([]), np.array([]))
+    )
 
     # normalize intensity over fragments and losses
     intensities = list(sorted_fragments_intensities) + list(sorted_losses_intensities)
@@ -43,8 +69,8 @@ def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", sig
     normalized_intensities = np.array(intensities) / max_intensity
 
     # split fragments and losses
-    normalized_frag_intensities = normalized_intensities[:len(sorted_fragments)]
-    normalized_loss_intensities = normalized_intensities[len(sorted_fragments):]
+    normalized_frag_intensities = normalized_intensities[: len(sorted_fragments)]
+    normalized_loss_intensities = normalized_intensities[len(sorted_fragments) :]
 
     # create spectrum object
     spectrum = Mass2Motif(
@@ -55,9 +81,9 @@ def create_spectrum(motif_k_features, k, frag_tag="frag@", loss_tag="loss@", sig
         metadata={
             "id": f"motif_{k}".strip(),
             "charge": charge,
-            "ms2accuracy": (1 / (10 ** significant_digits)) / 2 ,
+            "ms2accuracy": (1 / (10**significant_digits)) / 2,
             "motifset": motifset,
-        }
+        },
     )
 
     return spectrum
@@ -111,26 +137,29 @@ def retrieve_spec4doc(doc2spec_map, ms2lda, doc_id):
     for word_index in ms2lda.docs[doc_id].words:
         original_doc += ms2lda.vocabs[word_index]
 
-    hashed_feature_word = hashlib.md5(original_doc.encode('utf-8')).hexdigest()
+    hashed_feature_word = hashlib.md5(original_doc.encode("utf-8")).hexdigest()
     retrieved_spec = doc2spec_map[hashed_feature_word]
     return retrieved_spec
 
 
-
-def download_model_and_data(file_urls=[
-    "https://zenodo.org/records/15003249/files/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy?download=1",
-    "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model?download=1",
-    "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.syn1neg.npy?download=1",
-    "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.wv.vectors.npy?download=1",
-    "https://zenodo.org/records/15003249/files/150225_CombLibraries_spectra.db?download=1",
-], mode="positive"):
+def download_model_and_data(
+    file_urls=[
+        "https://zenodo.org/records/15003249/files/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy?download=1",
+        "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model?download=1",
+        "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.syn1neg.npy?download=1",
+        "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.wv.vectors.npy?download=1",
+        "https://zenodo.org/records/15003249/files/150225_CombLibraries_spectra.db?download=1",
+    ],
+    mode="positive",
+):
     """Downloads the Spec2Vec model/data to Add_On/Spec2Vec/model_{mode}_mode.
-       Skips files already present and shows a tqdm progress bar per file.
+    Skips files already present and shows a tqdm progress bar per file.
     """
 
-
     script_directory = os.path.dirname(os.path.abspath(__file__))
-    save_directory = os.path.join(script_directory, f"Add_On/Spec2Vec/model_{mode}_mode")
+    save_directory = os.path.join(
+        script_directory, f"Add_On/Spec2Vec/model_{mode}_mode"
+    )
     os.makedirs(save_directory, exist_ok=True)
 
     download_count = 0
@@ -160,7 +189,7 @@ def download_model_and_data(file_urls=[
                 initial=0,
             ) as bar:
                 for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:                       # skip keep-alive chunks
+                    if chunk:  # skip keep-alive chunks
                         fh.write(chunk)
                         bar.update(len(chunk))
 
@@ -170,5 +199,51 @@ def download_model_and_data(file_urls=[
     return f"Done. Downloaded {download_count} files, skipped {skip_count} existing."
 
 
+def download_fp_calculation():
+    """Clone the FP_calculation folder (without the big jars) if missing."""
+    import subprocess, tempfile, shutil
+    target = PKG_ROOT / "Add_On" / "Fingerprints" / "FP_calculation"
+    if target.exists():
+        return "FP_calculation already present – skipped."
+    print("Cloning FP_calculation …")
+    with tempfile.TemporaryDirectory() as tmp:
+        subprocess.check_call(
+            [
+                "git",
+                "clone",
+                "--depth",
+                "1",
+                "--filter=blob:none",
+                "--sparse",
+                "https://github.com/vdhooftcompmet/MS2LDA",
+                tmp,
+            ]
+        )
+        src = Path(tmp) / "MS2LDA" / "Add_On" / "Fingerprints" / "FP_calculation"
+        shutil.copytree(src, target)
+    return "FP_calculation downloaded."
 
 
+def download_motifdb():
+    """Download MotifDB jsons if the folder is absent."""
+    import subprocess, tempfile, shutil
+    target = PKG_ROOT / "MotifDB"
+    if target.exists():
+        return "MotifDB already present – skipped."
+    print("Cloning MotifDB …")
+    with tempfile.TemporaryDirectory() as tmp:
+        subprocess.check_call(
+            [
+                "git",
+                "clone",
+                "--depth",
+                "1",
+                "--filter=blob:none",
+                "--sparse",
+                "https://github.com/vdhooftcompmet/MS2LDA",
+                tmp,
+            ]
+        )
+        src = Path(tmp) / "MS2LDA" / "MotifDB"
+        shutil.copytree(src, target)
+    return "MotifDB downloaded."

@@ -6,6 +6,7 @@ import json
 
 from MS2LDA.Mass2Motif import Mass2Motif
 
+
 def motifs2motifDB(spectra):
     """converts a set of motif spectra into a MassQL dataframe format
 
@@ -35,19 +36,24 @@ def motifs2motifDB(spectra):
         feature_dict["auto_annotation"] = spectrum.get("auto_annotation")
         feature_dict["motif_id"] = spectrum.get("id")
         feature_dict["motifset"] = spectrum.get("motifset")
-        feature_dict["analysis_massspectrometer"] = spectrum.get("analysis_massspectrometer")
+        feature_dict["analysis_massspectrometer"] = spectrum.get(
+            "analysis_massspectrometer"
+        )
         feature_dict["collision_energy"] = spectrum.get("collision_energy")
         feature_dict["other_information"] = spectrum.get("other_information")
         feature_dict["scientific_name"] = spectrum.get("scientific_name")
         feature_dict["sample_type"] = spectrum.get("sample_type")
         feature_dict["massive_id"] = spectrum.get("massive_id")
         feature_dict["taxon_id"] = spectrum.get("taxon_id")
-        feature_dict["analysis_ionizationsource"] = spectrum.get("analysis_ionizationsource")
-        feature_dict["analysis_chromatographyandphase"] = spectrum.get("analysis_chromatographyandphase")
+        feature_dict["analysis_ionizationsource"] = spectrum.get(
+            "analysis_ionizationsource"
+        )
+        feature_dict["analysis_chromatographyandphase"] = spectrum.get(
+            "analysis_chromatographyandphase"
+        )
         feature_dict["analysis_polarity"] = spectrum.get("analysis_polarity")
         feature_dict["paper_url"] = spectrum.get("paper_url")
         feature_dict["property"] = spectrum.get("property")
-
 
         feature_dict["scan"] = hash_id
         feature_dict["ms1scan"] = 0
@@ -108,7 +114,7 @@ def motifDB2motifs(motifDB_ms2, filter_table=pd.DataFrame()):
 
     ARGS:
         motifDB_ms2 (pd.dataframe): MassQL dataframe format for MS2 data
-	filter: output from massql query or None to convert all
+        filter: output from massql query or None to convert all
 
     RETURNS (list): list of matchms spectra objects
     """
@@ -160,7 +166,7 @@ def motifDB2motifs(motifDB_ms2, filter_table=pd.DataFrame()):
             frag_intensities=fragments_intensities,
             loss_mz=losses_mz,
             loss_intensities=losses_intensities,
-            metadata = {
+            metadata={
                 "id": name,
                 "charge": charge,
                 "short_annotation": short_annotation,
@@ -181,7 +187,7 @@ def motifDB2motifs(motifDB_ms2, filter_table=pd.DataFrame()):
                 "paper_url": paper_url,
                 "auto_annotation": auto_annotation,
                 "property": property,
-            }
+            },
         )
 
         motif_spectra.append(motif_spectrum)
@@ -190,34 +196,38 @@ def motifDB2motifs(motifDB_ms2, filter_table=pd.DataFrame()):
 
 
 def group_ms2(ms2_df):
-    ms2_df_grouped = ms2_df.groupby("scan").agg(
-        {
-            "frag_mz": list,
-            "frag_intens": list,
-            "loss_mz": list,
-            "loss_intens": list,
-            "charge": "first",
-            "ms2accuracy": "first",
-            "short_annotation": "first",
-            "annotation": "first",
-            "motif_id": "first",
-            "motifset": "first",
-            "ms1scan": "first",
-            "analysis_massspectrometer": "first",
-            "collision_energy": "first",
-            "other_information": "first",
-            "scientific_name": "first",
-            "sample_type": "first",
-            "massive_id": "first",
-            "taxon_id": "first",
-            "analysis_ionizationsource": "first",
-            "analysis_chromatographyandphase": "first",
-            "analysis_polarity": "first",
-            "paper_url": "first",
-            "auto_annotation": "first",
-            "property": "first",
-        }
-    ).reset_index()
+    ms2_df_grouped = (
+        ms2_df.groupby("scan")
+        .agg(
+            {
+                "frag_mz": list,
+                "frag_intens": list,
+                "loss_mz": list,
+                "loss_intens": list,
+                "charge": "first",
+                "ms2accuracy": "first",
+                "short_annotation": "first",
+                "annotation": "first",
+                "motif_id": "first",
+                "motifset": "first",
+                "ms1scan": "first",
+                "analysis_massspectrometer": "first",
+                "collision_energy": "first",
+                "other_information": "first",
+                "scientific_name": "first",
+                "sample_type": "first",
+                "massive_id": "first",
+                "taxon_id": "first",
+                "analysis_ionizationsource": "first",
+                "analysis_chromatographyandphase": "first",
+                "analysis_polarity": "first",
+                "paper_url": "first",
+                "auto_annotation": "first",
+                "property": "first",
+            }
+        )
+        .reset_index()
+    )
 
     return ms2_df_grouped
 
@@ -245,7 +255,9 @@ def load_motifDB(motifDB_filename):
     ms1_df = pd.DataFrame(motifDB["ms1"])
     ms2_df = pd.DataFrame(motifDB["ms2"])
 
-    ms2_df_expanded = ms2_df.explode(["frag_mz", "frag_intens", "loss_mz", "loss_intens"]).reset_index(drop=True)
+    ms2_df_expanded = ms2_df.explode(
+        ["frag_mz", "frag_intens", "loss_mz", "loss_intens"]
+    ).reset_index(drop=True)
     ms2_df_expanded["frag_mz"] = ms2_df_expanded["frag_mz"].astype(float)
     ms2_df_expanded["frag_intens"] = ms2_df_expanded["frag_intens"].astype(float)
     ms2_df_expanded["loss_mz"] = ms2_df_expanded["loss_mz"].astype(float)
@@ -265,7 +277,7 @@ def store_motifDB_excel(ms1_df, ms2_df, name="motifDB.xlsx"):
 
 
 def load_motifDB_excel(motifDB_filename):
-    ms1_df = pd.read_excel(motifDB_filename, sheet_name='ms1')
-    ms2_df = pd.read_excel(motifDB_filename, sheet_name='ms2')
+    ms1_df = pd.read_excel(motifDB_filename, sheet_name="ms1")
+    ms2_df = pd.read_excel(motifDB_filename, sheet_name="ms2")
 
     return ms1_df, ms2_df

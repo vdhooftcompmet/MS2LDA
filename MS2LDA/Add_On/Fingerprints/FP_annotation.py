@@ -1,13 +1,14 @@
 from MS2LDA.Add_On.Fingerprints.FP_calculation.rdkit_fps import *
-#from Add_On.Fingerprints.FP_calculation.minhash_fps import *
+
+# from Add_On.Fingerprints.FP_calculation.minhash_fps import *
 from MS2LDA.Add_On.Fingerprints.FP_calculation.adaptive_fps import generate_fingerprint
 from itertools import chain
 from rdkit.Chem import MolFromSmiles
 
 
-def mols2fps(smiles_per_motif, selected_fp_type, smarts=None): 
+def mols2fps(smiles_per_motif, selected_fp_type, smarts=None):
     """calculates the selected fingerprint for a given list of rdkit mol objects
-    
+
     ARGS:
         mols_per_motif (list(rdkit.mol.objects)): list of rdkit.mol.objects associated with one motif
         fp_type (str): a name of fingerprint that will be calculated
@@ -16,20 +17,48 @@ def mols2fps(smiles_per_motif, selected_fp_type, smarts=None):
         fps (numpy.array): a multi-array numpy error containing all fingerprints
     """
 
-    fps_type = ["adaptive", "pubchem", "daylight", "kr", "lingo", "estate", "dfs", "asp", "lstar", "rad2d", 
-                "ph2", "ph3", "ecfp", "avalon", "tt", "maccs", "fcfp", "ap", "rdkit", "map4", "mhfp"]
-    
+    fps_type = [
+        "adaptive",
+        "pubchem",
+        "daylight",
+        "kr",
+        "lingo",
+        "estate",
+        "dfs",
+        "asp",
+        "lstar",
+        "rad2d",
+        "ph2",
+        "ph3",
+        "ecfp",
+        "avalon",
+        "tt",
+        "maccs",
+        "fcfp",
+        "ap",
+        "rdkit",
+        "map4",
+        "mhfp",
+    ]
+
     selected_fp_type = selected_fp_type.lower()
 
     # self developed dynamic fingerprint
     if selected_fp_type == "adaptive":
         from FP_calculation.adaptive_fps import calc_adaptive
+
         mols_per_motif = smiles2mols(smiles_per_motif)
         fps = calc_adaptive(mols_per_motif, smarts)
 
     # cdk based fingerprints
     elif selected_fp_type in fps_type[1:6]:
-        from FP_calculation.cdk_fps import calc_PUBCHEM, calc_DAYLIGHT, calc_KR, calc_LINGO, calc_ESTATE
+        from FP_calculation.cdk_fps import (
+            calc_PUBCHEM,
+            calc_DAYLIGHT,
+            calc_KR,
+            calc_LINGO,
+            calc_ESTATE,
+        )
 
         if selected_fp_type == "pubchem":
             fps = calc_PUBCHEM(smiles_per_motif)
@@ -41,11 +70,18 @@ def mols2fps(smiles_per_motif, selected_fp_type, smarts=None):
             fps = calc_LINGO(smiles_per_motif)
         elif selected_fp_type == "estate":
             fps = calc_ESTATE(smiles_per_motif)
-    
+
     # jmap based fingerprints
     elif selected_fp_type in fps_type[6:10]:
-        from FP_calculation.jmap_fps import calc_DFS, calc_ASP, calc_LSTAR, calc_RAD2D, calc_PH2, calc_PH3
-        
+        from FP_calculation.jmap_fps import (
+            calc_DFS,
+            calc_ASP,
+            calc_LSTAR,
+            calc_RAD2D,
+            calc_PH2,
+            calc_PH3,
+        )
+
         if selected_fp_type == "dfs":
             fps = calc_DFS(smiles_per_motif)
         elif selected_fp_type == "asp":
@@ -75,11 +111,11 @@ def mols2fps(smiles_per_motif, selected_fp_type, smarts=None):
             fps = calc_AP(mols_per_motif)
         elif selected_fp_type == "rdkit":
             fps = calc_RDKIT(mols_per_motif)
-      
-        
+
     # minhash based fingerprints
     elif selected_fp_type in fps_type[19:]:
         from FP_calculation.minhash_fps import calc_MAP4, calc_MHFP
+
         mols_per_motif = smiles2mols(smiles_per_motif)
         if selected_fp_type == "map4":
             fps = calc_MAP4(mols_per_motif)
@@ -87,17 +123,19 @@ def mols2fps(smiles_per_motif, selected_fp_type, smarts=None):
             fps = calc_MHFP(mols_per_motif)
 
     else:
-        raise Exception (f"One of the following fingerprint types need to be selected: {fps_type}")
+        raise Exception(
+            f"One of the following fingerprint types need to be selected: {fps_type}"
+        )
 
     return fps
 
 
 def smiles2mols(smiles):
     """converts SMILES to rdkit mol objects
-    
+
     ARGS:
         smiles (list): list of SMILES strings
-        
+
     RETURNS:
         mols (list): list of rdkit mol objects
     """
@@ -109,30 +147,29 @@ def smiles2mols(smiles):
             mols.append(mol)
 
     return mols
-        
-        
-    
-def scale_fps(fps_per_motif): 
+
+
+def scale_fps(fps_per_motif):
     """calculates the percentage of the presents of every fingerprint bit in a motif
-    
+
     ARGS:
         fps_per_motif (pandas.dataframe): a dataframe (rows are molecules and columns are fingerprint bit) for all molecular fingerprints
 
     RETURNS:
         scaled_fps (np.array): a fingerprint array with values between 0 and 1 showing the presents of substructures within a motif
-    
+
     """
     n_fps_per_motif = len(fps_per_motif)
     combined_fps = sum(fps_per_motif)
 
-    scaled_fps = combined_fps/n_fps_per_motif
+    scaled_fps = combined_fps / n_fps_per_motif
     # error with Nan if cluster is empty
     return scaled_fps
 
 
 def fps2motif(scaled_fps, threshold):
     """overlaps fingerprints of compounds allocated to the same topic/motif
-    
+
     ARGS:
         scaled_fps (np.array): a fingerprint array with values between 0 and 1 showing the presents of substructures within a motif
         threshold (float; 0 > x <= 1): number that defines if a bit in the fingerprint with be set to zero (below threshold) or to one (above threshold)
@@ -152,11 +189,9 @@ def fps2motif(scaled_fps, threshold):
     return scaled_fps
 
 
-
-
-
-
-def annotate_motifs(smiles_per_motifs, fp_type="maccs", threshold=0.8): # can be simplyfied
+def annotate_motifs(
+    smiles_per_motifs, fp_type="maccs", threshold=0.8
+):  # can be simplyfied
     """runs all the scripts to generate a selected fingerprint for a motif
 
     - smiles2mol: convert smiles to mol objects
@@ -182,14 +217,13 @@ def annotate_motifs(smiles_per_motifs, fp_type="maccs", threshold=0.8): # can be
     all_mols = list(chain(*smiles_per_motifs))
     smarts = generate_fingerprint([Chem.MolFromSmiles(mol) for mol in all_mols])
 
-
     for smiles_per_motif in smiles_per_motifs:
         fps_per_motif = mols2fps(smiles_per_motif, fp_type, smarts)
-        #print(fps_per_motif)
+        # print(fps_per_motif)
         scaled_fps = scale_fps(fps_per_motif)
-        #print(scaled_fps)
+        # print(scaled_fps)
         fps_motif = fps2motif(scaled_fps, threshold)
-        #print(fps_motif)
+        # print(fps_motif)
         fps_motifs.append(fps_motif)
 
     return fps_motifs
@@ -198,11 +232,11 @@ def annotate_motifs(smiles_per_motifs, fp_type="maccs", threshold=0.8): # can be
 def tanimoto_similarity(fps_1, fps_2):
     """
     Compute Tanimoto similarity for two sets of fingerprints using NumPy.
-    
+
     Args:
     pair1_maccs_fps: List[List[int]] - The first set of binary fingerprints.
     pair2_maccs_fps: List[List[int]] - The second set of binary fingerprints.
-    
+
     Returns:
     np.ndarray: A 2D array where the element at (i, j) represents the Tanimoto similarity
                 between `pair1_maccs_fps[i]` and `pair2_maccs_fps[j]`.
@@ -210,26 +244,27 @@ def tanimoto_similarity(fps_1, fps_2):
     # Convert to NumPy arrays
     pair1 = np.array(fps_1, dtype=np.int32)
     pair2 = np.array(fps_2, dtype=np.int32)
-    
+
     # Compute intersection and union for each pair of fingerprints
     intersection = np.dot(pair1, pair2.T)  # Dot product gives pairwise |A ∩ B|
     sum1 = pair1.sum(axis=1, keepdims=True)  # Row-wise sums (|A|)
     sum2 = pair2.sum(axis=1, keepdims=True)  # Row-wise sums (|B|)
     union = sum1 + sum2.T - intersection  # Pairwise |A ∪ B|
-    
+
     # Handle cases where union is zero (to avoid division by zero)
     tanimoto_scores = np.divide(
-        intersection, 
-        union, 
-        out=np.zeros_like(intersection, dtype=float), 
-        where=(union != 0)
+        intersection,
+        union,
+        out=np.zeros_like(intersection, dtype=float),
+        where=(union != 0),
     )
-    
+
     return tanimoto_scores
+
 
 def check_and_find_substructures(suspect_fp, motif_fps, threshold=0.7):
     sub_fp_sum = np.sum(suspect_fp)
-    
+
     subs = []
     for i, fp in enumerate(motif_fps):
         fp = np.array(fp)  # Convert motif fingerprint to NumPy array

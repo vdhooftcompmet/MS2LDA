@@ -15,12 +15,10 @@ from rdkit.Chem.Scaffolds.MurckoScaffold import GetScaffoldForMol
 from collections import Counter
 
 
-
-
 def functional_group_finder(mols):
     """Uses the ERTL algorithm to find functional groups and returns their smiles
-    
-    ARGS: 
+
+    ARGS:
         mols (list(rdkit.mol.objects)): list of molecules converted to rdkit molecule objects
 
     RETURNS:
@@ -42,18 +40,16 @@ def functional_group_finder(mols):
     return fgs
 
 
-
-
 def scaffold_finder(mols):
     """Uses the Murck Scaffold definition to find the molecular scaffold and returns their smiles
-    
+
     ARGS:
         mols (list(rdkit.mol.objects)): list of molecules converted to rdkit molecule objects
 
     RETURNS:
         scaffolds (Counter dict): counter object that counts the appearance of Murcko Scaffolds across all molecules
     """
-    
+
     scaffolds = Counter()
     for mol in mols:
         scaffold = GetScaffoldForMol(mol)
@@ -64,10 +60,9 @@ def scaffold_finder(mols):
     return scaffolds
 
 
-
 def greedy_substructure_finder(mols):
     """breaks all single bonds within molecules which are not part of a ring system and returns the resulting substructures
-    
+
     ARGS:
         mols (list(rdkit.mol.objects)): list of molecules converted to rdkit molecule objects
 
@@ -82,14 +77,21 @@ def greedy_substructure_finder(mols):
         for bond_index in bonds_index:
             with Chem.RWMol(mol) as rwmol:
                 selected_bond = rwmol.GetBondWithIdx(bond_index)
-                if selected_bond.GetBondType() == Chem.BondType.SINGLE and selected_bond.IsInRing() == False:
-                    rwmol.RemoveBond(selected_bond.GetBeginAtomIdx(), selected_bond.GetEndAtomIdx())
+                if (
+                    selected_bond.GetBondType() == Chem.BondType.SINGLE
+                    and selected_bond.IsInRing() == False
+                ):
+                    rwmol.RemoveBond(
+                        selected_bond.GetBeginAtomIdx(), selected_bond.GetEndAtomIdx()
+                    )
                 else:
                     continue
-            substructure_pair = Chem.GetMolFrags(rwmol, asMols=True, sanitizeFrags=False) 
+            substructure_pair = Chem.GetMolFrags(
+                rwmol, asMols=True, sanitizeFrags=False
+            )
             substructure_1 = Chem.MolToSmiles(substructure_pair[0])
             substructure_2 = Chem.MolToSmiles(substructure_pair[1])
-    
+
             substructures[substructure_1] += 1
             substructures[substructure_2] += 1
 
@@ -107,7 +109,7 @@ def calc_adaptive(mols, smarts):
     RETURNS:
         adaptive_fps (list): List of fingerprints for each molecule.
     """
-    
+
     smarts = [Chem.MolFromSmiles(sma, sanitize=False) for sma in smarts]
     n_bits = len(smarts)
 
@@ -121,11 +123,9 @@ def calc_adaptive(mols, smarts):
     return adaptive_fps, len(mols), n_bits
 
 
-
-
 def generate_fingerprint(mols):
     """uses ERTL algorithm + Murcho Scaffold Finder to generate fingerprints based on common substructures
-    
+
     - functional_group_finder (ERTL algorithm)
     - scaffold_finder (Murcko Scaffold algorithm)
     - generate_fingerprints (Fingerprints based on ERTL algorithm and Murcko scaffold algorithm)
@@ -137,19 +137,23 @@ def generate_fingerprint(mols):
         adaptive_fps (list): List of RDKit explitcit bit vectors (fingerprints)
     """
 
-    #fgs = functional_group_finder(mols)
-    #scaffolds = scaffold_finder(mols)
-    #substructures = fgs + scaffolds
+    # fgs = functional_group_finder(mols)
+    # scaffolds = scaffold_finder(mols)
+    # substructures = fgs + scaffolds
 
     substructures = greedy_substructure_finder(mols)
 
     n_mols = len(mols)
-    min_frequency = int(n_mols * 0.005) # substructure must be present in 0.5% of molecules to be part of the fingerprint
+    min_frequency = int(
+        n_mols * 0.005
+    )  # substructure must be present in 0.5% of molecules to be part of the fingerprint
 
-    frequent_substructures = [match[0] for match in substructures.most_common() if match[1] > min_frequency] 
+    frequent_substructures = [
+        match[0] for match in substructures.most_common() if match[1] > min_frequency
+    ]
 
     return frequent_substructures
 
 
 if __name__ == "__main__":
-    pass # have an example here!!!
+    pass  # have an example here!!!
