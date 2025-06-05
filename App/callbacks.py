@@ -23,7 +23,7 @@ from rdkit import Chem
 from rdkit.Chem.Draw import MolsToGridImage
 
 import MS2LDA
-from App.app_instance import app
+from App.app_instance import app, MOTIFDB_DIR
 from MS2LDA.Add_On.MassQL.MassQL4MotifDB import load_motifDB, motifDB2motifs
 from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings
 from MS2LDA.Add_On.Spec2Vec.annotation_refined import calc_similarity
@@ -452,8 +452,8 @@ def apply_common_layout(fig: go.Figure, ytitle: str | None = None) -> None:
         fig.update_yaxes(title_text=ytitle)
 
 
-# Hardcode the path for .m2m references
-MOTIFDB_FOLDER = "./MS2LDA/MotifDB"
+# Dynamic path – works inside site-packages too
+MOTIFDB_FOLDER = str(MOTIFDB_DIR)
 
 
 def load_motifset_file(json_path):

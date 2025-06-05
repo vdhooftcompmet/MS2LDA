@@ -5,7 +5,11 @@ import os, requests
 from tqdm import tqdm
 import numpy as np
 import hashlib
+from pathlib import Path
 from MS2LDA.Mass2Motif import Mass2Motif
+
+# Package root for path resolution
+PKG_ROOT = Path(__file__).resolve().parent
 
 
 from matchms import set_matchms_logger_level
@@ -193,3 +197,53 @@ def download_model_and_data(
         print(f"Downloaded {file_name} successfully.")
 
     return f"Done. Downloaded {download_count} files, skipped {skip_count} existing."
+
+
+def download_fp_calculation():
+    """Clone the FP_calculation folder (without the big jars) if missing."""
+    import subprocess, tempfile, shutil
+    target = PKG_ROOT / "Add_On" / "Fingerprints" / "FP_calculation"
+    if target.exists():
+        return "FP_calculation already present – skipped."
+    print("Cloning FP_calculation …")
+    with tempfile.TemporaryDirectory() as tmp:
+        subprocess.check_call(
+            [
+                "git",
+                "clone",
+                "--depth",
+                "1",
+                "--filter=blob:none",
+                "--sparse",
+                "https://github.com/vdhooftcompmet/MS2LDA",
+                tmp,
+            ]
+        )
+        src = Path(tmp) / "MS2LDA" / "Add_On" / "Fingerprints" / "FP_calculation"
+        shutil.copytree(src, target)
+    return "FP_calculation downloaded."
+
+
+def download_motifdb():
+    """Download MotifDB jsons if the folder is absent."""
+    import subprocess, tempfile, shutil
+    target = PKG_ROOT / "MotifDB"
+    if target.exists():
+        return "MotifDB already present – skipped."
+    print("Cloning MotifDB …")
+    with tempfile.TemporaryDirectory() as tmp:
+        subprocess.check_call(
+            [
+                "git",
+                "clone",
+                "--depth",
+                "1",
+                "--filter=blob:none",
+                "--sparse",
+                "https://github.com/vdhooftcompmet/MS2LDA",
+                tmp,
+            ]
+        )
+        src = Path(tmp) / "MS2LDA" / "MotifDB"
+        shutil.copytree(src, target)
+    return "MotifDB downloaded."

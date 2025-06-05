@@ -1,6 +1,7 @@
 import dash_bootstrap_components as dbc
 from dash import dash_table
 from dash import html, dcc
+from App.app_instance import SPEC2VEC_DIR
 
 
 def create_run_analysis_tab():
@@ -226,7 +227,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="s2v-model-path",
                                         type="text",
-                                        value="../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
+                                        value=str(SPEC2VEC_DIR / "150225_Spec2Vec_pos_CleanedLibraries.model"),
                                     ),
                                 ],
                                 className="mb-3",
@@ -246,7 +247,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="s2v-library-embeddings",
                                         type="text",
-                                        value="../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
+                                        value=str(SPEC2VEC_DIR / "150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy"),
                                     ),
                                 ],
                                 className="mb-3",
@@ -260,7 +261,7 @@ def create_run_analysis_tab():
                                     dbc.Input(
                                         id="s2v-library-db",
                                         type="text",
-                                        value="../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db",
+                                        value=str(SPEC2VEC_DIR / "150225_CombLibraries_spectra.db"),
                                     ),
                                 ],
                                 className="mb-3",
