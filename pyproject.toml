@@ -93,6 +93,19 @@ flake8     = "^7.0.0"
 pytest     = "^8.3.2"
 pre-commit = "^3.7.0"
 mypy       = "^1.10.0"
+ruff = "^0.11.13"
+
+[tool.ruff]
+line-length = 88
+exclude = [
+  "build",
+  "dist",
+  ".ipynb_checkpoints",
+  "MS2LDA/Add_On/Fingerprints/FP_calculation/*"
+]
+unsafe-fixes = true
+select = ["ALL"]
+ignore = ["D", "ANN"]
 
 [tool.poetry.scripts]
 ms2lda      = "scripts.ms2lda_runfull:main"
