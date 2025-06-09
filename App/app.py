@@ -1,9 +1,9 @@
 import dash
 import dash_bootstrap_components as dbc
-from dash import html, dcc
+from dash import dcc, html
 
-import App.layout as layout  # without App.layout
 import App.callbacks  # noqa: F401 -- callbacks must be imported to register callbacks with the app
+from App import layout  # without App.layout
 from App.app_instance import app  # Import the Dash app instance
 
 # Define the layout
@@ -22,8 +22,8 @@ app.layout = dbc.Container(
                         dcc.Markdown(
                             """
                 Developed by [Jonas Dietrich](https://github.com/j-a-dietrich),
-                [Rosina Torres Ortega](https://github.com/rtlortega),  
-                [Joe Wandy](https://github.com/joewandy), and 
+                [Rosina Torres Ortega](https://github.com/rtlortega),
+                [Joe Wandy](https://github.com/joewandy), and
                 [Justin van der Hooft](https://github.com/justinjjvanderhooft).
                 """,
                             style={"textAlign": "center"},
@@ -65,7 +65,7 @@ app.layout = dbc.Container(
                     id="search-spectra-tab",
                 ),
                 dcc.Tab(label="View Network", value="results-tab", id="results-tab"),
-                dcc.Tab(label="Screening", value="screening-tab", id="screening-tab"),
+                dcc.Tab(label="Motif Search", value="screening-tab", id="screening-tab"),
             ],
             className="mt-3",
         ),

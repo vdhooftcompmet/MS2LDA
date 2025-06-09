@@ -1,11 +1,11 @@
 import dash_bootstrap_components as dbc
-from dash import dash_table
-from dash import html, dcc
+from dash import dash_table, dcc, html
+
 from App.app_instance import SPEC2VEC_DIR
 
 
 def create_run_analysis_tab():
-    tab = html.Div(
+    return html.Div(
         id="run-analysis-tab-content",
         children=[
             # Card 1: Intro / Explanation
@@ -16,13 +16,13 @@ def create_run_analysis_tab():
                         [
                             dcc.Markdown(
                                 """
-                                This tab allows you to run an MS2LDA analysis from scratch using a single uploaded data file. 
-                                You can control basic parameters like the number of motifs, polarity, and top N Spec2Vec matches, 
-                                as well as advanced settings (e.g., min_mz, max_mz). 
+                                This tab allows you to run an MS2LDA analysis from scratch using a single uploaded data file.
+                                You can control basic parameters like the number of motifs, polarity, and top N Spec2Vec matches,
+                                as well as advanced settings (e.g., min_mz, max_mz).
                                 When ready, click "Run Analysis" to generate the results and proceed to the other tabs for visualization.
-                                """
+                                """,
                             ),
-                        ]
+                        ],
                     ),
                 ],
                 style={
@@ -41,7 +41,7 @@ def create_run_analysis_tab():
                             dcc.Upload(
                                 id="upload-data",
                                 children=html.Div(
-                                    ["Drag and Drop or ", html.A("Select Files")]
+                                    ["Drag and Drop or ", html.A("Select Files")],
                                 ),
                                 style={
                                     "width": "100%",
@@ -56,13 +56,13 @@ def create_run_analysis_tab():
                                 multiple=False,
                             ),
                             html.Div(
-                                id="file-upload-info", style={"marginBottom": "20px"}
+                                id="file-upload-info", style={"marginBottom": "20px"},
                             ),
                             # Basic parameters (with tooltips):
                             dbc.InputGroup(
                                 [
                                     dbc.InputGroupText(
-                                        "Number of Motifs", id="n-motifs-tooltip"
+                                        "Number of Motifs", id="n-motifs-tooltip",
                                     ),
                                     dbc.Input(
                                         id="n-motifs",
@@ -82,7 +82,7 @@ def create_run_analysis_tab():
                             html.Div(
                                 [
                                     dbc.Label(
-                                        "Acquisition Type", id="acq-type-tooltip"
+                                        "Acquisition Type", id="acq-type-tooltip",
                                     ),
                                     dbc.RadioItems(
                                         options=[
@@ -105,10 +105,10 @@ def create_run_analysis_tab():
                             dbc.InputGroup(
                                 [
                                     dbc.InputGroupText(
-                                        "Top N Matches", id="topn-tooltip"
+                                        "Top N Matches", id="topn-tooltip",
                                     ),
                                     dbc.Input(
-                                        id="top-n", type="number", value=5, min=1
+                                        id="top-n", type="number", value=5, min=1,
                                     ),
                                 ],
                                 className="mb-3",
@@ -122,7 +122,7 @@ def create_run_analysis_tab():
                             html.Div(
                                 [
                                     dbc.Label(
-                                        "Unique Molecules", id="uniqmols-tooltip"
+                                        "Unique Molecules", id="uniqmols-tooltip",
                                     ),
                                     dbc.RadioItems(
                                         options=[
@@ -166,10 +166,10 @@ def create_run_analysis_tab():
                             dbc.InputGroup(
                                 [
                                     dbc.InputGroupText(
-                                        "Iterations", id="iterations-tooltip"
+                                        "Iterations", id="iterations-tooltip",
                                     ),
                                     dbc.Input(
-                                        id="n-iterations", type="number", value=10000
+                                        id="n-iterations", type="number", value=10000,
                                     ),
                                 ],
                                 className="mb-3",
@@ -180,7 +180,7 @@ def create_run_analysis_tab():
                                 target="iterations-tooltip",
                                 placement="right",
                             ),
-                        ]
+                        ],
                     ),
                 ],
                 style={
@@ -197,10 +197,10 @@ def create_run_analysis_tab():
                         [
                             dcc.Markdown(
                                 """
-                                **Spec2Vec** is used to annotate motifs by comparing them against a pretrained model 
-                                and library embeddings. You can download the necessary files here if you haven't already. 
+                                **Spec2Vec** is used to annotate motifs by comparing them against a pretrained model
+                                and library embeddings. You can download the necessary files here if you haven't already.
                                 If the files already exist, the process will skip them.
-                                """
+                                """,
                             ),
                             dcc.Loading(
                                 id="download-s2v-spinner",
@@ -222,7 +222,7 @@ def create_run_analysis_tab():
                             dbc.InputGroup(
                                 [
                                     dbc.InputGroupText(
-                                        "S2V Model Path", id="s2v-model-tooltip"
+                                        "S2V Model Path", id="s2v-model-tooltip",
                                     ),
                                     dbc.Input(
                                         id="s2v-model-path",
@@ -256,7 +256,7 @@ def create_run_analysis_tab():
                             dbc.InputGroup(
                                 [
                                     dbc.InputGroupText(
-                                        "S2V Library DB", id="s2v-library-db-tooltip"
+                                        "S2V Library DB", id="s2v-library-db-tooltip",
                                     ),
                                     dbc.Input(
                                         id="s2v-library-db",
@@ -272,7 +272,7 @@ def create_run_analysis_tab():
                                 target="s2v-library-tooltip",
                                 placement="right",
                             ),
-                        ]
+                        ],
                     ),
                 ],
                 style={
@@ -289,11 +289,11 @@ def create_run_analysis_tab():
                         [
                             dcc.Markdown(
                                 """
-                                These parameters allow fine-grained control over MS2LDA preprocessing, 
-                                convergence criteria, and model hyperparameters. Generally, 
-                                you can leave them as defaults unless you want to experiment 
+                                These parameters allow fine-grained control over MS2LDA preprocessing,
+                                convergence criteria, and model hyperparameters. Generally,
+                                you can leave them as defaults unless you want to experiment
                                 with more specialized behaviors or custom thresholding.
-                                """
+                                """,
                             ),
                             dbc.Button(
                                 "Show/Hide Advanced Settings",
@@ -667,7 +667,7 @@ def create_run_analysis_tab():
                                                 ],
                                                 width=6,
                                             ),
-                                        ]
+                                        ],
                                     ),
                                     dbc.Row(
                                         [
@@ -784,7 +784,7 @@ def create_run_analysis_tab():
                                                 ],
                                                 width=6,
                                             ),
-                                        ]
+                                        ],
                                     ),
                                     html.Hr(),
                                     dbc.Row(
@@ -959,11 +959,11 @@ def create_run_analysis_tab():
                                                 ],
                                                 width=6,
                                             ),
-                                        ]
+                                        ],
                                     ),
                                 ],
                             ),
-                        ]
+                        ],
                     ),
                 ],
                 style={
@@ -979,11 +979,11 @@ def create_run_analysis_tab():
                         [
                             dcc.Markdown(
                                 """
-                                Once everything is configured, click **Run Analysis** 
-                                to perform LDA on your spectra. Depending on the dataset 
-                                size and iterations, this can take a while. Please wait until the 
+                                Once everything is configured, click **Run Analysis**
+                                to perform LDA on your spectra. Depending on the dataset
+                                size and iterations, this can take a while. Please wait until the
                                 progress indicator has finished to retrieve the results.
-                                """
+                                """,
                             ),
                             dcc.Loading(
                                 id="run-analysis-spinner",
@@ -995,11 +995,11 @@ def create_run_analysis_tab():
                                         color="primary",
                                     ),
                                     html.Div(
-                                        id="run-status", style={"marginTop": "20px"}
+                                        id="run-status", style={"marginTop": "20px"},
                                     ),
                                 ],
                             ),
-                        ]
+                        ],
                     ),
                 ],
                 style={
@@ -1011,22 +1011,21 @@ def create_run_analysis_tab():
         ],
         style={"display": "block"},
     )
-    return tab
 
 
 def create_load_results_tab():
-    tab = html.Div(
+    return html.Div(
         id="load-results-tab-content",
         children=[
             html.Div(
                 [
                     dcc.Markdown(
                         """
-                        This tab allows you to load previously generated MS2LDA results (a compressed JSON file). 
-                        Once loaded, you can explore them immediately in the subsequent tabs. 
+                        This tab allows you to load previously generated MS2LDA results (a compressed JSON file).
+                        Once loaded, you can explore them immediately in the subsequent tabs.
                         This is useful if you’ve run an analysis before and want to revisit or share the results.
-                        """
-                    )
+                        """,
+                    ),
                 ],
                 style={"marginTop": "20px", "marginBottom": "20px"},
             ),
@@ -1037,7 +1036,7 @@ def create_load_results_tab():
                             dcc.Upload(
                                 id="upload-results",
                                 children=html.Div(
-                                    ["Drag and Drop or ", html.A("Select Results File")]
+                                    ["Drag and Drop or ", html.A("Select Results File")],
                                 ),
                                 style={
                                     "width": "100%",
@@ -1064,35 +1063,34 @@ def create_load_results_tab():
                             ),
                         ],
                         width=6,
-                    )
+                    ),
                 ],
                 justify="center",
             ),
         ],
         style={"display": "none"},
     )
-    return tab
 
 
 def create_cytoscape_network_tab():
-    tab = html.Div(
+    return html.Div(
         id="results-tab-content",
         children=[
             html.Div(
                 [
                     dcc.Markdown(
                         """
-                        This tab shows an interactive network of optimized motifs. 
-                        Each motif is displayed as a node, and its fragments or losses 
-                        appear as connected nodes (color-coded for clarity). 
-                        Only edges above the selected intensity threshold will be shown. 
-                        You can adjust that threshold with the slider. 
-                        By default, the extra edges from each loss node to its 
-                        corresponding fragment node are hidden for less clutter, 
-                        but you can re-enable them using the checkbox. 
+                        This tab shows an interactive network of optimized motifs.
+                        Each motif is displayed as a node, and its fragments or losses
+                        appear as connected nodes (color-coded for clarity).
+                        Only edges above the selected intensity threshold will be shown.
+                        You can adjust that threshold with the slider.
+                        By default, the extra edges from each loss node to its
+                        corresponding fragment node are hidden for less clutter,
+                        but you can re-enable them using the checkbox.
                         Click on any motif node to see its associated molecules on the right side.
-                        """
-                    )
+                        """,
+                    ),
                 ],
                 style={"marginTop": "20px", "marginBottom": "20px"},
             ),
@@ -1119,12 +1117,12 @@ def create_cytoscape_network_tab():
                                     {
                                         "label": "Add Loss -> Fragment Edge",
                                         "value": "show_loss_edge",
-                                    }
+                                    },
                                 ],
                                 value=[],
                                 id="toggle-loss-edge",
                                 inline=True,
-                            )
+                            ),
                         ],
                         width=6,
                     ),
@@ -1166,7 +1164,7 @@ def create_cytoscape_network_tab():
                                     "marginTop": "20px",
                                     "height": "600px",
                                 },
-                            )
+                            ),
                         ],
                         width=8,
                     ),
@@ -1194,11 +1192,10 @@ def create_cytoscape_network_tab():
         ],
         style={"display": "none"},
     )
-    return tab
 
 
 def create_motif_rankings_tab():
-    tab = html.Div(
+    return html.Div(
         id="motif-rankings-tab-content",
         children=[
             dbc.Container(
@@ -1207,18 +1204,18 @@ def create_motif_rankings_tab():
                         [
                             dcc.Markdown(
                                 """
-                            This tab displays your motifs in a ranked table based on how many documents meet 
-                            the selected Probability and Overlap ranges. For each motif, we compute a `Degree` 
-                            representing the number of documents where the motif’s doc-topic probability and overlap 
-                            score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability` 
-                            and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters, 
-                            so they can be quite high if the motif strongly dominates the docs where it appears. 
+                            This tab displays your motifs in a ranked table based on how many documents meet
+                            the selected Probability and Overlap ranges. For each motif, we compute a `Degree`
+                            representing the number of documents where the motif’s doc-topic probability and overlap
+                            score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability`
+                            and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters,
+                            so they can be quite high if the motif strongly dominates the docs where it appears.
 
-                            Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap. 
-                            _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row 
+                            Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap.
+                            _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row
                             takes you to a detailed view of that motif.
-                            """
-                            )
+                            """,
+                            ),
                         ],
                         style={"marginTop": "20px", "marginBottom": "20px"},
                     ),
@@ -1231,7 +1228,7 @@ def create_motif_rankings_tab():
                                             dbc.Col(
                                                 [
                                                     dbc.Label(
-                                                        "Probability Threshold Range"
+                                                        "Probability Threshold Range",
                                                     ),
                                                     dcc.RangeSlider(
                                                         id="probability-thresh",
@@ -1262,7 +1259,7 @@ def create_motif_rankings_tab():
                                             dbc.Col(
                                                 [
                                                     dbc.Label(
-                                                        "Overlap Threshold Range"
+                                                        "Overlap Threshold Range",
                                                     ),
                                                     dcc.RangeSlider(
                                                         id="overlap-thresh",
@@ -1290,8 +1287,30 @@ def create_motif_rankings_tab():
                                                 ],
                                                 width=6,
                                             ),
-                                        ]
+                                        ],
                                     ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                dbc.Input(
+                                                    id="motif-ranking-massql-input",
+                                                    placeholder=(
+                                                        "QUERY scaninfo(MS2DATA) WHERE MS2PROD=178.03"
+                                                    ),
+                                                ),
+                                                width=8,
+                                            ),
+                                            dbc.Col(
+                                                dbc.Button(
+                                                    "Run Query",
+                                                    id="motif-ranking-massql-btn",
+                                                ),
+                                                width=2,
+                                            ),
+                                        ],
+                                        className="mt-2",
+                                    ),
+                                    dcc.Store(id="motif-ranking-massql-matches"),
                                     html.Div(
                                         id="motif-rankings-count",
                                         style={"marginTop": "10px"},
@@ -1341,18 +1360,17 @@ def create_motif_rankings_tab():
                                 ],
                                 width=12,
                             ),
-                        ]
+                        ],
                     ),
-                ]
+                ],
             ),
         ],
         style={"display": "none"},
     )
-    return tab
 
 
 def create_motif_details_tab():
-    tab = html.Div(
+    return html.Div(
         id="motif-details-tab-content",
         children=[
             # Brief high-level overview of the entire tab
@@ -1360,12 +1378,12 @@ def create_motif_details_tab():
                 [
                     dcc.Markdown(
                         """
-                        This tab provides detailed insight into a selected MS2LDA motif, highlighting possible 
-                        chemical structures, motif composition, and the actual spectra that represent it. 
-                        The content is structured into three clear sections: Motif Details, Features in Motifs, 
+                        This tab provides detailed insight into a selected MS2LDA motif, highlighting possible
+                        chemical structures, motif composition, and the actual spectra that represent it.
+                        The content is structured into three clear sections: Motif Details, Features in Motifs,
                         and Spectra in Motifs. Each section contains explanations to help interpret the results.
-                        """
-                    )
+                        """,
+                    ),
                 ],
                 style={"marginTop": "20px", "marginBottom": "20px"},
             ),
@@ -1381,7 +1399,7 @@ def create_motif_details_tab():
                             dcc.Markdown(
                                 """
                         The Spec2Vec matching results displayed here suggest chemical structures (SMILES strings) that closely match the selected motif. Spec2Vec calculates similarities by comparing motif pseudo-spectra against reference spectra from a known database. Matches shown here can help identify possible chemical identities or provide clues about structural characteristics represented by this motif.
-                        """
+                        """,
                             ),
                             html.Div(
                                 id="motif-spec2vec-container",
@@ -1407,7 +1425,7 @@ def create_motif_details_tab():
                         The **bottom panel** shows the raw LDA pseudo-spectrum (probability scale), filtered according to your chosen thresholds. Higher bars indicate peaks strongly associated with this motif according to the LDA topic model.
 
                         Both panels share the same m/z axis, making it easy to spot retained or removed peaks during optimisation. Use the toggle below to switch between fragment and loss views.
-                        """
+                        """,
                             ),
                             dbc.RadioItems(
                                 id="optimised-motif-fragloss-toggle",
@@ -1467,7 +1485,7 @@ def create_motif_details_tab():
                             dcc.Markdown(
                                 """
                         The slider below controls the minimum and maximum probability thresholds for selecting motif features (fragments and losses) identified by the LDA model. Setting a higher minimum value keeps only peaks strongly associated with the motif, providing a simpler representation. A lower minimum includes more peaks, potentially capturing additional detail but also introducing noise.
-                        """
+                        """,
                             ),
                             dbc.Label("Spectra-Peaks Probability Filter:"),
                             dcc.RangeSlider(
@@ -1530,7 +1548,7 @@ def create_motif_details_tab():
                                 allowCross=False,
                             ),
                             html.Div(
-                                id="overlap-filter-display", style={"marginTop": "10px"}
+                                id="overlap-filter-display", style={"marginTop": "10px"},
                             ),
                         ],
                         style={
@@ -1546,7 +1564,7 @@ def create_motif_details_tab():
                             dcc.Markdown(
                                 """
                         The table below lists the motif features (fragments and losses) that pass the probability filter, including their probabilities within the motif. Below it, a bar plot shows how frequently each feature appears **within the filtered set of documents** for this motif (i.e., documents whose doc-topic probability and overlap score both pass the current threshold ranges).
-                        """
+                        """,
                             ),
                             html.Div(id="motif-features-container"),
                         ],
@@ -1577,14 +1595,14 @@ def create_motif_details_tab():
                                 """
                         This section lists MS2 spectra linked to the selected motif. When
                         you pick a spectrum (or use the navigation buttons) the plot underneath
-                        updates.  
+                        updates.
 
                         Peaks matching fragment or neutral-loss features of the motif turn
                         red. For every neutral-loss match, a green dashed line connects the
                         fragment peak to the precursor ion and is annotated with the
-                        loss value. All remaining peaks are grey. The plot lets you judge whether the 
+                        loss value. All remaining peaks are grey. The plot lets you judge whether the
                         motif's characteristic features are genuinely present in the experimental spectrum.
-                        """
+                        """,
                             ),
                             html.Div(id="motif-documents-container"),
                             dash_table.DataTable(
@@ -1653,7 +1671,7 @@ def create_motif_details_tab():
                                         id="motif-details-associated-motifs-list",
                                         style={"marginTop": "5px"},
                                     ),
-                                ]
+                                ],
                             ),
                             # Hidden input to store the highlight mode
                             dcc.Store(id="spectrum-highlight-mode", data="single"),
@@ -1701,7 +1719,6 @@ def create_motif_details_tab():
         ],
         style={"display": "none"},
     )
-    return tab
 
 
 def create_screening_tab():
@@ -1712,13 +1729,14 @@ def create_screening_tab():
             html.Div(
                 [
                     dcc.Markdown(
-                        """
-                        This tab allows you to automatically compare your optimized motifs
-                        against the reference motifs from MotifDB. To begin, first select 
-                        which reference sets you want to include. Then click "Compute Similarities" 
-                        to run the screening using Spec2Vec comparison. Screening results are shown 
-                        in the table below, and you can use the slider to filter the table by minimum similarity score.
-                    """
+                        r"""
+                        Use this tab to perform a **motif\-motif search**. Your optimized
+                        motifs are compared against reference motifs from MotifDB.
+                        First select which reference sets you want to include, then
+                        click "Compute Similarities" to run the motif search using
+                        Spec2Vec comparison. Results are shown in the table below and can
+                        be filtered by minimum similarity score using the slider.
+                    """,
                     ),
                 ],
                 style={"marginTop": "20px", "marginBottom": "20px"},
@@ -1735,7 +1753,7 @@ def create_screening_tab():
                         value=[],
                         switch=True,
                         className="mb-3",
-                    )
+                    ),
                 ],
             ),
             dbc.Button(
@@ -1782,7 +1800,7 @@ def create_screening_tab():
                 ],
                 style={"marginTop": "10px"},
             ),
-            html.H5("Screening Results (Filtered)"),
+            html.H5("Motif Search Results (Filtered)"),
             dash_table.DataTable(
                 id="screening-results-table",
                 columns=[
@@ -1833,7 +1851,7 @@ def create_screening_tab():
 
 
 def create_spectra_search_tab():
-    tab = html.Div(
+    return html.Div(
         id="search-spectra-tab-content",
         style={"display": "none"},
         children=[
@@ -1982,4 +2000,3 @@ def create_spectra_search_tab():
             ),
         ],
     )
-    return tab
