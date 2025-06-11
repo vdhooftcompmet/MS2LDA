@@ -6,6 +6,8 @@ import App.callbacks  # noqa: F401 -- callbacks must be imported to register cal
 from App import layout  # without App.layout
 from App.app_instance import app  # Import the Dash app instance
 
+server = app.server # gunicorn will import this WSGI callable
+
 # Define the layout
 app.layout = dbc.Container(
     [
