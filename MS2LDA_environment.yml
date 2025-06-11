@@ -3,9 +3,8 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - python>=3.10
-  - ipython>=8.26.0
-  - jupyterlab>=4.2.4
+  # Core runtime
+  - python>=3.10,<3.13
   - matplotlib>=3.9.1
   - seaborn>=0.13.2
   - pandas>=2.2.2
@@ -14,8 +13,7 @@ dependencies:
   - gensim>=4.3.3
   - psims>=1.3.3
   - pubchempy>=1.0.4
-  - rdkit>=2023.9.4
-  - pytest>=8.3.2
+  - rdkit>=2023.9.6   # matches Poetry min; satisfies matchms
   - requests>=2.32.3
   - matchms>=0.27.0
   - plotly>=5.23.0
@@ -23,6 +21,20 @@ dependencies:
   - pymzml>=2.5.10
   - scikit-learn>=1.5.1
   - openpyxl=3.1.5
+
+  # Optional / notebook tooling
+  - ipython>=8.26.0
+  - jupyterlab>=4.2.4
+  - kaleido=0.2.1        # universal macOS & Windows wheel
+
+  # Development tools
+  - black=24.3.0
+  - flake8=7.0.0
+  - mypy=1.10.0
+  - pre-commit=3.7.0
+  - pytest>=8.3.2
+
+  # Packages easier via pip (no conda recipe or bleeding-edge)
   - pip
   - pip:
       - dash>=2.18.1

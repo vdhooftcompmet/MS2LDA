@@ -16,7 +16,8 @@ from collections import defaultdict
 
 import tmap as tm
 from FP_calculation.mhfp import MHFPEncoder
-#from mhfp import MHFPEncoder
+
+# from mhfp import MHFPEncoder
 from rdkit import Chem
 from rdkit.Chem import rdmolops
 from rdkit.Chem.rdmolops import GetDistanceMatrix
@@ -28,7 +29,14 @@ def to_smiles(mol):
 
 class MAP4Calculator:
 
-    def __init__(self, dimensions=1024, radius=2, is_counted=False, is_folded=False, return_strings=False):
+    def __init__(
+        self,
+        dimensions=1024,
+        radius=2,
+        is_counted=False,
+        is_folded=False,
+        return_strings=False,
+    ):
         """
         MAP4 calculator class
         """
@@ -50,7 +58,7 @@ class MAP4Calculator:
         Returns:
             tmap VectorUint -- minhashed fingerprint
         """
-        
+
         atom_env_pairs = self._calculate(mol)
         if self.is_folded:
             return self._fold(atom_env_pairs)
@@ -59,7 +67,7 @@ class MAP4Calculator:
         return self.encoder.from_string_array(atom_env_pairs)
 
     def calculate_many(self, mols):
-        """ Calculates the atom pair minhashed fingerprint
+        """Calculates the atom pair minhashed fingerprint
         Arguments:
             mols -- list of mols
         Returns:
@@ -97,9 +105,11 @@ class MAP4Calculator:
 
         submol = Chem.PathToSubmol(mol, env, atomMap=atom_map)
         if idx in atom_map:
-            smiles = Chem.MolToSmiles(submol, rootedAtAtom=atom_map[idx], canonical=True, isomericSmiles=False)
+            smiles = Chem.MolToSmiles(
+                submol, rootedAtAtom=atom_map[idx], canonical=True, isomericSmiles=False
+            )
             return smiles
-        return ''
+        return ""
 
     def _all_pairs(self, mol, atoms_env):
         atom_pairs = []
@@ -115,13 +125,13 @@ class MAP4Calculator:
 
                 ordered = sorted([env_a, env_b])
 
-                shingle = '{}|{}|{}'.format(ordered[0], dist, ordered[1])
+                shingle = "{}|{}|{}".format(ordered[0], dist, ordered[1])
 
                 if self.is_counted:
                     shingle_dict[shingle] += 1
-                    shingle += '|' + str(shingle_dict[shingle])
+                    shingle += "|" + str(shingle_dict[shingle])
 
-                atom_pairs.append(shingle.encode('utf-8'))
+                atom_pairs.append(shingle.encode("utf-8"))
         return list(set(atom_pairs))
 
 
@@ -134,54 +144,105 @@ def main():
         mol = Chem.MolFromSmiles(fields[0])
         if mol:
             if args.clean_mols:
-                mol = sorted(Chem.GetMolFrags(mol, asMols=True),
-                             key=lambda mol: mol.GetNumHeavyAtoms(), reverse=True)[0]
+                mol = sorted(
+                    Chem.GetMolFrags(mol, asMols=True),
+                    key=lambda mol: mol.GetNumHeavyAtoms(),
+                    reverse=True,
+                )[0]
                 mol = Chem.MolFromSmiles(to_smiles(mol))
             return (line, mol)
         else:
             return None
 
-    calculator = MAP4Calculator(args.dimensions, args.radius, args.is_counted, args.is_folded)
-
+    calculator = MAP4Calculator(
+        args.dimensions, args.radius, args.is_counted, args.is_folded
+    )
 
     def process(batch, output_file):
         parsed_lines = [_parse_line(line) for line in batch]
-        parsed_lines = [_tuple for _tuple in parsed_lines if _tuple is not None] #remove all lines with unreadable mols
+        parsed_lines = [
+            _tuple for _tuple in parsed_lines if _tuple is not None
+        ]  # remove all lines with unreadable mols
         lines, mols = zip(*parsed_lines)
         fingerprints = calculator.calculate_many(mols)
         for line, mol, fingerprint in zip(lines, mols, fingerprints):
             if len(fingerprint):
                 fp_str = args.fp_delimiter.join(str(v) for v in fingerprint)
-                output_file.write("{}{}{}{}{}\n".format(line, args.delimiter, to_smiles(mol), args.delimiter, fp_str))
+                output_file.write(
+                    "{}{}{}{}{}\n".format(
+                        line, args.delimiter, to_smiles(mol), args.delimiter, fp_str
+                    )
+                )
 
     with open(args.input_path, "r") as input_file:
         with open(args.output_path, "w+") as output_file:
             batch = []
             for line in input_file:
                 batch.append(line)
-                if len(batch)>=args.batch_size:
+                if len(batch) >= args.batch_size:
                     process(batch, output_file)
-                    batch=[]
+                    batch = []
             process(batch, output_file)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="MAP4 calculator")
     parser.add_argument("--input-path", "-i", help="", type=str, required=True)
     parser.add_argument("--output-path", "-o", help="", type=str, required=True)
-    parser.add_argument("--dimensions", "-d", help="Number of dimensions of the MinHashed fingerprint [DEFAULT: 1024]",
-                        type=int, default=1024, choices = [128, 512, 1024, 2048])
-    parser.add_argument("--radius", "-r", help="Radius of the fingerprint [DEFAULT: 2]",
-                        type=int, default=2)
-    parser.add_argument("--is-counted", help="The fingerprint stores all shingles.",
-                        action="store_true", default=False)
-    parser.add_argument("--is-folded", help="The fingerprint is folded with modulo (instead of MinHash).",
-                        action="store_true", default=False)
-    parser.add_argument("--clean-mols", help="Molecules will be canonicalized, cleaned, and chirality information will be removed, \
+    parser.add_argument(
+        "--dimensions",
+        "-d",
+        help="Number of dimensions of the MinHashed fingerprint [DEFAULT: 1024]",
+        type=int,
+        default=1024,
+        choices=[128, 512, 1024, 2048],
+    )
+    parser.add_argument(
+        "--radius",
+        "-r",
+        help="Radius of the fingerprint [DEFAULT: 2]",
+        type=int,
+        default=2,
+    )
+    parser.add_argument(
+        "--is-counted",
+        help="The fingerprint stores all shingles.",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--is-folded",
+        help="The fingerprint is folded with modulo (instead of MinHash).",
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
+        "--clean-mols",
+        help="Molecules will be canonicalized, cleaned, and chirality information will be removed, \
     NECESSARY FOR FINGERPRINT CONSISTENCY ACROSS DIFFERENT SMILES INPUT [DEFAULT: True].",
-                        type=lambda x: (str(x).lower() == "true"), default="True", metavar = "True/False")
-    parser.add_argument("--delimiter", help="Delimiter used for both the input and output files [DEFAULT: \\t]", type=str, default="\t")
-    parser.add_argument("--fp-delimiter", help="Delimiter used between the numbers in the fingerprint output [DEFAULT: ;]", type=str, default=";")
-    parser.add_argument("--batch-size", "-b", help="Numbers of molecules to process in a batch [DEFAULT: 500]", type=int, default=500)
+        type=lambda x: (str(x).lower() == "true"),
+        default="True",
+        metavar="True/False",
+    )
+    parser.add_argument(
+        "--delimiter",
+        help="Delimiter used for both the input and output files [DEFAULT: \\t]",
+        type=str,
+        default="\t",
+    )
+    parser.add_argument(
+        "--fp-delimiter",
+        help="Delimiter used between the numbers in the fingerprint output [DEFAULT: ;]",
+        type=str,
+        default=";",
+    )
+    parser.add_argument(
+        "--batch-size",
+        "-b",
+        help="Numbers of molecules to process in a batch [DEFAULT: 500]",
+        type=int,
+        default=500,
+    )
     return parser.parse_args()
 
 

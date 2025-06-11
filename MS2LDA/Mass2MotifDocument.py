@@ -38,6 +38,7 @@ class Mass2MotifDocument(SpectrumDocument):
         [100.   150.   200.51]
         substance1
     """
+
     def __init__(self, spectrum, n_decimals: int = 2):
         """
 
@@ -62,7 +63,9 @@ class Mass2MotifDocument(SpectrumDocument):
         else:
             peak_words = []
         if self._obj.losses is not None:
-            loss_words = [f"loss@{mz:.{self.n_decimals}f}" for mz in self._obj.losses.mz]
+            loss_words = [
+                f"loss@{mz:.{self.n_decimals}f}" for mz in self._obj.losses.mz
+            ]
         else:
             loss_words = []
         self.words = peak_words + loss_words
@@ -70,16 +73,15 @@ class Mass2MotifDocument(SpectrumDocument):
 
     def _add_weights(self):
         """Add peaks (and loss) intensities as weights."""
-        
 
         if self._obj.peaks is not None:
             peak_intensities = self._obj.peaks.intensities.tolist()
-            #assert self._obj.peaks.intensities.max() <= 1, "peak intensities not normalized"
+            # assert self._obj.peaks.intensities.max() <= 1, "peak intensities not normalized"
         else:
             peak_intensities = []
         if self._obj.losses is not None:
             loss_intensities = self._obj.losses.intensities.tolist()
-            #assert self._obj.losses.intensities.max() <= 1, "loss intensities not normalized"
+            # assert self._obj.losses.intensities.max() <= 1, "loss intensities not normalized"
         else:
             loss_intensities = []
         self.weights = peak_intensities + loss_intensities
@@ -93,7 +95,9 @@ class Mass2MotifDocument(SpectrumDocument):
             val = self._obj.metadata[key]
 
         """
-        assert not hasattr(self, key), "Key cannot be attribute of SpectrumDocument class"
+        assert not hasattr(
+            self, key
+        ), "Key cannot be attribute of SpectrumDocument class"
         return self._obj.get(key, default)
 
     @property
