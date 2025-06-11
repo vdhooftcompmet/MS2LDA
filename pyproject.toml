@@ -73,7 +73,7 @@ faiss-cpu  = "1.10.0"
 rdkit      = ">=2023.9.6,<2026"
 
 # custom massql extension for MS2LDA
-massql4motifs = { git = "https://github.com/joewandy/MassQueryLanguage4Mass2Motifs.git", rev = "1817a00a24aa717405c79833ead4a82e42fe8480" }
+massql4motifs = { git = "https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git", rev = "ac1b10b1f020fdfde114c17d57f0ed9b435d9d47" }
 
 # optional notebook tooling
 ipython    = { version = "^8.26.0", optional = true }
