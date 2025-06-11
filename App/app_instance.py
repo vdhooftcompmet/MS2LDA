@@ -10,6 +10,7 @@ app = dash.Dash(
     suppress_callback_exceptions=True,
 )
 app.title = "MS2LDA Interactive Dashboard"
+server = app.server # gunicorn will import this WSGI callable
 
 PKG_ROOT = Path(MS2LDA.__file__).resolve().parent
 SPEC2VEC_DIR = PKG_ROOT / "Add_On" / "Spec2Vec" / "model_positive_mode"
