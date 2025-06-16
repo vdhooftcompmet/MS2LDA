@@ -12,6 +12,8 @@ import tempfile
 import dash
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
+from dash_extensions.enrich import ServersideOutput
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -543,10 +545,10 @@ def toggle_advanced_settings(n_clicks, is_open):
 @app.callback(
     Output("run-status", "children"),
     Output("load-status", "children"),
-    Output("clustered-smiles-store", "data"),
-    Output("optimized-motifs-store", "data"),
-    Output("lda-dict-store", "data"),
-    Output("spectra-store", "data"),
+    ServersideOutput("clustered-smiles-store", "data"),
+    ServersideOutput("optimized-motifs-store", "data"),
+    ServersideOutput("lda-dict-store", "data"),
+    ServersideOutput("spectra-store", "data"),
     Input("run-button", "n_clicks"),
     Input("load-results-button", "n_clicks"),
     State("upload-data", "contents"),
@@ -2259,7 +2261,7 @@ def filter_and_normalize_spectra(spectrum_list):
 
 
 @app.callback(
-    Output("screening-fullresults-store", "data"),
+    ServersideOutput("screening-fullresults-store", "data"),
     Output("compute-screening-status", "children"),
     Output("screening-progress", "value"),
     Output("compute-screening-button", "disabled"),
