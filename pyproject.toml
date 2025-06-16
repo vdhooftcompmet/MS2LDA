@@ -82,8 +82,8 @@ jupyterlab = { version = "^4.2.4", optional = true }
 # Plotly static-image backend.
 # 0.2.1 still has wheels for Linux, Windows and universal-2 macOS; 0.2.1.post1 dropped the macOS-arm64 wheel.
 kaleido = { version = "0.2.1", optional = true }
-diskcache = "^5.6.3"
-dash-extensions = "<1.0"
+diskcache = ">=5.6.3"
+dash-extensions = "==1.0.20"
 
 [tool.poetry.extras]
 notebook = ["ipython", "jupyterlab", "kaleido"]

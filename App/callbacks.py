@@ -12,7 +12,7 @@ import tempfile
 import dash
 import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
-from dash_extensions.enrich import ServersideOutput
+from dash_extensions.enrich import Serverside
 
 import numpy as np
 import pandas as pd
@@ -545,10 +545,10 @@ def toggle_advanced_settings(n_clicks, is_open):
 @app.callback(
     Output("run-status", "children"),
     Output("load-status", "children"),
-    ServersideOutput("clustered-smiles-store", "data"),
-    ServersideOutput("optimized-motifs-store", "data"),
-    ServersideOutput("lda-dict-store", "data"),
-    ServersideOutput("spectra-store", "data"),
+    Output("clustered-smiles-store", "data"),
+    Output("optimized-motifs-store", "data"),
+    Output("lda-dict-store", "data"),
+    Output("spectra-store", "data"),
     Input("run-button", "n_clicks"),
     Input("load-results-button", "n_clicks"),
     State("upload-data", "contents"),
@@ -804,10 +804,10 @@ def handle_run_or_load(
         return (
             run_status,
             load_status,
-            clustered_smiles_data,
-            optimized_motifs_data,
-            lda_dict,
-            spectra_data,
+            Serverside(clustered_smiles_data),
+            Serverside(optimized_motifs_data),
+            Serverside(lda_dict),
+            Serverside(spectra_data),
         )
 
     # 2) If LOAD-RESULTS-BUTTON was clicked
@@ -819,10 +819,10 @@ def handle_run_or_load(
             return (
                 run_status,
                 load_status,
-                clustered_smiles_data,
-                optimized_motifs_data,
-                lda_dict_data,
-                spectra_data,
+                Serverside(clustered_smiles_data),
+                Serverside(optimized_motifs_data),
+                Serverside(lda_dict_data),
+                Serverside(spectra_data),
             )
         try:
             data = parse_ms2lda_viz_file(results_contents)
@@ -831,10 +831,10 @@ def handle_run_or_load(
             return (
                 run_status,
                 load_status,
-                clustered_smiles_data,
-                optimized_motifs_data,
-                lda_dict_data,
-                spectra_data,
+                Serverside(clustered_smiles_data),
+                Serverside(optimized_motifs_data),
+                Serverside(lda_dict_data),
+                Serverside(spectra_data),
             )
 
         required_keys = {
@@ -850,10 +850,10 @@ def handle_run_or_load(
             return (
                 run_status,
                 load_status,
-                clustered_smiles_data,
-                optimized_motifs_data,
-                lda_dict_data,
-                spectra_data,
+                Serverside(clustered_smiles_data),
+                Serverside(optimized_motifs_data),
+                Serverside(lda_dict_data),
+                Serverside(spectra_data),
             )
 
         try:
@@ -868,10 +868,10 @@ def handle_run_or_load(
             return (
                 run_status,
                 load_status,
-                clustered_smiles_data,
-                optimized_motifs_data,
-                lda_dict_data,
-                spectra_data,
+                Serverside(clustered_smiles_data),
+                Serverside(optimized_motifs_data),
+                Serverside(lda_dict_data),
+                Serverside(spectra_data),
             )
 
         load_status = dbc.Alert(
@@ -882,10 +882,10 @@ def handle_run_or_load(
         return (
             run_status,
             load_status,
-            clustered_smiles_data,
-            optimized_motifs_data,
-            lda_dict_data,
-            spectra_data,
+            Serverside(clustered_smiles_data),
+            Serverside(optimized_motifs_data),
+            Serverside(lda_dict_data),
+            Serverside(spectra_data),
         )
 
     raise dash.exceptions.PreventUpdate
@@ -2261,7 +2261,7 @@ def filter_and_normalize_spectra(spectrum_list):
 
 
 @app.callback(
-    ServersideOutput("screening-fullresults-store", "data"),
+    Output("screening-fullresults-store", "data"),
     Output("compute-screening-status", "children"),
     Output("screening-progress", "value"),
     Output("compute-screening-button", "disabled"),
@@ -2437,7 +2437,7 @@ def compute_spec2vec_screening(
     )
     button_disabled = False
 
-    return json_data, msg, progress_val, button_disabled
+    return Serverside(df.to_json(orient="records")), msg, progress_val, button_disabled
 
 
 @app.callback(
