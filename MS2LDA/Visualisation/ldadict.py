@@ -8,11 +8,16 @@ import numpy as np
 from matchms import Spectrum
 
 
-def generate_corpusjson_from_tomotopy(model, documents, spectra, doc_metadata,
-                                      min_prob_to_keep_beta=1e-3,
-                                      min_prob_to_keep_phi=1e-2,
-                                      min_prob_to_keep_theta=1e-2,
-                                      filename=None):
+def generate_corpusjson_from_tomotopy(
+    model,
+    documents,
+    spectra,
+    doc_metadata,
+    min_prob_to_keep_beta=1e-3,
+    min_prob_to_keep_phi=1e-2,
+    min_prob_to_keep_theta=1e-2,
+    filename=None,
+):
     """
     Generates lda_dict in the similar format as in the previous MS2LDA app.
     """
@@ -76,7 +81,7 @@ def generate_corpusjson_from_tomotopy(model, documents, spectra, doc_metadata,
     for d_idx, doc in enumerate(model.docs):
         doc_name = doc_names[d_idx]
         phi_matrix[doc_name] = defaultdict(lambda: np.zeros(K, dtype=float))
-        for (word_id, topic_id) in zip(doc.words, doc.topics):
+        for word_id, topic_id in zip(doc.words, doc.topics):
             w_str = model.vocabs[word_id]
             phi_matrix[doc_name][w_str][topic_id] += 1.0
         # Normalize each word’s topic distribution
@@ -87,7 +92,9 @@ def generate_corpusjson_from_tomotopy(model, documents, spectra, doc_metadata,
 
     # Build topic_index + metadata
     topic_index = {f"motif_{k}": k for k in range(K)}
-    topic_metadata = {f"motif_{k}": {"name": f"motif_{k}", "type": "learnt"} for k in range(K)}
+    topic_metadata = {
+        f"motif_{k}": {"name": f"motif_{k}", "type": "learnt"} for k in range(K)
+    }
 
     # For convenience, extract “features” if they look like "frag@X" or "loss@X".
     features_to_mz = {}
@@ -174,16 +181,16 @@ def generate_corpusjson_from_tomotopy(model, documents, spectra, doc_metadata,
 
 
 def save_visualization_data(
-        trained_ms2lda,
-        cleaned_spectra,
-        optimized_motifs,
-        doc2spec_map,
-        output_folder,
-        filename="ms2lda_viz.json",
-        min_prob_to_keep_beta=1e-3,
-        min_prob_to_keep_phi=1e-2,
-        min_prob_to_keep_theta=1e-2,
-        run_parameters=None
+    trained_ms2lda,
+    cleaned_spectra,
+    optimized_motifs,
+    doc2spec_map,
+    output_folder,
+    filename="ms2lda_viz.json",
+    min_prob_to_keep_beta=1e-3,
+    min_prob_to_keep_phi=1e-2,
+    min_prob_to_keep_theta=1e-2,
+    run_parameters=None,
 ):
     """
     Creates the final data structure needed by the MS2LDA UI
@@ -271,7 +278,7 @@ def save_visualization_data(
             # single string
             clustered_smiles_data.append([ann])
 
-    # 6) Build the final dictionary
+        # 6) Build the final dictionary
         # build doc→spec index from doc2spec_map
         # Map Spectrum object -> integer index
         spectrum_to_idx = {spec: i for i, spec in enumerate(cleaned_spectra)}
@@ -285,7 +292,7 @@ def save_visualization_data(
                 real_spec = doc2spec_map[hashed]
                 doc_to_spec_index[str(d_idx)] = spectrum_to_idx.get(real_spec, -1)
             else:
-                doc_to_spec_index[str(d_idx)] = -1 # hash is not found
+                doc_to_spec_index[str(d_idx)] = -1  # hash is not found
 
         lda_dict["doc_to_spec_index"] = doc_to_spec_index
 
@@ -304,4 +311,3 @@ def save_visualization_data(
         json.dump(final_data, gz_file, indent=2)
 
     print(f"Visualization data saved (gzipped) to: {outpath}")
-

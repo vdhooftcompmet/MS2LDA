@@ -160,3 +160,5 @@ deepmol.egg-info
 *.bin
 *.ai
 *.graphml
+
+ms2lda_cache/

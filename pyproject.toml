@@ -1,72 +1,121 @@
-[project]
-name = "MS2LDA"
-version = "2.0.0"
+[tool.poetry]
+name        = "ms2lda"
+version     = "2.0.0"
 description = "Unsupervised Substructure Discovery using Topic Modelling with Automated Annotation."
-readme = "README.md"
-requires-python = ">=3.8"
-#license-files = { paths = ["LICENSE"] }
-authors = [
-    { name = "Jonas Dietrich", email = "jonas.dietrich@wur.nl" },
-    { name = "Rosina Torres Ortega", email = "rosina.torresortega@wur.nl" }
+authors     = [
+  "Jonas Dietrich <jonas.dietrich@wur.nl>",
+  "Rosina Torres Ortega <rosina.torresortega@wur.nl>",
+  "Joe Wandy <joe@example.com>",
+  "Justin van der Hooft <justin@example.com>"
+]
+license     = "MIT"
+readme      = "README.md"
+
+packages = [
+  { include = "MS2LDA" },
+  { include = "App" },
+  { include = "scripts" }          # for scripts.ms2lda_runfull
 ]
 
-dependencies = [
-    "coloredlogs~=15.0.1",
+include = [
+  "LICENSE",
+  "README.md"
 ]
+
+exclude = [
+  # Spec2Vec models (HUGE files, get them from Zenodo)
+  "MS2LDA/**/Spec2Vec/model_positive_mode/**",
+  "MS2LDA/**/Spec2Vec/model_negative_mode/**",
+
+  # Fingerprint JARs – 43 MB combined
+  "MS2LDA/Add_On/Fingerprints/FP_calculation/cdk-*.jar",
+  "MS2LDA/Add_On/Fingerprints/FP_calculation/jCMapperCLI.jar",
+
+  # Optional: strip heavy notebooks you don’t need in production
+  "MS2LDA/Add_On/Fingerprints/FP_calculation/*.ipynb",
+
+    # MotifDB entire folder (now fetched at runtime)
+  "MS2LDA/MotifDB/**"
+]
+
+[tool.poetry.dependencies]
+python        = ">=3.11,<3.13"
+
+# scientific / data stack
+matplotlib    = "^3.9.1"
+seaborn       = "^0.13.2"
+pandas        = "^2.2.2"
+scipy         = "^1.10.1"
+networkx      = "^3.3"
+gensim        = "^4.3.3"
+psims         = "^1.3.3"
+pubchempy     = "^1.0.4"
+requests      = "^2.32.3"
+matchms       = ">=0.27,<1"
+plotly        = "^5.23.0"
+pyarrow       = "^17.0.0"
+pymzml        = "^2.5.10"
+scikit-learn  = "^1.5.1"
+openpyxl      = "3.1.5"
+
+# Dash UI
+dash                      = "^2.18.1"
+dash-cytoscape            = "^1.0.2"
+dash-bootstrap-components = "^1.6.0"
+
+# modelling / embeddings
+tomotopy   = "^0.12.7"
+spec2vec   = "^0.8.0"
+PyQt6      = "^6.7.1"
+faiss-cpu  = "1.10.0"
+
+# cheminformatics (required)
+rdkit      = ">=2023.9.6,<2026"
+
+# custom massql extension for MS2LDA
+massql4motifs = { git = "https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git", rev = "ac1b10b1f020fdfde114c17d57f0ed9b435d9d47" }
+
+# optional notebook tooling
+ipython    = { version = "^8.26.0", optional = true }
+jupyterlab = { version = "^4.2.4", optional = true }
+
+# Plotly static-image backend.
+# 0.2.1 still has wheels for Linux, Windows and universal-2 macOS; 0.2.1.post1 dropped the macOS-arm64 wheel.
+kaleido = { version = "0.2.1", optional = true }
+diskcache = ">=5.6.3"
+dash-extensions = "==1.0.20"
+
+[tool.poetry.extras]
+notebook = ["ipython", "jupyterlab", "kaleido"]
+lite     = []          # enables:  pip install ms2lda[lite] --no-binary rdkit
+
+[tool.poetry.group.dev.dependencies]
+black      = "^24.3.0"
+flake8     = "^7.0.0"
+pytest     = "^8.3.2"
+pre-commit = "^3.7.0"
+mypy       = "^1.10.0"
+ruff = "^0.11.13"
+
+[tool.poetry.group.deploy.dependencies]
+gunicorn = "^23.0.0"
+
+[tool.ruff]
+line-length = 88
+exclude = [
+  "build",
+  "dist",
+  ".ipynb_checkpoints",
+  "MS2LDA/Add_On/Fingerprints/FP_calculation/*"
+]
+unsafe-fixes = true
+select = ["ALL"]
+ignore = ["D", "ANN"]
+
+[tool.poetry.scripts]
+ms2lda      = "scripts.ms2lda_runfull:main"
+ms2lda-viz  = "App.app:app.run_server"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[project.scripts]
-modern_python = "modern_python.main:main"
-
-[project.optional-dependencies]
-dev = [
-    "black~=24.4.2",
-    "pre-commit~=3.4.0",
-    "pytest~=7.4.2",
-    "ruff~=0.5.0"
-]
-
-[tool.hatch.envs.dev]
-features = [
-    "dev"
-]
-
-[tool.ruff.lint]
-select = [
-    # flake8-bugbear
-    "B",
-    # flake8-comprehensions
-    "C4",
-    # flake8-eradicate/eradicate
-    "ERA",
-    # isort
-    "I",
-    # pep8-naming
-    "N",
-    # flake8-pie
-    "PIE",
-    # pygrep
-    "PGH",
-    # ruff checks
-    "RUF",
-    # flake8-simplify
-    "SIM",
-    # flake8-type-checking
-    "TCH",
-    # flake8-tidy-imports
-    "TID",
-    # pyupgrade
-    "UP",
-]
-ignore = [
-    # whitespace-before-punctuation
-    "E203",
-]
-
-[tool.mypy]
-exclude= 'tests'
-strict = true
-ignore_missing_imports = true
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
