@@ -140,6 +140,11 @@ Then, launch the Dash app using:
 
 Navigate your web browser to [http://localhost:8050](http://localhost:8050) to start exploring.
 
+If you are hosting the dashboard on a resource-limited server and want to disable
+the "Run Analysis" tab, set the environment variable `ENABLE_RUN_ANALYSIS=0`
+before launching the app. This hides the analysis tab but still allows loading
+existing results locally.
+
 ---
 
 ## Jupyter Notebooks

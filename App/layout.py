@@ -1,10 +1,29 @@
 import dash_bootstrap_components as dbc
 from dash import dash_table, dcc, html
 
+import os
 from App.app_instance import SPEC2VEC_DIR
 
+# Determine whether to show the Run Analysis tab. When the
+# environment variable ``ENABLE_RUN_ANALYSIS`` is set to ``0`` or
+# ``false`` the tab will be hidden. Default is to show it.
+SHOW_RUN_ANALYSIS = os.getenv("ENABLE_RUN_ANALYSIS", "1").lower() not in (
+    "0",
+    "false",
+)
 
-def create_run_analysis_tab():
+
+def create_run_analysis_tab(show_tab: bool = True):
+    """Create the Run Analysis tab.
+
+    Parameters
+    ----------
+    show_tab: bool, optional
+        If ``False`` the container is hidden using ``display: none``. The
+        tab's contents are still created so callbacks referencing the
+        components remain valid.
+    """
+
     return html.Div(
         id="run-analysis-tab-content",
         children=[
@@ -1009,7 +1028,7 @@ def create_run_analysis_tab():
                 },
             ),
         ],
-        style={"display": "block"},
+        style={"display": "block" if show_tab else "none"},
     )
 
 
@@ -1372,7 +1391,11 @@ def create_motif_rankings_tab():
 def create_motif_details_tab():
     return html.Div(
         id="motif-details-tab-content",
-        children=[
+        children=dcc.Loading(
+            id="motif-details-loading",
+            type="circle",
+            fullscreen=True,
+            children=[
             # Brief high-level overview of the entire tab
             html.Div(
                 [
@@ -1717,6 +1740,7 @@ def create_motif_details_tab():
                 },
             ),
         ],
+        ),
         style={"display": "none"},
     )
 
@@ -1935,11 +1959,15 @@ def create_spectra_search_tab():
             html.Div(
                 id="search-tab-spectrum-details-container",
                 style={"marginTop": "20px", "display": "none"},
-                children=[
-                    html.H4(id="search-tab-spectrum-title"),
-                    # === Combined controls + plot ===
-                    html.Div(
-                        [
+                children=dcc.Loading(
+                    id="search-spectrum-details-loading",
+                    type="circle",
+                    fullscreen=True,
+                    children=[
+                        html.H4(id="search-tab-spectrum-title"),
+                        # === Combined controls + plot ===
+                        html.Div(
+                            [
                             dbc.ButtonGroup(
                                 [
                                     dbc.Button(
@@ -1995,8 +2023,9 @@ def create_spectra_search_tab():
                             "marginBottom": "15px",
                         },
                     ),
-                    html.Div(id="search-tab-spectrum-plot-container"),
-                ],
+                        html.Div(id="search-tab-spectrum-plot-container"),
+                    ],
+                ),
             ),
         ],
     )

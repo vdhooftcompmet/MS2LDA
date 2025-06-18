@@ -1,3 +1,4 @@
+import os
 import dash
 import dash_bootstrap_components as dbc
 from dash import dcc, html
@@ -5,6 +6,11 @@ from dash import dcc, html
 import App.callbacks  # noqa: F401 -- callbacks must be imported to register callbacks with the app
 from App import layout  # without App.layout
 from App.app_instance import app  # Import the Dash app instance
+
+ENABLE_RUN_ANALYSIS = os.getenv("ENABLE_RUN_ANALYSIS", "1").lower() not in (
+    "0",
+    "false",
+)
 
 server = app.server # gunicorn will import this WSGI callable
 
@@ -39,13 +45,15 @@ app.layout = dbc.Container(
         html.Hr(),
         dcc.Tabs(
             id="tabs",
-            value="run-analysis-tab",
+            value="run-analysis-tab" if ENABLE_RUN_ANALYSIS else "load-results-tab",
             children=[
-                dcc.Tab(
-                    label="Run Analysis",
-                    value="run-analysis-tab",
-                    id="run-analysis-tab",
-                ),
+                *([
+                    dcc.Tab(
+                        label="Run Analysis",
+                        value="run-analysis-tab",
+                        id="run-analysis-tab",
+                    )
+                ] if ENABLE_RUN_ANALYSIS else []),
                 dcc.Tab(
                     label="Load Results",
                     value="load-results-tab",
@@ -72,7 +80,7 @@ app.layout = dbc.Container(
             className="mt-3",
         ),
         # Tabs for all the sections
-        layout.create_run_analysis_tab(),
+        layout.create_run_analysis_tab(show_tab=ENABLE_RUN_ANALYSIS),
         layout.create_load_results_tab(),
         layout.create_motif_rankings_tab(),
         layout.create_motif_details_tab(),
