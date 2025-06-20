@@ -143,18 +143,14 @@ def retrieve_spec4doc(doc2spec_map, ms2lda, doc_id):
 
 
 def download_model_and_data(
-    file_urls=[
-        "https://zenodo.org/records/15003249/files/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy?download=1",
-        "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model?download=1",
-        "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.syn1neg.npy?download=1",
-        "https://zenodo.org/records/15003249/files/150225_Spec2Vec_pos_CleanedLibraries.model.wv.vectors.npy?download=1",
-        "https://zenodo.org/records/15003249/files/150225_CombLibraries_spectra.db?download=1",
-    ],
     mode="positive",
 ):
     """Downloads the Spec2Vec model/data to Add_On/Spec2Vec/model_{mode}_mode.
-    Skips files already present and shows a tqdm progress bar per file.
+    Downloads a zip file from Zenodo, extracts it, and places the files in the appropriate directory.
+    Skips files already present and shows a tqdm progress bar.
     """
+    import zipfile
+    import shutil
 
     script_directory = os.path.dirname(os.path.abspath(__file__))
     save_directory = os.path.join(
@@ -162,41 +158,91 @@ def download_model_and_data(
     )
     os.makedirs(save_directory, exist_ok=True)
 
-    download_count = 0
-    skip_count = 0
+    # New Zenodo URL for the zipped file
+    zip_url = "https://zenodo.org/records/15688609/files/Spec2Vec.zip?download=1"
+    zip_file_name = "Spec2Vec.zip"
+    zip_file_path = os.path.join(save_directory, zip_file_name)
 
-    for url in file_urls:
-        file_name = os.path.basename(url.split("?download")[0])
+    # Check if the required files already exist
+    required_files = [
+        "150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
+        "150225_Spec2Vec_pos_CleanedLibraries.model",
+        "150225_Spec2Vec_pos_CleanedLibraries.model.syn1neg.npy",
+        "150225_Spec2Vec_pos_CleanedLibraries.model.wv.vectors.npy",
+        "150225_CombLibraries_spectra.db"
+    ]
+
+    all_files_exist = True
+    for file_name in required_files:
         file_path = os.path.join(save_directory, file_name)
+        if not os.path.exists(file_path):
+            all_files_exist = False
+            break
 
-        if os.path.exists(file_path):
-            skip_count += 1
-            print(f"File {file_name} already exists, skipping download.")
-            continue
+    if all_files_exist:
+        print("All required files already exist, skipping download.")
+        return "Done. All files already present."
 
-        print(f"Downloading {file_name} ...")
-        with requests.get(url, stream=True) as response:
-            if response.status_code != 200:
-                raise Exception(f"HTTP {response.status_code} while fetching {url}")
+    # Download the zip file
+    print(f"Downloading {zip_file_name} ...")
+    with requests.get(zip_url, stream=True) as response:
+        if response.status_code != 200:
+            raise Exception(f"HTTP {response.status_code} while fetching {zip_url}")
 
-            total = int(response.headers.get("content-length", 0))
-            with open(file_path, "wb") as fh, tqdm(
-                total=total or None,
-                unit="B",
-                unit_scale=True,
-                unit_divisor=1024,
-                desc=file_name,
-                initial=0,
-            ) as bar:
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:  # skip keep-alive chunks
-                        fh.write(chunk)
-                        bar.update(len(chunk))
+        total = int(response.headers.get("content-length", 0))
+        with open(zip_file_path, "wb") as fh, tqdm(
+            total=total or None,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+            desc=zip_file_name,
+            initial=0,
+        ) as bar:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:  # skip keep-alive chunks
+                    fh.write(chunk)
+                    bar.update(len(chunk))
 
-        download_count += 1
-        print(f"Downloaded {file_name} successfully.")
+    print(f"Downloaded {zip_file_name} successfully.")
 
-    return f"Done. Downloaded {download_count} files, skipped {skip_count} existing."
+    # Extract the zip file
+    print(f"Extracting {zip_file_name} ...")
+    temp_extract_dir = os.path.join(save_directory, "temp_extract")
+    os.makedirs(temp_extract_dir, exist_ok=True)
+
+    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+        zip_ref.extractall(temp_extract_dir)
+
+    # Move files from the extracted directory to the save directory
+    source_dir = os.path.join(temp_extract_dir, "Spec2Vec", "positive_mode")
+    if os.path.exists(source_dir):
+        for file_name in os.listdir(source_dir):
+            source_file = os.path.join(source_dir, file_name)
+            dest_file = os.path.join(save_directory, file_name)
+            if os.path.isfile(source_file):
+                shutil.copy2(source_file, dest_file)
+                print(f"Copied {file_name} to {save_directory}")
+
+    # Clean up temporary files
+    if os.path.exists(temp_extract_dir):
+        shutil.rmtree(temp_extract_dir)
+    if os.path.exists(zip_file_path):
+        os.remove(zip_file_path)
+
+    print("Extraction and cleanup complete.")
+
+    # Verify all required files exist
+    missing_files = []
+    for file_name in required_files:
+        file_path = os.path.join(save_directory, file_name)
+        if not os.path.exists(file_path):
+            missing_files.append(file_name)
+
+    if missing_files:
+        print(f"Warning: The following required files are missing: {', '.join(missing_files)}")
+        return f"Warning: Some required files are missing: {', '.join(missing_files)}"
+    else:
+        return "Done. All files successfully downloaded and extracted."
 
 
 def download_fp_calculation():
