@@ -1,14 +1,3 @@
-![header](App/assets/MS2LDA_LOGO_white.jpg)
-![Maintainer](https://img.shields.io/badge/maintainer-Rosina_Torres_Ortega-blue)
-![Maintainer](https://img.shields.io/badge/maintainer-Jonas_Dietrich-blue)
-![Maintainer](https://img.shields.io/badge/maintainer-Joe_Wandy-blue)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12625409.svg)](https://doi.org/10.5281/zenodo.11394248)
-
-**MS2LDA** is an advanced tool designed for unsupervised substructure discovery in mass spectrometry data, utilizing topic modeling and providing automated annotation of discovered motifs. This tool significantly enhances the capabilities described in the [original MS2LDA paper](https://www.pnas.org/doi/abs/10.1073/pnas.1608041113) (2016), offering users an integrated workflow with improved usability, detailed visualizations, and a searchable motif database (MotifDB).
-
-Mass spectrometry fragmentation patterns hold abundant structural information vital for analytical chemistry, natural product research, and food safety assessments. However, interpreting this data remains challenging, and only a fraction of available information is traditionally utilized. MS2LDA addresses this by identifying recurring substructures (motifs) across spectral datasets without relying on prior compound identification, thus accelerating structure elucidation and analysis.
-
----
 
 # MS2LDA Command Line Tool Usage
 
@@ -235,24 +224,3 @@ Here's a complete example configuration file:
        "window_size": 20
    }
    ```
-
----
-
-## Documentation
-
-For more comprehensive guidance, refer to our complete [MS2LDA Documentation](https://ms2lda.org/), providing detailed instructions, FAQs, and additional resources.
-
----
-
-## Citing MS2LDA
-
-Please cite our work if you use MS2LDA in your research. *(Citation details coming soon.)*
-
----
-
-## Our Research Group
-
-[![GitHub Logo](https://github.com/vdhooftcompmet/group-website/blob/main/website/custom/logo/logo.png?raw=true)](https://vdhooftcompmet.github.io)
-[![Github Logo](App/assets/WUR_RGB_standard_2021.png?raw=true)](https://www.wur.nl/en.htm)
-
----
