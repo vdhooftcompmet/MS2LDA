@@ -13,6 +13,7 @@ dependencies:
   - gensim>=4.3.3
   - psims>=1.3.3
   - pubchempy>=1.0.4
+  - pydantic=2.10.3
   - rdkit>=2023.9.6   # matches Poetry min; satisfies matchms
   - requests>=2.32.3
   - matchms>=0.27.0
@@ -21,11 +22,12 @@ dependencies:
   - pymzml>=2.5.10
   - scikit-learn>=1.5.1
   - openpyxl=3.1.5
+  - diskcache>=5.6.3
+  - dash-extensions==1.0.20
 
   # Optional / notebook tooling
   - ipython>=8.26.0
   - jupyterlab>=4.2.4
-  - kaleido=0.2.1        # universal macOS & Windows wheel
 
   # Development tools
   - black=24.3.0
@@ -33,6 +35,10 @@ dependencies:
   - mypy=1.10.0
   - pre-commit=3.7.0
   - pytest>=8.3.2
+  - ruff>=0.11.0
+
+  # Deployment tools
+  - gunicorn>=23.0.0
 
   # Packages easier via pip (no conda recipe or bleeding-edge)
   - pip
@@ -44,4 +50,5 @@ dependencies:
       - spec2vec>=0.8.0
       - PyQt6>=6.7.1
       - faiss-cpu==1.10.0
-      - git+https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git
+      - kaleido==0.2.1
+      - git+https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git@ac1b10b1f020fdfde114c17d57f0ed9b435d9d47
