@@ -1378,7 +1378,7 @@ def update_motif_rankings_table(
             screening_hits = ["" for _ in range(len(df))]
     else:
         screening_hits = ["" for _ in range(len(df))]
-    df["ScreeningHits"] = screening_hits
+    df["Matching Hits"] = screening_hits
 
     # Filter out motifs that have no docs passing, i.e. degree=0
     df = df[df["Degree"] > 0].copy()
@@ -1411,8 +1411,8 @@ def update_motif_rankings_table(
             "id": "Annotation",
         },
         {
-            "name": "ScreeningHits",
-            "id": "ScreeningHits",
+            "name": "Matching Hits",
+            "id": "Matching Hits",
         },
     ]
 
