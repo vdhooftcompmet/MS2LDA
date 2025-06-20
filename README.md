@@ -10,166 +10,38 @@ Mass spectrometry fragmentation patterns hold abundant structural information vi
 
 ---
 
-## Installation
+# MS2LDA Installation and Usage
 
-You can set up MS2LDA using either **Conda** (recommended for ease and reliability) or **Poetry** (preferred by developers or users needing finer control over dependencies).
+You can set up MS2LDA using either **Conda** or **Poetry**, depending on your preferences and requirements.
 
-### Option A: Installation via Conda (Recommended)
+## Installation Guides
 
-**Step 1: Install Conda**
-Download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or the complete [Anaconda](https://www.anaconda.com/products/distribution) distribution.
+We provide separate detailed documentation for each installation method:
 
-**Step 2: Clone the Repository**
-Clone the MS2LDA repository from GitHub and navigate into the project directory:
-
-```bash
-git clone https://github.com/vdhooftcompmet/MS2LDA.git
-cd MS2LDA
-```
-
-**Step 3: Create and Activate Environment**
-Use Conda to create and activate the required environment from the provided configuration file:
-
-```bash
-conda env create -f MS2LDA_environment.yml
-conda activate MS2LDA_v2
-```
-
-**Step 4: Download Required Data and Models**
-Download necessary models and datasets from [Zenodo](https://zenodo.org/records/15003249). Extract and place them into the appropriate directories as indicated in the Zenodo repository.
+- [**Conda Installation Guide**](README_CONDA.md) - Uses Conda environment management.
+- [**Poetry Installation Guide**](README_POETRY.md) - Uses Poetry for dependency management.
 
 ---
 
-### Option B: Installation via Poetry (Alternative)
+## Command Line Tool Usage
 
-Poetry provides modern Python dependency management and is particularly suited for development or customized installations.
+MS2LDA provides powerful command-line tools for batch processing and analysis of mass spectrometry data.
 
-**Step 1: Install Poetry**
-Follow the [official Poetry documentation](https://python-poetry.org/docs/#installation) for installation instructions suitable to your operating system.
-
-**Step 2: Clone Repository and Install**
-Clone and install dependencies:
-
-```bash
-git clone https://github.com/vdhooftcompmet/MS2LDA.git
-cd MS2LDA
-poetry install
-```
-
-**Important Notes for RDKit with Poetry:**
-
-* RDKit installation via Poetry typically uses pre-built binaries, which work well for common systems. However, for certain hardware or OS configurations (especially ARM-based Macs or less common Linux distributions), pre-built binaries might not be available.
-* In such cases, we recommend installing RDKit separately using Conda, then installing MS2LDA without the RDKit binary:
-
-```bash
-poetry install --extras lite --no-binary rdkit
-```
+For detailed instructions on using the command-line interface, see the [**Command Line Tool Guide**](README_CLI.md).
 
 ---
 
-## Running MS2LDA via Command-Line Interface (CLI)
+## MS2LDAViz Application
 
-MS2LDA includes a powerful CLI enabling batch analysis and scripting. You can execute analyses using the included runner scripts (recommended for simplicity) or via Poetry's installed commands.
+MS2LDA includes a web-based visualization application (MS2LDAViz) for exploring and analyzing results.
 
-**Using the runner scripts:** (Linux/MacOS)
-
-Run basic analysis:
-
-```bash
-./run_analysis.sh --dataset datasets/mushroom_spectra.mgf --n-motifs 200 --n-iterations 5000 --output-folder cli_results
-```
-
-Run analysis and automatically download Spec2Vec data if not present:
-
-```bash
-./run_analysis.sh --dataset datasets/mushroom_spectra.mgf --n-motifs 200 --n-iterations 5000 --output-folder cli_results --download-spec2vec
-```
-
-Use a configuration file for advanced settings:
-
-```bash
-./run_analysis.sh --dataset datasets/mushroom_spectra.mgf --n-motifs 200 --n-iterations 5000 --output-folder test_results --config default_config.json
-```
-
-**Using Poetry command (Editable install):**
-
-If you've installed MS2LDA with Poetry, you can directly run analyses via:
-
-```bash
-poetry run ms2lda --dataset datasets/mushroom_spectra.mgf --n-motifs 200 --n-iterations 5000 --output-folder cli_results
-```
-
----
-
-## Running the Interactive Dash Application
-
-The Dash application provides a comprehensive, user-friendly graphical interface for exploring mass spectrometry datasets, viewing motifs, screening substructures, and visualizing results interactively.
-
-Activate your environment first:
-
-* **Conda:**
-
-  ```bash
-  conda activate MS2LDA_v2
-  ```
-* **Poetry:**
-
-  ```bash
-  poetry shell
-  ```
-
-Then, launch the Dash app using:
-
-* **Windows:**
-
-  ```bash
-  run_ms2ldaviz.bat
-  ```
-
-* **Linux/MacOS:**
-
-  ```bash
-  ./run_ms2ldaviz.sh
-  ```
-
-* **Or via Poetry (Editable install):**
-
-  ```bash
-  poetry run ms2lda-viz
-  ```
-
-Navigate your web browser to [http://localhost:8050](http://localhost:8050) to start exploring.
-
-If you are hosting the dashboard on a resource-limited server and want to disable
-the "Run Analysis" tab, set the environment variable `ENABLE_RUN_ANALYSIS=0`
-before launching the app. This hides the analysis tab but still allows loading
-existing results locally.
-
----
-
-## Jupyter Notebooks
-
-Included in the repository are several Jupyter notebooks organized in the `notebooks` directory, providing tutorials, conversion utilities, detailed examples, and analyses replication from previous publications.
-
-Key notebooks folders:
-
-* **MotifSets**: Tools for converting motif formats.
-* **Paper\_Results**: Code and data to reproduce published results.
-* **Spec2Vec**: Reference libraries and embedding models.
-* **Tutorial**: Interactive introductory tutorials and example workflows.
-
-To launch notebooks with Poetry:
-
-```bash
-poetry install --extras notebook
-poetry run jupyter lab
-```
+For instructions on starting and using the visualization application, see the [**MS2LDAViz Guide**](README_VIZ.md).
 
 ---
 
 ## Documentation
 
-For more comprehensive guidance, refer to our complete [MS2LDA Documentation](https://vdhooftcompmet.github.io/MS2LDA/), providing detailed instructions, FAQs, and additional resources.
+For more comprehensive guidance, refer to our complete [MS2LDA Documentation](https://ms2lda.org/), providing detailed instructions, FAQs, and additional resources.
 
 ---
 
