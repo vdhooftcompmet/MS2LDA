@@ -75,7 +75,7 @@ def create_run_analysis_tab(show_tab: bool = True):
                                 multiple=False,
                             ),
                             html.Div(
-                                id="file-upload-info", style={"marginBottom": "20px"},
+                                id="file-upload-info", style={"marginBottom": "20px", "textAlign": "center"},
                             ),
                             # Basic parameters (with tooltips):
                             dbc.InputGroup(
@@ -1069,6 +1069,7 @@ def create_load_results_tab():
                                 },
                                 multiple=False,
                             ),
+                            html.Div(id="selected-file-info", style={"marginTop": "10px", "textAlign": "center"}),
                             html.Div(id="load-status", style={"marginTop": "20px"}),
                             html.Div(
                                 [

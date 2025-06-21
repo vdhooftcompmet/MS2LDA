@@ -525,7 +525,10 @@ def toggle_tab_content(active_tab):
 )
 def update_output(contents, filename):
     if contents:
-        return html.Div([html.H5(f"Uploaded File: {filename}")])
+        return html.Div([
+            html.I(className="fas fa-file-alt me-2"),
+            f"Selected file: {filename}",
+        ], style={"color": "#007bff", "fontWeight": "bold"})
     return html.Div([html.H5("No file uploaded yet.")])
 
 
@@ -889,6 +892,59 @@ def handle_run_or_load(
         )
 
     raise dash.exceptions.PreventUpdate
+
+
+@app.callback(
+    [Output("selected-file-info", "children"),
+     Output("upload-results", "style"),
+     Output("load-status", "children", allow_duplicate=True)],
+    Input("upload-results", "filename"),
+    State("upload-results", "style"),
+    prevent_initial_call=True,
+)
+def update_selected_file_info(filename, current_style):
+    """
+    Update the UI to show the selected filename when a file is uploaded
+    but before the Load Results button is clicked.
+    Also update the style of the upload component to indicate a file is selected.
+    And clear any previous load status messages.
+    """
+    if not current_style:
+        current_style = {}
+
+    if filename:
+        # Create a copy of the current style to avoid modifying the original
+        updated_style = dict(current_style)
+        # Update the style to indicate a file is selected
+        updated_style.update({
+            "borderColor": "#007bff",
+            "borderWidth": "2px",
+            "backgroundColor": "#f8f9fa"
+        })
+
+        return (
+            html.Div([
+                html.I(className="fas fa-file-alt me-2"),
+                f"Selected file: {filename}",
+            ], style={"color": "#007bff", "fontWeight": "bold"}),
+            updated_style,
+            # Clear any previous load status messages
+            ""
+        )
+
+    # Reset to default style if no file is selected
+    default_style = {
+        "width": "100%",
+        "height": "60px",
+        "lineHeight": "60px",
+        "borderWidth": "1px",
+        "borderStyle": "dashed",
+        "borderRadius": "5px",
+        "textAlign": "center",
+        "margin": "10px",
+    }
+
+    return "", default_style, ""
 
 
 def parse_ms2lda_viz_file(base64_contents: str) -> dict:
