@@ -39,15 +39,12 @@ For instructions on starting and using the visualization application, see the [*
 
 ---
 
-## Documentation
-
-For more comprehensive guidance, refer to our complete [MS2LDA Documentation](https://ms2lda.org/), providing detailed instructions, FAQs, and additional resources.
-
----
 
 ## Citing MS2LDA
 
-Please cite our work if you use MS2LDA in your research. *(Citation details coming soon.)*
+Please cite our work if you use MS2LDA in your research:
+
+Torres Ortega, L.R., Dietrich, J., Wandy, J., Mol, H., & van der Hooft, J.J.J. (2025). Large-scale discovery and annotation of hidden substructure patterns in mass spectrometry profiles. *bioRxiv*. doi: [https://doi.org/10.1101/2025.06.19.659491](https://www.biorxiv.org/content/10.1101/2025.06.19.659491v1)
 
 ---
 
