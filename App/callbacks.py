@@ -2292,6 +2292,12 @@ def make_spectrum_from_dict(spectrum_dict):
 
 
 def filter_and_normalize_spectra(spectrum_list):
+    """
+    Filters out invalid spectra and normalizes the intensities of valid spectra.
+    Fragments and losses are normalized together against the single highest peak, similar to
+    the logic in create_spectrum method.
+    """
+
     def trunc_annotation(val, max_len=40):
         """Truncate any string over max_len for readability."""
         if isinstance(val, str) and len(val) > max_len:
@@ -2302,32 +2308,51 @@ def filter_and_normalize_spectra(spectrum_list):
     for sp in spectrum_list:
         if not sp.peaks or len(sp.peaks.mz) == 0:
             continue
-        # Normalize peaks
-        max_i = sp.peaks.intensities.max()
-        if max_i <= 0:
-            continue
-        if max_i > 1.0:
-            sp.peaks = Fragments(
-                mz=sp.peaks.mz, intensities=sp.peaks.intensities / max_i,
-            )
-        # Normalize losses
-        if sp.losses and len(sp.losses.mz) > 0:
-            max_l = sp.losses.intensities.max()
-            if max_l > 1.0:
-                sp.losses = Fragments(
-                    mz=sp.losses.mz, intensities=sp.losses.intensities / max_l,
-                )
 
-        # Possibly convert short_annotation from list->string
-        ann = sp.get("short_annotation", "")
+        # Clone so as not to modify the original object
+        current_sp = sp.clone()
+
+        # Normalize fragments and losses together
+        frag_intensities = current_sp.peaks.intensities
+        loss_intensities = np.array([])
+        if current_sp.losses and len(current_sp.losses.mz) > 0:
+            loss_intensities = current_sp.losses.intensities
+
+        all_intensities = np.concatenate((frag_intensities, loss_intensities))
+        if all_intensities.size == 0:
+            continue
+
+        max_intensity = np.max(all_intensities)
+        if max_intensity <= 0:
+            continue
+
+        # Normalize if the max intensity is greater than 1.0
+        normalized_frag_intensities = frag_intensities
+        normalized_loss_intensities = loss_intensities
+        if max_intensity > 1.0:
+            normalized_frag_intensities = frag_intensities / max_intensity
+            if loss_intensities.size > 0:
+                normalized_loss_intensities = loss_intensities / max_intensity
+
+        # Re-create Mass2Motif object with normalized values
+        reconstructed_sp = Mass2Motif(
+            frag_mz=current_sp.peaks.mz,
+            frag_intensities=normalized_frag_intensities,
+            loss_mz=current_sp.losses.mz if current_sp.losses else np.array([]),
+            loss_intensities=normalized_loss_intensities,
+            metadata=current_sp.metadata
+        )
+
+        # Handle annotation on the new object
+        ann = reconstructed_sp.get("short_annotation", "")
         if isinstance(ann, list):
             joined = ", ".join(map(str, ann))
             joined = trunc_annotation(joined, 60)
-            sp.set("short_annotation", joined)
+            reconstructed_sp.set("short_annotation", joined)
         elif isinstance(ann, str):
-            sp.set("short_annotation", trunc_annotation(ann, 60))
+            reconstructed_sp.set("short_annotation", trunc_annotation(ann, 60))
 
-        valid.append(sp)
+        valid.append(reconstructed_sp)
 
     return valid
 
