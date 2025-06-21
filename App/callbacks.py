@@ -1318,6 +1318,10 @@ def run_massql_query(n_clicks, query, motifs_data):
     specs = [make_spectrum_from_dict(d) for d in motifs_data]
     ms1_df, ms2_df = motifs2motifDB(specs)
     matches = msql_engine.process_query(query, ms1_df=ms1_df, ms2_df=ms2_df)
+
+    # If no results
+    if matches.empty or "motif_id" not in matches.columns:
+        return []
     return matches["motif_id"].unique().tolist()
 
 
@@ -1361,7 +1365,7 @@ def update_motif_rankings_table(
         ],
     )
 
-    if massql_matches:
+    if massql_matches is not None:
         df = df[df["Motif"].isin(massql_matches)]
 
     # 1) topic_metadata from LDA
@@ -2258,21 +2262,33 @@ def auto_scan_m2m_subfolders(tab_value):
 
 
 def make_spectrum_from_dict(spectrum_dict):
-    try:
-        mz_ = np.array(spectrum_dict["mz"], dtype=float)
-        ints_ = np.array(spectrum_dict["intensities"], dtype=float)
-        meta_ = spectrum_dict["metadata"]
-        sp = Spectrum(mz=mz_, intensities=ints_, metadata=meta_)
-        if "losses" in meta_:
-            loss_mz = []
-            loss_int = []
-            for x in meta_["losses"]:
-                loss_mz.append(x["loss_mz"])
-                loss_int.append(x["loss_intensity"])
-            sp.losses = Fragments(mz=np.array(loss_mz), intensities=np.array(loss_int))
-        return sp
-    except:
-        return None
+    """
+    Creates a Mass2Motif object from a dictionary.
+    This is used to reconstruct motifs from the stored data for MassQL queries.
+    """
+    # Extract fragments from the dictionary
+    frag_mz = np.array(spectrum_dict.get("mz", []), dtype=float)
+    frag_intensities = np.array(spectrum_dict.get("intensities", []), dtype=float)
+
+    meta_ = spectrum_dict.get("metadata", {})
+
+    # Extract losses from the metadata dictionary
+    loss_mz = []
+    loss_intensities = []
+    if "losses" in meta_:
+        for loss_item in meta_.get("losses", []):
+            loss_mz.append(loss_item.get("loss_mz"))
+            loss_intensities.append(loss_item.get("loss_intensity"))
+
+    sp = Mass2Motif(
+        frag_mz=frag_mz,
+        frag_intensities=frag_intensities,
+        loss_mz=np.array(loss_mz, dtype=float),
+        loss_intensities=np.array(loss_intensities, dtype=float),
+        metadata=meta_,
+    )
+
+    return sp
 
 
 def filter_and_normalize_spectra(spectrum_list):
