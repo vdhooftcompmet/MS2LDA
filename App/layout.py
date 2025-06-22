@@ -2218,17 +2218,7 @@ def create_spectra_search_tab():
                                             dbc.Label("Parent Mass Range:", style={"fontWeight": "bold"}),
                                             dcc.RangeSlider(
                                                 id="spectra-search-parentmass-slider",
-                                                min=0,
-                                                max=2000,
                                                 step=1,
-                                                value=[0, 2000],
-                                                marks={
-                                                    0: "0",
-                                                    500: "500",
-                                                    1000: "1000",
-                                                    1500: "1500",
-                                                    2000: "2000",
-                                                },
                                                 allowCross=False,
                                             ),
                                             html.Div(

@@ -2724,6 +2724,60 @@ def unlock_run_after_download(n_clicks):
 
 
 @app.callback(
+    Output("spectra-search-parentmass-slider", "min"),
+    Output("spectra-search-parentmass-slider", "max"),
+    Output("spectra-search-parentmass-slider", "value"),
+    Output("spectra-search-parentmass-slider", "marks"),
+    Input("spectra-store", "data"),
+    prevent_initial_call=True,
+)
+def update_parentmass_slider_range(spectra_data):
+    if not spectra_data:
+        # Default values if no data is available
+        return 0, 2000, [0, 2000], {0: "0", 500: "500", 1000: "1000", 1500: "1500", 2000: "2000"}
+
+    # Extract parent masses from spectra data
+    parent_masses = []
+    for spec_dict in spectra_data:
+        meta = spec_dict.get("metadata", {})
+        pmass = meta.get("precursor_mz", None)
+        if pmass is not None:
+            parent_masses.append(pmass)
+
+    if not parent_masses:
+        # No valid parent masses found
+        return 0, 2000, [0, 2000], {0: "0", 500: "500", 1000: "1000", 1500: "1500", 2000: "2000"}
+
+    # Calculate min and max with some margin
+    min_mass = max(0, min(parent_masses) - 50)  # Add 50 Da margin, but not below 0
+    max_mass = max(parent_masses) + 50  # Add 50 Da margin
+
+    # Round to nice values
+    min_mass = int(min_mass // 10) * 10  # Round down to nearest 10
+    max_mass = int((max_mass + 9) // 10) * 10  # Round up to nearest 10
+
+    # Create marks at reasonable intervals
+    range_size = max_mass - min_mass
+    if range_size <= 100:
+        step = 20
+    elif range_size <= 500:
+        step = 100
+    elif range_size <= 1000:
+        step = 200
+    else:
+        step = 500
+
+    marks = {}
+    for i in range(min_mass, max_mass + 1, step):
+        marks[i] = str(i)
+
+    # Always include min and max in marks
+    marks[min_mass] = str(min_mass)
+    marks[max_mass] = str(max_mass)
+
+    return min_mass, max_mass, [min_mass, max_mass], marks
+
+@app.callback(
     Output("spectra-search-parentmass-slider-display", "children"),
     Input("spectra-search-parentmass-slider", "value"),
 )
