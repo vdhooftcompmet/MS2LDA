@@ -1152,82 +1152,101 @@ def create_cytoscape_network_tab():
             # ----------------------------------------------------------------
             html.Div(
                 [
-                    html.H4("Network Controls", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
                     html.Div(
                         [
-                            dcc.Markdown(
-                                """
-                                Control how the network is displayed using the options below. You can adjust the edge intensity threshold,
-                                toggle additional edges between loss and fragment nodes, and change the graph layout algorithm.
-                                """
-                            ),
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        [
-                                            dbc.Label("Edge Intensity Threshold", style={"fontWeight": "bold"}),
-                                            dcc.Slider(
-                                                id="edge-intensity-threshold",
-                                                min=0,
-                                                max=1,
-                                                step=0.05,
-                                                value=0.50,
-                                                marks={0: "0.0", 0.5: "0.5", 1: "1.0"},
-                                            ),
-                                        ],
-                                        width=6,
-                                    ),
-                                    dbc.Col(
-                                        [
-                                            dbc.Label("Edge Options", style={"fontWeight": "bold"}),
-                                            dbc.Checklist(
-                                                options=[
-                                                    {
-                                                        "label": "Add Loss -> Fragment Edge",
-                                                        "value": "show_loss_edge",
-                                                    },
-                                                ],
-                                                value=[],
-                                                id="toggle-loss-edge",
-                                                inline=True,
-                                            ),
-                                        ],
-                                        width=6,
-                                    ),
-                                ],
-                            ),
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        [
-                                            dbc.Label("Graph Layout", style={"fontWeight": "bold"}),
-                                            dcc.Dropdown(
-                                                id="cytoscape-layout-dropdown",
-                                                options=[
-                                                    {"label": "CoSE", "value": "cose"},
-                                                    {
-                                                        "label": "Force-Directed (Spring)",
-                                                        "value": "fcose",
-                                                    },
-                                                    {"label": "Circle", "value": "circle"},
-                                                    {"label": "Concentric", "value": "concentric"},
-                                                ],
-                                                value="fcose",
-                                                clearable=False,
-                                            ),
-                                        ],
-                                        width=6,
-                                    ),
-                                ],
-                                style={"marginTop": "10px"},
+                            html.H4("Network Controls", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px", "display": "inline-block"}),
+                            dbc.Button(
+                                "🔍 Hide",
+                                id="network-controls-toggle-button",
+                                color="primary",
+                                size="sm",
+                                className="ms-2",
+                                style={"display": "inline-block", "marginLeft": "10px", "marginBottom": "5px"},
                             ),
                         ],
-                        style={
-                            "border": "1px dashed #ccc",
-                            "padding": "10px",
-                            "borderRadius": "5px",
-                            "marginBottom": "15px",
-                        },
+                        style={"display": "flex", "alignItems": "center", "justifyContent": "space-between", "width": "100%"},
+                    ),
+                    dbc.Collapse(
+                        id="network-controls-collapse",
+                        is_open=True,
+                        children=[
+                            html.Div(
+                                [
+                                    dcc.Markdown(
+                                        """
+                                        Control how the network is displayed using the options below. You can adjust the edge intensity threshold,
+                                        toggle additional edges between loss and fragment nodes, and change the graph layout algorithm.
+                                        """
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Edge Intensity Threshold", style={"fontWeight": "bold"}),
+                                                    dcc.Slider(
+                                                        id="edge-intensity-threshold",
+                                                        min=0,
+                                                        max=1,
+                                                        step=0.05,
+                                                        value=0.50,
+                                                        marks={0: "0.0", 0.5: "0.5", 1: "1.0"},
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Edge Options", style={"fontWeight": "bold"}),
+                                                    dbc.Checklist(
+                                                        options=[
+                                                            {
+                                                                "label": "Add Loss -> Fragment Edge",
+                                                                "value": "show_loss_edge",
+                                                            },
+                                                        ],
+                                                        value=[],
+                                                        id="toggle-loss-edge",
+                                                        inline=True,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Graph Layout", style={"fontWeight": "bold"}),
+                                                    dcc.Dropdown(
+                                                        id="cytoscape-layout-dropdown",
+                                                        options=[
+                                                            {"label": "CoSE", "value": "cose"},
+                                                            {
+                                                                "label": "Force-Directed (Spring)",
+                                                                "value": "fcose",
+                                                            },
+                                                            {"label": "Circle", "value": "circle"},
+                                                            {"label": "Concentric", "value": "concentric"},
+                                                        ],
+                                                        value="fcose",
+                                                        clearable=False,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                        style={"marginTop": "10px"},
+                                    ),
+                                ],
+                                style={
+                                    "border": "1px dashed #ccc",
+                                    "padding": "10px",
+                                    "borderRadius": "5px",
+                                    "marginBottom": "15px",
+                                },
+                            ),
+                        ],
                     ),
                 ],
                 style={
@@ -1334,25 +1353,21 @@ def create_motif_rankings_tab():
                         [
                             html.Div(
                                 [
-                                    html.Div(
-                                        [
-                                            html.H4("Filter Controls", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px", "display": "inline-block"}),
-                                            dbc.Button(
-                                                "🔍 Show",
-                                                id="filter-controls-toggle-button",
-                                                color="primary",
-                                                size="sm",
-                                                className="ms-2",
-                                                style={"display": "inline-block", "marginLeft": "10px", "marginBottom": "5px"},
-                                            ),
-                                        ],
+                                    html.H4("Filter Controls", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px", "display": "inline-block"}),
+                                    dbc.Button(
+                                        "🔍 Hide",
+                                        id="filter-controls-toggle-button",
+                                        color="primary",
+                                        size="sm",
+                                        className="ms-2",
+                                        style={"display": "inline-block", "marginLeft": "10px", "marginBottom": "5px"},
                                     ),
                                 ],
-                                style={"display": "flex", "alignItems": "center", "justifyContent": "space-between"},
+                                style={"display": "flex", "alignItems": "center", "justifyContent": "space-between", "width": "100%"},
                             ),
                             dbc.Collapse(
                                 id="filter-controls-collapse",
-                                is_open=False,
+                                is_open=True,
                                 children=[
                                     html.Div(
                                         [
@@ -2207,7 +2222,7 @@ def create_spectra_search_tab():
             # ----------------------------------------------------------------
             # 1. SEARCH CONTROLS
             # ----------------------------------------------------------------
-            html.Div(
+            dbc.Container(
                 [
                     html.Div(
                         [
@@ -2215,7 +2230,7 @@ def create_spectra_search_tab():
                                 [
                                     html.H4("Search Controls", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px", "display": "inline-block"}),
                                     dbc.Button(
-                                        "🔎 Show",
+                                        "🔎 Hide",
                                         id="search-controls-toggle-button",
                                         color="primary",
                                         size="sm",
@@ -2223,132 +2238,132 @@ def create_spectra_search_tab():
                                         style={"display": "inline-block", "marginLeft": "10px", "marginBottom": "5px"},
                                     ),
                                 ],
+                                style={"display": "flex", "alignItems": "center", "justifyContent": "space-between", "width": "100%"},
                             ),
-                        ],
-                        style={"display": "flex", "alignItems": "center", "justifyContent": "space-between"},
-                    ),
-                    dbc.Collapse(
-                        id="search-controls-collapse",
-                        is_open=False,
-                        children=[
-                            html.Div(
-                                [
-                                    # Show/Hide Explanation button
-                                    dbc.Button(
-                                        "ℹ️ Info",
-                                        id="spectra-search-explanation-button",
-                                        color="secondary",
-                                        size="sm",
-                                        className="mb-3",
-                                    ),
-                                    # Collapsible explanation section
-                                    dbc.Collapse(
-                                        id="spectra-search-explanation-collapse",
-                                        is_open=False,
-                                        children=[
-                                            dcc.Markdown(
-                                                """
-                                                Search for specific spectra in your dataset based on fragment/loss values or parent mass range.
+                            dbc.Collapse(
+                                id="search-controls-collapse",
+                                is_open=True,
+                                children=[
+                                    html.Div(
+                                        [
+                                            # Show/Hide Explanation button
+                                            dbc.Button(
+                                                "ℹ️ Info",
+                                                id="spectra-search-explanation-button",
+                                                color="secondary",
+                                                size="sm",
+                                                className="mb-3",
+                                            ),
+                                            # Collapsible explanation section
+                                            dbc.Collapse(
+                                                id="spectra-search-explanation-collapse",
+                                                is_open=False,
+                                                children=[
+                                                    dcc.Markdown(
+                                                        """
+                                                        Search for specific spectra in your dataset based on fragment/loss values or parent mass range.
 
-                                                **Search by Fragment or Loss**: Enter a numeric value (e.g., 150.1) to search for spectra containing that specific fragment or loss mass. The search uses a tolerance of 0.01 Da. Use the checkboxes to specify whether to search in fragments, losses, or both.
+                                                        **Search by Fragment or Loss**: Enter a numeric value (e.g., 150.1) to search for spectra containing that specific fragment or loss mass. The search uses a tolerance of 0.01 Da. Use the checkboxes to specify whether to search in fragments, losses, or both.
 
-                                                **Parent Mass Range**: Use the slider to filter spectra based on their parent mass. This is useful for narrowing down your search to a specific mass range.
+                                                        **Parent Mass Range**: Use the slider to filter spectra based on their parent mass. This is useful for narrowing down your search to a specific mass range.
 
-                                                The results table shows matching spectra with their ID, parent mass, and lists of fragments and losses. Click on any spectrum to view its detailed plot and associated motifs below.
-                                                """,
+                                                        The results table shows matching spectra with their ID, parent mass, and lists of fragments and losses. Click on any spectrum to view its detailed plot and associated motifs below.
+                                                        """,
+                                                        style={
+                                                            "backgroundColor": "#f8f9fa",
+                                                            "padding": "15px",
+                                                            "borderRadius": "5px",
+                                                            "border": "1px solid #e9ecef",
+                                                        },
+                                                    ),
+                                                ],
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Search by Fragment or Loss:", style={"fontWeight": "bold"}),
+                                                            dbc.Input(
+                                                                id="spectra-search-fragloss-input",
+                                                                type="text",
+                                                                placeholder="Enter a numeric value (e.g. 150.1)",
+                                                            ),
+                                                            dbc.Tooltip(
+                                                                "Enter a numeric value for comparison with a tolerance of 0.01. "
+                                                                "Use the checkboxes below to search in fragments, losses, or both.",
+                                                                target="spectra-search-fragloss-input",
+                                                            ),
+                                                            html.Div(
+                                                                [
+                                                                    dbc.Checkbox(
+                                                                        id="spectra-search-fragment-checkbox",
+                                                                        label="Fragment",
+                                                                        value=True,
+                                                                        className="mr-2",
+                                                                        style={"marginTop": "10px", "marginRight": "10px", "display": "inline-block"}
+                                                                    ),
+                                                                    dbc.Checkbox(
+                                                                        id="spectra-search-loss-checkbox",
+                                                                        label="Loss",
+                                                                        value=True,
+                                                                        className="mr-2",
+                                                                        style={"marginTop": "10px", "display": "inline-block"}
+                                                                    ),
+                                                                ],
+                                                                style={"marginTop": "5px"}
+                                                            ),
+                                                        ],
+                                                        width=4,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Parent Mass Range:", style={"fontWeight": "bold"}),
+                                                            dcc.RangeSlider(
+                                                                id="spectra-search-parentmass-slider",
+                                                                step=1,
+                                                                allowCross=False,
+                                                            ),
+                                                            html.Div(
+                                                                id="spectra-search-parentmass-slider-display",
+                                                                style={"marginTop": "10px"},
+                                                            ),
+                                                        ],
+                                                        width=8,
+                                                    ),
+                                                ],
+                                            ),
+                                            html.Div(
+                                                id="spectra-search-status-message",
                                                 style={
+                                                    "marginTop": "20px", 
+                                                    "fontWeight": "bold",
+                                                    "fontSize": "16px",
+                                                    "color": "#007bff",
+                                                    "padding": "10px",
                                                     "backgroundColor": "#f8f9fa",
-                                                    "padding": "15px",
                                                     "borderRadius": "5px",
-                                                    "border": "1px solid #e9ecef",
+                                                    "textAlign": "center"
                                                 },
                                             ),
                                         ],
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Search by Fragment or Loss:", style={"fontWeight": "bold"}),
-                                                    dbc.Input(
-                                                        id="spectra-search-fragloss-input",
-                                                        type="text",
-                                                        placeholder="Enter a numeric value (e.g. 150.1)",
-                                                    ),
-                                                    dbc.Tooltip(
-                                                        "Enter a numeric value for comparison with a tolerance of 0.01. "
-                                                        "Use the checkboxes below to search in fragments, losses, or both.",
-                                                        target="spectra-search-fragloss-input",
-                                                    ),
-                                                    html.Div(
-                                                        [
-                                                            dbc.Checkbox(
-                                                                id="spectra-search-fragment-checkbox",
-                                                                label="Fragment",
-                                                                value=True,
-                                                                className="mr-2",
-                                                                style={"marginTop": "10px", "marginRight": "10px", "display": "inline-block"}
-                                                            ),
-                                                            dbc.Checkbox(
-                                                                id="spectra-search-loss-checkbox",
-                                                                label="Loss",
-                                                                value=True,
-                                                                className="mr-2",
-                                                                style={"marginTop": "10px", "display": "inline-block"}
-                                                            ),
-                                                        ],
-                                                        style={"marginTop": "5px"}
-                                                    ),
-                                                ],
-                                                width=4,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label("Parent Mass Range:", style={"fontWeight": "bold"}),
-                                                    dcc.RangeSlider(
-                                                        id="spectra-search-parentmass-slider",
-                                                        step=1,
-                                                        allowCross=False,
-                                                    ),
-                                                    html.Div(
-                                                        id="spectra-search-parentmass-slider-display",
-                                                        style={"marginTop": "10px"},
-                                                    ),
-                                                ],
-                                                width=8,
-                                            ),
-                                        ],
-                                    ),
-                                    html.Div(
-                                        id="spectra-search-status-message",
                                         style={
-                                            "marginTop": "20px", 
-                                            "fontWeight": "bold",
-                                            "fontSize": "16px",
-                                            "color": "#007bff",
+                                            "border": "1px dashed #ccc",
                                             "padding": "10px",
-                                            "backgroundColor": "#f8f9fa",
                                             "borderRadius": "5px",
-                                            "textAlign": "center"
+                                            "marginBottom": "15px",
                                         },
                                     ),
                                 ],
-                                style={
-                                    "border": "1px dashed #ccc",
-                                    "padding": "10px",
-                                    "borderRadius": "5px",
-                                    "marginBottom": "15px",
-                                },
                             ),
                         ],
+                        style={
+                            "border": "1px dashed #999",
+                            "padding": "15px",
+                            "borderRadius": "5px",
+                            "marginBottom": "20px",
+                        },
                     ),
                 ],
-                style={
-                    "border": "1px dashed #999",
-                    "padding": "15px",
-                    "borderRadius": "5px",
-                    "marginBottom": "20px",
-                },
             ),
             # ----------------------------------------------------------------
             # 2. SEARCH RESULTS

@@ -574,28 +574,50 @@ def toggle_spectra_search_explanation(n_clicks, is_open):
 
 # Show/hide filter controls in motif rankings
 @app.callback(
-    Output("filter-controls-collapse", "is_open"),
+    [Output("filter-controls-collapse", "is_open"),
+     Output("filter-controls-toggle-button", "children")],
     Input("filter-controls-toggle-button", "n_clicks"),
     State("filter-controls-collapse", "is_open"),
     prevent_initial_call=True,
 )
 def toggle_filter_controls(n_clicks, is_open):
     if n_clicks:
-        return not is_open
-    return is_open
+        new_is_open = not is_open
+        button_text = "🔍 Hide" if new_is_open else "🔍 Show"
+        return new_is_open, button_text
+    return is_open, "🔍 Hide" if is_open else "🔍 Show"
 
 
 # Show/hide search controls in spectra search
 @app.callback(
-    Output("search-controls-collapse", "is_open"),
+    [Output("search-controls-collapse", "is_open"),
+     Output("search-controls-toggle-button", "children")],
     Input("search-controls-toggle-button", "n_clicks"),
     State("search-controls-collapse", "is_open"),
     prevent_initial_call=True,
 )
 def toggle_search_controls(n_clicks, is_open):
     if n_clicks:
-        return not is_open
-    return is_open
+        new_is_open = not is_open
+        button_text = "🔎 Hide" if new_is_open else "🔎 Show"
+        return new_is_open, button_text
+    return is_open, "🔎 Hide" if is_open else "🔎 Show"
+
+
+# Show/hide network controls in network visualization
+@app.callback(
+    [Output("network-controls-collapse", "is_open"),
+     Output("network-controls-toggle-button", "children")],
+    Input("network-controls-toggle-button", "n_clicks"),
+    State("network-controls-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_network_controls(n_clicks, is_open):
+    if n_clicks:
+        new_is_open = not is_open
+        button_text = "🔍 Hide" if new_is_open else "🔍 Show"
+        return new_is_open, button_text
+    return is_open, "🔍 Hide" if is_open else "🔍 Show"
 
 
 @app.callback(
