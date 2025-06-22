@@ -22,6 +22,7 @@ import tomotopy as tp
 from dash import ALL, Input, Output, State, dash_table, dcc, html, no_update
 from dash.exceptions import PreventUpdate
 from massql4motifs import msql_engine
+from lark.exceptions import UnexpectedCharacters
 from matchms import Fragments, Spectrum
 from plotly.subplots import make_subplots
 from rdkit import Chem
@@ -1361,6 +1362,8 @@ def compute_motif_degrees(lda_dict, p_low, p_high, o_low, o_high):
 @app.callback(
     Output("motif-ranking-massql-input", "value"),
     Output("motif-ranking-massql-matches", "data"),
+    Output("motif-ranking-massql-error", "children"),
+    Output("motif-ranking-massql-error", "style"),
     Input("motif-ranking-massql-btn", "n_clicks"),
     Input("motif-ranking-massql-reset-btn", "n_clicks"),
     State("motif-ranking-massql-input", "value"),
@@ -1375,22 +1378,65 @@ def handle_massql_query(run_clicks, reset_clicks, query, motifs_data):
 
     button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
+    # Default error style (hidden)
+    error_style = {
+        "marginTop": "10px",
+        "color": "#dc3545",
+        "padding": "10px",
+        "backgroundColor": "#f8d7da",
+        "borderRadius": "5px",
+        "display": "none"
+    }
+
     # Handle Reset Query button
     if button_id == "motif-ranking-massql-reset-btn":
-        return "", []
+        return "", [], "", error_style
 
     # Handle Run Query button
     if button_id == "motif-ranking-massql-btn":
         if not query or not motifs_data:
             raise PreventUpdate
+
         specs = [make_spectrum_from_dict(d) for d in motifs_data]
         ms1_df, ms2_df = motifs2motifDB(specs)
-        matches = msql_engine.process_query(query, ms1_df=ms1_df, ms2_df=ms2_df)
 
-        # If no results
-        if matches.empty or "motif_id" not in matches.columns:
-            return no_update, []
-        return no_update, matches["motif_id"].unique().tolist()
+        try:
+            matches = msql_engine.process_query(query, ms1_df=ms1_df, ms2_df=ms2_df)
+
+            # If no results
+            if matches.empty or "motif_id" not in matches.columns:
+                return no_update, [], "No motifs match the query criteria.", {
+                    **error_style,
+                    "display": "block"
+                }
+
+            return no_update, matches["motif_id"].unique().tolist(), "", error_style
+
+        except UnexpectedCharacters as e:
+            # Extract error message and format it for display
+            error_message = str(e)
+            user_friendly_message = f"Invalid MassQL query: {error_message}"
+
+            # Show the error message
+            visible_error_style = {
+                **error_style,
+                "display": "block"
+            }
+
+            return no_update, [], user_friendly_message, visible_error_style
+
+        except Exception as e:
+            # Handle any other exceptions
+            error_message = str(e)
+            user_friendly_message = f"Error processing query: {error_message}"
+
+            # Show the error message
+            visible_error_style = {
+                **error_style,
+                "display": "block"
+            }
+
+            return no_update, [], user_friendly_message, visible_error_style
 
     # Default case (should not happen)
     raise PreventUpdate

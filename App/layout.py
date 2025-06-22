@@ -1488,6 +1488,17 @@ def create_motif_rankings_tab():
                                             ),
                                             dcc.Store(id="motif-ranking-massql-matches"),
                                             html.Div(
+                                                id="motif-ranking-massql-error",
+                                                style={
+                                                    "marginTop": "10px",
+                                                    "color": "#dc3545",
+                                                    "padding": "10px",
+                                                    "backgroundColor": "#f8d7da",
+                                                    "borderRadius": "5px",
+                                                    "display": "none"
+                                                },
+                                            ),
+                                            html.Div(
                                                 id="motif-rankings-count",
                                                 style={
                                                     "marginTop": "20px", 
