@@ -1059,9 +1059,9 @@ def create_load_results_tab():
                         [
                             dcc.Markdown(
                                 """
-                                Upload a previously generated MS2LDA results file (compressed JSON format).
+                                Select a previously generated MS2LDA results file (compressed JSON format).
                                 This file contains all the motifs, spectra, and analysis results from a previous run.
-                                After uploading, click the "Load Results" button to process the file.
+                                **After selecting the file, click the "Load Results" button to upload and process the file.**
                                 """
                             ),
                             dbc.Row(

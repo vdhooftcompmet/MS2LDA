@@ -529,7 +529,7 @@ def update_output(contents, filename):
             html.I(className="fas fa-file-alt me-2"),
             f"Selected file: {filename}",
         ], style={"color": "#007bff", "fontWeight": "bold"})
-    return html.Div([html.H5("No file uploaded yet.")])
+    return html.Div([])
 
 
 # Show/hide advanced settings
