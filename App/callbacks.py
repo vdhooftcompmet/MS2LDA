@@ -2798,6 +2798,7 @@ def save_motifranking_results(csv_click, json_click, table_data):
         State("motif-rankings-table", "data"),
         State("screening-results-table", "data"),
         State("motif-rankings-table", "derived_viewport_data"),
+        State("screening-results-table", "derived_viewport_data"),
     ],
     prevent_initial_call=True,
 )
@@ -2807,6 +2808,7 @@ def on_motif_click(
     ranking_data,
     screening_data,
     ranking_dv_data,
+    screening_dv_data,
 ):
     ctx = dash.callback_context
     if not ctx.triggered:
@@ -2823,11 +2825,15 @@ def on_motif_click(
         raise dash.exceptions.PreventUpdate
 
     if triggered_id == "screening-results-table":
-        if screening_active_cell and screening_data:
+        if screening_active_cell:
             col_id = screening_active_cell["column_id"]
             row_id = screening_active_cell["row"]
             if col_id == "user_motif_id":
-                return screening_data[row_id]["user_motif_id"]
+                # Use derived_viewport_data if available (for pagination support)
+                if screening_dv_data:
+                    return screening_dv_data[row_id]["user_motif_id"]
+                else:
+                    return screening_data[row_id]["user_motif_id"]
         raise dash.exceptions.PreventUpdate
 
     raise dash.exceptions.PreventUpdate
@@ -2919,9 +2925,10 @@ def display_parentmass_range(value):
     Output("search-tab-selected-motif-id-for-plot-store", "data", allow_duplicate=True),
     Input("spectra-search-results-table", "active_cell"),
     State("spectra-search-results-table", "data"),
+    State("spectra-search-results-table", "derived_viewport_data"),
     prevent_initial_call=True,
 )
-def handle_spectrum_selection(active_cell, table_data):
+def handle_spectrum_selection(active_cell, table_data, derived_viewport_data):
     if not active_cell or not table_data:
         return None, {"marginTop": "20px", "display": "none"}, None
 
@@ -2930,10 +2937,14 @@ def handle_spectrum_selection(active_cell, table_data):
         raise dash.exceptions.PreventUpdate
 
     row_idx = active_cell.get("row", -1)
-    if row_idx < 0 or row_idx >= len(table_data):
+    if row_idx < 0 or (derived_viewport_data and row_idx >= len(derived_viewport_data)) or (not derived_viewport_data and row_idx >= len(table_data)):
         return None, {"marginTop": "20px", "display": "none"}, None
 
-    selected_spectrum = table_data[row_idx]
+    # Use derived_viewport_data if available (for pagination support)
+    if derived_viewport_data:
+        selected_spectrum = derived_viewport_data[row_idx]
+    else:
+        selected_spectrum = table_data[row_idx]
 
     container_style = {"marginTop": "20px", "display": "block"}
     return selected_spectrum, container_style, None
