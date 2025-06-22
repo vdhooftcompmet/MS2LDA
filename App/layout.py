@@ -1557,7 +1557,6 @@ def create_motif_rankings_tab():
                                         data=[],
                                         columns=[],
                                         sort_action="custom",
-                                        filter_action="native",
                                         page_size=20,
                                         style_table={"overflowX": "auto"},
                                         style_cell={
