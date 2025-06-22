@@ -22,6 +22,7 @@ import tomotopy as tp
 from dash import ALL, Input, Output, State, dash_table, dcc, html, no_update
 from dash.exceptions import PreventUpdate
 from massql4motifs import msql_engine
+from lark.exceptions import UnexpectedCharacters
 from matchms import Fragments, Spectrum
 from plotly.subplots import make_subplots
 from rdkit import Chem
@@ -525,8 +526,11 @@ def toggle_tab_content(active_tab):
 )
 def update_output(contents, filename):
     if contents:
-        return html.Div([html.H5(f"Uploaded File: {filename}")])
-    return html.Div([html.H5("No file uploaded yet.")])
+        return html.Div([
+            html.I(className="fas fa-file-alt me-2"),
+            f"Selected file: {filename}",
+        ], style={"color": "#007bff", "fontWeight": "bold"})
+    return html.Div([])
 
 
 # Show/hide advanced settings
@@ -540,6 +544,80 @@ def toggle_advanced_settings(n_clicks, is_open):
     if n_clicks:
         return not is_open
     return is_open
+
+
+# Show/hide motif rankings explanation
+@app.callback(
+    Output("motif-rankings-explanation-collapse", "is_open"),
+    Input("motif-rankings-explanation-button", "n_clicks"),
+    State("motif-rankings-explanation-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_motif_rankings_explanation(n_clicks, is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+
+
+# Show/hide spectra search explanation
+@app.callback(
+    Output("spectra-search-explanation-collapse", "is_open"),
+    Input("spectra-search-explanation-button", "n_clicks"),
+    State("spectra-search-explanation-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_spectra_search_explanation(n_clicks, is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+
+
+# Show/hide filter controls in motif rankings
+@app.callback(
+    [Output("filter-controls-collapse", "is_open"),
+     Output("filter-controls-toggle-button", "children")],
+    Input("filter-controls-toggle-button", "n_clicks"),
+    State("filter-controls-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_filter_controls(n_clicks, is_open):
+    if n_clicks:
+        new_is_open = not is_open
+        button_text = "🔍 Hide" if new_is_open else "🔍 Show"
+        return new_is_open, button_text
+    return is_open, "🔍 Hide" if is_open else "🔍 Show"
+
+
+# Show/hide search controls in spectra search
+@app.callback(
+    [Output("search-controls-collapse", "is_open"),
+     Output("search-controls-toggle-button", "children")],
+    Input("search-controls-toggle-button", "n_clicks"),
+    State("search-controls-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_search_controls(n_clicks, is_open):
+    if n_clicks:
+        new_is_open = not is_open
+        button_text = "🔎 Hide" if new_is_open else "🔎 Show"
+        return new_is_open, button_text
+    return is_open, "🔎 Hide" if is_open else "🔎 Show"
+
+
+# Show/hide network controls in network visualization
+@app.callback(
+    [Output("network-controls-collapse", "is_open"),
+     Output("network-controls-toggle-button", "children")],
+    Input("network-controls-toggle-button", "n_clicks"),
+    State("network-controls-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_network_controls(n_clicks, is_open):
+    if n_clicks:
+        new_is_open = not is_open
+        button_text = "🔍 Hide" if new_is_open else "🔍 Show"
+        return new_is_open, button_text
+    return is_open, "🔍 Hide" if is_open else "🔍 Show"
 
 
 @app.callback(
@@ -889,6 +967,59 @@ def handle_run_or_load(
         )
 
     raise dash.exceptions.PreventUpdate
+
+
+@app.callback(
+    [Output("selected-file-info", "children"),
+     Output("upload-results", "style"),
+     Output("load-status", "children", allow_duplicate=True)],
+    Input("upload-results", "filename"),
+    State("upload-results", "style"),
+    prevent_initial_call=True,
+)
+def update_selected_file_info(filename, current_style):
+    """
+    Update the UI to show the selected filename when a file is uploaded
+    but before the Load Results button is clicked.
+    Also update the style of the upload component to indicate a file is selected.
+    And clear any previous load status messages.
+    """
+    if not current_style:
+        current_style = {}
+
+    if filename:
+        # Create a copy of the current style to avoid modifying the original
+        updated_style = dict(current_style)
+        # Update the style to indicate a file is selected
+        updated_style.update({
+            "borderColor": "#007bff",
+            "borderWidth": "2px",
+            "backgroundColor": "#f8f9fa"
+        })
+
+        return (
+            html.Div([
+                html.I(className="fas fa-file-alt me-2"),
+                f"Selected file: {filename}",
+            ], style={"color": "#007bff", "fontWeight": "bold"}),
+            updated_style,
+            # Clear any previous load status messages
+            ""
+        )
+
+    # Reset to default style if no file is selected
+    default_style = {
+        "width": "100%",
+        "height": "60px",
+        "lineHeight": "60px",
+        "borderWidth": "1px",
+        "borderStyle": "dashed",
+        "borderRadius": "5px",
+        "textAlign": "center",
+        "margin": "10px",
+    }
+
+    return "", default_style, ""
 
 
 def parse_ms2lda_viz_file(base64_contents: str) -> dict:
@@ -1251,18 +1382,86 @@ def compute_motif_degrees(lda_dict, p_low, p_high, o_low, o_high):
 
 
 @app.callback(
+    Output("motif-ranking-massql-input", "value"),
     Output("motif-ranking-massql-matches", "data"),
+    Output("motif-ranking-massql-error", "children"),
+    Output("motif-ranking-massql-error", "style"),
     Input("motif-ranking-massql-btn", "n_clicks"),
+    Input("motif-ranking-massql-reset-btn", "n_clicks"),
     State("motif-ranking-massql-input", "value"),
     State("optimized-motifs-store", "data"),
+    prevent_initial_call=True,
 )
-def run_massql_query(n_clicks, query, motifs_data):
-    if not n_clicks or not query or not motifs_data:
+def handle_massql_query(run_clicks, reset_clicks, query, motifs_data):
+    # Use callback_context to determine which button was clicked
+    ctx = dash.callback_context
+    if not ctx.triggered:
         raise PreventUpdate
-    specs = [make_spectrum_from_dict(d) for d in motifs_data]
-    ms1_df, ms2_df = motifs2motifDB(specs)
-    matches = msql_engine.process_query(query, ms1_df=ms1_df, ms2_df=ms2_df)
-    return matches["motif_id"].unique().tolist()
+
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    # Default error style (hidden)
+    error_style = {
+        "marginTop": "10px",
+        "color": "#dc3545",
+        "padding": "10px",
+        "backgroundColor": "#f8d7da",
+        "borderRadius": "5px",
+        "display": "none"
+    }
+
+    # Handle Reset Query button
+    if button_id == "motif-ranking-massql-reset-btn":
+        return "", [], "", error_style
+
+    # Handle Run Query button
+    if button_id == "motif-ranking-massql-btn":
+        if not query or not motifs_data:
+            raise PreventUpdate
+
+        specs = [make_spectrum_from_dict(d) for d in motifs_data]
+        ms1_df, ms2_df = motifs2motifDB(specs)
+
+        try:
+            matches = msql_engine.process_query(query, ms1_df=ms1_df, ms2_df=ms2_df)
+
+            # If no results
+            if matches.empty or "motif_id" not in matches.columns:
+                return no_update, [], "No motifs match the query criteria.", {
+                    **error_style,
+                    "display": "block"
+                }
+
+            return no_update, matches["motif_id"].unique().tolist(), "", error_style
+
+        except UnexpectedCharacters as e:
+            # Extract error message and format it for display
+            error_message = str(e)
+            user_friendly_message = f"Invalid MassQL query: {error_message}"
+
+            # Show the error message
+            visible_error_style = {
+                **error_style,
+                "display": "block"
+            }
+
+            return no_update, [], user_friendly_message, visible_error_style
+
+        except Exception as e:
+            # Handle any other exceptions
+            error_message = str(e)
+            user_friendly_message = f"Error processing query: {error_message}"
+
+            # Show the error message
+            visible_error_style = {
+                **error_style,
+                "display": "block"
+            }
+
+            return no_update, [], user_friendly_message, visible_error_style
+
+    # Default case (should not happen)
+    raise PreventUpdate
 
 
 @app.callback(
@@ -1305,7 +1504,14 @@ def update_motif_rankings_table(
         ],
     )
 
-    if massql_matches:
+    # Filter out motifs that have no docs passing, i.e. degree=0
+    # Do this before applying MassQL filter to get accurate count of motifs passing probability/overlap thresholds
+    df = df[df["Degree"] > 0].copy()
+
+    # Store the count of motifs passing probability/overlap thresholds
+    motifs_passing_thresholds = len(df)
+
+    if massql_matches is not None and len(massql_matches) > 0:
         df = df[df["Motif"].isin(massql_matches)]
 
     # 1) topic_metadata from LDA
@@ -1380,9 +1586,6 @@ def update_motif_rankings_table(
         screening_hits = ["" for _ in range(len(df))]
     df["Matching Hits"] = screening_hits
 
-    # Filter out motifs that have no docs passing, i.e. degree=0
-    df = df[df["Degree"] > 0].copy()
-
     table_data = df.to_dict("records")
     table_columns = [
         {
@@ -1416,7 +1619,11 @@ def update_motif_rankings_table(
         },
     ]
 
-    row_count_message = f"{len(df)} motif(s) pass the filter"
+    # Create message showing both the number of motifs passing thresholds and the number displayed after MassQL filtering
+    if massql_matches is not None and len(massql_matches) > 0:
+        row_count_message = f"{motifs_passing_thresholds} motif(s) pass the filter, {len(df)} displayed after MassQL query"
+    else:
+        row_count_message = f"{motifs_passing_thresholds} motif(s) pass the filter"
     return table_data, table_columns, row_count_message
 
 
@@ -2202,24 +2409,42 @@ def auto_scan_m2m_subfolders(tab_value):
 
 
 def make_spectrum_from_dict(spectrum_dict):
-    try:
-        mz_ = np.array(spectrum_dict["mz"], dtype=float)
-        ints_ = np.array(spectrum_dict["intensities"], dtype=float)
-        meta_ = spectrum_dict["metadata"]
-        sp = Spectrum(mz=mz_, intensities=ints_, metadata=meta_)
-        if "losses" in meta_:
-            loss_mz = []
-            loss_int = []
-            for x in meta_["losses"]:
-                loss_mz.append(x["loss_mz"])
-                loss_int.append(x["loss_intensity"])
-            sp.losses = Fragments(mz=np.array(loss_mz), intensities=np.array(loss_int))
-        return sp
-    except:
-        return None
+    """
+    Creates a Mass2Motif object from a dictionary.
+    This is used to reconstruct motifs from the stored data for MassQL queries.
+    """
+    # Extract fragments from the dictionary
+    frag_mz = np.array(spectrum_dict.get("mz", []), dtype=float)
+    frag_intensities = np.array(spectrum_dict.get("intensities", []), dtype=float)
+
+    meta_ = spectrum_dict.get("metadata", {})
+
+    # Extract losses from the metadata dictionary
+    loss_mz = []
+    loss_intensities = []
+    if "losses" in meta_:
+        for loss_item in meta_.get("losses", []):
+            loss_mz.append(loss_item.get("loss_mz"))
+            loss_intensities.append(loss_item.get("loss_intensity"))
+
+    sp = Mass2Motif(
+        frag_mz=frag_mz,
+        frag_intensities=frag_intensities,
+        loss_mz=np.array(loss_mz, dtype=float),
+        loss_intensities=np.array(loss_intensities, dtype=float),
+        metadata=meta_,
+    )
+
+    return sp
 
 
 def filter_and_normalize_spectra(spectrum_list):
+    """
+    Filters out invalid spectra and normalizes the intensities of valid spectra.
+    Fragments and losses are normalized together against the single highest peak, similar to
+    the logic in create_spectrum method.
+    """
+
     def trunc_annotation(val, max_len=40):
         """Truncate any string over max_len for readability."""
         if isinstance(val, str) and len(val) > max_len:
@@ -2230,32 +2455,51 @@ def filter_and_normalize_spectra(spectrum_list):
     for sp in spectrum_list:
         if not sp.peaks or len(sp.peaks.mz) == 0:
             continue
-        # Normalize peaks
-        max_i = sp.peaks.intensities.max()
-        if max_i <= 0:
-            continue
-        if max_i > 1.0:
-            sp.peaks = Fragments(
-                mz=sp.peaks.mz, intensities=sp.peaks.intensities / max_i,
-            )
-        # Normalize losses
-        if sp.losses and len(sp.losses.mz) > 0:
-            max_l = sp.losses.intensities.max()
-            if max_l > 1.0:
-                sp.losses = Fragments(
-                    mz=sp.losses.mz, intensities=sp.losses.intensities / max_l,
-                )
 
-        # Possibly convert short_annotation from list->string
-        ann = sp.get("short_annotation", "")
+        # Clone so as not to modify the original object
+        current_sp = sp.clone()
+
+        # Normalize fragments and losses together
+        frag_intensities = current_sp.peaks.intensities
+        loss_intensities = np.array([])
+        if current_sp.losses and len(current_sp.losses.mz) > 0:
+            loss_intensities = current_sp.losses.intensities
+
+        all_intensities = np.concatenate((frag_intensities, loss_intensities))
+        if all_intensities.size == 0:
+            continue
+
+        max_intensity = np.max(all_intensities)
+        if max_intensity <= 0:
+            continue
+
+        # Normalize if the max intensity is greater than 1.0
+        normalized_frag_intensities = frag_intensities
+        normalized_loss_intensities = loss_intensities
+        if max_intensity > 1.0:
+            normalized_frag_intensities = frag_intensities / max_intensity
+            if loss_intensities.size > 0:
+                normalized_loss_intensities = loss_intensities / max_intensity
+
+        # Re-create Mass2Motif object with normalized values
+        reconstructed_sp = Mass2Motif(
+            frag_mz=current_sp.peaks.mz,
+            frag_intensities=normalized_frag_intensities,
+            loss_mz=current_sp.losses.mz if current_sp.losses else np.array([]),
+            loss_intensities=normalized_loss_intensities,
+            metadata=current_sp.metadata
+        )
+
+        # Handle annotation on the new object
+        ann = reconstructed_sp.get("short_annotation", "")
         if isinstance(ann, list):
             joined = ", ".join(map(str, ann))
             joined = trunc_annotation(joined, 60)
-            sp.set("short_annotation", joined)
+            reconstructed_sp.set("short_annotation", joined)
         elif isinstance(ann, str):
-            sp.set("short_annotation", trunc_annotation(ann, 60))
+            reconstructed_sp.set("short_annotation", trunc_annotation(ann, 60))
 
-        valid.append(sp)
+        valid.append(reconstructed_sp)
 
     return valid
 
@@ -2587,6 +2831,60 @@ def unlock_run_after_download(n_clicks):
 
 
 @app.callback(
+    Output("spectra-search-parentmass-slider", "min"),
+    Output("spectra-search-parentmass-slider", "max"),
+    Output("spectra-search-parentmass-slider", "value"),
+    Output("spectra-search-parentmass-slider", "marks"),
+    Input("spectra-store", "data"),
+    prevent_initial_call=True,
+)
+def update_parentmass_slider_range(spectra_data):
+    if not spectra_data:
+        # Default values if no data is available
+        return 0, 2000, [0, 2000], {0: "0", 500: "500", 1000: "1000", 1500: "1500", 2000: "2000"}
+
+    # Extract parent masses from spectra data
+    parent_masses = []
+    for spec_dict in spectra_data:
+        meta = spec_dict.get("metadata", {})
+        pmass = meta.get("precursor_mz", None)
+        if pmass is not None:
+            parent_masses.append(pmass)
+
+    if not parent_masses:
+        # No valid parent masses found
+        return 0, 2000, [0, 2000], {0: "0", 500: "500", 1000: "1000", 1500: "1500", 2000: "2000"}
+
+    # Calculate min and max with some margin
+    min_mass = max(0, min(parent_masses) - 50)  # Add 50 Da margin, but not below 0
+    max_mass = max(parent_masses) + 50  # Add 50 Da margin
+
+    # Round to nice values
+    min_mass = int(min_mass // 10) * 10  # Round down to nearest 10
+    max_mass = int((max_mass + 9) // 10) * 10  # Round up to nearest 10
+
+    # Create marks at reasonable intervals
+    range_size = max_mass - min_mass
+    if range_size <= 100:
+        step = 20
+    elif range_size <= 500:
+        step = 100
+    elif range_size <= 1000:
+        step = 200
+    else:
+        step = 500
+
+    marks = {}
+    for i in range(min_mass, max_mass + 1, step):
+        marks[i] = str(i)
+
+    # Always include min and max in marks
+    marks[min_mass] = str(min_mass)
+    marks[max_mass] = str(max_mass)
+
+    return min_mass, max_mass, [min_mass, max_mass], marks
+
+@app.callback(
     Output("spectra-search-parentmass-slider-display", "children"),
     Input("spectra-search-parentmass-slider", "value"),
 )
@@ -2866,29 +3164,24 @@ def update_search_tab_spectrum_plot(
     Input("spectra-store", "data"),
     Input("spectra-search-fragloss-input", "value"),
     Input("spectra-search-parentmass-slider", "value"),
+    Input("spectra-search-fragment-checkbox", "value"),
+    Input("spectra-search-loss-checkbox", "value"),
     prevent_initial_call=True,
 )
-def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
+def update_spectra_search_table(spectra_data, search_text, parent_mass_range, fragment_checked, loss_checked):
     if not spectra_data:
         raise PreventUpdate
 
     # Prepare query and parent mass bounds
     query = (search_text or "").strip().lower()
-    frag_query = None
-    loss_query = None
-    if query:
-        frag_match = re.search(r"frag@(\d+(?:\.\d+)?)", query)
-        loss_match = re.search(r"loss@(\d+(?:\.\d+)?)", query)
-        if frag_match:
-            try:
-                frag_query = float(frag_match.group(1))
-            except ValueError:
-                frag_query = None
-        if loss_match:
-            try:
-                loss_query = float(loss_match.group(1))
-            except ValueError:
-                loss_query = None
+    query_value = None
+
+    # Try to parse the input as a numeric value directly
+    try:
+        if query:
+            query_value = float(query)
+    except ValueError:
+        query_value = None
     pmass_low, pmass_high = parent_mass_range
 
     filtered_rows = []
@@ -2900,27 +3193,35 @@ def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
         if not (pmass_low <= pmass <= pmass_high):
             continue
 
-        frag_list = [f"frag@{mzval:.4g}" for mzval in spec_dict["mz"]]
+        frag_list = [f"frag@{mzval:.5f}" for mzval in spec_dict["mz"]]
         frag_vals = [float(mzval) for mzval in spec_dict["mz"]]
         loss_list = []
         loss_vals = []
         if "losses" in meta:
             for loss_item in meta["losses"]:
-                loss_list.append(f"loss@{loss_item['loss_mz']:.4g}")
+                loss_list.append(f"loss@{loss_item['loss_mz']:.5f}")
                 with contextlib.suppress(KeyError, ValueError):
                     loss_vals.append(float(loss_item["loss_mz"]))
 
         if query:
-            if frag_query is not None:
-                if not any(abs(mz - frag_query) <= 0.01 for mz in frag_vals):
-                    continue
-            elif loss_query is not None:
-                if not any(abs(mz - loss_query) <= 0.01 for mz in loss_vals):
-                    continue
-            else:
-                combined = frag_list + loss_list
-                if not any(query in x.lower() for x in combined):
-                    continue
+            # Only use numeric comparison for searching
+            skip_spectrum = True
+
+            # If we have a valid numeric query
+            if query_value is not None:
+                # Check fragments if fragment checkbox is checked
+                if fragment_checked:
+                    if any(abs(mz - query_value) <= 0.01 for mz in frag_vals):
+                        skip_spectrum = False
+
+                # Check losses if loss checkbox is checked
+                if loss_checked:
+                    if any(abs(mz - query_value) <= 0.01 for mz in loss_vals):
+                        skip_spectrum = False
+
+            # If neither fragment nor loss query matched, or if query doesn't match expected format, skip this spectrum
+            if skip_spectrum:
+                continue
 
         filtered_rows.append(
             {
@@ -2942,9 +3243,9 @@ def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
     )
 
     if filtered_rows:
-        status_msg = f"Showing {len(filtered_rows)} matching spectra."
+        status_msg = f"{len(filtered_rows)} spectra pass the filter"
     elif is_filtered:
-        status_msg = "No spectra found matching your criteria."
+        status_msg = "No spectra pass the filter"
     else:
         status_msg = ""  # No filters active yet
 

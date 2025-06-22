@@ -27,35 +27,25 @@ def create_run_analysis_tab(show_tab: bool = True):
     return html.Div(
         id="run-analysis-tab-content",
         children=[
-            # Card 1: Intro / Explanation
-            dbc.Card(
+            # Brief high-level overview of the entire tab
+            html.Div(
                 [
-                    dbc.CardHeader("MS2LDA Run Analysis Overview"),
-                    dbc.CardBody(
-                        [
-                            dcc.Markdown(
-                                """
-                                This tab allows you to run an MS2LDA analysis from scratch using a single uploaded data file.
-                                You can control basic parameters like the number of motifs, polarity, and top N Spec2Vec matches,
-                                as well as advanced settings (e.g., min_mz, max_mz).
-                                When ready, click "Run Analysis" to generate the results and proceed to the other tabs for visualization.
-                                """,
-                            ),
-                        ],
+                    dcc.Markdown(
+                        """
+                        This tab allows you to run an MS2LDA analysis from scratch using a single uploaded data file.
+                        You can control basic parameters like the number of motifs, polarity, and top N Spec2Vec matches,
+                        as well as advanced settings (e.g., min_mz, max_mz).
+                        When ready, click "Run Analysis" to generate the results and proceed to the other tabs for visualization.
+                        """,
                     ),
                 ],
-                style={
-                    "border": "1px solid #ccc",
-                    "padding": "10px",
-                    "marginTop": "20px",
-                    "marginBottom": "20px",
-                },
+                style={"marginTop": "20px", "marginBottom": "20px"},
             ),
-            # Card 2: Data upload & basic MS2LDA parameters
-            dbc.Card(
+            # Data upload & basic MS2LDA parameters section
+            html.Div(
                 [
-                    dbc.CardHeader("Data Upload & Basic MS2LDA Parameters"),
-                    dbc.CardBody(
+                    html.H4("Data Upload & Basic MS2LDA Parameters", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
                         [
                             dcc.Upload(
                                 id="upload-data",
@@ -75,7 +65,7 @@ def create_run_analysis_tab(show_tab: bool = True):
                                 multiple=False,
                             ),
                             html.Div(
-                                id="file-upload-info", style={"marginBottom": "20px"},
+                                id="file-upload-info", style={"marginBottom": "20px", "textAlign": "center"},
                             ),
                             # Basic parameters (with tooltips):
                             dbc.InputGroup(
@@ -203,16 +193,17 @@ def create_run_analysis_tab(show_tab: bool = True):
                     ),
                 ],
                 style={
-                    "border": "1px solid #ccc",
-                    "padding": "10px",
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
                     "marginBottom": "20px",
                 },
             ),
-            # Card 3: Spec2Vec Setup
-            dbc.Card(
+            # Spec2Vec Setup section
+            html.Div(
                 [
-                    dbc.CardHeader("Spec2Vec Setup"),
-                    dbc.CardBody(
+                    html.H4("Spec2Vec Setup", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
                         [
                             dcc.Markdown(
                                 """
@@ -226,9 +217,9 @@ def create_run_analysis_tab(show_tab: bool = True):
                                 type="circle",
                                 children=[
                                     dbc.Button(
-                                        "Download Spec2Vec Files",
+                                        "📥 Download Spec2Vec Files",
                                         id="download-s2v-button",
-                                        color="info",
+                                        color="primary",
                                         className="mt-3",
                                     ),
                                     html.Div(
@@ -295,16 +286,17 @@ def create_run_analysis_tab(show_tab: bool = True):
                     ),
                 ],
                 style={
-                    "border": "1px solid #ccc",
-                    "padding": "10px",
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
                     "marginBottom": "20px",
                 },
             ),
-            # Card 4: Advanced Settings
-            dbc.Card(
+            # Advanced Settings section
+            html.Div(
                 [
-                    dbc.CardHeader("Advanced Settings"),
-                    dbc.CardBody(
+                    html.H4("Advanced Settings", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
                         [
                             dcc.Markdown(
                                 """
@@ -315,21 +307,21 @@ def create_run_analysis_tab(show_tab: bool = True):
                                 """,
                             ),
                             dbc.Button(
-                                "Show/Hide Advanced Settings",
+                                ["⚙️ Advanced Settings"],
                                 id="advanced-settings-button",
-                                color="info",
+                                color="secondary",
                                 className="mb-3",
                             ),
                             dbc.Collapse(
                                 id="advanced-settings-collapse",
                                 is_open=False,
                                 children=[
-                                    html.H5("Advanced Parameters", className="mt-3"),
+                                    html.H5("Advanced Parameters", className="mt-3", style={"fontSize": "18px", "fontWeight": "bold", "color": "#34495e", "marginBottom": "8px"}),
                                     dbc.Row(
                                         [
                                             dbc.Col(
                                                 [
-                                                    html.H6("Preprocessing"),
+                                                    html.H6("Preprocessing", style={"fontSize": "16px", "fontWeight": "bold", "color": "#3c4c5e", "marginBottom": "6px"}),
                                                     dbc.InputGroup(
                                                         [
                                                             dbc.InputGroupText(
@@ -457,7 +449,7 @@ def create_run_analysis_tab(show_tab: bool = True):
                                             ),
                                             dbc.Col(
                                                 [
-                                                    html.H6("Convergence"),
+                                                    html.H6("Convergence", style={"fontSize": "16px", "fontWeight": "bold", "color": "#3c4c5e", "marginBottom": "6px"}),
                                                     dbc.InputGroup(
                                                         [
                                                             dbc.InputGroupText(
@@ -566,7 +558,7 @@ def create_run_analysis_tab(show_tab: bool = True):
                                         [
                                             dbc.Col(
                                                 [
-                                                    html.H6("Annotation"),
+                                                    html.H6("Annotation", style={"fontSize": "16px", "fontWeight": "bold", "color": "#3c4c5e", "marginBottom": "6px"}),
                                                     dbc.InputGroup(
                                                         [
                                                             dbc.InputGroupText(
@@ -622,7 +614,7 @@ def create_run_analysis_tab(show_tab: bool = True):
                                             ),
                                             dbc.Col(
                                                 [
-                                                    html.H6("Model"),
+                                                    html.H6("Model", style={"fontSize": "16px", "fontWeight": "bold", "color": "#3c4c5e", "marginBottom": "6px"}),
                                                     dbc.InputGroup(
                                                         [
                                                             dbc.InputGroupText(
@@ -986,15 +978,17 @@ def create_run_analysis_tab(show_tab: bool = True):
                     ),
                 ],
                 style={
-                    "border": "1px solid #ccc",
-                    "padding": "10px",
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
                     "marginBottom": "20px",
                 },
             ),
-            dbc.Card(
+            # Run Analysis section
+            html.Div(
                 [
-                    dbc.CardHeader("Run Analysis"),
-                    dbc.CardBody(
+                    html.H4("Run Analysis", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
                         [
                             dcc.Markdown(
                                 """
@@ -1008,10 +1002,15 @@ def create_run_analysis_tab(show_tab: bool = True):
                                 id="run-analysis-spinner",
                                 type="circle",
                                 children=[
-                                    dbc.Button(
-                                        "Run Analysis",
-                                        id="run-button",
-                                        color="primary",
+                                    html.Div(
+                                        [
+                                            dbc.Button(
+                                                "▶️ Run Analysis",
+                                                id="run-button",
+                                                color="primary",
+                                            ),
+                                        ],
+                                        className="d-grid gap-2 mt-3",
                                     ),
                                     html.Div(
                                         id="run-status", style={"marginTop": "20px"},
@@ -1022,8 +1021,9 @@ def create_run_analysis_tab(show_tab: bool = True):
                     ),
                 ],
                 style={
-                    "border": "1px solid #ccc",
-                    "padding": "10px",
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
                     "marginBottom": "20px",
                 },
             ),
@@ -1036,6 +1036,7 @@ def create_load_results_tab():
     return html.Div(
         id="load-results-tab-content",
         children=[
+            # Brief high-level overview of the entire tab
             html.Div(
                 [
                     dcc.Markdown(
@@ -1048,43 +1049,75 @@ def create_load_results_tab():
                 ],
                 style={"marginTop": "20px", "marginBottom": "20px"},
             ),
-            dbc.Row(
+            # ----------------------------------------------------------------
+            # 1. FILE UPLOAD SECTION
+            # ----------------------------------------------------------------
+            html.Div(
                 [
-                    dbc.Col(
+                    html.H4("Load MS2LDA Results File", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
                         [
-                            dcc.Upload(
-                                id="upload-results",
-                                children=html.Div(
-                                    ["Drag and Drop or ", html.A("Select Results File")],
-                                ),
-                                style={
-                                    "width": "100%",
-                                    "height": "60px",
-                                    "lineHeight": "60px",
-                                    "borderWidth": "1px",
-                                    "borderStyle": "dashed",
-                                    "borderRadius": "5px",
-                                    "textAlign": "center",
-                                    "margin": "10px",
-                                },
-                                multiple=False,
+                            dcc.Markdown(
+                                """
+                                Select a previously generated MS2LDA results file (compressed JSON format).
+                                This file contains all the motifs, spectra, and analysis results from a previous run.
+                                **After selecting the file, click the "Load Results" button to upload and process the file.**
+                                """
                             ),
-                            html.Div(id="load-status", style={"marginTop": "20px"}),
-                            html.Div(
+                            dbc.Row(
                                 [
-                                    dbc.Button(
-                                        "Load Results",
-                                        id="load-results-button",
-                                        color="primary",
+                                    dbc.Col(
+                                        [
+                                            dcc.Upload(
+                                                id="upload-results",
+                                                children=html.Div(
+                                                    ["Drag and Drop or ", html.A("Select Results File")],
+                                                ),
+                                                style={
+                                                    "width": "100%",
+                                                    "height": "60px",
+                                                    "lineHeight": "60px",
+                                                    "borderWidth": "1px",
+                                                    "borderStyle": "dashed",
+                                                    "borderRadius": "5px",
+                                                    "textAlign": "center",
+                                                    "margin": "10px",
+                                                },
+                                                multiple=False,
+                                            ),
+                                            html.Div(id="selected-file-info", style={"marginTop": "10px", "textAlign": "center"}),
+                                            html.Div(id="load-status", style={"marginTop": "20px"}),
+                                            html.Div(
+                                                [
+                                                    dbc.Button(
+                                                        "📂 Load Results",
+                                                        id="load-results-button",
+                                                        color="primary",
+                                                    ),
+                                                ],
+                                                className="d-grid gap-2 mt-3",
+                                            ),
+                                        ],
+                                        width=6,
                                     ),
                                 ],
-                                className="d-grid gap-2 mt-3",
+                                justify="center",
                             ),
                         ],
-                        width=6,
+                        style={
+                            "border": "1px dashed #ccc",
+                            "padding": "10px",
+                            "borderRadius": "5px",
+                            "marginBottom": "15px",
+                        },
                     ),
                 ],
-                justify="center",
+                style={
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
+                    "marginBottom": "20px",
+                },
             ),
         ],
         style={"display": "none"},
@@ -1095,6 +1128,7 @@ def create_cytoscape_network_tab():
     return html.Div(
         id="results-tab-content",
         children=[
+            # Brief high-level overview of the entire tab
             html.Div(
                 [
                     dcc.Markdown(
@@ -1113,100 +1147,179 @@ def create_cytoscape_network_tab():
                 ],
                 style={"marginTop": "20px", "marginBottom": "20px"},
             ),
-            dbc.Row(
+            # ----------------------------------------------------------------
+            # 1. NETWORK CONTROLS
+            # ----------------------------------------------------------------
+            html.Div(
                 [
-                    dbc.Col(
+                    html.Div(
                         [
-                            dbc.Label("Edge Intensity Threshold"),
-                            dcc.Slider(
-                                id="edge-intensity-threshold",
-                                min=0,
-                                max=1,
-                                step=0.05,
-                                value=0.50,
-                                marks={0: "0.0", 0.5: "0.5", 1: "1.0"},
+                            html.H4("Network Controls", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px", "display": "inline-block"}),
+                            dbc.Button(
+                                "🔍 Hide",
+                                id="network-controls-toggle-button",
+                                color="primary",
+                                size="sm",
+                                className="ms-2",
+                                style={"display": "inline-block", "marginLeft": "10px", "marginBottom": "5px"},
                             ),
                         ],
-                        width=6,
+                        style={"display": "flex", "alignItems": "center", "justifyContent": "space-between", "width": "100%"},
                     ),
-                    dbc.Col(
-                        [
-                            dbc.Checklist(
-                                options=[
-                                    {
-                                        "label": "Add Loss -> Fragment Edge",
-                                        "value": "show_loss_edge",
-                                    },
-                                ],
-                                value=[],
-                                id="toggle-loss-edge",
-                                inline=True,
-                            ),
-                        ],
-                        width=6,
-                    ),
-                ],
-                style={"marginTop": "20px"},
-            ),
-            dbc.Row(
-                [
-                    dbc.Col(
-                        [
-                            dbc.Label("Graph Layout"),
-                            dcc.Dropdown(
-                                id="cytoscape-layout-dropdown",
-                                options=[
-                                    {"label": "CoSE", "value": "cose"},
-                                    {
-                                        "label": "Force-Directed (Spring)",
-                                        "value": "fcose",
-                                    },
-                                    {"label": "Circle", "value": "circle"},
-                                    {"label": "Concentric", "value": "concentric"},
-                                ],
-                                value="fcose",
-                                clearable=False,
-                            ),
-                        ],
-                        width=6,
-                    ),
-                ],
-                style={"marginTop": "20px"},
-            ),
-            dbc.Row(
-                [
-                    dbc.Col(
-                        [
+                    dbc.Collapse(
+                        id="network-controls-collapse",
+                        is_open=True,
+                        children=[
                             html.Div(
-                                id="cytoscape-network-container",
+                                [
+                                    dcc.Markdown(
+                                        """
+                                        Control how the network is displayed using the options below. You can adjust the edge intensity threshold,
+                                        toggle additional edges between loss and fragment nodes, and change the graph layout algorithm.
+                                        """
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Edge Intensity Threshold", style={"fontWeight": "bold"}),
+                                                    dcc.Slider(
+                                                        id="edge-intensity-threshold",
+                                                        min=0,
+                                                        max=1,
+                                                        step=0.05,
+                                                        value=0.50,
+                                                        marks={0: "0.0", 0.5: "0.5", 1: "1.0"},
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Edge Options", style={"fontWeight": "bold"}),
+                                                    dbc.Checklist(
+                                                        options=[
+                                                            {
+                                                                "label": "Add Loss -> Fragment Edge",
+                                                                "value": "show_loss_edge",
+                                                            },
+                                                        ],
+                                                        value=[],
+                                                        id="toggle-loss-edge",
+                                                        inline=True,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                    ),
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    dbc.Label("Graph Layout", style={"fontWeight": "bold"}),
+                                                    dcc.Dropdown(
+                                                        id="cytoscape-layout-dropdown",
+                                                        options=[
+                                                            {"label": "CoSE", "value": "cose"},
+                                                            {
+                                                                "label": "Force-Directed (Spring)",
+                                                                "value": "fcose",
+                                                            },
+                                                            {"label": "Circle", "value": "circle"},
+                                                            {"label": "Concentric", "value": "concentric"},
+                                                        ],
+                                                        value="fcose",
+                                                        clearable=False,
+                                                    ),
+                                                ],
+                                                width=6,
+                                            ),
+                                        ],
+                                        style={"marginTop": "10px"},
+                                    ),
+                                ],
                                 style={
-                                    "marginTop": "20px",
-                                    "height": "600px",
-                                },
-                            ),
-                        ],
-                        width=8,
-                    ),
-                    dbc.Col(
-                        [
-                            html.Div(
-                                id="molecule-images",
-                                style={
-                                    "textAlign": "center",
-                                    "marginTop": "20px",
-                                    "overflowY": "auto",
-                                    "height": "600px",
+                                    "border": "1px dashed #ccc",
                                     "padding": "10px",
-                                    "backgroundColor": "#f8f9fa",
                                     "borderRadius": "5px",
+                                    "marginBottom": "15px",
                                 },
                             ),
                         ],
-                        width=4,
                     ),
                 ],
-                align="start",
-                className="g-3",
+                style={
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
+                    "marginBottom": "20px",
+                },
+            ),
+            # ----------------------------------------------------------------
+            # 2. NETWORK VISUALIZATION
+            # ----------------------------------------------------------------
+            html.Div(
+                [
+                    html.H4("Network Visualization", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
+                        [
+                            dcc.Markdown(
+                                """
+                                The network visualization shows motifs and their fragments/losses as an interactive graph.
+                                Motif nodes are shown in blue, fragment nodes in green, and loss nodes in red.
+                                Click on any motif node to see its associated molecules in the panel on the right.
+                                """
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            html.Div(
+                                                id="cytoscape-network-container",
+                                                style={
+                                                    "height": "600px",
+                                                },
+                                            ),
+                                        ],
+                                        width=8,
+                                    ),
+                                    dbc.Col(
+                                        [
+                                            html.H5("Associated Molecules", style={"fontSize": "18px", "fontWeight": "bold", "color": "#34495e", "marginBottom": "8px"}),
+                                            html.Div(
+                                                id="molecule-images",
+                                                style={
+                                                    "textAlign": "center",
+                                                    "overflowY": "auto",
+                                                    "height": "600px",
+                                                    "padding": "10px",
+                                                    "backgroundColor": "#f8f9fa",
+                                                    "borderRadius": "5px",
+                                                },
+                                            ),
+                                        ],
+                                        width=4,
+                                    ),
+                                ],
+                                align="start",
+                                className="g-3",
+                            ),
+                        ],
+                        style={
+                            "border": "1px dashed #ccc",
+                            "padding": "10px",
+                            "borderRadius": "5px",
+                            "marginBottom": "15px",
+                        },
+                    ),
+                ],
+                style={
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
+                    "marginBottom": "20px",
+                },
             ),
         ],
         style={"display": "none"},
@@ -1217,123 +1330,228 @@ def create_motif_rankings_tab():
     return html.Div(
         id="motif-rankings-tab-content",
         children=[
+            # Brief high-level overview of the entire tab
+            html.Div(
+                [
+                    dcc.Markdown(
+                        """
+                        This tab displays all discovered motifs in a ranked table format. You can filter motifs based on 
+                        probability and overlap thresholds, or search for specific motifs using MassQL queries.
+                        The table shows each motif's degree (number of documents containing it), average probability, 
+                        and average overlap score. Click on any motif to view its detailed composition and associated spectra.
+                        """,
+                    ),
+                ],
+                style={"marginTop": "20px", "marginBottom": "20px"},
+            ),
             dbc.Container(
                 [
+                    # ----------------------------------------------------------------
+                    # 1. FILTER CONTROLS
+                    # ----------------------------------------------------------------
                     html.Div(
                         [
-                            dcc.Markdown(
-                                """
-                            This tab displays your motifs in a ranked table based on how many documents meet
-                            the selected Probability and Overlap ranges. For each motif, we compute a `Degree`
-                            representing the number of documents where the motif’s doc-topic probability and overlap
-                            score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability`
-                            and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters,
-                            so they can be quite high if the motif strongly dominates the docs where it appears.
+                            html.Div(
+                                [
+                                    html.H4("Filter Controls", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px", "display": "inline-block"}),
+                                    dbc.Button(
+                                        "🔍 Hide",
+                                        id="filter-controls-toggle-button",
+                                        color="primary",
+                                        size="sm",
+                                        className="ms-2",
+                                        style={"display": "inline-block", "marginLeft": "10px", "marginBottom": "5px"},
+                                    ),
+                                ],
+                                style={"display": "flex", "alignItems": "center", "justifyContent": "space-between", "width": "100%"},
+                            ),
+                            dbc.Collapse(
+                                id="filter-controls-collapse",
+                                is_open=True,
+                                children=[
+                                    html.Div(
+                                        [
+                                            # Show/Hide Explanation button
+                                            dbc.Button(
+                                                "ℹ️ Info",
+                                                id="motif-rankings-explanation-button",
+                                                color="secondary",
+                                                size="sm",
+                                                className="mb-3",
+                                            ),
+                                            # Collapsible explanation section
+                                            dbc.Collapse(
+                                                id="motif-rankings-explanation-collapse",
+                                                is_open=False,
+                                                children=[
+                                                    dcc.Markdown(
+                                                        """
+                                                        From here you can filter your motifs in a ranked table based on how many documents (spectra) meet the selected Probability and Overlap ranges. For each motif, we compute a `Degree` representing the number of documents where the motif's doc-topic probability and overlap score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability` and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters, so they can be quite high if the motif strongly dominates the docs where it appears. The `Overlap Score` is computed by multiplying the word-topic distribution with the topic-word distribution for each word in a document, and then summing these products for each topic. This provides a measure of how well a document's word distribution matches a topic's expected word distribution. Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap. _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row takes you to a detailed view of that motif.
 
-                            Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap.
-                            _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row
-                            takes you to a detailed view of that motif.
-                            """,
+                                                        You can also use [MassQL (Mass Spectrometry Query Language)](https://www.nature.com/articles/s41592-025-02660-z) to filter and search for specific motifs. MassQL uses SQL-like syntax to query mass spectrometry data, enabling discovery of chemical patterns across datasets. In this application, motifs are translated into pseudo-spectra where fragments and losses are treated as peaks, allowing you to search for specific fragment masses or filter motifs by metadata. The filtering process applies all filters in sequence: first, motifs are filtered based on the Probability and Overlap thresholds, and then the MassQL query is applied to the remaining motifs. For example, you can use queries like `QUERY scaninfo(MS2DATA) METAFILTER:motif_id=motif_123` to filter spectra by a specific motif ID, or `QUERY scaninfo(MS2DATA) WHERE MS2PROD=178.03` to find spectra containing a specific product ion mass.
+                                                        """,
+                                                        style={
+                                                            "backgroundColor": "#f8f9fa",
+                                                            "padding": "15px",
+                                                            "borderRadius": "5px",
+                                                            "border": "1px solid #e9ecef",
+                                                        },
+                                                    ),
+                                                ],
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(
+                                                                "Average Doc-Topic Probability",
+                                                                style={"fontWeight": "bold"},
+                                                            ),
+                                                            dcc.RangeSlider(
+                                                                id="probability-thresh",
+                                                                min=0,
+                                                                max=1,
+                                                                step=0.01,
+                                                                value=[0, 1],
+                                                                marks={
+                                                                    0: "0",
+                                                                    0.25: "0.25",
+                                                                    0.5: "0.5",
+                                                                    0.75: "0.75",
+                                                                    1: "1",
+                                                                },
+                                                                tooltip={
+                                                                    "always_visible": False,
+                                                                    "placement": "top",
+                                                                },
+                                                                allowCross=False,
+                                                            ),
+                                                            html.Div(
+                                                                id="probability-thresh-display",
+                                                                style={"marginTop": "10px"},
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label(
+                                                                "Average Overlap Score",
+                                                                style={"fontWeight": "bold"},
+                                                            ),
+                                                            dcc.RangeSlider(
+                                                                id="overlap-thresh",
+                                                                min=0,
+                                                                max=1,
+                                                                step=0.01,
+                                                                value=[0, 1],
+                                                                marks={
+                                                                    0: "0",
+                                                                    0.25: "0.25",
+                                                                    0.5: "0.5",
+                                                                    0.75: "0.75",
+                                                                    1: "1",
+                                                                },
+                                                                tooltip={
+                                                                    "always_visible": False,
+                                                                    "placement": "top",
+                                                                },
+                                                                allowCross=False,
+                                                            ),
+                                                            html.Div(
+                                                                id="overlap-thresh-display",
+                                                                style={"marginTop": "10px"},
+                                                            ),
+                                                        ],
+                                                        width=6,
+                                                    ),
+                                                ],
+                                            ),
+                                            dbc.Label(
+                                                "MassQL Query",
+                                                style={"fontWeight": "bold", "marginTop": "20px"},
+                                            ),
+                                            dbc.Textarea(
+                                                id="motif-ranking-massql-input",
+                                                placeholder="Enter your MassQL query here",
+                                                style={"width": "100%", "height": "150px", "marginTop": "10px"},
+                                            ),
+                                            html.Div(
+                                                [
+                                                    dbc.Row(
+                                                        [
+                                                            dbc.Col(
+                                                                dbc.Button(
+                                                                    "🔍 Run Query",
+                                                                    id="motif-ranking-massql-btn",
+                                                                    color="primary",
+                                                                ),
+                                                                width="auto",
+                                                            ),
+                                                            dbc.Col(
+                                                                dbc.Button(
+                                                                    "🔄 Reset Query",
+                                                                    id="motif-ranking-massql-reset-btn",
+                                                                    color="primary",
+                                                                ),
+                                                                width="auto",
+                                                            ),
+                                                        ],
+                                                        className="mt-3",
+                                                    ),
+                                                ],
+                                            ),
+                                            dcc.Store(id="motif-ranking-massql-matches"),
+                                            html.Div(
+                                                id="motif-ranking-massql-error",
+                                                style={
+                                                    "marginTop": "10px",
+                                                    "color": "#dc3545",
+                                                    "padding": "10px",
+                                                    "backgroundColor": "#f8d7da",
+                                                    "borderRadius": "5px",
+                                                    "display": "none"
+                                                },
+                                            ),
+                                            html.Div(
+                                                id="motif-rankings-count",
+                                                style={
+                                                    "marginTop": "20px", 
+                                                    "fontWeight": "bold",
+                                                    "fontSize": "16px",
+                                                    "color": "#007bff",
+                                                    "padding": "10px",
+                                                    "backgroundColor": "#f8f9fa",
+                                                    "borderRadius": "5px",
+                                                    "textAlign": "center"
+                                                },
+                                            ),
+                                        ],
+                                        style={
+                                            "border": "1px dashed #ccc",
+                                            "padding": "10px",
+                                            "borderRadius": "5px",
+                                            "marginBottom": "15px",
+                                        },
+                                    ),
+                                ],
                             ),
                         ],
-                        style={"marginTop": "20px", "marginBottom": "20px"},
+                        style={
+                            "border": "1px dashed #999",
+                            "padding": "15px",
+                            "borderRadius": "5px",
+                            "marginBottom": "20px",
+                        },
                     ),
-                    dbc.Row(
+                    # ----------------------------------------------------------------
+                    # 2. MOTIF RANKINGS TABLE
+                    # ----------------------------------------------------------------
+                    html.Div(
                         [
-                            dbc.Col(
+                            html.H4("Motif Rankings Table", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                            html.Div(
                                 [
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label(
-                                                        "Probability Threshold Range",
-                                                    ),
-                                                    dcc.RangeSlider(
-                                                        id="probability-thresh",
-                                                        min=0,
-                                                        max=1,
-                                                        step=0.01,
-                                                        value=[0, 1],
-                                                        marks={
-                                                            0: "0",
-                                                            0.25: "0.25",
-                                                            0.5: "0.5",
-                                                            0.75: "0.75",
-                                                            1: "1",
-                                                        },
-                                                        tooltip={
-                                                            "always_visible": False,
-                                                            "placement": "top",
-                                                        },
-                                                        allowCross=False,
-                                                    ),
-                                                    html.Div(
-                                                        id="probability-thresh-display",
-                                                        style={"marginTop": "10px"},
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                            dbc.Col(
-                                                [
-                                                    dbc.Label(
-                                                        "Overlap Threshold Range",
-                                                    ),
-                                                    dcc.RangeSlider(
-                                                        id="overlap-thresh",
-                                                        min=0,
-                                                        max=1,
-                                                        step=0.01,
-                                                        value=[0, 1],
-                                                        marks={
-                                                            0: "0",
-                                                            0.25: "0.25",
-                                                            0.5: "0.5",
-                                                            0.75: "0.75",
-                                                            1: "1",
-                                                        },
-                                                        tooltip={
-                                                            "always_visible": False,
-                                                            "placement": "top",
-                                                        },
-                                                        allowCross=False,
-                                                    ),
-                                                    html.Div(
-                                                        id="overlap-thresh-display",
-                                                        style={"marginTop": "10px"},
-                                                    ),
-                                                ],
-                                                width=6,
-                                            ),
-                                        ],
-                                    ),
-                                    dbc.Row(
-                                        [
-                                            dbc.Col(
-                                                dbc.Input(
-                                                    id="motif-ranking-massql-input",
-                                                    placeholder=(
-                                                        "QUERY scaninfo(MS2DATA) WHERE MS2PROD=178.03"
-                                                    ),
-                                                ),
-                                                width=8,
-                                            ),
-                                            dbc.Col(
-                                                dbc.Button(
-                                                    "Run Query",
-                                                    id="motif-ranking-massql-btn",
-                                                ),
-                                                width=2,
-                                            ),
-                                        ],
-                                        className="mt-2",
-                                    ),
-                                    dcc.Store(id="motif-ranking-massql-matches"),
-                                    html.Div(
-                                        id="motif-rankings-count",
-                                        style={"marginTop": "10px"},
-                                    ),
                                     dash_table.DataTable(
                                         id="motif-rankings-table",
                                         data=[],
@@ -1363,23 +1581,34 @@ def create_motif_rankings_tab():
                                         },
                                     ),
                                     dbc.Button(
-                                        "Save to CSV",
+                                        "📄 Save to CSV",
                                         id="save-motifranking-csv",
-                                        color="secondary",
+                                        color="primary",
                                         className="mt-2",
                                     ),
                                     dbc.Button(
-                                        "Save to JSON",
+                                        "💾 Save to JSON",
                                         id="save-motifranking-json",
-                                        color="secondary",
+                                        color="primary",
                                         className="ms-2 mt-2",
                                     ),
                                     dcc.Download(id="download-motifranking-csv"),
                                     dcc.Download(id="download-motifranking-json"),
                                 ],
-                                width=12,
+                                style={
+                                    "border": "1px dashed #ccc",
+                                    "padding": "10px",
+                                    "borderRadius": "5px",
+                                    "marginBottom": "15px",
+                                },
                             ),
                         ],
+                        style={
+                            "border": "1px dashed #999",
+                            "padding": "15px",
+                            "borderRadius": "5px",
+                            "marginBottom": "20px",
+                        },
                     ),
                 ],
             ),
@@ -1415,10 +1644,10 @@ def create_motif_details_tab():
             # ----------------------------------------------------------------
             html.Div(
                 [
-                    html.H4(id="motif-details-title"),
+                    html.H4(id="motif-details-title", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
                     html.Div(
                         [
-                            html.H5("Spec2Vec Matching Results"),
+                            html.H5("Spec2Vec Matching Results", style={"fontSize": "18px", "fontWeight": "bold", "color": "#34495e", "marginBottom": "8px"}),
                             dcc.Markdown(
                                 """
                         The Spec2Vec matching results displayed here suggest chemical structures (SMILES strings) that closely match the selected motif. Spec2Vec calculates similarities by comparing motif pseudo-spectra against reference spectra from a known database. Matches shown here can help identify possible chemical identities or provide clues about structural characteristics represented by this motif.
@@ -1438,7 +1667,7 @@ def create_motif_details_tab():
                     ),
                     html.Div(
                         [
-                            html.H5("Optimised vs Raw Motif Pseudo-Spectra"),
+                            html.H5("Optimised vs Raw Motif Pseudo-Spectra", style={"fontSize": "18px", "fontWeight": "bold", "color": "#34495e", "marginBottom": "8px"}),
                             dcc.Markdown(
                                 """
                         This view compares two aligned versions of the selected Mass2Motif, highlighting changes made during optimisation.
@@ -1501,10 +1730,10 @@ def create_motif_details_tab():
             # ----------------------------------------------------------------
             html.Div(
                 [
-                    html.H4("Features in Motifs"),
+                    html.H4("Features in Motifs", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
                     html.Div(
                         [
-                            html.H5("Spectra-Peaks Probability Filter"),
+                            html.H5("Spectra-Peaks Probability Filter", style={"fontSize": "18px", "fontWeight": "bold", "color": "#34495e", "marginBottom": "8px"}),
                             dcc.Markdown(
                                 """
                         The slider below controls the minimum and maximum probability thresholds for selecting motif features (fragments and losses) identified by the LDA model. Setting a higher minimum value keeps only peaks strongly associated with the motif, providing a simpler representation. A lower minimum includes more peaks, potentially capturing additional detail but also introducing noise.
@@ -1583,7 +1812,7 @@ def create_motif_details_tab():
                     ),
                     html.Div(
                         [
-                            html.H5("Motif Features Table and Summary Plots"),
+                            html.H5("Motif Features Table and Summary Plots", style={"fontSize": "18px", "fontWeight": "bold", "color": "#34495e", "marginBottom": "8px"}),
                             dcc.Markdown(
                                 """
                         The table below lists the motif features (fragments and losses) that pass the probability filter, including their probabilities within the motif. Below it, a bar plot shows how frequently each feature appears **within the filtered set of documents** for this motif (i.e., documents whose doc-topic probability and overlap score both pass the current threshold ranges).
@@ -1611,7 +1840,7 @@ def create_motif_details_tab():
             # ----------------------------------------------------------------
             html.Div(
                 [
-                    html.H4("Spectra in Motifs"),
+                    html.H4("Spectra in Motifs", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
                     html.Div(
                         [
                             dcc.Markdown(
@@ -1644,7 +1873,7 @@ def create_motif_details_tab():
                                     dbc.ButtonGroup(
                                         [
                                             dbc.Button(
-                                                "All motifs",
+                                                "🔍 All motifs",
                                                 id="spectrum-highlight-all-btn",
                                                 color="primary",
                                                 outline=True,
@@ -1652,7 +1881,7 @@ def create_motif_details_tab():
                                                 className="me-1",
                                             ),
                                             dbc.Button(
-                                                "None",
+                                                "❌ None",
                                                 id="spectrum-highlight-none-btn",
                                                 color="primary",
                                                 outline=True,
@@ -1689,7 +1918,7 @@ def create_motif_details_tab():
                             ),
                             html.Div(
                                 [
-                                    html.H5("Individual motifs (probability):"),
+                                    html.H5("Individual motifs (probability):", style={"fontSize": "18px", "fontWeight": "bold", "color": "#34495e", "marginBottom": "8px"}),
                                     html.Div(
                                         id="motif-details-associated-motifs-list",
                                         style={"marginTop": "5px"},
@@ -1702,17 +1931,17 @@ def create_motif_details_tab():
                             html.Div(
                                 [
                                     dbc.Button(
-                                        "Previous",
+                                        "⬅️ Previous",
                                         id="prev-spectrum",
                                         n_clicks=0,
-                                        color="info",
+                                        color="primary",
                                     ),
                                     dbc.Button(
-                                        "Next",
+                                        "➡️ Next",
                                         id="next-spectrum",
                                         n_clicks=0,
                                         className="ms-2",
-                                        color="info",
+                                        color="primary",
                                     ),
                                     dbc.Button(
                                         "Spectrum Details ↗",
@@ -1750,12 +1979,14 @@ def create_screening_tab():
         id="screening-tab-content",
         style={"display": "none"},
         children=[
+            # Brief high-level overview of the entire tab
             html.Div(
                 [
                     dcc.Markdown(
                         r"""
-                        Use this tab to perform a **motif\-motif search**. Your optimized
-                        motifs are compared against reference motifs from MotifDB.
+                        This tab allows you to perform a **motif\-motif search**. Your discovered
+                        motifs are compared against reference motifs from MotifDB to find potential 
+                        matches and thereby annotate their chemical identity.
                         First select which reference sets you want to include, then
                         click "Compute Similarities" to run the motif search using
                         Spec2Vec comparison. Results are shown in the table below and can
@@ -1765,111 +1996,206 @@ def create_screening_tab():
                 ],
                 style={"marginTop": "20px", "marginBottom": "20px"},
             ),
-            html.Hr(),
-            html.H4("Reference Motif Sets Found"),
-            dcc.Loading(
-                id="m2m-subfolders-loading",
-                type="default",
-                children=[
-                    dbc.Checklist(
-                        id="m2m-folders-checklist",
-                        options=[],
-                        value=[],
-                        switch=True,
-                        className="mb-3",
-                    ),
-                ],
-            ),
-            dbc.Button(
-                "Compute Similarities",
-                id="compute-screening-button",
-                color="primary",
-                disabled=False,
-            ),
-            dbc.Progress(
-                id="screening-progress",
-                value=0,
-                striped=True,
-                animated=True,
-                style={"marginTop": "10px", "width": "100%", "height": "20px"},
-            ),
-            html.Div(id="compute-screening-status", style={"marginTop": "10px"}),
-            html.Hr(),
-            dbc.Row(
+            # ----------------------------------------------------------------
+            # 1. REFERENCE MOTIF SELECTION
+            # ----------------------------------------------------------------
+            html.Div(
                 [
-                    dbc.Col(
+                    html.H4("Reference Motif Selection", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
                         [
-                            html.Label("Minimum Similarity Score"),
-                            dcc.Slider(
-                                id="screening-threshold-slider",
-                                min=0,
-                                max=1,
-                                step=0.05,
-                                value=0.0,
-                                marks={
-                                    0: "0",
-                                    0.25: "0.25",
-                                    0.5: "0.5",
-                                    0.75: "0.75",
-                                    1: "1",
-                                },
+                            dcc.Markdown(
+                                """
+                                Select which reference motif sets you want to include in your search.
+                                These are the libraries of known motifs that your discovered motifs will be compared against.
+                                """
+                            ),
+                            dcc.Loading(
+                                id="m2m-subfolders-loading",
+                                type="default",
+                                children=[
+                                    dbc.Checklist(
+                                        id="m2m-folders-checklist",
+                                        options=[],
+                                        value=[],
+                                        switch=True,
+                                        className="mb-3",
+                                    ),
+                                ],
                             ),
                             html.Div(
-                                id="screening-threshold-value",
-                                style={"marginTop": "10px"},
+                                [
+                                    dbc.Button(
+                                        "🔄 Compute Similarities",
+                                        id="compute-screening-button",
+                                        color="primary",
+                                        disabled=False,
+                                    ),
+                                ],
+                                className="d-grid gap-2 mt-3",
                             ),
+                            dbc.Progress(
+                                id="screening-progress",
+                                value=0,
+                                striped=True,
+                                animated=True,
+                                style={"marginTop": "10px", "width": "100%", "height": "20px"},
+                            ),
+                            html.Div(id="compute-screening-status", style={"marginTop": "10px"}),
                         ],
-                        width=6,
+                        style={
+                            "border": "1px dashed #ccc",
+                            "padding": "10px",
+                            "borderRadius": "5px",
+                            "marginBottom": "15px",
+                        },
                     ),
                 ],
-                style={"marginTop": "10px"},
-            ),
-            html.H5("Motif Search Results (Filtered)"),
-            dash_table.DataTable(
-                id="screening-results-table",
-                columns=[
-                    {"name": "User Motif ID", "id": "user_motif_id"},
-                    {"name": "User AutoAnno", "id": "user_auto_annotation"},
-                    {"name": "Reference Motif ID", "id": "ref_motif_id"},
-                    {"name": "Ref ShortAnno", "id": "ref_short_annotation"},
-                    {"name": "Ref MotifSet", "id": "ref_motifset"},
-                    {"name": "Similarity Score", "id": "score"},
-                ],
-                data=[],
-                page_size=15,
-                style_table={"overflowX": "auto"},
-                style_cell={
-                    "textAlign": "left",
-                    "maxWidth": "250px",
-                    "whiteSpace": "normal",
+                style={
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
+                    "marginBottom": "20px",
                 },
-                style_header={
-                    "backgroundColor": "rgb(230, 230, 230)",
-                    "fontWeight": "bold",
-                },
-                style_data_conditional=[
-                    {
-                        "if": {"column_id": "user_motif_id"},
-                        "cursor": "pointer",
-                        "textDecoration": "underline",
-                        "color": "blue",
-                    },
+            ),
+            # ----------------------------------------------------------------
+            # 2. FILTERING CONTROLS
+            # ----------------------------------------------------------------
+            html.Div(
+                [
+                    html.H4("Filtering Controls", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
+                        [
+                            dcc.Markdown(
+                                """
+                                Use the slider below to filter the results by minimum similarity score.
+                                Only matches with a similarity score above the threshold will be shown in the results table.
+                                """
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            html.Label("Minimum Similarity Score", style={"fontWeight": "bold"}),
+                                            dcc.Slider(
+                                                id="screening-threshold-slider",
+                                                min=0,
+                                                max=1,
+                                                step=0.05,
+                                                value=0.0,
+                                                marks={
+                                                    0: "0",
+                                                    0.25: "0.25",
+                                                    0.5: "0.5",
+                                                    0.75: "0.75",
+                                                    1: "1",
+                                                },
+                                            ),
+                                            html.Div(
+                                                id="screening-threshold-value",
+                                                style={"marginTop": "10px"},
+                                            ),
+                                        ],
+                                        width=6,
+                                    ),
+                                ],
+                            ),
+                        ],
+                        style={
+                            "border": "1px dashed #ccc",
+                            "padding": "10px",
+                            "borderRadius": "5px",
+                            "marginBottom": "15px",
+                        },
+                    ),
                 ],
+                style={
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
+                    "marginBottom": "20px",
+                },
             ),
-            dbc.Button(
-                "Save to CSV",
-                id="save-screening-csv",
-                color="secondary",
-                className="mt-2",
+            # ----------------------------------------------------------------
+            # 3. SEARCH RESULTS
+            # ----------------------------------------------------------------
+            html.Div(
+                [
+                    html.H4("Motif Search Results", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
+                        [
+                            dcc.Markdown(
+                                """
+                                This table shows the matches between your discovered motifs and reference motifs.
+                                Click on any user motif ID to view its details. You can sort and filter the table by any column.
+                                """
+                            ),
+                            dash_table.DataTable(
+                                id="screening-results-table",
+                                columns=[
+                                    {"name": "User Motif ID", "id": "user_motif_id"},
+                                    {"name": "User AutoAnno", "id": "user_auto_annotation"},
+                                    {"name": "Reference Motif ID", "id": "ref_motif_id"},
+                                    {"name": "Ref ShortAnno", "id": "ref_short_annotation"},
+                                    {"name": "Ref MotifSet", "id": "ref_motifset"},
+                                    {"name": "Similarity Score", "id": "score"},
+                                ],
+                                data=[],
+                                page_size=15,
+                                style_table={"overflowX": "auto"},
+                                style_cell={
+                                    "textAlign": "left",
+                                    "maxWidth": "250px",
+                                    "whiteSpace": "normal",
+                                },
+                                style_header={
+                                    "backgroundColor": "rgb(230, 230, 230)",
+                                    "fontWeight": "bold",
+                                },
+                                style_data_conditional=[
+                                    {
+                                        "if": {"column_id": "user_motif_id"},
+                                        "cursor": "pointer",
+                                        "textDecoration": "underline",
+                                        "color": "blue",
+                                    },
+                                ],
+                            ),
+                            html.Div(
+                                [
+                                    dbc.Button(
+                                        "📄 Save to CSV",
+                                        id="save-screening-csv",
+                                        color="primary",
+                                        className="mt-2",
+                                    ),
+                                    dbc.Button(
+                                        "💾 Save to JSON",
+                                        id="save-screening-json",
+                                        color="primary",
+                                        className="ms-2 mt-2",
+                                    ),
+                                ],
+                                style={"marginTop": "10px"},
+                            ),
+                            dcc.Download(id="download-screening-csv"),
+                            dcc.Download(id="download-screening-json"),
+                        ],
+                        style={
+                            "border": "1px dashed #ccc",
+                            "padding": "10px",
+                            "borderRadius": "5px",
+                            "marginBottom": "15px",
+                        },
+                    ),
+                ],
+                style={
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
+                    "marginBottom": "20px",
+                },
             ),
-            dbc.Button(
-                "Save to JSON",
-                id="save-screening-json",
-                color="secondary",
-                className="ms-2 mt-2",
-            ),
-            dcc.Download(id="download-screening-csv"),
-            dcc.Download(id="download-screening-json"),
         ],
     )
 
@@ -1879,80 +2205,218 @@ def create_spectra_search_tab():
         id="search-spectra-tab-content",
         style={"display": "none"},
         children=[
-            html.H3("Search by Fragment/Loss or Parent Mass"),
-            # -------  SEARCH FORM  -------
-            dbc.Row(
-                [
-                    dbc.Col(
-                        [
-                            dbc.Label("Fragment or Loss Contains:"),
-                            dbc.Input(
-                                id="spectra-search-fragloss-input",
-                                type="text",
-                                placeholder="e.g. frag@150 or loss@40",
-                            ),
-                            dbc.Tooltip(
-                                "Enter a partial fragment (e.g. 'frag@150.1') or loss "
-                                "(e.g. 'loss@40.2'). The search is case-insensitive.",
-                                target="spectra-search-fragloss-input",
-                            ),
-                        ],
-                        width=4,
-                    ),
-                    dbc.Col(
-                        [
-                            dbc.Label("Parent Mass Range:"),
-                            dcc.RangeSlider(
-                                id="spectra-search-parentmass-slider",
-                                min=0,
-                                max=2000,
-                                step=1,
-                                value=[0, 2000],
-                                marks={
-                                    0: "0",
-                                    500: "500",
-                                    1000: "1000",
-                                    1500: "1500",
-                                    2000: "2000",
-                                },
-                                allowCross=False,
-                            ),
-                            html.Div(
-                                id="spectra-search-parentmass-slider-display",
-                                style={"marginTop": "10px"},
-                            ),
-                        ],
-                        width=8,
-                    ),
-                ],
-                style={"marginTop": "20px"},
-            ),
+            # Brief high-level overview of the entire tab
             html.Div(
-                id="spectra-search-status-message",
-                style={"marginTop": "10px", "fontStyle": "italic", "color": "#555"},
-            ),
-            dash_table.DataTable(
-                id="spectra-search-results-table",
-                columns=[
-                    {"name": "Spectrum ID", "id": "spec_id"},
-                    {"name": "Parent Mass", "id": "parent_mass"},
-                    {"name": "Feature ID", "id": "feature_id"},
-                    {"name": "Fragments", "id": "fragments"},
-                    {"name": "Losses", "id": "losses"},
+                [
+                    dcc.Markdown(
+                        """
+                        This tab allows you to search for specific spectra in your dataset based on fragment/loss values or parent mass range.
+                        You can filter spectra by entering a numeric value and selecting whether to search in fragments, losses, or both using the checkboxes,
+                        or by specifying a parent mass range.
+                        Click on any spectrum in the results table to view its detailed plot and associated motifs.
+                        """,
+                    ),
                 ],
-                page_size=20,
-                style_table={"overflowX": "auto"},
-                style_cell={"textAlign": "left", "whiteSpace": "normal"},
-                style_data_conditional=[
-                    {
-                        "if": {"column_id": "spec_id"},
-                        "cursor": "pointer",
-                        "textDecoration": "underline",
-                        "color": "blue",
-                    },
+                style={"marginTop": "20px", "marginBottom": "20px"},
+            ),
+            # ----------------------------------------------------------------
+            # 1. SEARCH CONTROLS
+            # ----------------------------------------------------------------
+            dbc.Container(
+                [
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    html.H4("Search Controls", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px", "display": "inline-block"}),
+                                    dbc.Button(
+                                        "🔎 Hide",
+                                        id="search-controls-toggle-button",
+                                        color="primary",
+                                        size="sm",
+                                        className="ms-2",
+                                        style={"display": "inline-block", "marginLeft": "10px", "marginBottom": "5px"},
+                                    ),
+                                ],
+                                style={"display": "flex", "alignItems": "center", "justifyContent": "space-between", "width": "100%"},
+                            ),
+                            dbc.Collapse(
+                                id="search-controls-collapse",
+                                is_open=True,
+                                children=[
+                                    html.Div(
+                                        [
+                                            # Show/Hide Explanation button
+                                            dbc.Button(
+                                                "ℹ️ Info",
+                                                id="spectra-search-explanation-button",
+                                                color="secondary",
+                                                size="sm",
+                                                className="mb-3",
+                                            ),
+                                            # Collapsible explanation section
+                                            dbc.Collapse(
+                                                id="spectra-search-explanation-collapse",
+                                                is_open=False,
+                                                children=[
+                                                    dcc.Markdown(
+                                                        """
+                                                        Search for specific spectra in your dataset based on fragment/loss values or parent mass range.
+
+                                                        **Search by Fragment or Loss**: Enter a numeric value (e.g., 150.1) to search for spectra containing that specific fragment or loss mass. The search uses a tolerance of 0.01 Da. Use the checkboxes to specify whether to search in fragments, losses, or both.
+
+                                                        **Parent Mass Range**: Use the slider to filter spectra based on their parent mass. This is useful for narrowing down your search to a specific mass range.
+
+                                                        The results table shows matching spectra with their ID, parent mass, and lists of fragments and losses. Click on any spectrum to view its detailed plot and associated motifs below.
+                                                        """,
+                                                        style={
+                                                            "backgroundColor": "#f8f9fa",
+                                                            "padding": "15px",
+                                                            "borderRadius": "5px",
+                                                            "border": "1px solid #e9ecef",
+                                                        },
+                                                    ),
+                                                ],
+                                            ),
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Search by Fragment or Loss:", style={"fontWeight": "bold"}),
+                                                            dbc.Input(
+                                                                id="spectra-search-fragloss-input",
+                                                                type="text",
+                                                                placeholder="Enter a numeric value (e.g. 150.1)",
+                                                            ),
+                                                            dbc.Tooltip(
+                                                                "Enter a numeric value for comparison with a tolerance of 0.01. "
+                                                                "Use the checkboxes below to search in fragments, losses, or both.",
+                                                                target="spectra-search-fragloss-input",
+                                                            ),
+                                                            html.Div(
+                                                                [
+                                                                    dbc.Checkbox(
+                                                                        id="spectra-search-fragment-checkbox",
+                                                                        label="Fragment",
+                                                                        value=True,
+                                                                        className="mr-2",
+                                                                        style={"marginTop": "10px", "marginRight": "10px", "display": "inline-block"}
+                                                                    ),
+                                                                    dbc.Checkbox(
+                                                                        id="spectra-search-loss-checkbox",
+                                                                        label="Loss",
+                                                                        value=True,
+                                                                        className="mr-2",
+                                                                        style={"marginTop": "10px", "display": "inline-block"}
+                                                                    ),
+                                                                ],
+                                                                style={"marginTop": "5px"}
+                                                            ),
+                                                        ],
+                                                        width=4,
+                                                    ),
+                                                    dbc.Col(
+                                                        [
+                                                            dbc.Label("Parent Mass Range:", style={"fontWeight": "bold"}),
+                                                            dcc.RangeSlider(
+                                                                id="spectra-search-parentmass-slider",
+                                                                step=1,
+                                                                allowCross=False,
+                                                            ),
+                                                            html.Div(
+                                                                id="spectra-search-parentmass-slider-display",
+                                                                style={"marginTop": "10px"},
+                                                            ),
+                                                        ],
+                                                        width=8,
+                                                    ),
+                                                ],
+                                            ),
+                                            html.Div(
+                                                id="spectra-search-status-message",
+                                                style={
+                                                    "marginTop": "20px", 
+                                                    "fontWeight": "bold",
+                                                    "fontSize": "16px",
+                                                    "color": "#007bff",
+                                                    "padding": "10px",
+                                                    "backgroundColor": "#f8f9fa",
+                                                    "borderRadius": "5px",
+                                                    "textAlign": "center"
+                                                },
+                                            ),
+                                        ],
+                                        style={
+                                            "border": "1px dashed #ccc",
+                                            "padding": "10px",
+                                            "borderRadius": "5px",
+                                            "marginBottom": "15px",
+                                        },
+                                    ),
+                                ],
+                            ),
+                        ],
+                        style={
+                            "border": "1px dashed #999",
+                            "padding": "15px",
+                            "borderRadius": "5px",
+                            "marginBottom": "20px",
+                        },
+                    ),
                 ],
             ),
-            # ----------  DETAILS ----------
+            # ----------------------------------------------------------------
+            # 2. SEARCH RESULTS
+            # ----------------------------------------------------------------
+            html.Div(
+                [
+                    html.H4("Search Results", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
+                        [
+                            dash_table.DataTable(
+                                id="spectra-search-results-table",
+                                columns=[
+                                    {"name": "Spectrum ID", "id": "spec_id"},
+                                    {"name": "Parent Mass", "id": "parent_mass"},
+                                    {"name": "Feature ID", "id": "feature_id"},
+                                    {"name": "Fragments", "id": "fragments"},
+                                    {"name": "Losses", "id": "losses"},
+                                ],
+                                page_size=20,
+                                style_table={"overflowX": "auto"},
+                                style_cell={"textAlign": "left", "whiteSpace": "normal"},
+                                style_data_conditional=[
+                                    {
+                                        "if": {"column_id": "spec_id"},
+                                        "cursor": "pointer",
+                                        "textDecoration": "underline",
+                                        "color": "blue",
+                                    },
+                                ],
+                                style_header={
+                                    "backgroundColor": "rgb(230, 230, 230)",
+                                    "fontWeight": "bold",
+                                },
+                            ),
+                        ],
+                        style={
+                            "border": "1px dashed #ccc",
+                            "padding": "10px",
+                            "borderRadius": "5px",
+                            "marginBottom": "15px",
+                        },
+                    ),
+                ],
+                style={
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
+                    "marginBottom": "20px",
+                },
+            ),
+            # ----------------------------------------------------------------
+            # 3. SPECTRUM DETAILS
+            # ----------------------------------------------------------------
             dcc.Store(id="search-tab-selected-spectrum-details-store"),
             dcc.Store(id="search-tab-selected-motif-id-for-plot-store"),
             dcc.Store(id="search-highlight-mode", data="all"),
@@ -1964,66 +2428,109 @@ def create_spectra_search_tab():
                     type="circle",
                     fullscreen=True,
                     children=[
-                        html.H4(id="search-tab-spectrum-title"),
-                        # === Combined controls + plot ===
                         html.Div(
                             [
-                            dbc.ButtonGroup(
-                                [
-                                    dbc.Button(
-                                        "All motifs",
-                                        id="search-highlight-all-btn",
-                                        color="primary",
-                                        outline=True,
-                                        active=True,
-                                        className="me-1",
-                                    ),
-                                    dbc.Button(
-                                        "None",
-                                        id="search-highlight-none-btn",
-                                        color="primary",
-                                        outline=True,
-                                        active=False,
-                                    ),
-                                ],
-                                className="me-2",
-                            ),
-                            dbc.RadioItems(
-                                id="search-fragloss-toggle",
-                                options=[
-                                    {"label": "Fragments + Losses", "value": "both"},
-                                    {"label": "Fragments Only", "value": "fragments"},
-                                    {"label": "Losses Only", "value": "losses"},
-                                ],
-                                value="both",
-                                inline=True,
-                                style={"marginLeft": "10px"},
-                            ),
-                            dbc.Checkbox(
-                                id="search-show-parent-ion",
-                                label="Show Parent Ion",
-                                value=True,
-                                className="ms-3",
-                            ),
-                        ],
-                        className="d-flex align-items-center flex-wrap mb-2",
-                    ),
-                    html.Div(
-                        [
-                            html.H5("Individual motifs (probability):"),
-                            html.Div(
-                                id="search-tab-associated-motifs-list",
-                                style={"marginTop": "5px"},
-                            ),
-                        ],
-                        style={
-                            "border": "1px dashed #ccc",
-                            "padding": "10px",
-                            "borderRadius": "5px",
-                            "marginBottom": "15px",
-                        },
-                    ),
-                        html.Div(id="search-tab-spectrum-plot-container"),
+                                html.H4(id="search-tab-spectrum-title", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                                html.Div(
+                                    [
+                                        html.H5("Spectrum Visualization Controls", style={"fontSize": "18px", "fontWeight": "bold", "color": "#34495e", "marginBottom": "8px"}),
+                                        dcc.Markdown(
+                                            """
+                                            Control how the spectrum is displayed using the options below. You can highlight specific motifs,
+                                            show only fragments or losses, and toggle the display of the parent ion.
+                                            """
+                                        ),
+                                        html.Div(
+                                            [
+                                                dbc.ButtonGroup(
+                                                    [
+                                                        dbc.Button(
+                                                            "🔍 All motifs",
+                                                            id="search-highlight-all-btn",
+                                                            color="primary",
+                                                            outline=True,
+                                                            active=True,
+                                                            className="me-1",
+                                                        ),
+                                                        dbc.Button(
+                                                            "❌ None",
+                                                            id="search-highlight-none-btn",
+                                                            color="primary",
+                                                            outline=True,
+                                                            active=False,
+                                                        ),
+                                                    ],
+                                                    className="me-2",
+                                                ),
+                                                dbc.RadioItems(
+                                                    id="search-fragloss-toggle",
+                                                    options=[
+                                                        {"label": "Fragments + Losses", "value": "both"},
+                                                        {"label": "Fragments Only", "value": "fragments"},
+                                                        {"label": "Losses Only", "value": "losses"},
+                                                    ],
+                                                    value="both",
+                                                    inline=True,
+                                                    style={"marginLeft": "10px"},
+                                                ),
+                                                dbc.Checkbox(
+                                                    id="search-show-parent-ion",
+                                                    label="Show Parent Ion",
+                                                    value=True,
+                                                    className="ms-3",
+                                                ),
+                                            ],
+                                            className="d-flex align-items-center flex-wrap mb-2",
+                                        ),
+                                    ],
+                                    style={
+                                        "border": "1px dashed #ccc",
+                                        "padding": "10px",
+                                        "borderRadius": "5px",
+                                        "marginBottom": "15px",
+                                    },
+                                ),
+                                html.Div(
+                                    [
+                                        html.H5("Associated Motifs", style={"fontSize": "18px", "fontWeight": "bold", "color": "#34495e", "marginBottom": "8px"}),
+                                        dcc.Markdown(
+                                            """
+                                            This section shows the motifs associated with the selected spectrum and their probabilities.
+                                            Click on a motif to highlight it in the spectrum plot below.
+                                            """
+                                        ),
+                                        html.Div(
+                                            id="search-tab-associated-motifs-list",
+                                            style={"marginTop": "5px"},
+                                        ),
+                                    ],
+                                    style={
+                                        "border": "1px dashed #ccc",
+                                        "padding": "10px",
+                                        "borderRadius": "5px",
+                                        "marginBottom": "15px",
+                                    },
+                                ),
+                                html.Div(
+                                    [
+                                        html.H5("Spectrum Plot", style={"fontSize": "18px", "fontWeight": "bold", "color": "#34495e", "marginBottom": "8px"}),
+                                        html.Div(id="search-tab-spectrum-plot-container"),
+                                    ],
+                                    style={
+                                        "border": "1px dashed #ccc",
+                                        "padding": "10px",
+                                        "borderRadius": "5px",
+                                        "marginBottom": "15px",
+                                    },
+                                ),
+                            ],
+                            style={
+                                "border": "1px dashed #999",
+                                "padding": "15px",
+                                "borderRadius": "5px",
+                                "marginBottom": "20px",
+                            },
+                        ),
                     ],
                 ),
             ),
