@@ -1320,22 +1320,41 @@ def compute_motif_degrees(lda_dict, p_low, p_high, o_low, o_high):
 
 
 @app.callback(
+    Output("motif-ranking-massql-input", "value"),
     Output("motif-ranking-massql-matches", "data"),
     Input("motif-ranking-massql-btn", "n_clicks"),
+    Input("motif-ranking-massql-reset-btn", "n_clicks"),
     State("motif-ranking-massql-input", "value"),
     State("optimized-motifs-store", "data"),
+    prevent_initial_call=True,
 )
-def run_massql_query(n_clicks, query, motifs_data):
-    if not n_clicks or not query or not motifs_data:
+def handle_massql_query(run_clicks, reset_clicks, query, motifs_data):
+    # Use callback_context to determine which button was clicked
+    ctx = dash.callback_context
+    if not ctx.triggered:
         raise PreventUpdate
-    specs = [make_spectrum_from_dict(d) for d in motifs_data]
-    ms1_df, ms2_df = motifs2motifDB(specs)
-    matches = msql_engine.process_query(query, ms1_df=ms1_df, ms2_df=ms2_df)
 
-    # If no results
-    if matches.empty or "motif_id" not in matches.columns:
-        return []
-    return matches["motif_id"].unique().tolist()
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    # Handle Reset Query button
+    if button_id == "motif-ranking-massql-reset-btn":
+        return "", []
+
+    # Handle Run Query button
+    if button_id == "motif-ranking-massql-btn":
+        if not query or not motifs_data:
+            raise PreventUpdate
+        specs = [make_spectrum_from_dict(d) for d in motifs_data]
+        ms1_df, ms2_df = motifs2motifDB(specs)
+        matches = msql_engine.process_query(query, ms1_df=ms1_df, ms2_df=ms2_df)
+
+        # If no results
+        if matches.empty or "motif_id" not in matches.columns:
+            return no_update, []
+        return no_update, matches["motif_id"].unique().tolist()
+
+    # Default case (should not happen)
+    raise PreventUpdate
 
 
 @app.callback(
@@ -1378,7 +1397,7 @@ def update_motif_rankings_table(
         ],
     )
 
-    if massql_matches is not None:
+    if massql_matches is not None and len(massql_matches) > 0:
         df = df[df["Motif"].isin(massql_matches)]
 
     # 1) topic_metadata from LDA

@@ -1454,13 +1454,28 @@ def create_motif_rankings_tab():
                                     ),
                                     html.Div(
                                         [
-                                            dbc.Button(
-                                                "Run Query",
-                                                id="motif-ranking-massql-btn",
-                                                color="primary",
+                                            dbc.Row(
+                                                [
+                                                    dbc.Col(
+                                                        dbc.Button(
+                                                            "Run Query",
+                                                            id="motif-ranking-massql-btn",
+                                                            color="primary",
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                    dbc.Col(
+                                                        dbc.Button(
+                                                            "Reset Query",
+                                                            id="motif-ranking-massql-reset-btn",
+                                                            color="secondary",
+                                                        ),
+                                                        width="auto",
+                                                    ),
+                                                ],
+                                                className="mt-3",
                                             ),
                                         ],
-                                        className="d-grid gap-2 mt-3",
                                     ),
                                     dcc.Store(id="motif-ranking-massql-matches"),
                                     html.Div(
