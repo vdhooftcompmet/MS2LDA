@@ -1397,6 +1397,13 @@ def update_motif_rankings_table(
         ],
     )
 
+    # Filter out motifs that have no docs passing, i.e. degree=0
+    # Do this before applying MassQL filter to get accurate count of motifs passing probability/overlap thresholds
+    df = df[df["Degree"] > 0].copy()
+
+    # Store the count of motifs passing probability/overlap thresholds
+    motifs_passing_thresholds = len(df)
+
     if massql_matches is not None and len(massql_matches) > 0:
         df = df[df["Motif"].isin(massql_matches)]
 
@@ -1472,9 +1479,6 @@ def update_motif_rankings_table(
         screening_hits = ["" for _ in range(len(df))]
     df["Matching Hits"] = screening_hits
 
-    # Filter out motifs that have no docs passing, i.e. degree=0
-    df = df[df["Degree"] > 0].copy()
-
     table_data = df.to_dict("records")
     table_columns = [
         {
@@ -1508,7 +1512,11 @@ def update_motif_rankings_table(
         },
     ]
 
-    row_count_message = f"{len(df)} motif(s) pass the filter"
+    # Create message showing both the number of motifs passing thresholds and the number displayed after MassQL filtering
+    if massql_matches is not None and len(massql_matches) > 0:
+        row_count_message = f"{motifs_passing_thresholds} motif(s) pass the filter, {len(df)} displayed after MassQL query"
+    else:
+        row_count_message = f"{motifs_passing_thresholds} motif(s) pass the filter"
     return table_data, table_columns, row_count_message
 
 

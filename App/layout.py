@@ -1348,23 +1348,9 @@ def create_motif_rankings_tab():
                                         children=[
                                             dcc.Markdown(
                                                 """
-                                                This tab displays your motifs in a ranked table based on how many documents meet the selected Probability and Overlap ranges. For each motif, we compute a `Degree` representing the number of documents where the motif's doc-topic probability and overlap score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability` and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters, so they can be quite high if the motif strongly dominates the docs where it appears. Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap. _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row takes you to a detailed view of that motif.
+                                                This tab displays your motifs in a ranked table based on how many documents meet the selected Probability and Overlap ranges. For each motif, we compute a `Degree` representing the number of documents where the motif's doc-topic probability and overlap score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability` and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters, so they can be quite high if the motif strongly dominates the docs where it appears. The `Overlap Score` is computed by multiplying the word-topic distribution with the topic-word distribution for each word in a document, and then summing these products for each topic. This provides a measure of how well a document's word distribution matches a topic's expected word distribution. Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap. _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row takes you to a detailed view of that motif.
 
-                                                You can also use [MassQL (Mass Spectrometry Query Language)](https://www.nature.com/articles/s41592-025-02660-z) to filter and search for specific motifs. MassQL uses SQL-like syntax to query mass spectrometry data, enabling discovery of chemical patterns across datasets. In this application, motifs are translated into pseudo-spectra where fragments and losses are treated as peaks, allowing you to search for specific fragment masses or filter motifs by metadata using MassQL's powerful capabilities.
-
-                                                Here are some example queries:
-
-                                                ```
-                                                QUERY scaninfo(MS2DATA) METAFILTER:motif_id=motif_123
-                                                ```
-
-                                                This query filters spectra by a specific motif ID.
-
-                                                ```
-                                                QUERY scaninfo(MS2DATA) WHERE MS2PROD=178.03
-                                                ```
-
-                                                This query finds spectra containing a specific product ion mass.
+                                                You can also use [MassQL (Mass Spectrometry Query Language)](https://www.nature.com/articles/s41592-025-02660-z) to filter and search for specific motifs. MassQL uses SQL-like syntax to query mass spectrometry data, enabling discovery of chemical patterns across datasets. In this application, motifs are translated into pseudo-spectra where fragments and losses are treated as peaks, allowing you to search for specific fragment masses or filter motifs by metadata. The filtering process applies all filters in sequence: first, motifs are filtered based on the Probability and Overlap thresholds, and then the MassQL query is applied to the remaining motifs. For example, you can use queries like `QUERY scaninfo(MS2DATA) METAFILTER:motif_id=motif_123` to filter spectra by a specific motif ID, or `QUERY scaninfo(MS2DATA) WHERE MS2PROD=178.03` to find spectra containing a specific product ion mass.
                                                 """,
                                                 style={
                                                     "backgroundColor": "#f8f9fa",
@@ -1380,7 +1366,7 @@ def create_motif_rankings_tab():
                                             dbc.Col(
                                                 [
                                                     dbc.Label(
-                                                        "Probability Threshold Range",
+                                                        "Average Doc-Topic Probability",
                                                         style={"fontWeight": "bold"},
                                                     ),
                                                     dcc.RangeSlider(
@@ -1412,7 +1398,7 @@ def create_motif_rankings_tab():
                                             dbc.Col(
                                                 [
                                                     dbc.Label(
-                                                        "Overlap Threshold Range",
+                                                        "Average Overlap Score",
                                                         style={"fontWeight": "bold"},
                                                     ),
                                                     dcc.RangeSlider(
