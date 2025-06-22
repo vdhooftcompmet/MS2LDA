@@ -3037,13 +3037,13 @@ def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
         if not (pmass_low <= pmass <= pmass_high):
             continue
 
-        frag_list = [f"frag@{mzval:.4g}" for mzval in spec_dict["mz"]]
+        frag_list = [f"frag@{mzval:.5f}" for mzval in spec_dict["mz"]]
         frag_vals = [float(mzval) for mzval in spec_dict["mz"]]
         loss_list = []
         loss_vals = []
         if "losses" in meta:
             for loss_item in meta["losses"]:
-                loss_list.append(f"loss@{loss_item['loss_mz']:.4g}")
+                loss_list.append(f"loss@{loss_item['loss_mz']:.5f}")
                 with contextlib.suppress(KeyError, ValueError):
                     loss_vals.append(float(loss_item["loss_mz"]))
 
