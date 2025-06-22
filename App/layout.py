@@ -219,7 +219,7 @@ def create_run_analysis_tab(show_tab: bool = True):
                                     dbc.Button(
                                         "Download Spec2Vec Files",
                                         id="download-s2v-button",
-                                        color="secondary",
+                                        color="primary",
                                         className="mt-3",
                                     ),
                                     html.Div(
@@ -1468,7 +1468,7 @@ def create_motif_rankings_tab():
                                                         dbc.Button(
                                                             "Reset Query",
                                                             id="motif-ranking-massql-reset-btn",
-                                                            color="secondary",
+                                                            color="primary",
                                                         ),
                                                         width="auto",
                                                     ),
@@ -1546,13 +1546,13 @@ def create_motif_rankings_tab():
                                     dbc.Button(
                                         "Save to CSV",
                                         id="save-motifranking-csv",
-                                        color="secondary",
+                                        color="primary",
                                         className="mt-2",
                                     ),
                                     dbc.Button(
                                         "Save to JSON",
                                         id="save-motifranking-json",
-                                        color="secondary",
+                                        color="primary",
                                         className="ms-2 mt-2",
                                     ),
                                     dcc.Download(id="download-motifranking-csv"),
@@ -1838,7 +1838,7 @@ def create_motif_details_tab():
                                             dbc.Button(
                                                 "All motifs",
                                                 id="spectrum-highlight-all-btn",
-                                                color="secondary",
+                                                color="primary",
                                                 outline=True,
                                                 active=False,
                                                 className="me-1",
@@ -1846,7 +1846,7 @@ def create_motif_details_tab():
                                             dbc.Button(
                                                 "None",
                                                 id="spectrum-highlight-none-btn",
-                                                color="secondary",
+                                                color="primary",
                                                 outline=True,
                                                 active=False,
                                             ),
@@ -1897,19 +1897,19 @@ def create_motif_details_tab():
                                         "Previous",
                                         id="prev-spectrum",
                                         n_clicks=0,
-                                        color="secondary",
+                                        color="primary",
                                     ),
                                     dbc.Button(
                                         "Next",
                                         id="next-spectrum",
                                         n_clicks=0,
                                         className="ms-2",
-                                        color="secondary",
+                                        color="primary",
                                     ),
                                     dbc.Button(
                                         "Spectrum Details ↗",
                                         id="jump-to-search-btn",
-                                        color="secondary",
+                                        color="primary",
                                         className="ms-2",
                                     ),
                                 ],
@@ -2129,13 +2129,13 @@ def create_screening_tab():
                                     dbc.Button(
                                         "Save to CSV",
                                         id="save-screening-csv",
-                                        color="secondary",
+                                        color="primary",
                                         className="mt-2",
                                     ),
                                     dbc.Button(
                                         "Save to JSON",
                                         id="save-screening-json",
-                                        color="secondary",
+                                        color="primary",
                                         className="ms-2 mt-2",
                                     ),
                                 ],
@@ -2336,7 +2336,7 @@ def create_spectra_search_tab():
                                                         dbc.Button(
                                                             "All motifs",
                                                             id="search-highlight-all-btn",
-                                                            color="secondary",
+                                                            color="primary",
                                                             outline=True,
                                                             active=True,
                                                             className="me-1",
@@ -2344,7 +2344,7 @@ def create_spectra_search_tab():
                                                         dbc.Button(
                                                             "None",
                                                             id="search-highlight-none-btn",
-                                                            color="secondary",
+                                                            color="primary",
                                                             outline=True,
                                                             active=False,
                                                         ),
