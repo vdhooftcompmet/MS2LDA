@@ -3185,9 +3185,10 @@ def update_search_tab_spectrum_plot(
     Input("spectra-search-parentmass-slider", "value"),
     Input("spectra-search-fragment-checkbox", "value"),
     Input("spectra-search-loss-checkbox", "value"),
+    Input("spectra-search-results-table", "sort_by"),
     prevent_initial_call=True,
 )
-def update_spectra_search_table(spectra_data, search_text, parent_mass_range, fragment_checked, loss_checked):
+def update_spectra_search_table(spectra_data, search_text, parent_mass_range, fragment_checked, loss_checked, sort_by):
     if not spectra_data:
         raise PreventUpdate
 
@@ -3267,6 +3268,30 @@ def update_spectra_search_table(spectra_data, search_text, parent_mass_range, fr
         status_msg = "No spectra pass the filter"
     else:
         status_msg = ""  # No filters active yet
+
+    # Apply sorting if sort_by is provided
+    if sort_by and len(sort_by):
+        col_id = sort_by[0]['column_id']
+        direction = sort_by[0]['direction']
+        ascending = (direction == 'asc')
+
+        # Convert filtered_rows to DataFrame for easier sorting
+        df = pd.DataFrame(filtered_rows)
+
+        if col_id == 'spec_id':
+            # Implement natural sorting for the 'spec_id' column
+            # 1. Extract the number from the 'spec_XXX' string
+            # 2. Convert it to an integer so it sorts numerically
+            # 3. Sort by this new numeric key
+            # 4. Drop the temporary key column
+            df['_sort_key'] = df['spec_id'].str.extract(r'(\d+)').astype(int)
+            df = df.sort_values('_sort_key', ascending=ascending).drop(columns=['_sort_key'])
+        else:
+            # For all other columns, use standard pandas sorting
+            df = df.sort_values(col_id, ascending=ascending)
+
+        # Convert back to list of dictionaries
+        filtered_rows = df.to_dict('records')
 
     return filtered_rows, status_msg
 

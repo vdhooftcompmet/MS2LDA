@@ -2381,6 +2381,8 @@ def create_spectra_search_tab():
                                     {"name": "Fragments", "id": "fragments"},
                                     {"name": "Losses", "id": "losses"},
                                 ],
+                                sort_action="custom",
+                                sort_mode="single",
                                 page_size=20,
                                 style_table={"overflowX": "auto"},
                                 style_cell={"textAlign": "left", "whiteSpace": "normal"},
