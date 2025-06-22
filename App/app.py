@@ -24,7 +24,7 @@ app.layout = dbc.Container(
                         html.Img(
                             src="assets/MS2LDA_LOGO_white.jpg",
                             alt="MS2LDA Logo",
-                            height="250px",
+                            height="150px",
                             style={"display": "block", "margin": "auto"},
                         ),
                         dcc.Markdown(
