@@ -571,6 +571,32 @@ def toggle_spectra_search_explanation(n_clicks, is_open):
     return is_open
 
 
+# Show/hide filter controls in motif rankings
+@app.callback(
+    Output("filter-controls-collapse", "is_open"),
+    Input("filter-controls-toggle-button", "n_clicks"),
+    State("filter-controls-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_filter_controls(n_clicks, is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+
+
+# Show/hide search controls in spectra search
+@app.callback(
+    Output("search-controls-collapse", "is_open"),
+    Input("search-controls-toggle-button", "n_clicks"),
+    State("search-controls-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_search_controls(n_clicks, is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+
+
 @app.callback(
     Output("run-status", "children"),
     Output("load-status", "children"),
@@ -3149,9 +3175,9 @@ def update_spectra_search_table(spectra_data, search_text, parent_mass_range, fr
     )
 
     if filtered_rows:
-        status_msg = f"Showing {len(filtered_rows)} matching spectra."
+        status_msg = f"{len(filtered_rows)} spectra pass the filter"
     elif is_filtered:
-        status_msg = "No spectra found matching your criteria."
+        status_msg = "No spectra pass the filter"
     else:
         status_msg = ""  # No filters active yet
 
