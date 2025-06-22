@@ -1573,6 +1573,11 @@ def create_motif_rankings_tab():
                                                 "textDecoration": "underline",
                                                 "color": "blue",
                                             },
+                                            {
+                                                'if': {'state': 'active'},
+                                                'backgroundColor': 'transparent',
+                                                'border': 'transparent'
+                                            }
                                         ],
                                         style_header={
                                             "backgroundColor": "rgb(230, 230, 230)",
@@ -2158,6 +2163,11 @@ def create_screening_tab():
                                         "textDecoration": "underline",
                                         "color": "blue",
                                     },
+                                    {
+                                        'if': {'state': 'active'},
+                                        'backgroundColor': 'transparent',
+                                        'border': 'transparent'
+                                    }
                                 ],
                             ),
                             html.Div(
@@ -2393,6 +2403,11 @@ def create_spectra_search_tab():
                                         "textDecoration": "underline",
                                         "color": "blue",
                                     },
+                                    {
+                                        'if': {'state': 'active'},
+                                        'backgroundColor': 'transparent',
+                                        'border': 'transparent'
+                                    }
                                 ],
                                 style_header={
                                     "backgroundColor": "rgb(230, 230, 230)",
