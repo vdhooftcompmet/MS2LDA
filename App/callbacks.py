@@ -3003,29 +3003,24 @@ def update_search_tab_spectrum_plot(
     Input("spectra-store", "data"),
     Input("spectra-search-fragloss-input", "value"),
     Input("spectra-search-parentmass-slider", "value"),
+    Input("spectra-search-fragment-checkbox", "value"),
+    Input("spectra-search-loss-checkbox", "value"),
     prevent_initial_call=True,
 )
-def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
+def update_spectra_search_table(spectra_data, search_text, parent_mass_range, fragment_checked, loss_checked):
     if not spectra_data:
         raise PreventUpdate
 
     # Prepare query and parent mass bounds
     query = (search_text or "").strip().lower()
-    frag_query = None
-    loss_query = None
-    if query:
-        frag_match = re.search(r"frag@(\d+(?:\.\d+)?)", query)
-        loss_match = re.search(r"loss@(\d+(?:\.\d+)?)", query)
-        if frag_match:
-            try:
-                frag_query = float(frag_match.group(1))
-            except ValueError:
-                frag_query = None
-        if loss_match:
-            try:
-                loss_query = float(loss_match.group(1))
-            except ValueError:
-                loss_query = None
+    query_value = None
+
+    # Try to parse the input as a numeric value directly
+    try:
+        if query:
+            query_value = float(query)
+    except ValueError:
+        query_value = None
     pmass_low, pmass_high = parent_mass_range
 
     filtered_rows = []
@@ -3048,16 +3043,24 @@ def update_spectra_search_table(spectra_data, search_text, parent_mass_range):
                     loss_vals.append(float(loss_item["loss_mz"]))
 
         if query:
-            if frag_query is not None:
-                if not any(abs(mz - frag_query) <= 0.01 for mz in frag_vals):
-                    continue
-            elif loss_query is not None:
-                if not any(abs(mz - loss_query) <= 0.01 for mz in loss_vals):
-                    continue
-            else:
-                combined = frag_list + loss_list
-                if not any(query in x.lower() for x in combined):
-                    continue
+            # Only use numeric comparison for searching
+            skip_spectrum = True
+
+            # If we have a valid numeric query
+            if query_value is not None:
+                # Check fragments if fragment checkbox is checked
+                if fragment_checked:
+                    if any(abs(mz - query_value) <= 0.01 for mz in frag_vals):
+                        skip_spectrum = False
+
+                # Check losses if loss checkbox is checked
+                if loss_checked:
+                    if any(abs(mz - query_value) <= 0.01 for mz in loss_vals):
+                        skip_spectrum = False
+
+            # If neither fragment nor loss query matched, or if query doesn't match expected format, skip this spectrum
+            if skip_spectrum:
+                continue
 
         filtered_rows.append(
             {

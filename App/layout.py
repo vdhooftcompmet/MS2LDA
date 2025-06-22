@@ -2159,8 +2159,9 @@ def create_spectra_search_tab():
                 [
                     dcc.Markdown(
                         """
-                        This tab allows you to search for specific spectra in your dataset based on fragment/loss patterns or parent mass range.
-                        You can filter spectra by entering fragment or loss values, or by specifying a parent mass range.
+                        This tab allows you to search for specific spectra in your dataset based on fragment/loss values or parent mass range.
+                        You can filter spectra by entering a numeric value and selecting whether to search in fragments, losses, or both using the checkboxes,
+                        or by specifying a parent mass range.
                         Click on any spectrum in the results table to view its detailed plot and associated motifs.
                         """,
                     ),
@@ -2179,16 +2180,35 @@ def create_spectra_search_tab():
                                 [
                                     dbc.Col(
                                         [
-                                            dbc.Label("Fragment or Loss Contains:", style={"fontWeight": "bold"}),
+                                            dbc.Label("Search by Fragment or Loss:", style={"fontWeight": "bold"}),
                                             dbc.Input(
                                                 id="spectra-search-fragloss-input",
                                                 type="text",
-                                                placeholder="e.g. frag@150 or loss@40",
+                                                placeholder="Enter a numeric value (e.g. 150.1)",
                                             ),
                                             dbc.Tooltip(
-                                                "Enter a partial fragment (e.g. 'frag@150.1') or loss "
-                                                "(e.g. 'loss@40.2'). The search is case-insensitive.",
+                                                "Enter a numeric value for comparison with a tolerance of 0.01. "
+                                                "Use the checkboxes below to search in fragments, losses, or both.",
                                                 target="spectra-search-fragloss-input",
+                                            ),
+                                            html.Div(
+                                                [
+                                                    dbc.Checkbox(
+                                                        id="spectra-search-fragment-checkbox",
+                                                        label="Fragment",
+                                                        value=True,
+                                                        className="mr-2",
+                                                        style={"marginTop": "10px", "marginRight": "10px", "display": "inline-block"}
+                                                    ),
+                                                    dbc.Checkbox(
+                                                        id="spectra-search-loss-checkbox",
+                                                        label="Loss",
+                                                        value=True,
+                                                        className="mr-2",
+                                                        style={"marginTop": "10px", "display": "inline-block"}
+                                                    ),
+                                                ],
+                                                style={"marginTop": "5px"}
                                             ),
                                         ],
                                         width=4,
