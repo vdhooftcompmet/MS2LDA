@@ -1473,6 +1473,7 @@ def handle_massql_query(run_clicks, reset_clicks, query, motifs_data):
     Input("overlap-thresh", "value"),
     Input("tabs", "value"),
     Input("motif-ranking-massql-matches", "data"),
+    Input("motif-rankings-table", "sort_by"),
     State("screening-fullresults-store", "data"),
     State("optimized-motifs-store", "data"),
 )
@@ -1482,6 +1483,7 @@ def update_motif_rankings_table(
     overlap_thresh,
     active_tab,
     massql_matches,
+    sort_by,
     screening_data,
     optimized_motifs_data,
 ):
@@ -1585,6 +1587,23 @@ def update_motif_rankings_table(
     else:
         screening_hits = ["" for _ in range(len(df))]
     df["Matching Hits"] = screening_hits
+
+    if sort_by and len(sort_by):
+        col_id = sort_by[0]['column_id']
+        direction = sort_by[0]['direction']
+        ascending = (direction == 'asc')
+
+        if col_id == 'Motif':
+            # Implement natural sorting for the 'Motif' column
+            # 1. Extract the number from the 'motif_XXX' string
+            # 2. Convert it to an integer so it sorts numerically
+            # 3. Sort by this new numeric key
+            # 4. Drop the temporary key column
+            df['_sort_key'] = df['Motif'].str.extract(r'(\d+)').astype(int)
+            df = df.sort_values('_sort_key', ascending=ascending).drop(columns=['_sort_key'])
+        else:
+            # For all other columns, use standard pandas sorting
+            df = df.sort_values(col_id, ascending=ascending)
 
     table_data = df.to_dict("records")
     table_columns = [
