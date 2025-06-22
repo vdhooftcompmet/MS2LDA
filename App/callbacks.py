@@ -545,6 +545,19 @@ def toggle_advanced_settings(n_clicks, is_open):
     return is_open
 
 
+# Show/hide motif rankings explanation
+@app.callback(
+    Output("motif-rankings-explanation-collapse", "is_open"),
+    Input("motif-rankings-explanation-button", "n_clicks"),
+    State("motif-rankings-explanation-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_motif_rankings_explanation(n_clicks, is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+
+
 @app.callback(
     Output("run-status", "children"),
     Output("load-status", "children"),

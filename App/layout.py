@@ -1220,35 +1220,61 @@ def create_motif_rankings_tab():
         children=[
             dbc.Container(
                 [
+                    # ----------------------------------------------------------------
+                    # 1. FILTER CONTROLS
+                    # ----------------------------------------------------------------
                     html.Div(
                         [
-                            dcc.Markdown(
-                                """
-                            This tab displays your motifs in a ranked table based on how many documents meet
-                            the selected Probability and Overlap ranges. For each motif, we compute a `Degree`
-                            representing the number of documents where the motif’s doc-topic probability and overlap
-                            score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability`
-                            and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters,
-                            so they can be quite high if the motif strongly dominates the docs where it appears.
-
-                            Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap.
-                            _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row
-                            takes you to a detailed view of that motif.
-                            """,
-                            ),
-                        ],
-                        style={"marginTop": "20px", "marginBottom": "20px"},
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(
+                            html.H4("Filter Controls"),
+                            html.Div(
                                 [
+                                    # Collapsible explanation section
+                                    dbc.Button(
+                                        "Show/Hide Explanation",
+                                        id="motif-rankings-explanation-button",
+                                        color="info",
+                                        className="mb-3",
+                                    ),
+                                    dbc.Collapse(
+                                        id="motif-rankings-explanation-collapse",
+                                        is_open=False,
+                                        children=[
+                                            dcc.Markdown(
+                                                """
+                                                This tab displays your motifs in a ranked table based on how many documents meet the selected Probability and Overlap ranges. For each motif, we compute a `Degree` representing the number of documents where the motif's doc-topic probability and overlap score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability` and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters, so they can be quite high if the motif strongly dominates the docs where it appears. Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap. _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row takes you to a detailed view of that motif.
+
+                                                You can also use [MassQL (Mass Spectrometry Query Language)](https://www.nature.com/articles/s41592-025-02660-z) to filter and search for specific motifs. MassQL uses SQL-like syntax to query mass spectrometry data, enabling discovery of chemical patterns across datasets. In this application, motifs are translated into pseudo-spectra where fragments and losses are treated as peaks, allowing you to search for specific fragment masses or filter motifs by metadata using MassQL's powerful capabilities.
+
+                                                Here are some example queries:
+
+                                                ```
+                                                QUERY scaninfo(MS2DATA) METAFILTER:motif_id=motif_123
+                                                ```
+
+                                                This query filters spectra by a specific motif ID.
+
+                                                ```
+                                                QUERY scaninfo(MS2DATA) WHERE MS2PROD=178.03
+                                                ```
+
+                                                This query finds spectra containing a specific product ion mass.
+                                                """,
+                                                style={
+                                                    "backgroundColor": "#f8f9fa",
+                                                    "padding": "15px",
+                                                    "borderRadius": "5px",
+                                                    "border": "1px solid #e9ecef",
+                                                },
+                                            ),
+                                        ],
+                                    ),
                                     dbc.Row(
                                         [
                                             dbc.Col(
                                                 [
                                                     dbc.Label(
                                                         "Probability Threshold Range",
+                                                        style={"fontWeight": "bold"},
                                                     ),
                                                     dcc.RangeSlider(
                                                         id="probability-thresh",
@@ -1280,6 +1306,7 @@ def create_motif_rankings_tab():
                                                 [
                                                     dbc.Label(
                                                         "Overlap Threshold Range",
+                                                        style={"fontWeight": "bold"},
                                                     ),
                                                     dcc.RangeSlider(
                                                         id="overlap-thresh",
@@ -1309,14 +1336,16 @@ def create_motif_rankings_tab():
                                             ),
                                         ],
                                     ),
+                                    dbc.Label(
+                                        "MassQL Query",
+                                        style={"fontWeight": "bold", "marginTop": "20px"},
+                                    ),
                                     dbc.Row(
                                         [
                                             dbc.Col(
                                                 dbc.Input(
                                                     id="motif-ranking-massql-input",
-                                                    placeholder=(
-                                                        "QUERY scaninfo(MS2DATA) WHERE MS2PROD=178.03"
-                                                    ),
+                                                    placeholder="",
                                                 ),
                                                 width=8,
                                             ),
@@ -1333,8 +1362,41 @@ def create_motif_rankings_tab():
                                     dcc.Store(id="motif-ranking-massql-matches"),
                                     html.Div(
                                         id="motif-rankings-count",
-                                        style={"marginTop": "10px"},
+                                        style={
+                                            "marginTop": "20px", 
+                                            "fontWeight": "bold",
+                                            "fontSize": "16px",
+                                            "color": "#007bff",
+                                            "padding": "10px",
+                                            "backgroundColor": "#f8f9fa",
+                                            "borderRadius": "5px",
+                                            "textAlign": "center"
+                                        },
                                     ),
+                                ],
+                                style={
+                                    "border": "1px dashed #ccc",
+                                    "padding": "10px",
+                                    "borderRadius": "5px",
+                                    "marginBottom": "15px",
+                                },
+                            ),
+                        ],
+                        style={
+                            "border": "1px dashed #999",
+                            "padding": "15px",
+                            "borderRadius": "5px",
+                            "marginBottom": "20px",
+                        },
+                    ),
+                    # ----------------------------------------------------------------
+                    # 2. MOTIF RANKINGS TABLE
+                    # ----------------------------------------------------------------
+                    html.Div(
+                        [
+                            html.H4("Motif Rankings Table"),
+                            html.Div(
+                                [
                                     dash_table.DataTable(
                                         id="motif-rankings-table",
                                         data=[],
@@ -1378,9 +1440,20 @@ def create_motif_rankings_tab():
                                     dcc.Download(id="download-motifranking-csv"),
                                     dcc.Download(id="download-motifranking-json"),
                                 ],
-                                width=12,
+                                style={
+                                    "border": "1px dashed #ccc",
+                                    "padding": "10px",
+                                    "borderRadius": "5px",
+                                    "marginBottom": "15px",
+                                },
                             ),
                         ],
+                        style={
+                            "border": "1px dashed #999",
+                            "padding": "15px",
+                            "borderRadius": "5px",
+                            "marginBottom": "20px",
+                        },
                     ),
                 ],
             ),
