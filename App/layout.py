@@ -1556,8 +1556,7 @@ def create_motif_rankings_tab():
                                         id="motif-rankings-table",
                                         data=[],
                                         columns=[],
-                                        sort_action="native",
-                                        filter_action="native",
+                                        sort_action="custom",
                                         page_size=20,
                                         style_table={"overflowX": "auto"},
                                         style_cell={
@@ -1574,6 +1573,11 @@ def create_motif_rankings_tab():
                                                 "textDecoration": "underline",
                                                 "color": "blue",
                                             },
+                                            {
+                                                'if': {'state': 'active'},
+                                                'backgroundColor': 'transparent',
+                                                'border': 'transparent'
+                                            }
                                         ],
                                         style_header={
                                             "backgroundColor": "rgb(230, 230, 230)",
@@ -2159,6 +2163,11 @@ def create_screening_tab():
                                         "textDecoration": "underline",
                                         "color": "blue",
                                     },
+                                    {
+                                        'if': {'state': 'active'},
+                                        'backgroundColor': 'transparent',
+                                        'border': 'transparent'
+                                    }
                                 ],
                             ),
                             html.Div(
@@ -2382,6 +2391,8 @@ def create_spectra_search_tab():
                                     {"name": "Fragments", "id": "fragments"},
                                     {"name": "Losses", "id": "losses"},
                                 ],
+                                sort_action="custom",
+                                sort_mode="single",
                                 page_size=20,
                                 style_table={"overflowX": "auto"},
                                 style_cell={"textAlign": "left", "whiteSpace": "normal"},
@@ -2392,6 +2403,11 @@ def create_spectra_search_tab():
                                         "textDecoration": "underline",
                                         "color": "blue",
                                     },
+                                    {
+                                        'if': {'state': 'active'},
+                                        'backgroundColor': 'transparent',
+                                        'border': 'transparent'
+                                    }
                                 ],
                                 style_header={
                                     "backgroundColor": "rgb(230, 230, 230)",

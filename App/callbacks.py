@@ -1473,6 +1473,7 @@ def handle_massql_query(run_clicks, reset_clicks, query, motifs_data):
     Input("overlap-thresh", "value"),
     Input("tabs", "value"),
     Input("motif-ranking-massql-matches", "data"),
+    Input("motif-rankings-table", "sort_by"),
     State("screening-fullresults-store", "data"),
     State("optimized-motifs-store", "data"),
 )
@@ -1482,6 +1483,7 @@ def update_motif_rankings_table(
     overlap_thresh,
     active_tab,
     massql_matches,
+    sort_by,
     screening_data,
     optimized_motifs_data,
 ):
@@ -1585,6 +1587,23 @@ def update_motif_rankings_table(
     else:
         screening_hits = ["" for _ in range(len(df))]
     df["Matching Hits"] = screening_hits
+
+    if sort_by and len(sort_by):
+        col_id = sort_by[0]['column_id']
+        direction = sort_by[0]['direction']
+        ascending = (direction == 'asc')
+
+        if col_id == 'Motif':
+            # Implement natural sorting for the 'Motif' column
+            # 1. Extract the number from the 'motif_XXX' string
+            # 2. Convert it to an integer so it sorts numerically
+            # 3. Sort by this new numeric key
+            # 4. Drop the temporary key column
+            df['_sort_key'] = df['Motif'].str.extract(r'(\d+)').astype(int)
+            df = df.sort_values('_sort_key', ascending=ascending).drop(columns=['_sort_key'])
+        else:
+            # For all other columns, use standard pandas sorting
+            df = df.sort_values(col_id, ascending=ascending)
 
     table_data = df.to_dict("records")
     table_columns = [
@@ -2779,6 +2798,7 @@ def save_motifranking_results(csv_click, json_click, table_data):
         State("motif-rankings-table", "data"),
         State("screening-results-table", "data"),
         State("motif-rankings-table", "derived_viewport_data"),
+        State("screening-results-table", "derived_viewport_data"),
     ],
     prevent_initial_call=True,
 )
@@ -2788,6 +2808,7 @@ def on_motif_click(
     ranking_data,
     screening_data,
     ranking_dv_data,
+    screening_dv_data,
 ):
     ctx = dash.callback_context
     if not ctx.triggered:
@@ -2804,11 +2825,15 @@ def on_motif_click(
         raise dash.exceptions.PreventUpdate
 
     if triggered_id == "screening-results-table":
-        if screening_active_cell and screening_data:
+        if screening_active_cell:
             col_id = screening_active_cell["column_id"]
             row_id = screening_active_cell["row"]
             if col_id == "user_motif_id":
-                return screening_data[row_id]["user_motif_id"]
+                # Use derived_viewport_data if available (for pagination support)
+                if screening_dv_data:
+                    return screening_dv_data[row_id]["user_motif_id"]
+                else:
+                    return screening_data[row_id]["user_motif_id"]
         raise dash.exceptions.PreventUpdate
 
     raise dash.exceptions.PreventUpdate
@@ -2900,9 +2925,10 @@ def display_parentmass_range(value):
     Output("search-tab-selected-motif-id-for-plot-store", "data", allow_duplicate=True),
     Input("spectra-search-results-table", "active_cell"),
     State("spectra-search-results-table", "data"),
+    State("spectra-search-results-table", "derived_viewport_data"),
     prevent_initial_call=True,
 )
-def handle_spectrum_selection(active_cell, table_data):
+def handle_spectrum_selection(active_cell, table_data, derived_viewport_data):
     if not active_cell or not table_data:
         return None, {"marginTop": "20px", "display": "none"}, None
 
@@ -2911,10 +2937,14 @@ def handle_spectrum_selection(active_cell, table_data):
         raise dash.exceptions.PreventUpdate
 
     row_idx = active_cell.get("row", -1)
-    if row_idx < 0 or row_idx >= len(table_data):
+    if row_idx < 0 or (derived_viewport_data and row_idx >= len(derived_viewport_data)) or (not derived_viewport_data and row_idx >= len(table_data)):
         return None, {"marginTop": "20px", "display": "none"}, None
 
-    selected_spectrum = table_data[row_idx]
+    # Use derived_viewport_data if available (for pagination support)
+    if derived_viewport_data:
+        selected_spectrum = derived_viewport_data[row_idx]
+    else:
+        selected_spectrum = table_data[row_idx]
 
     container_style = {"marginTop": "20px", "display": "block"}
     return selected_spectrum, container_style, None
@@ -3166,9 +3196,10 @@ def update_search_tab_spectrum_plot(
     Input("spectra-search-parentmass-slider", "value"),
     Input("spectra-search-fragment-checkbox", "value"),
     Input("spectra-search-loss-checkbox", "value"),
+    Input("spectra-search-results-table", "sort_by"),
     prevent_initial_call=True,
 )
-def update_spectra_search_table(spectra_data, search_text, parent_mass_range, fragment_checked, loss_checked):
+def update_spectra_search_table(spectra_data, search_text, parent_mass_range, fragment_checked, loss_checked, sort_by):
     if not spectra_data:
         raise PreventUpdate
 
@@ -3248,6 +3279,30 @@ def update_spectra_search_table(spectra_data, search_text, parent_mass_range, fr
         status_msg = "No spectra pass the filter"
     else:
         status_msg = ""  # No filters active yet
+
+    # Apply sorting if sort_by is provided
+    if sort_by and len(sort_by):
+        col_id = sort_by[0]['column_id']
+        direction = sort_by[0]['direction']
+        ascending = (direction == 'asc')
+
+        # Convert filtered_rows to DataFrame for easier sorting
+        df = pd.DataFrame(filtered_rows)
+
+        if col_id == 'spec_id':
+            # Implement natural sorting for the 'spec_id' column
+            # 1. Extract the number from the 'spec_XXX' string
+            # 2. Convert it to an integer so it sorts numerically
+            # 3. Sort by this new numeric key
+            # 4. Drop the temporary key column
+            df['_sort_key'] = df['spec_id'].str.extract(r'(\d+)').astype(int)
+            df = df.sort_values('_sort_key', ascending=ascending).drop(columns=['_sort_key'])
+        else:
+            # For all other columns, use standard pandas sorting
+            df = df.sort_values(col_id, ascending=ascending)
+
+        # Convert back to list of dictionaries
+        filtered_rows = df.to_dict('records')
 
     return filtered_rows, status_msg
 
