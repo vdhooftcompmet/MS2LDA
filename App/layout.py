@@ -1348,7 +1348,7 @@ def create_motif_rankings_tab():
                                         children=[
                                             dcc.Markdown(
                                                 """
-                                                This tab displays your motifs in a ranked table based on how many documents meet the selected Probability and Overlap ranges. For each motif, we compute a `Degree` representing the number of documents where the motif's doc-topic probability and overlap score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability` and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters, so they can be quite high if the motif strongly dominates the docs where it appears. The `Overlap Score` is computed by multiplying the word-topic distribution with the topic-word distribution for each word in a document, and then summing these products for each topic. This provides a measure of how well a document's word distribution matches a topic's expected word distribution. Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap. _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row takes you to a detailed view of that motif.
+                                                From here you can filter your motifs in a ranked table based on how many documents (spectra) meet the selected Probability and Overlap ranges. For each motif, we compute a `Degree` representing the number of documents where the motif's doc-topic probability and overlap score both fall within the selected threshold ranges. We also report an `Average Doc-Topic Probability` and an `Average Overlap Score`. These averages are computed only over the documents that pass the filters, so they can be quite high if the motif strongly dominates the docs where it appears. The `Overlap Score` is computed by multiplying the word-topic distribution with the topic-word distribution for each word in a document, and then summing these products for each topic. This provides a measure of how well a document's word distribution matches a topic's expected word distribution. Adjust the two RangeSliders below to narrow the doc-level thresholds on Probability and Overlap. _A motif remains in the table only if at least one document passes these filters_. Clicking on a motif row takes you to a detailed view of that motif.
 
                                                 You can also use [MassQL (Mass Spectrometry Query Language)](https://www.nature.com/articles/s41592-025-02660-z) to filter and search for specific motifs. MassQL uses SQL-like syntax to query mass spectrometry data, enabling discovery of chemical patterns across datasets. In this application, motifs are translated into pseudo-spectra where fragments and losses are treated as peaks, allowing you to search for specific fragment masses or filter motifs by metadata. The filtering process applies all filters in sequence: first, motifs are filtered based on the Probability and Overlap thresholds, and then the MassQL query is applied to the remaining motifs. For example, you can use queries like `QUERY scaninfo(MS2DATA) METAFILTER:motif_id=motif_123` to filter spectra by a specific motif ID, or `QUERY scaninfo(MS2DATA) WHERE MS2PROD=178.03` to find spectra containing a specific product ion mass.
                                                 """,
@@ -2176,6 +2176,36 @@ def create_spectra_search_tab():
                     html.H4("Search Controls", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
                     html.Div(
                         [
+                            # Collapsible explanation section
+                            dbc.Button(
+                                "Show/Hide Explanation",
+                                id="spectra-search-explanation-button",
+                                color="secondary",
+                                className="mb-3",
+                            ),
+                            dbc.Collapse(
+                                id="spectra-search-explanation-collapse",
+                                is_open=False,
+                                children=[
+                                    dcc.Markdown(
+                                        """
+                                        Search for specific spectra in your dataset based on fragment/loss values or parent mass range.
+
+                                        **Search by Fragment or Loss**: Enter a numeric value (e.g., 150.1) to search for spectra containing that specific fragment or loss mass. The search uses a tolerance of 0.01 Da. Use the checkboxes to specify whether to search in fragments, losses, or both.
+
+                                        **Parent Mass Range**: Use the slider to filter spectra based on their parent mass. This is useful for narrowing down your search to a specific mass range.
+
+                                        The results table shows matching spectra with their ID, parent mass, and lists of fragments and losses. Click on any spectrum to view its detailed plot and associated motifs below.
+                                        """,
+                                        style={
+                                            "backgroundColor": "#f8f9fa",
+                                            "padding": "15px",
+                                            "borderRadius": "5px",
+                                            "border": "1px solid #e9ecef",
+                                        },
+                                    ),
+                                ],
+                            ),
                             dbc.Row(
                                 [
                                     dbc.Col(

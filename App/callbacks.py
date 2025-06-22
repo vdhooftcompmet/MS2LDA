@@ -558,6 +558,19 @@ def toggle_motif_rankings_explanation(n_clicks, is_open):
     return is_open
 
 
+# Show/hide spectra search explanation
+@app.callback(
+    Output("spectra-search-explanation-collapse", "is_open"),
+    Input("spectra-search-explanation-button", "n_clicks"),
+    State("spectra-search-explanation-collapse", "is_open"),
+    prevent_initial_call=True,
+)
+def toggle_spectra_search_explanation(n_clicks, is_open):
+    if n_clicks:
+        return not is_open
+    return is_open
+
+
 @app.callback(
     Output("run-status", "children"),
     Output("load-status", "children"),
