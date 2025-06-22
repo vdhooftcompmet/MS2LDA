@@ -37,9 +37,6 @@ dependencies:
   - pytest>=8.3.2
   - ruff>=0.11.0
 
-  # Deployment tools
-  - gunicorn>=23.0.0
-
   # Packages easier via pip (no conda recipe or bleeding-edge)
   - pip
   - pip:
@@ -50,5 +47,4 @@ dependencies:
       - spec2vec>=0.8.0
       - PyQt6>=6.7.1
       - faiss-cpu==1.10.0
-      - kaleido==0.2.1
-      - git+https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git@ac1b10b1f020fdfde114c17d57f0ed9b435d9d47
+      - git+https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git
