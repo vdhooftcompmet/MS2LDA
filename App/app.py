@@ -24,18 +24,18 @@ app.layout = dbc.Container(
                         html.Img(
                             src="assets/MS2LDA_LOGO_white.jpg",
                             alt="MS2LDA Logo",
-                            height="150px",
+                            height="100px",
                             style={"display": "block", "margin": "auto"},
                         ),
-                        dcc.Markdown(
-                            """
-                Developed by [Jonas Dietrich](https://github.com/j-a-dietrich),
-                [Rosina Torres Ortega](https://github.com/rtlortega),
-                [Joe Wandy](https://github.com/joewandy), and
-                [Justin van der Hooft](https://github.com/justinjjvanderhooft).
-                """,
-                            style={"textAlign": "center"},
-                        ),
+                #         dcc.Markdown(
+                #             """
+                # Developed by [Jonas Dietrich](https://github.com/j-a-dietrich),
+                # [Rosina Torres Ortega](https://github.com/rtlortega),
+                # [Joe Wandy](https://github.com/joewandy), and
+                # [Justin van der Hooft](https://github.com/justinjjvanderhooft).
+                # """,
+                #             style={"textAlign": "center"},
+                #         ),
                     ],
                     width=True,
                 ),
