@@ -8,6 +8,12 @@ import json
 import os
 import re
 import tempfile
+import requests
+import tempfile
+import os
+import gzip
+import json
+import pickle
 
 import dash
 import dash_bootstrap_components as dbc
@@ -627,6 +633,7 @@ def toggle_network_controls(n_clicks, is_open):
     Output("optimized-motifs-store", "data"),
     Output("lda-dict-store", "data"),
     Output("spectra-store", "data"),
+    Output("upload-spinner", "spinner_style"),
     Input("run-button", "n_clicks"),
     Input("load-results-button", "n_clicks"),
     State("upload-data", "contents"),
@@ -729,6 +736,8 @@ def handle_run_or_load(
     optimized_motifs_data = no_update
     lda_dict_data = no_update
     spectra_data = no_update
+    # Default spinner style - hidden
+    spinner_style = {"display": "none"}
 
     # 1) If RUN-BUTTON was clicked
     if triggered_id == "run-button":
@@ -901,11 +910,17 @@ def handle_run_or_load(
                 Serverside(optimized_motifs_data),
                 Serverside(lda_dict_data),
                 Serverside(spectra_data),
+                spinner_style,
             )
+
+        # Show spinner while loading
+        spinner_style = {"width": "3rem", "height": "3rem"}
         try:
             data = parse_ms2lda_viz_file(results_contents)
         except ValueError as e:
             load_status = dbc.Alert(f"Error parsing the file: {e!s}", color="danger")
+            # Hide spinner on error
+            spinner_style = {"display": "none"}
             return (
                 run_status,
                 load_status,
@@ -913,6 +928,7 @@ def handle_run_or_load(
                 Serverside(optimized_motifs_data),
                 Serverside(lda_dict_data),
                 Serverside(spectra_data),
+                spinner_style,
             )
 
         required_keys = {
@@ -925,6 +941,8 @@ def handle_run_or_load(
             load_status = dbc.Alert(
                 "Invalid results file. Missing required data keys.", color="danger",
             )
+            # Hide spinner on error
+            spinner_style = {"display": "none"}
             return (
                 run_status,
                 load_status,
@@ -932,6 +950,7 @@ def handle_run_or_load(
                 Serverside(optimized_motifs_data),
                 Serverside(lda_dict_data),
                 Serverside(spectra_data),
+                spinner_style,
             )
 
         try:
@@ -943,6 +962,8 @@ def handle_run_or_load(
             load_status = dbc.Alert(
                 f"Error reading data from file: {e!s}", color="danger",
             )
+            # Hide spinner on error
+            spinner_style = {"display": "none"}
             return (
                 run_status,
                 load_status,
@@ -950,12 +971,16 @@ def handle_run_or_load(
                 Serverside(optimized_motifs_data),
                 Serverside(lda_dict_data),
                 Serverside(spectra_data),
+                spinner_style,
             )
 
         load_status = dbc.Alert(
-            f"Selected Results File: {results_filename}\nResults loaded successfully!",
+            f"Selected Results File: {results_filename}\nResults loaded successfully! You can now explore the data by clicking on the other tabs: 'Motif Rankings', 'Motif Details', 'Spectra Search', 'View Network', or 'Motif Search'.",
             color="success",
         )
+
+        # Hide spinner on success
+        spinner_style = {"display": "none"}
 
         return (
             run_status,
@@ -964,6 +989,7 @@ def handle_run_or_load(
             Serverside(optimized_motifs_data),
             Serverside(lda_dict_data),
             Serverside(spectra_data),
+            spinner_style,
         )
 
     raise dash.exceptions.PreventUpdate
@@ -1047,6 +1073,76 @@ def parse_ms2lda_viz_file(base64_contents: str) -> dict:
     except Exception as e:
         msg = f"Error decoding or parsing MS2LDA viz file: {e!s}"
         raise ValueError(msg)
+
+
+@app.callback(
+    Output("demo-load-status", "children"),
+    Output("clustered-smiles-store", "data", allow_duplicate=True),
+    Output("optimized-motifs-store", "data", allow_duplicate=True),
+    Output("lda-dict-store", "data", allow_duplicate=True),
+    Output("spectra-store", "data", allow_duplicate=True),
+    Output("demo-spinner", "spinner_style"),
+    Input("load-mushroom-demo-button", "n_clicks"),
+    Input("load-pesticides-demo-button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def load_demo_data(mushroom_clicks, pesticides_clicks):
+    """
+    Load demo data when one of the demo buttons is clicked.
+    Downloads the data from Zenodo and loads it into the app.
+    """
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise PreventUpdate
+
+    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    # Set the URL based on which button was clicked
+    if triggered_id == "load-mushroom-demo-button":
+        demo_url = "https://zenodo.org/records/15688609/files/CaseStudy_Results_Mushroom_200_ms2lda_viz.json.gz?download=1"
+        demo_name = "Mushroom Demo"
+    elif triggered_id == "load-pesticides-demo-button":
+        demo_url = "https://zenodo.org/records/15688609/files/CaseStudy_Results_Pesticides250_ms2lda_viz.json.gz?download=1"
+        demo_name = "Pesticides Demo"
+    else:
+        raise PreventUpdate
+
+    try:
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_file = os.path.join(temp_dir, "demo_data")
+
+            # Download the file
+            response = requests.get(demo_url, stream=True)
+            if response.status_code != 200:
+                # Hide spinner on error
+                spinner_style = {"display": "none"}
+                return dbc.Alert(f"Error downloading demo data: HTTP {response.status_code}", color="danger"), no_update, no_update, no_update, no_update, spinner_style
+
+            with open(temp_file, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+
+            with gzip.open(temp_file, 'rb') as f:
+                data = json.loads(f.read().decode('utf-8'))
+
+            # Extract the data
+            clustered_smiles_data = data["clustered_smiles_data"]
+            optimized_motifs_data = data["optimized_motifs_data"]
+            lda_dict_data = data["lda_dict"]
+            spectra_data = data["spectra_data"]
+
+            # Return success message and the data
+            status = dbc.Alert(f"{demo_name} loaded successfully! You can now explore the data by clicking on the other tabs: 'Motif Rankings', 'Motif Details', 'Spectra Search', 'View Network', or 'Motif Search'.", color="success")
+            # Hide spinner on success
+            spinner_style = {"display": "none"}
+            return status, Serverside(clustered_smiles_data), Serverside(optimized_motifs_data), Serverside(lda_dict_data), Serverside(spectra_data), spinner_style
+
+    except Exception as e:
+        # Hide spinner on error
+        spinner_style = {"display": "none"}
+        return dbc.Alert(f"Error loading {demo_name}: {str(e)}", color="danger"), no_update, no_update, no_update, no_update, spinner_style
 
 
 # -------------------------------- CYTOSCAPE NETWORK --------------------------------

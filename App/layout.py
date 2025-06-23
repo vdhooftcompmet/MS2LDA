@@ -1086,7 +1086,14 @@ def create_load_results_tab():
                                                 multiple=False,
                                             ),
                                             html.Div(id="selected-file-info", style={"marginTop": "10px", "textAlign": "center"}),
-                                            html.Div(id="load-status", style={"marginTop": "20px"}),
+                                            dbc.Spinner(
+                                                html.Div(id="load-status", style={"marginTop": "20px"}),
+                                                id="upload-spinner",
+                                                color="primary",
+                                                type="border",
+                                                fullscreen=False,
+                                                spinner_style={"width": "3rem", "height": "3rem"},
+                                            ),
                                             html.Div(
                                                 [
                                                     dbc.Button(
@@ -1099,6 +1106,68 @@ def create_load_results_tab():
                                             ),
                                         ],
                                         width=6,
+                                    ),
+                                ],
+                                justify="center",
+                            ),
+                        ],
+                        style={
+                            "border": "1px dashed #ccc",
+                            "padding": "10px",
+                            "borderRadius": "5px",
+                            "marginBottom": "15px",
+                        },
+                    ),
+                ],
+                style={
+                    "border": "1px dashed #999",
+                    "padding": "15px",
+                    "borderRadius": "5px",
+                    "marginBottom": "20px",
+                },
+            ),
+
+            # ----------------------------------------------------------------
+            # 2. DEMO DATA SECTION
+            # ----------------------------------------------------------------
+            html.Div(
+                [
+                    html.H4("Load Demo Data", style={"fontSize": "20px", "fontWeight": "bold", "color": "#2c3e50", "marginBottom": "10px"}),
+                    html.Div(
+                        [
+                            dcc.Markdown(
+                                """
+                                Click one of the buttons below to load pre-processed demo datasets used in the paper.
+                                These datasets are ready to explore and can help you understand how MS2LDA works.
+                                """
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        [
+                                            dbc.Button(
+                                                "🍄 Load Mushroom Demo",
+                                                id="load-mushroom-demo-button",
+                                                color="success",
+                                                className="me-2 mb-2",
+                                            ),
+                                            dbc.Button(
+                                                "🌱 Load Pesticides Demo",
+                                                id="load-pesticides-demo-button",
+                                                color="success",
+                                                className="me-2 mb-2",
+                                            ),
+                                            dbc.Spinner(
+                                                html.Div(id="demo-load-status", style={"marginTop": "10px"}),
+                                                id="demo-spinner",
+                                                color="success",
+                                                type="border",
+                                                fullscreen=False,
+                                                spinner_style={"width": "3rem", "height": "3rem"},
+                                            ),
+                                        ],
+                                        width=6,
+                                        style={"textAlign": "center"},
                                     ),
                                 ],
                                 justify="center",
