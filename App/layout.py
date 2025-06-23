@@ -1557,6 +1557,7 @@ def create_motif_rankings_tab():
                                         data=[],
                                         columns=[],
                                         sort_action="custom",
+                                        filter_action="native",
                                         page_size=20,
                                         style_table={"overflowX": "auto"},
                                         style_cell={
@@ -1868,9 +1869,17 @@ def create_motif_details_tab():
                                 style_table={"overflowX": "auto"},
                                 style_cell={"textAlign": "left"},
                                 page_size=10,
+                                filter_action="native",
                                 row_selectable="single",
                                 selected_rows=[0],
                                 hidden_columns=["SpecIndex"],
+                                style_data_conditional=[
+                                    {
+                                        'if': {'state': 'active'},
+                                        'backgroundColor': 'transparent',
+                                        'border': 'transparent'
+                                    }
+                                ],
                             ),
                             html.Div(
                                 [
@@ -2142,10 +2151,11 @@ def create_screening_tab():
                                     {"name": "Reference Motif ID", "id": "ref_motif_id"},
                                     {"name": "Ref ShortAnno", "id": "ref_short_annotation"},
                                     {"name": "Ref MotifSet", "id": "ref_motifset"},
-                                    {"name": "Similarity Score", "id": "score"},
+                                    {"name": "Similarity Score", "id": "score", "type": "numeric", "format": {"specifier": ".4f"}},
                                 ],
                                 data=[],
-                                page_size=15,
+                                page_size=20,
+                                filter_action="native",
                                 style_table={"overflowX": "auto"},
                                 style_cell={
                                     "textAlign": "left",
@@ -2394,6 +2404,7 @@ def create_spectra_search_tab():
                                 sort_action="custom",
                                 sort_mode="single",
                                 page_size=20,
+                                filter_action="native",
                                 style_table={"overflowX": "auto"},
                                 style_cell={"textAlign": "left", "whiteSpace": "normal"},
                                 style_data_conditional=[

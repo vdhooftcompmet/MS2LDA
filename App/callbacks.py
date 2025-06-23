@@ -1795,6 +1795,14 @@ def update_motif_details(
         style_table={"overflowX": "auto"},
         style_cell={"textAlign": "left"},
         page_size=10,
+        filter_action="native",
+        style_data_conditional=[
+            {
+                'if': {'state': 'active'},
+                'backgroundColor': 'transparent',
+                'border': 'transparent'
+            }
+        ],
     )
 
     # rebuild bar-plot dataframe and drop zero-count rows
