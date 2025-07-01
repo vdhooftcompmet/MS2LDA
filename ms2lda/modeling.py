@@ -1,6 +1,6 @@
 import tomotopy as tp
 import numpy as np
-from MS2LDA.utils import create_spectrum
+from ms2lda.utils import create_spectrum
 import warnings
 from tqdm import tqdm
 

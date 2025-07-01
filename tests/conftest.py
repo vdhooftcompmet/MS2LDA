@@ -349,5 +349,5 @@ def mock_download_function(monkeypatch):
         # Create dummy files instead of downloading
         return True
     
-    monkeypatch.setattr("MS2LDA.utils.download_model_and_data", mock_download)
+    monkeypatch.setattr("ms2lda.utils.download_model_and_data", mock_download)
     return mock_download

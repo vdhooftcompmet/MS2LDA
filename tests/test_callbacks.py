@@ -9,7 +9,7 @@ import plotly.graph_objs as go
 import pytest
 
 from App import callbacks
-from MS2LDA.Mass2Motif import Mass2Motif
+from ms2lda.Mass2Motif import Mass2Motif
 
 
 def test_calculate_motif_shares_mixed():

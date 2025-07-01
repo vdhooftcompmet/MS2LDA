@@ -5,52 +5,52 @@ import os
 if platform.system() == "Darwin":
     os.environ["OMP_NUM_THREADS"] = "1"
 
-import MS2LDA
-from MS2LDA.Preprocessing.load_and_clean import load_mgf
-from MS2LDA.Preprocessing.load_and_clean import load_mzml
-from MS2LDA.Preprocessing.load_and_clean import load_msp
-from MS2LDA.Preprocessing.load_and_clean import clean_spectra
+import ms2lda
+from ms2lda.Preprocessing.load_and_clean import load_mgf
+from ms2lda.Preprocessing.load_and_clean import load_mzml
+from ms2lda.Preprocessing.load_and_clean import load_msp
+from ms2lda.Preprocessing.load_and_clean import clean_spectra
 
-from MS2LDA.utils import retrieve_spec4doc
+from ms2lda.utils import retrieve_spec4doc
 
-from MS2LDA.Preprocessing.generate_corpus import features_to_words
-from MS2LDA.Preprocessing.generate_corpus import map_doc2spec
+from ms2lda.Preprocessing.generate_corpus import features_to_words
+from ms2lda.Preprocessing.generate_corpus import map_doc2spec
 
-from MS2LDA.modeling import define_model
-from MS2LDA.modeling import train_model
-from MS2LDA.modeling import extract_motifs
-from MS2LDA.modeling import create_motif_spectra
+from ms2lda.modeling import define_model
+from ms2lda.modeling import train_model
+from ms2lda.modeling import extract_motifs
+from ms2lda.modeling import create_motif_spectra
 
-from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity_faiss
-from MS2LDA.Add_On.Spec2Vec.annotation import get_library_matches
-from MS2LDA.Add_On.Spec2Vec.annotation import load_s2v_model
+from ms2lda.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity_faiss
+from ms2lda.Add_On.Spec2Vec.annotation import get_library_matches
+from ms2lda.Add_On.Spec2Vec.annotation import load_s2v_model
 
 
-from MS2LDA.Add_On.Spec2Vec.annotation_refined import hit_clustering
-from MS2LDA.Add_On.Spec2Vec.annotation_refined import motif_optimization
+from ms2lda.Add_On.Spec2Vec.annotation_refined import hit_clustering
+from ms2lda.Add_On.Spec2Vec.annotation_refined import motif_optimization
 
-from MS2LDA.Add_On.Fingerprints.FP_annotation import (
+from ms2lda.Add_On.Fingerprints.FP_annotation import (
     annotate_motifs as calc_fingerprints,
 )
-from MS2LDA.Visualisation.visualisation import create_interactive_motif_network
-from MS2LDA.Visualisation.visualisation import create_network
-from MS2LDA.Visualisation.visualisation import plot_convergence
-from MS2LDA.Visualisation.visualisation import show_annotated_motifs
+from ms2lda.Visualisation.visualisation import create_interactive_motif_network
+from ms2lda.Visualisation.visualisation import create_network
+from ms2lda.Visualisation.visualisation import plot_convergence
+from ms2lda.Visualisation.visualisation import show_annotated_motifs
 
-from MS2LDA.motif_parser import store_m2m_folder
+from ms2lda.motif_parser import store_m2m_folder
 
 # MotifDB
-from MS2LDA.Add_On.MassQL.MassQL4MotifDB import motifDB2motifs
-from MS2LDA.Add_On.MassQL.MassQL4MotifDB import load_motifDB
-from MS2LDA.Add_On.MassQL.MassQL4MotifDB import load_motifDB_excel
+from ms2lda.Add_On.MassQL.MassQL4MotifDB import motifDB2motifs
+from ms2lda.Add_On.MassQL.MassQL4MotifDB import load_motifDB
+from ms2lda.Add_On.MassQL.MassQL4MotifDB import load_motifDB_excel
 
-from MS2LDA.Add_On.MassQL.MassQL4MotifDB import motifs2motifDB
-from MS2LDA.Add_On.MassQL.MassQL4MotifDB import store_motifDB
-from MS2LDA.Add_On.MassQL.MassQL4MotifDB import store_motifDB_excel
+from ms2lda.Add_On.MassQL.MassQL4MotifDB import motifs2motifDB
+from ms2lda.Add_On.MassQL.MassQL4MotifDB import store_motifDB
+from ms2lda.Add_On.MassQL.MassQL4MotifDB import store_motifDB_excel
 
 from massql4motifs import msql_engine
 
-from MS2LDA.Add_On.Fingerprints.FP_annotation import tanimoto_similarity
+from ms2lda.Add_On.Fingerprints.FP_annotation import tanimoto_similarity
 
 import pickle
 import matplotlib.pyplot as plt
@@ -61,7 +61,7 @@ import pandas as pd
 import numpy as np
 from functools import partial
 
-from MS2LDA.Visualisation.ldadict import save_visualization_data
+from ms2lda.Visualisation.ldadict import save_visualization_data
 
 
 # --------------------------------------------------------main functions------------------------------------------------------------#
@@ -102,7 +102,7 @@ def run(
 
     # Mapping
     doc2spec_map = map_doc2spec(feature_words, cleaned_spectra)
-    MS2LDA.retrieve_spec4doc = partial(retrieve_spec4doc, doc2spec_map, trained_ms2lda)
+    ms2lda.retrieve_spec4doc = partial(retrieve_spec4doc, doc2spec_map, trained_ms2lda)
 
     # Motif Generation
     motifs = extract_motifs(trained_ms2lda, top_n=motif_parameter)
@@ -180,7 +180,7 @@ def screen_spectra(
     motifDB=None,
     motifDB_query=None,
     s2v_similarity=None,
-    output_folder="MS2LDA_Results",
+    output_folder="ms2lda_results",
     threshold=0.5,
 ):
 
@@ -244,7 +244,7 @@ def screen_structure(
     motif_spectra,
     structure_query,
     fp_type="rdkit",
-    output_folder="MS2LDA_Results",
+    output_folder="ms2lda_results",
     threshold=0.7,
 ):
     query_fps = []
@@ -389,7 +389,7 @@ def store_results(
     convergence_curve,
     clustered_smiles,
     doc2spec_map,
-    output_folder="MS2LDA_Results",
+    output_folder="ms2lda_results",
 ):
     """
     Save MS2LDA results to a new folder. If 'output_folder' already exists,

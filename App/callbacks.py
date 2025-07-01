@@ -34,20 +34,20 @@ from plotly.subplots import make_subplots
 from rdkit import Chem
 from rdkit.Chem.Draw import MolsToGridImage
 
-import MS2LDA
+import ms2lda
 from App.app_instance import MOTIFDB_DIR, app
-from MS2LDA.Add_On.MassQL.MassQL4MotifDB import (
+from ms2lda.Add_On.MassQL.MassQL4MotifDB import (
     load_motifDB,
     motifDB2motifs,
     motifs2motifDB,
 )
-from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings
-from MS2LDA.Add_On.Spec2Vec.annotation_refined import calc_similarity
-from MS2LDA.Mass2Motif import Mass2Motif
-from MS2LDA.Preprocessing.load_and_clean import clean_spectra
-from MS2LDA.run import filetype_check, load_s2v_model
-from MS2LDA.utils import create_spectrum, download_model_and_data
-from MS2LDA.Visualisation.ldadict import generate_corpusjson_from_tomotopy
+from ms2lda.Add_On.Spec2Vec.annotation import calc_embeddings
+from ms2lda.Add_On.Spec2Vec.annotation_refined import calc_similarity
+from ms2lda.Mass2Motif import Mass2Motif
+from ms2lda.Preprocessing.load_and_clean import clean_spectra
+from ms2lda.run import filetype_check, load_s2v_model
+from ms2lda.utils import create_spectrum, download_model_and_data
+from ms2lda.Visualisation.ldadict import generate_corpusjson_from_tomotopy
 
 # Cache for consistent motif colors
 MOTIF_COLOR_CACHE = {}
@@ -820,7 +820,7 @@ def handle_run_or_load(
             "threshold": fp_threshold,
         }
 
-        motif_spectra, optimized_motifs, motif_fps = MS2LDA.run(
+        motif_spectra, optimized_motifs, motif_fps = ms2lda.run(
             dataset=tmp_file_path,
             n_motifs=n_motifs,
             n_iterations=n_iterations,
@@ -887,7 +887,7 @@ def handle_run_or_load(
             else:
                 clustered_smiles_data.append([ann])
 
-        run_status = dbc.Alert("MS2LDA.run completed successfully!", color="success")
+        run_status = dbc.Alert("ms2lda.run completed successfully!", color="success")
         return (
             run_status,
             load_status,

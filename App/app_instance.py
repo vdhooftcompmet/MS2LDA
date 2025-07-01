@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 from dash_extensions.enrich import DashProxy, ServersideOutputTransform, FileSystemBackend
 from pathlib import Path
-import MS2LDA
+import ms2lda
 
 PROJECT_ROOT = Path(__file__).parent.parent
 CACHE_DIR = PROJECT_ROOT / "ms2lda_cache"
@@ -20,7 +20,7 @@ app = DashProxy(
 )
 app.title = "MS2LDA Interactive Dashboard"
 
-PKG_ROOT = Path(MS2LDA.__file__).resolve().parent
+PKG_ROOT = Path(ms2lda.__file__).resolve().parent
 SPEC2VEC_DIR = PKG_ROOT / "Add_On" / "Spec2Vec" / "model_positive_mode"
 FPCALC_DIR = PKG_ROOT / "Add_On" / "Fingerprints" / "FP_calculation"
 MOTIFDB_DIR = PKG_ROOT / "MotifDB"

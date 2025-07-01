@@ -6,7 +6,7 @@ import pickle
 from rdkit.Chem import MolFromSmiles, MolToInchi, InchiToInchiKey
 from gensim.models import Word2Vec
 from spec2vec import Spec2Vec
-from MS2LDA.Mass2MotifDocument import Mass2MotifDocument
+from ms2lda.Mass2MotifDocument import Mass2MotifDocument
 
 
 def load_s2v_model(path_model):
@@ -178,11 +178,11 @@ if __name__ == "__main__":
 
     # Load data
     s2v_similarity = load_s2v_model(
-        r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\WP1\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode\020724_Spec2Vec_pos_CleanedLibraries.model"
+        r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\WP1\MS2LDA\ms2lda\Add_On\Spec2Vec\model_positive_mode\020724_Spec2Vec_pos_CleanedLibraries.model"
     )
 
     embeddings = np.load(
-        r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\WP1\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode_fast\020724_Spec2Vec_pos_embeddings.npy"
+        r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\WP1\MS2LDA\ms2lda\Add_On\Spec2Vec\model_positive_mode_fast\020724_Spec2Vec_pos_embeddings.npy"
     )
     embeddings = embeddings.reshape((426280, 300))
 
@@ -193,7 +193,7 @@ if __name__ == "__main__":
     matching_settings = {
         "similarities": similarities,
         "indices": indices,
-        "db_path": r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\WP1\MS2LDA\MS2LDA\Add_On\Spec2Vec\model_positive_mode_fast\XXXXXX_cleaned_library_spectra.db",
+        "db_path": r"C:\Users\dietr004\Documents\PhD\computational mass spectrometry\WP1\MS2LDA\ms2lda\Add_On\Spec2Vec\model_positive_mode_fast\XXXXXX_cleaned_library_spectra.db",
         "top_n": 10,
         "unique_mols": True,
     }

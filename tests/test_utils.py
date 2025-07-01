@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 from matchms import Fragments, Spectrum
 
-from MS2LDA import utils
+from ms2lda import utils
 
 
 class TestCreateSpectrum:
@@ -168,7 +168,7 @@ class TestMatchFragsAndLosses:
         ], k=0)
         
         # Create analog spectrum with matching peaks
-        from MS2LDA.Mass2Motif import Mass2Motif
+        from ms2lda.Mass2Motif import Mass2Motif
         analog = Mass2Motif(
             frag_mz=np.array([100.0, 150.0, 200.0]),
             frag_intensities=np.array([1.0, 0.5, 0.3]),
@@ -189,7 +189,7 @@ class TestMatchFragsAndLosses:
             ("loss@50.00", 0.5),
         ], k=0)
         
-        from MS2LDA.Mass2Motif import Mass2Motif
+        from ms2lda.Mass2Motif import Mass2Motif
         analog = Mass2Motif(
             frag_mz=np.array([200.0, 300.0]),
             frag_intensities=np.array([1.0, 0.5]),
@@ -213,7 +213,7 @@ class TestMatchFragsAndLosses:
         
         # Create analog spectra with varying overlap
         # Use Mass2Motif objects since regular Spectrum losses property works differently
-        from MS2LDA.Mass2Motif import Mass2Motif
+        from ms2lda.Mass2Motif import Mass2Motif
         
         # Spectrum 1: Perfect match
         analog1 = Mass2Motif(
@@ -261,7 +261,7 @@ class TestMatchFragsAndLosses:
             ("loss@50.00", 0.5),
         ], k=0)
         
-        from MS2LDA.Mass2Motif import Mass2Motif
+        from ms2lda.Mass2Motif import Mass2Motif
         analog = Mass2Motif(
             frag_mz=np.array([100.0, 150.0]),
             frag_intensities=np.array([1.0, 0.5]),
@@ -283,7 +283,7 @@ class TestMatchFragsAndLosses:
             ("loss@200.00", 0.5),
         ], k=0)
         
-        from MS2LDA.Mass2Motif import Mass2Motif
+        from ms2lda.Mass2Motif import Mass2Motif
         analog = Mass2Motif(
             frag_mz=np.array([100.0, 150.0]),
             frag_intensities=np.array([1.0, 0.5]),
@@ -450,7 +450,7 @@ class TestDownloadModelAndData:
         """Test that download is skipped if files already exist."""
         with tempfile.TemporaryDirectory() as tmpdir:
             # Create the expected directory structure
-            model_dir = Path(tmpdir) / "MS2LDA" / "Add_On" / "Spec2Vec" / "model_positive_mode"
+            model_dir = Path(tmpdir) / "ms2lda" / "Add_On" / "Spec2Vec" / "model_positive_mode"
             model_dir.mkdir(parents=True)
             (model_dir / "model.txt").write_text("fake model")
             
@@ -500,7 +500,7 @@ class TestIntegration:
         motif = utils.create_spectrum(motif_features, k=0)
         
         # Create analog spectra with varying overlap
-        from MS2LDA.Mass2Motif import Mass2Motif
+        from ms2lda.Mass2Motif import Mass2Motif
         analogs = []
         
         # Analog 1: Perfect match

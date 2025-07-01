@@ -6,8 +6,8 @@ from Preprocessing.load_and_clean import clean_spectra
 from Preprocessing.generate_corpus import features_to_words
 from Preprocessing.generate_corpus import combine_features
 
-from MS2LDA.modeling import define_model
-from MS2LDA.modeling import train_model
+from ms2lda.modeling import define_model
+from ms2lda.modeling import train_model
 
 
 def compute_coherence_values(spectra_path, limit, start, step):

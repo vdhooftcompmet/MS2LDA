@@ -1,7 +1,7 @@
-from MS2LDA.Add_On.Fingerprints.FP_calculation.rdkit_fps import *
+from ms2lda.Add_On.Fingerprints.FP_calculation.rdkit_fps import *
 
 # from Add_On.Fingerprints.FP_calculation.minhash_fps import *
-from MS2LDA.Add_On.Fingerprints.FP_calculation.adaptive_fps import generate_fingerprint
+from ms2lda.Add_On.Fingerprints.FP_calculation.adaptive_fps import generate_fingerprint
 from itertools import chain
 from rdkit.Chem import MolFromSmiles
 
