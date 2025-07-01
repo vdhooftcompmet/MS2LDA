@@ -97,6 +97,10 @@ Note: Poetry creates convenient command aliases:
 2. **Web**: `ms2lda-viz` for interactive exploration
 3. **API**: Direct Python imports for custom workflows
 
+## Vendored Dependencies
+
+- **massql4motifs**: Vendored from https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git to enable PyPI distribution. See `massql4motifs/README.vendored.md` for details on provenance and update process. This is temporary until the package is published to PyPI or merged into upstream MassQL.
+
 ## Notes
 
 - Large model files (Spec2Vec models, MotifDB) are excluded from the package and downloaded on first use
