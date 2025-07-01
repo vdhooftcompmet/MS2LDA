@@ -3,13 +3,30 @@ name        = "ms2lda"
 version     = "2.0.0"
 description = "Unsupervised Substructure Discovery using Topic Modelling with Automated Annotation."
 authors     = [
-  "Jonas Dietrich <jonas.dietrich@wur.nl>",
-  "Rosina Torres Ortega <rosina.torresortega@wur.nl>",
-  "Joe Wandy <joe@example.com>",
-  "Justin van der Hooft <justin@example.com>"
+  "MS2LDA Development Team <justin.vanderhooft@wur.nl>"
+]
+maintainers = [
+  "MS2LDA Development Team <justin.vanderhooft@wur.nl>"
 ]
 license     = "MIT"
 readme      = "README.md"
+homepage    = "https://github.com/vdhooftcompmet/MS2LDA"
+repository  = "https://github.com/vdhooftcompmet/MS2LDA"
+documentation = "https://ms2lda.org"
+keywords    = ["mass spectrometry", "metabolomics", "topic modeling", "LDA", "substructure discovery", "cheminformatics"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+  "Environment :: Console",
+  "Environment :: Web Environment"
+]
 
 packages = [
   { include = "MS2LDA" },
