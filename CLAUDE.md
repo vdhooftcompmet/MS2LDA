@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **NEVER PUSH ANYTHING TO THE MAIN BRANCH WITHOUT EXPLICIT USER APPROVAL. THIS IS EXTREMELY IMPORTANT!**
 
 ### Commit Message Guidelines
-- Keep commit messages to 1-2 sentences maximum
+- Keep commit messages to 1 sentence maximum (2 sentences only if absolutely necessary)
 - No emojis, no Claude signatures, no "Co-Authored-By" lines
 - Just describe what changed concisely
 

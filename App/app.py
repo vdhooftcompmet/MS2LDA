@@ -4,7 +4,15 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 import App.callbacks  # noqa: F401 -- callbacks must be imported to register callbacks with the app
-from App import layout  # without App.layout
+from App.layout import (
+    create_run_analysis_tab,
+    create_load_results_tab,
+    create_cytoscape_network_tab,
+    create_motif_rankings_tab,
+    create_motif_details_tab,
+    create_screening_tab,
+    create_spectra_search_tab,
+)
 from App.app_instance import app  # Import the Dash app instance
 
 ENABLE_RUN_ANALYSIS = os.getenv("ENABLE_RUN_ANALYSIS", "1").lower() not in (
@@ -80,13 +88,13 @@ app.layout = dbc.Container(
             className="mt-3",
         ),
         # Tabs for all the sections
-        layout.create_run_analysis_tab(show_tab=ENABLE_RUN_ANALYSIS),
-        layout.create_load_results_tab(),
-        layout.create_motif_rankings_tab(),
-        layout.create_motif_details_tab(),
-        layout.create_spectra_search_tab(),
-        layout.create_cytoscape_network_tab(),
-        layout.create_screening_tab(),
+        create_run_analysis_tab(show_tab=ENABLE_RUN_ANALYSIS),
+        create_load_results_tab(),
+        create_motif_rankings_tab(),
+        create_motif_details_tab(),
+        create_spectra_search_tab(),
+        create_cytoscape_network_tab(),
+        create_screening_tab(),
         # Hidden storage
         dcc.Store(id="motif-spectra-ids-store"),
         dcc.Store(id="selected-spectrum-index", data=0),
@@ -95,6 +103,8 @@ app.layout = dbc.Container(
         dcc.Store(id="lda-dict-store"),
         dcc.Store(id="selected-motif-store"),
         dcc.Store(id="spectra-store"),
+        dcc.Store(id="mass2motifs-store"),
+        dcc.Store(id="s2v-model-store"),
         dcc.Store(id="screening-fullresults-store"),
         dcc.Store(id="m2m-subfolders-store"),
         dcc.Store(id="motif-rankings-state", data=None, storage_type="memory"),
