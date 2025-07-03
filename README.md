@@ -39,6 +39,8 @@ For instructions on starting and using the visualization application, see the [*
 
 ---
 
+## MS2LDA Documentation
+Over the coming weeks, we will be developing comprehensive documentation to ensure clarity for users and developers. Stay tuned for detailed updates!
 
 ## Citing MS2LDA
 
