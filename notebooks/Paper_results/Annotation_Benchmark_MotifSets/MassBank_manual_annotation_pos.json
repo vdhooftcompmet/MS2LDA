@@ -8,7 +8,7 @@
     },
     "mb_motif_10.m2m": {
         "SMILES": [
-          	"CC(O)C"
+          	"CC[CH2]"
         ],
 	"ANNOTATION": "Loss of C3H6 - indicative for the presence of an isopropyl",
 	"PUBCHEMCID": []
@@ -29,14 +29,14 @@
     },
     "mb_motif_13.m2m": {
         "SMILES": [
-            	"CCC1=CC=CC=C1"
+            	"CCC1=CC=CC(=C1)C"
         ],
 	"ANNOTATION": "Alkyl aromatic substructure – indicative for aromatic ring with 2-carbon alkyl chain attached i.e. phenylethene fragment from ethylbenzene as a result of the fragmentation process.",
 	"PUBCHEMCID": [7500]
     },
     "mb_motif_150.m2m": {
         "SMILES": [
-            
+            "C[C]=O"
         ],
 	"ANNOTATION": "Acetyl loss",
 	"PUBCHEMCID": []
@@ -50,30 +50,28 @@
     },
     "mb_motif_17.m2m": {
         "SMILES": [
-		"C1CC(=O)NC1C(=O)O",
-	  	"C(CC(=O)N)C(C(=O)O)N"
+		"C1CC(=O)NC1C(=O)O"
         ],
 	"ANNOTATION": "Fragment ions indicative for pyroglutamic acid (pyroglutamate) or glutamine (both in MzCloud) – structure can be formed from glutamic acid (glutamate) in the mass spectrometer as well.",
 	"PUBCHEMCID": [7405, 5961]
     },
     "mb_motif_19.m2m": {
         "SMILES": [
-            	"CCC1=CC=CC=C1O"
+            	"CCC1=CC=C(C=C1)O"
         ],
 	"ANNOTATION": "Fragments indicative for ethylphenol (i.e. resulting from Tyramine in beer) or the structurally related paramethylmethoxybenzene (MassBank) substructure",
 	"PUBCHEMCID": [6997]
     },
     "mb_motif_195.m2m": {
         "SMILES": [
-            
+            "CC(=O)N"
         ],
 	"ANNOTATION": "Amide presence",
 	"PUBCHEMCID": []
     },
     "mb_motif_20.m2m": {
         "SMILES": [
-            	"C1=CC=C(C=C1)C=CC(=O)O",
-		        "COC1=C(C=CC(=C1)C=CC(=O)O)O"
+            	"C1=CC=C(C=C1)/C=C/C(=O)O"
         ],
 	"ANNOTATION": "Fragments indicative for cinnamic/hydroxycinnamic acid substructure",
 	"PUBCHEMCID": [444539, 445858]
@@ -87,14 +85,14 @@
     },
     "mb_motif_24.m2m": {
         "SMILES": [
-            	"C(C1C(C(C(C(O1)O)O)O)O)O"
+            	"C([C@@H]1[C@H]([C@@H]([C@H](C(O1)O)O)O)O)O"
         ],
 	"ANNOTATION": "Fragments indicative of a glycosylation – i.e. indicative for a sugar conjugation (in beer often related to glucose)",
 	"PUBCHEMCID": [5793]
     },
     "mb_motif_25.m2m": {
         "SMILES": [
-            	"C1=C(NC=N1)CC(C(=O)O)N"
+            	"C1=C(NC=N1)C[C@@H](C(=O)O)N"
         ],
 	"ANNOTATION": "Fragments indicative for histidine (C6H10N3O2) substructure (MzCloud)",
 	"PUBCHEMCID": [6274]
@@ -122,7 +120,7 @@
     },
     "mb_motif_32.m2m": {
         "SMILES": [
-            	"COC1=C(C=CC(=C1)C=CC(=O)O)O"
+            	"COC1=C(C=CC(=C1)/C=C/C(=O)O)O"
         ],
 	"ANNOTATION": "fragments indicative for ferulic acid based substructure (MzCloud)",
 	"PUBCHEMCID": [445858]
@@ -171,7 +169,7 @@
     },
     "mb_motif_4.m2m": {
         "SMILES": [
-            	"COc1ccccc1"
+            	"COC1=CC=CC=C1"
         ],
 	"ANNOTATION": "Loss of methyl group – indicative for presence of methoxy [O-CH3] methylsulfyl [S-CH3] or methylgroup connected to aromatic ring system",
 	"PUBCHEMCID": []
@@ -210,5 +208,97 @@
         ],
 	"ANNOTATION": "Fragment ions indicative for N-acetylputrescine substructure (MzCloud)",
 	"PUBCHEMCID": [122356]
+    },
+    "mb_motif_6.m2m": {
+        "SMILES": [
+            	"CN"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_7.m2m": {
+        "SMILES": [
+            	"CCN"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_18.m2m": {
+        "SMILES": [
+            	"CC(=O)C"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_1.m2m": {
+        "SMILES": [
+            	"C1C[C@H](NC1)C(=O)O"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_3.m2m": {
+        "SMILES": [
+            	"C1C[C@H](NC1)C(=O)O"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_8.m2m": {
+        "SMILES": [
+            	"C(CC(=O)O)CN"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_9.m2m": {
+        "SMILES": [
+            	"C([C@@H]1[C@H]([C@@H]([C@H](C(O1)O)O)O)O)O"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_14.m2m": {
+        "SMILES": [
+            	"C(C(=O)O)N"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_15.m2m": {
+        "SMILES": [
+            	"C(C(=O)O)N"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_23.m2m": {
+        "SMILES": [
+            	"C([C@@H]1[C@H]([C@H](C(O1)O)O)O)O"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_26.m2m": {
+        "SMILES": [
+            	"OP(=O)(O)O"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_27.m2m": {
+        "SMILES": [
+            	"CC(=O)O"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
+    },
+    "mb_motif_30.m2m": {
+        "SMILES": [
+            	"CC1=CC=CC=C1"
+        ],
+	"ANNOTATION": "",
+	"PUBCHEMCID": []
     }
+    
 }
