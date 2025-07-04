@@ -9,6 +9,7 @@ from dash.exceptions import PreventUpdate
 
 from App.app_instance import app
 from App.callbacks.common import *  # Import helper functions
+from App.callbacks.screening import make_spectrum_from_dict
 
 
 # -------------------------------- RANKINGS & DETAILS --------------------------------# -------------------------------- RANKINGS & DETAILS --------------------------------

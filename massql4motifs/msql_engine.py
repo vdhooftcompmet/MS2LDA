@@ -83,7 +83,7 @@ def pre_parsing(input_query, ms2_df):
     def extract_metafilters(query):
         metafilter_pattern = r"METAFILTER:([\w_]+)=(.*?)(?=\s+METAFILTER:|$)"
         metafilters = re.findall(metafilter_pattern, query)
-        metafilters_dict = {key: value for key, value in metafilters}
+        metafilters_dict = {key: value.strip() for key, value in metafilters}  # Strip whitespace from values
         cleaned_query = re.sub(metafilter_pattern, "", query).strip()
         cleaned_query = re.sub(r"\s+", " ", cleaned_query)
         return metafilters_dict, cleaned_query
@@ -92,7 +92,8 @@ def pre_parsing(input_query, ms2_df):
     def filter_ms2_df(ms2_df, metafilters):
         for key, value in metafilters.items():
             if key in ms2_df.columns:
-                ms2_df = ms2_df[ms2_df[key].astype(str) == value]
+                # Apply filter with better string handling
+                ms2_df = ms2_df[ms2_df[key].astype(str).str.strip() == value.strip()]
         return ms2_df
 
     metafilters, cleaned_query = extract_metafilters(input_query)
