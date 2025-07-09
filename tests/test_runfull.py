@@ -82,7 +82,7 @@ def test_download_all_aux_data(monkeypatch, tmp_path):
         lambda mode="positive": "spec2vec",  # noqa: ARG005
     )
     dummy_pkg = types.SimpleNamespace(__file__=str(tmp_path / "x"))
-    monkeypatch.setattr(runfull, "ms2lda", dummy_pkg)
+    monkeypatch.setattr(runfull, "MS2LDA", dummy_pkg)
     res = runfull.download_all_aux_data()
     assert "Spec2Vec assets" in res  # noqa: S101
 

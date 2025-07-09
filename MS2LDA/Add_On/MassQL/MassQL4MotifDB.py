@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import json
 
-from ms2lda.Mass2Motif import Mass2Motif
+from MS2LDA.Mass2Motif import Mass2Motif
 
 
 def motifs2motifDB(spectra):

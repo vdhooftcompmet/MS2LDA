@@ -2,7 +2,7 @@ from typing import Optional
 import matplotlib.pyplot as plt
 import numpy as np
 from matchms.plotting.spectrum_plots import plot_spectra_mirror, plot_spectrum
-from ms2lda.Visualisation.visualisation import show_annotated_motifs
+from MS2LDA.Visualisation.visualisation import show_annotated_motifs
 from matchms import Fragments
 from matchms.hashing import metadata_hash, spectrum_hash
 from matchms import Metadata

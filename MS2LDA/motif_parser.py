@@ -1,9 +1,9 @@
 import os
-from ms2lda.utils import create_spectrum
+from MS2LDA.utils import create_spectrum
 
 
 def store_m2m_file(motif_spectrum, motif_number, folder):
-    """stores one motif spectrum in a .m2m file. It uses the same format as in the original version from ms2lda.org
+    """stores one motif spectrum in a .m2m file. It uses the same format as in the original version from MS2LDA.org
 
     ARGS:
         motif_spectrum: matchms spectrum object

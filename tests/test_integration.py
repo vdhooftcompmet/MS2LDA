@@ -10,10 +10,10 @@ import numpy as np
 import pytest
 from matchms import Spectrum
 
-from ms2lda import modeling, utils
-from ms2lda.Preprocessing import load_and_clean, generate_corpus
-from ms2lda.motif_parser import store_m2m_folder, load_m2m_folder
-from ms2lda.run import run, filetype_check
+from MS2LDA import modeling, utils
+from MS2LDA.Preprocessing import load_and_clean, generate_corpus
+from MS2LDA.motif_parser import store_m2m_folder, load_m2m_folder
+from MS2LDA.run import run, filetype_check
 
 
 class TestCompleteWorkflow:
@@ -110,7 +110,7 @@ class TestCompleteWorkflow:
         assert (output_folder / "metadata.json").exists()
         assert len(list(output_folder.glob("*.m2m"))) == 2
         
-    @patch('ms2lda.utils.download_model_and_data')
+    @patch('MS2LDA.utils.download_model_and_data')
     def test_workflow_with_annotation(self, mock_download, sample_spectra_list, temp_dir):
         """Test workflow including Spec2Vec annotation."""
         mock_download.return_value = True
@@ -128,7 +128,7 @@ class TestCompleteWorkflow:
         motif_spectra = modeling.create_motif_spectra(motifs)
         
         # Mock Spec2Vec annotation
-        with patch('ms2lda.run.s2v_annotation') as mock_s2v:
+        with patch('MS2LDA.run.s2v_annotation') as mock_s2v:
             mock_s2v.return_value = motif_spectra  # Return unchanged
             
             # Simulate annotation
@@ -175,9 +175,9 @@ class TestCompleteWorkflow:
 class TestRunFunction:
     """Test the main run function."""
     
-    @patch('ms2lda.run.load_mgf')
-    @patch('ms2lda.run.store_m2m_folder')
-    @patch('ms2lda.utils.download_model_and_data')
+    @patch('MS2LDA.run.load_mgf')
+    @patch('MS2LDA.run.store_m2m_folder')
+    @patch('MS2LDA.utils.download_model_and_data')
     def test_run_basic(self, mock_download, mock_store, mock_load, temp_dir):
         """Test basic run function execution."""
         # Setup mocks

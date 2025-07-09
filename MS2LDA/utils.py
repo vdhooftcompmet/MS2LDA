@@ -6,7 +6,7 @@ from tqdm import tqdm
 import numpy as np
 import hashlib
 from pathlib import Path
-from ms2lda.Mass2Motif import Mass2Motif
+from MS2LDA.Mass2Motif import Mass2Motif
 
 # Package root for path resolution
 PKG_ROOT = Path(__file__).resolve().parent
@@ -265,7 +265,7 @@ def download_fp_calculation():
                 tmp,
             ]
         )
-        src = Path(tmp) / "ms2lda" / "Add_On" / "Fingerprints" / "FP_calculation"
+        src = Path(tmp) / "MS2LDA" / "Add_On" / "Fingerprints" / "FP_calculation"
         shutil.copytree(src, target)
     return "FP_calculation downloaded."
 
@@ -290,6 +290,6 @@ def download_motifdb():
                 tmp,
             ]
         )
-        src = Path(tmp) / "ms2lda" / "MotifDB"
+        src = Path(tmp) / "MS2LDA" / "MotifDB"
         shutil.copytree(src, target)
     return "MotifDB downloaded."

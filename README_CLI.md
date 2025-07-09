@@ -165,9 +165,9 @@ Here's a complete example configuration file:
         "criterium": "biggest",
         "cosine_similarity": 0.90,
         "n_mols_retrieved": 5,
-        "s2v_model_path": "../MS2LDA/ms2lda/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
-        "s2v_library_embeddings": "../MS2LDA/ms2lda/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
-        "s2v_library_db": "../MS2LDA/ms2lda/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db"
+        "s2v_model_path": "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
+        "s2v_library_embeddings": "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
+        "s2v_library_db": "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db"
     },
     "preprocessing_parameters": {
         "min_mz": 0,

@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 from matchms import Fragments, Spectrum
 
-from ms2lda.Preprocessing.generate_corpus import (
+from MS2LDA.Preprocessing.generate_corpus import (
     features_to_words, map_doc2spec, combine_features
 )
 

@@ -29,9 +29,9 @@ from tqdm import tqdm
 import requests
 
 try:
-    from ms2lda.run import run as run_ms2lda
-    from ms2lda.utils import download_model_and_data
-    import ms2lda  # locate package root
+    from MS2LDA.run import run as run_ms2lda
+    from MS2LDA.utils import download_model_and_data
+    import MS2LDA  # locate package root
 except ModuleNotFoundError:
     print("ERROR: Could not import the MS2LDA package.", file=sys.stderr)
     traceback.print_exc()
@@ -68,9 +68,9 @@ DEFAULT_PARAMS = {
         "criterium": "biggest",
         "cosine_similarity": 0.90,
         "n_mols_retrieved": 5,
-        "s2v_model_path": "../ms2lda/ms2lda/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
-        "s2v_library_embeddings": "../ms2lda/ms2lda/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
-        "s2v_library_db": "../ms2lda/ms2lda/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db"
+        "s2v_model_path": "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_Spec2Vec_pos_CleanedLibraries.model",
+        "s2v_library_embeddings": "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CleanedLibraries_Spec2Vec_pos_embeddings.npy",
+        "s2v_library_db": "../MS2LDA/MS2LDA/Add_On/Spec2Vec/model_positive_mode/150225_CombLibraries_spectra.db"
     },
     "preprocessing_parameters": {
         "min_mz": 0,
@@ -149,7 +149,7 @@ def download_all_aux_data() -> str:
     Download Spec2Vec assets, two FP-calculation JARs, and all MotifDB JSONs.
     Returns a printable summary.
     """
-    pkg_root = Path(ms2lda.__file__).resolve().parent
+    pkg_root = Path(MS2LDA.__file__).resolve().parent
     repo = "vdhooftcompmet/MS2LDA"
     summary: List[str] = []
 
@@ -163,14 +163,14 @@ def download_all_aux_data() -> str:
     summary.append(
         _github_file_download(
             repo,
-            "ms2lda/Add_On/Fingerprints/FP_calculation/cdk-2.2.jar",
+            "MS2LDA/Add_On/Fingerprints/FP_calculation/cdk-2.2.jar",
             jar_base / "cdk-2.2.jar",
         )
     )
     summary.append(
         _github_file_download(
             repo,
-            "ms2lda/Add_On/Fingerprints/FP_calculation/jCMapperCLI.jar",
+            "MS2LDA/Add_On/Fingerprints/FP_calculation/jCMapperCLI.jar",
             jar_base / "jCMapperCLI.jar",
         )
     )
@@ -178,7 +178,7 @@ def download_all_aux_data() -> str:
     # 3. MotifDB JSONs
     summary.append("\n→ MotifDB JSONs:")
     motif_dst = pkg_root / "MotifDB"
-    summary.extend(_github_dir_download(repo, "ms2lda/MotifDB", motif_dst))
+    summary.extend(_github_dir_download(repo, "MS2LDA/MotifDB", motif_dst))
 
     return "\n".join(summary)
 

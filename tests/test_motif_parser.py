@@ -1,8 +1,8 @@
 import tempfile
 from pathlib import Path
 
-from ms2lda import motif_parser
-from ms2lda.utils import create_spectrum
+from MS2LDA import motif_parser
+from MS2LDA.utils import create_spectrum
 
 
 def _motif():

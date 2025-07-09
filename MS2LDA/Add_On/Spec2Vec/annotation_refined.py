@@ -1,12 +1,12 @@
 # this script contains masking and hierachical clustering
 
 from matchms import Spectrum, Fragments
-from ms2lda.Mass2Motif import Mass2Motif
+from MS2LDA.Mass2Motif import Mass2Motif
 
 from scipy.stats import spearmanr
 from scipy.cluster.hierarchy import linkage, fcluster
 
-from ms2lda.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity_faiss
+from MS2LDA.Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity_faiss
 
 # from Add_On.Spec2Vec.annotation import calc_embeddings, calc_similarity
 from spec2vec.vector_operations import cosine_similarity_matrix
@@ -17,7 +17,7 @@ import numpy as np
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics.pairwise import cosine_similarity
 
-from ms2lda.Mass2Motif import Mass2Motif
+from MS2LDA.Mass2Motif import Mass2Motif
 import pandas as pd
 
 
@@ -537,7 +537,7 @@ if __name__ == "__main__":
     print(s)
     print(s.peaks.mz)
     print(s.losses.mz)
-    from ms2lda.Add_On.Spec2Vec.annotation import load_s2v_and_library
+    from MS2LDA.Add_On.Spec2Vec.annotation import load_s2v_and_library
 
     path_model = "model_positive_mode/020724_Spec2Vec_pos_CleanedLibraries.model"
     path_library = "model_positive_mode/positive_s2v_library.pkl"

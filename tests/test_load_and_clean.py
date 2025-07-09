@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 from matchms import Spectrum
 
-from ms2lda.Preprocessing.load_and_clean import (
+from MS2LDA.Preprocessing.load_and_clean import (
     clean_spectra, load_mgf, load_mzml, load_msp
 )
 
@@ -54,7 +54,7 @@ END IONS"""
         with pytest.raises(ValueError):
             list(load_mgf(str(mgf_file)))
         
-    @patch('ms2lda.Preprocessing.load_and_clean.load_from_mgf')
+    @patch('MS2LDA.Preprocessing.load_and_clean.load_from_mgf')
     def test_load_mgf_with_mock(self, mock_load):
         """Test MGF loading with mocked matchms function."""
         mock_spectra = [MagicMock(spec=Spectrum) for _ in range(3)]
@@ -68,7 +68,7 @@ END IONS"""
 class TestLoadMZML:
     """Test cases for mzML file loading."""
     
-    @patch('ms2lda.Preprocessing.load_and_clean.load_from_mzml')
+    @patch('MS2LDA.Preprocessing.load_and_clean.load_from_mzml')
     def test_load_mzml_basic(self, mock_load):
         """Test basic mzML loading."""
         mock_spectra = [MagicMock(spec=Spectrum) for _ in range(2)]
@@ -83,7 +83,7 @@ class TestLoadMZML:
         with pytest.raises(FileNotFoundError):
             list(load_mzml("nonexistent.mzML"))
             
-    @patch('ms2lda.Preprocessing.load_and_clean.load_from_mzml')
+    @patch('MS2LDA.Preprocessing.load_and_clean.load_from_mzml')
     def test_load_mzml_empty_result(self, mock_load):
         """Test mzML loading returning empty results."""
         mock_load.return_value = []
@@ -105,7 +105,7 @@ class TestLoadMSP:
         assert spectra[0].get("precursor_mz") == 300.0
         assert spectra[1].get("precursor_mz") == 400.0
         
-    @patch('ms2lda.Preprocessing.load_and_clean.load_from_msp')
+    @patch('MS2LDA.Preprocessing.load_and_clean.load_from_msp')
     def test_load_msp_with_mock(self, mock_load):
         """Test MSP loading with mocked matchms function."""
         mock_spectra = [MagicMock(spec=Spectrum) for _ in range(4)]

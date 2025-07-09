@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from unittest.mock import MagicMock, patch
 
-from ms2lda import modeling
+from MS2LDA import modeling
 
 
 class TestDefineModel:
