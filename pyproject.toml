@@ -82,7 +82,7 @@ dash-cytoscape            = "^1.0.2"
 dash-bootstrap-components = "^1.6.0"
 
 # modelling / embeddings
-tomotopy   = "^0.12.7"
+tomotopy   = ">=0.12.7"
 spec2vec   = "^0.8.0"
 PyQt6      = "^6.7.1"
 faiss-cpu  = "1.10.0"
