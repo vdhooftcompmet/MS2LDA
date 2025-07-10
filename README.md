@@ -20,6 +20,10 @@ You can install MS2LDA using **pip**, **Conda**, or **Poetry**, depending on you
 pip install ms2lda
 ```
 
+## Quick Start Demo
+
+Get started with MS2LDA in minutes! See the [**Quick Start Guide**](QUICK_START.md) for step-by-step instructions using Conda, Poetry, or virtualenv.
+
 ## Installation Guides
 
 For more detailed installation options and development setup:
