@@ -320,7 +320,7 @@ def handle_run_or_load(
             "threshold": fp_threshold,
         }
 
-        motif_spectra, optimized_motifs, motif_fps = ms2lda.run(
+        motif_spectra, optimized_motifs, motif_fps = ms2lda_run(
             dataset=tmp_file_path,
             n_motifs=n_motifs,
             n_iterations=n_iterations,
@@ -387,7 +387,7 @@ def handle_run_or_load(
             else:
                 clustered_smiles_data.append([ann])
 
-        run_status = dbc.Alert("ms2lda.run completed successfully!", color="success")
+        run_status = dbc.Alert("MS2LDA run completed successfully!", color="success")
         return (
             run_status,
             load_status,
@@ -599,10 +599,10 @@ def load_demo_data(mushroom_clicks, pesticides_clicks):
 
     # Set the URL based on which button was clicked
     if triggered_id == "load-mushroom-demo-button":
-        demo_url = "https://zenodo.org/records/15688609/files/CaseStudy_Results_Mushroom_200_ms2lda_viz.json.gz?download=1"
+        demo_url = "https://zenodo.org/records/15857387/files/CaseStudy_Results_Mushroom_200_ms2lda_viz.json.gz?download=1"
         demo_name = "Mushroom Demo"
     elif triggered_id == "load-pesticides-demo-button":
-        demo_url = "https://zenodo.org/records/15688609/files/CaseStudy_Results_Pesticides250_ms2lda_viz.json.gz?download=1"
+        demo_url = "https://zenodo.org/records/15857387/files/CaseStudy_Results_Pesticides250_ms2lda_viz.json.gz?download=1"
         demo_name = "Pesticides Demo"
     else:
         raise PreventUpdate

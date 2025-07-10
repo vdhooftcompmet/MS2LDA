@@ -3,8 +3,8 @@
 import numpy as np
 import pandas as pd
 import pytest
-from ms2lda.Mass2Motif import Mass2Motif
-from ms2lda.Add_On.MassQL.MassQL4MotifDB import motifs2motifDB
+from MS2LDA.Mass2Motif import Mass2Motif
+from MS2LDA.Add_On.MassQL.MassQL4MotifDB import motifs2motifDB
 from massql4motifs import msql_engine
 
 
