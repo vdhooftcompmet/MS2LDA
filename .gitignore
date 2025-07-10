@@ -139,6 +139,13 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Notebook outputs in Tutorial folder
+notebooks/Tutorial/mytest*/
+notebooks/Tutorial/test_*/
+notebooks/Tutorial/*_test/
+notebooks/Tutorial/*.log
+notebooks/Tutorial/NOTEBOOK_TEST_*.md
+
 .idea/
 
 .ipynb_checkpoints/
