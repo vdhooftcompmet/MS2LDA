@@ -12,14 +12,20 @@ Mass spectrometry fragmentation patterns hold abundant structural information vi
 
 # MS2LDA Installation and Usage
 
-You can set up MS2LDA using either **Conda** or **Poetry**, depending on your preferences and requirements.
+You can install MS2LDA using **pip**, **Conda**, or **Poetry**, depending on your preferences and requirements.
+
+## Quick Install with pip
+
+```bash
+pip install ms2lda
+```
 
 ## Installation Guides
 
-We provide separate detailed documentation for each installation method:
+For more detailed installation options and development setup:
 
 - [**Conda Installation Guide**](README_CONDA.md) - Uses Conda environment management.
-- [**Poetry Installation Guide**](README_POETRY.md) - Uses Poetry for dependency management.
+- [**Poetry Installation Guide**](README_POETRY.md) - Uses Poetry for dependency management (recommended for developers).
 
 ---
 

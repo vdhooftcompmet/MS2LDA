@@ -171,4 +171,5 @@ deepmol.egg-info
 ms2lda_cache/
 
 # Developer documentation
-CLAUDE.md
+CLAUDE.local.md
+PLANS.md
