@@ -80,6 +80,12 @@ existing results locally.
 
 Included in the repository are several Jupyter notebooks organized in the `notebooks` directory, providing tutorials, conversion utilities, detailed examples, and analyses replication from previous publications.
 
+To start Jupyter:
+```bash
+conda activate MS2LDA_v2
+jupyter lab
+```
+
 Key notebooks folders:
 
 * **MotifSets**: Tools for converting motif formats.

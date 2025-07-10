@@ -1,4 +1,4 @@
-![header](App/assets/MS2LDA_LOGO_white.jpg)
+![header](https://raw.githubusercontent.com/vdhooftcompmet/MS2LDA/main/App/assets/MS2LDA_LOGO_white.jpg)
 ![Maintainer](https://img.shields.io/badge/maintainer-Rosina_Torres_Ortega-blue)
 ![Maintainer](https://img.shields.io/badge/maintainer-Jonas_Dietrich-blue)
 ![Maintainer](https://img.shields.io/badge/maintainer-Joe_Wandy-blue)
