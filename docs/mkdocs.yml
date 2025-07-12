@@ -1,16 +1,104 @@
-site_name: MS2LDA Documentation
+site_name: MS2LDA - Mass Spectrometry Substructure Discovery
 site_url: https://vdhooftcompmet.github.io/MS2LDA/
-edit_uri: https://github.com/vdhooftcompmet/MS2LDA/docs/pages/
+site_description: Unsupervised Substructure Discovery using Topic Modelling with Automated Annotation
+site_author: MS2LDA Development Team
+
 repo_name: vdhooftcompmet/MS2LDA
 repo_url: https://github.com/vdhooftcompmet/MS2LDA
+edit_uri: edit/main/docs/docs/
 
 nav:
-- MS2LDA Introduction: index.md
-- MS2LDA Annotation: annotation.md
-- MS2LDA Modeling: modeling.md
-- MS2LDA MotifDB: motifDB.md
-- MS2LDA Motifs: motifs.md
-- MS2LDA Screening: screening.md
+  - Home: index.md
+  - User Guide:
+      - Getting Started: index.md
+      - Modeling: modeling.md
+      - Annotation: annotation.md
+      - Motifs: motifs.md
+      - MotifDB: motifDB.md
+      - Screening: screening.md
+      - Parameter Settings: parameter_settings.md
+      - Masking: masking.md
+  - API Reference:
+      - Overview: api/index.md
+      - Core Modules:
+          - MS2LDA Run: api/run.md
+          - Modeling: api/modeling.md
+          - Mass2Motif: api/mass2motif.md
+          - Preprocessing: api/preprocessing.md
+      - Add-On Modules:
+          - Fingerprints: api/fingerprints.md
+          - MassQL: api/massql.md
+          - NTS: api/nts.md
+          - Spec2Vec: api/spec2vec.md
+      - Visualization:
+          - Visualization Tools: api/visualization.md
+  - Examples:
+      - Tutorials: examples/tutorials.md
+      - Use Cases: examples/use_cases.md
 
 theme:
-name: readthedocs
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [..]
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            docstring_style: google
+            docstring_section_style: table
+            merge_init_into_class: true
+            show_if_no_docstring: false
+            show_signature_annotations: true
+            separate_signature: true
+            line_length: 80
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/vdhooftcompmet/MS2LDA
+    - icon: fontawesome/solid/globe
+      link: https://ms2lda.org
+
+copyright: Copyright &copy; 2024 MS2LDA Development Team

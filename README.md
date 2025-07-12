@@ -50,7 +50,14 @@ For instructions on starting and using the visualization application, see the [*
 ---
 
 ## MS2LDA Documentation
-Over the coming weeks, we will be developing comprehensive documentation to ensure clarity for users and developers. Stay tuned for detailed updates!
+
+📚 **[View the full documentation](https://vdhooftcompmet.github.io/MS2LDA/)**
+
+Our comprehensive documentation includes:
+- Getting started guides
+- API reference
+- Tutorials and examples
+- Parameter settings and advanced usage
 
 ## Citing MS2LDA
 
