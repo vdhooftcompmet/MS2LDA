@@ -2,7 +2,7 @@
 ![Maintainer](https://img.shields.io/badge/maintainer-Rosina_Torres_Ortega-blue)
 ![Maintainer](https://img.shields.io/badge/maintainer-Jonas_Dietrich-blue)
 ![Maintainer](https://img.shields.io/badge/maintainer-Joe_Wandy-blue)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12625409.svg)](https://doi.org/10.5281/zenodo.11394248)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12625409.svg)](https://doi.org/10.5281/zenodo.15858124)
 
 **MS2LDA** is an advanced tool designed for unsupervised substructure discovery in mass spectrometry data, utilizing topic modeling and providing automated annotation of discovered motifs. This tool significantly enhances the capabilities described in the [original MS2LDA paper](https://www.pnas.org/doi/abs/10.1073/pnas.1608041113) (2016), offering users an integrated workflow with improved usability, detailed visualizations, and a searchable motif database (MotifDB).
 
