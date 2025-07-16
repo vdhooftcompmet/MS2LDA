@@ -149,7 +149,6 @@ def run(
         if n_motifs < 500:
             # near the end of `run()` (or right before calling save_visualization_data)
             parameters_for_viz = {
-                "dataset": dataset,
                 "n_motifs": n_motifs,
                 "n_iterations": n_iterations,
                 "dataset_parameters": dataset_parameters,
