@@ -159,7 +159,7 @@ def download_model_and_data(
     os.makedirs(save_directory, exist_ok=True)
 
     # New Zenodo URL for the zipped file
-    zip_url = "https://zenodo.org/records/15688609/files/Spec2Vec.zip?download=1"
+    zip_url = "https://zenodo.org/records/15857387/files/Spec2Vec.zip?download=1"
     zip_file_name = "Spec2Vec.zip"
     zip_file_path = os.path.join(save_directory, zip_file_name)
 
@@ -293,3 +293,107 @@ def download_motifdb():
         src = Path(tmp) / "MS2LDA" / "MotifDB"
         shutil.copytree(src, target)
     return "MotifDB downloaded."
+
+
+def download_datasets():
+    """Downloads example datasets from Zenodo to the datasets/ directory.
+    Downloads a zip file containing MGF dataset files and extracts them.
+    Skips download if all required files already exist.
+    """
+    import zipfile
+    import shutil
+    
+    # Define the datasets directory relative to the package root's parent
+    # (since datasets/ is at the repository root, not inside the package)
+    datasets_dir = PKG_ROOT.parent / "datasets"
+    os.makedirs(datasets_dir, exist_ok=True)
+    
+    # Zenodo URL for the datasets zip file
+    zip_url = "https://zenodo.org/records/15857387/files/datasets.zip?download=1"
+    zip_file_name = "datasets.zip"
+    zip_file_path = datasets_dir / zip_file_name
+    
+    # Check if all required dataset files already exist
+    required_files = [
+        "Case_Study_Fungal_dataset.mgf",
+        "GNPS-SUSPECTLIST.mgf",
+        "mzmine443_Tomato200_InclusionListA_15000A.mgf"
+    ]
+    
+    all_files_exist = True
+    for file_name in required_files:
+        file_path = datasets_dir / file_name
+        if not file_path.exists():
+            all_files_exist = False
+            break
+    
+    if all_files_exist:
+        print("All required dataset files already exist, skipping download.")
+        return "Done. All dataset files already present."
+    
+    # Download the zip file
+    print(f"Downloading MS2LDA example datasets from Zenodo...")
+    try:
+        with requests.get(zip_url, stream=True) as response:
+            if response.status_code != 200:
+                raise Exception(f"HTTP {response.status_code} while fetching {zip_url}")
+            
+            total = int(response.headers.get("content-length", 0))
+            with open(zip_file_path, "wb") as fh, tqdm(
+                total=total or None,
+                unit="B",
+                unit_scale=True,
+                unit_divisor=1024,
+                desc="datasets.zip",
+                initial=0,
+            ) as bar:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:  # skip keep-alive chunks
+                        fh.write(chunk)
+                        bar.update(len(chunk))
+        
+        print(f"Downloaded {zip_file_name} successfully.")
+        
+        # Extract the zip file
+        print(f"Extracting {zip_file_name} ...")
+        temp_extract_dir = datasets_dir / "temp_extract"
+        os.makedirs(temp_extract_dir, exist_ok=True)
+        
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            zip_ref.extractall(temp_extract_dir)
+        
+        # Move files from the extracted datasets/ subdirectory to the main datasets directory
+        extracted_datasets_dir = temp_extract_dir / "datasets"
+        if extracted_datasets_dir.exists():
+            for file_name in extracted_datasets_dir.iterdir():
+                if file_name.is_file() and file_name.suffix == ".mgf":
+                    dest_file = datasets_dir / file_name.name
+                    shutil.copy2(file_name, dest_file)
+                    print(f"Extracted {file_name.name}")
+        
+        # Clean up temporary files
+        if temp_extract_dir.exists():
+            shutil.rmtree(temp_extract_dir)
+        if zip_file_path.exists():
+            os.remove(zip_file_path)
+        
+        print("Extraction and cleanup complete.")
+        
+        # Verify all required files exist
+        missing_files = []
+        for file_name in required_files:
+            file_path = datasets_dir / file_name
+            if not file_path.exists():
+                missing_files.append(file_name)
+        
+        if missing_files:
+            print(f"Warning: The following required files are missing: {', '.join(missing_files)}")
+            return f"Warning: Some required files are missing: {', '.join(missing_files)}"
+        else:
+            return "Done. All dataset files successfully downloaded and extracted."
+            
+    except Exception as e:
+        # Clean up on error
+        if zip_file_path.exists():
+            os.remove(zip_file_path)
+        raise Exception(f"Error downloading datasets: {str(e)}")

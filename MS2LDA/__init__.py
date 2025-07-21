@@ -6,3 +6,6 @@
 from .run import run
 from .run import screen_spectra
 from .run import screen_structure
+from .__version__ import __version__
+
+__all__ = ["run", "screen_spectra", "screen_structure", "__version__"]

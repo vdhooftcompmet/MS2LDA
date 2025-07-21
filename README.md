@@ -1,8 +1,8 @@
-![header](App/assets/MS2LDA_LOGO_white.jpg)
+![header](https://raw.githubusercontent.com/vdhooftcompmet/MS2LDA/main/App/assets/MS2LDA_LOGO_white.jpg)
 ![Maintainer](https://img.shields.io/badge/maintainer-Rosina_Torres_Ortega-blue)
 ![Maintainer](https://img.shields.io/badge/maintainer-Jonas_Dietrich-blue)
 ![Maintainer](https://img.shields.io/badge/maintainer-Joe_Wandy-blue)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12625409.svg)](https://doi.org/10.5281/zenodo.11394248)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12625409.svg)](https://doi.org/10.5281/zenodo.15858124)
 
 **MS2LDA** is an advanced tool designed for unsupervised substructure discovery in mass spectrometry data, utilizing topic modeling and providing automated annotation of discovered motifs. This tool significantly enhances the capabilities described in the [original MS2LDA paper](https://www.pnas.org/doi/abs/10.1073/pnas.1608041113) (2016), offering users an integrated workflow with improved usability, detailed visualizations, and a searchable motif database (MotifDB).
 
@@ -12,14 +12,24 @@ Mass spectrometry fragmentation patterns hold abundant structural information vi
 
 # MS2LDA Installation and Usage
 
-You can set up MS2LDA using either **Conda** or **Poetry**, depending on your preferences and requirements.
+You can install MS2LDA using **pip**, **Conda**, or **Poetry**, depending on your preferences and requirements.
+
+## Quick Install with pip
+
+```bash
+pip install ms2lda
+```
+
+## Quick Start Demo
+
+Get started with MS2LDA in minutes! See the [**Quick Start Guide**](QUICK_START.md) for step-by-step instructions using Conda, Poetry, or virtualenv.
 
 ## Installation Guides
 
-We provide separate detailed documentation for each installation method:
+For more detailed installation options and development setup:
 
 - [**Conda Installation Guide**](README_CONDA.md) - Uses Conda environment management.
-- [**Poetry Installation Guide**](README_POETRY.md) - Uses Poetry for dependency management.
+- [**Poetry Installation Guide**](README_POETRY.md) - Uses Poetry for dependency management (recommended for developers).
 
 ---
 
@@ -39,15 +49,21 @@ For instructions on starting and using the visualization application, see the [*
 
 ---
 
-## Documentation
+## MS2LDA Documentation
 
-For more comprehensive guidance, refer to our complete [MS2LDA Documentation](https://ms2lda.org/), providing detailed instructions, FAQs, and additional resources.
+📚 **[View the full documentation](https://vdhooftcompmet.github.io/MS2LDA/)**
 
----
+Our comprehensive documentation includes:
+- Getting started guides
+- API reference
+- Tutorials and examples
+- Parameter settings and advanced usage
 
 ## Citing MS2LDA
 
-Please cite our work if you use MS2LDA in your research. *(Citation details coming soon.)*
+Please cite our work if you use MS2LDA in your research:
+
+Torres Ortega, L.R., Dietrich, J., Wandy, J., Mol, H., & van der Hooft, J.J.J. (2025). Large-scale discovery and annotation of hidden substructure patterns in mass spectrometry profiles. *bioRxiv*. doi: [https://doi.org/10.1101/2025.06.19.659491](https://www.biorxiv.org/content/10.1101/2025.06.19.659491v1)
 
 ---
 

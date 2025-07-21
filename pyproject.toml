@@ -3,18 +3,36 @@ name        = "ms2lda"
 version     = "2.0.0"
 description = "Unsupervised Substructure Discovery using Topic Modelling with Automated Annotation."
 authors     = [
-  "Jonas Dietrich <jonas.dietrich@wur.nl>",
-  "Rosina Torres Ortega <rosina.torresortega@wur.nl>",
-  "Joe Wandy <joe@example.com>",
-  "Justin van der Hooft <justin@example.com>"
+  "MS2LDA Development Team <justin.vanderhooft@wur.nl>"
+]
+maintainers = [
+  "MS2LDA Development Team <justin.vanderhooft@wur.nl>"
 ]
 license     = "MIT"
 readme      = "README.md"
+homepage    = "https://github.com/vdhooftcompmet/MS2LDA"
+repository  = "https://github.com/vdhooftcompmet/MS2LDA"
+documentation = "https://ms2lda.org"
+keywords    = ["mass spectrometry", "metabolomics", "topic modeling", "LDA", "substructure discovery", "cheminformatics"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+  "Environment :: Console",
+  "Environment :: Web Environment"
+]
 
 packages = [
   { include = "MS2LDA" },
   { include = "App" },
-  { include = "scripts" }          # for scripts.ms2lda_runfull
+  { include = "scripts" },          # for scripts.ms2lda_runfull
+  { include = "massql4motifs" }     # Vendored until merged upstream
 ]
 
 include = [
@@ -64,7 +82,7 @@ dash-cytoscape            = "^1.0.2"
 dash-bootstrap-components = "^1.6.0"
 
 # modelling / embeddings
-tomotopy   = "^0.12.7"
+tomotopy   = ">=0.12.7"
 spec2vec   = "^0.8.0"
 PyQt6      = "^6.7.1"
 faiss-cpu  = "1.10.0"
@@ -72,8 +90,13 @@ faiss-cpu  = "1.10.0"
 # cheminformatics (required)
 rdkit      = ">=2023.9.6,<2026"
 
-# custom massql extension for MS2LDA
-massql4motifs = { git = "https://github.com/j-a-dietrich/MassQueryLanguage4Mass2Motifs.git", rev = "ac1b10b1f020fdfde114c17d57f0ed9b435d9d47" }
+# massql4motifs is vendored in the massql4motifs/ directory to enable PyPI distribution
+# See massql4motifs/README.vendored.md for details
+# Dependencies from massql4motifs:
+lark-parser = "^0.12.0"
+py_expression_eval = "^0.3.0"
+pydot = "^3.0.0"
+pyyaml = "^6.0.2"
 
 # optional notebook tooling
 ipython    = { version = "^8.26.0", optional = true }
@@ -96,6 +119,11 @@ pytest     = "^8.3.2"
 pre-commit = "^3.7.0"
 mypy       = "^1.10.0"
 ruff = "^0.11.13"
+# Documentation
+mkdocs = "^1.6.1"
+mkdocstrings = "^0.29.1"
+mkdocstrings-python = "^1.16.12"
+mkdocs-material = "^9.5.48"
 
 [tool.poetry.group.deploy.dependencies]
 gunicorn = "^23.0.0"

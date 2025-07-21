@@ -1,0 +1,166 @@
+statement: querykeyword querytype wherekeyword wherefullcondition+ "FILTER" filterfullcondition+
+     | querykeyword querytype "FILTER" filterfullcondition+
+     | querykeyword querytype wherekeyword wherefullcondition+ 
+     | querykeyword querytype
+
+querytype: datams1data
+     | datams2data
+     | function"(" datams1data ")"
+     | function "(" datams2data ")"
+     | function"(" datams1data "," param "=" floating ")"
+
+datams1data: "MS1DATA" | "ms1data" | "Ms1Data"
+datams2data: "MS2DATA" | "ms2data" | "Ms2Data"
+wherekeyword: "WHERE" | "where" | "Where"
+querykeyword: "QUERY" | "query" | "Query"
+
+wherefullcondition: wherefullcondition booleanandconjunction wherefullcondition
+    | condition ":" qualifier
+    | condition
+
+filterfullcondition: filterfullcondition booleanandconjunction filterfullcondition
+    | condition ":" qualifier
+    | condition
+
+condition: conditionfields equal numericalexpression
+    | conditionfields equal "(" statement ")"
+    | conditionfields equal "(" numericalexpressionwithor ")"
+    | conditionfields equal wildcard
+    | polaritycondition equal positivepolarity
+    | polaritycondition equal negativepolarity
+    | xcondition equal xfunction "(min=" numericalexpression "," "max=" numericalexpression ")"
+    | mobilitycondition equal mobilityfunction "(min=" numericalexpression "," "max=" numericalexpression ")"
+
+qualifier: qualifier ":" qualifier
+    | qualifierfields equal numericalexpression
+    | qualifierfields greaterthan numericalexpression
+    | qualifierfields lessthan numericalexpression
+    | qualifierintensityreference
+    | qualifiermassdefect equal xdefect "(min=" numericalexpression "," "max=" numericalexpression ")"
+    | qualifierexclude
+    | qualifiercardinality equal xrange "(min=" numericalexpression "," "max=" numericalexpression ")"
+    | qualifierotherscan equal otherscanrtrange "(left=" numericalexpression "," "right=" numericalexpression ")"
+
+equal: "="
+lessthan: "<"
+greaterthan: ">"
+positivepolarity: "POSITIVE"
+    | "positive"
+    | "Positive"
+negativepolarity: "NEGATIVE"
+    | "negative"
+    | "Negative"
+
+conditionfields: ms2productcondition
+    | ms2precursorcondition
+    | ms2neutrallosscondition
+    | ms1mzcondition
+    | rtmincondition
+    | rtmaxcondition
+    | scanmincondition
+    | scanmaxcondition
+    | chargecondition
+
+ms2productcondition: "MS2PROD" | "MS2MZ"
+ms2precursorcondition: "MS2PREC"
+ms2neutrallosscondition: "MS2NL"
+ms1mzcondition: "MS1MZ"
+rtmincondition: "RTMIN"
+rtmaxcondition: "RTMAX"
+scanmincondition: "SCANMIN"
+scanmaxcondition: "SCANMAX"
+polaritycondition: "POLARITY"
+chargecondition: "CHARGE"
+
+mobilitycondition: "MOBILITY"
+mobilityfunction: mobilityrange
+mobilityrange: "range"
+
+xcondition: "X"
+xfunction: xrange | xdefect
+xrange: "range"
+xdefect: "massdefect"
+
+otherscanrtrange: "rtrange"
+
+
+qualifierfields: qualifiermztolerance
+    | qualifierppmtolerance
+    | qualifierintensitypercent
+    | qualifierintensityticpercent
+    | qualifierintensityvalue
+    | qualifierintensitymatch
+    | qualifierintensitytolpercent
+
+qualifiermztolerance: "TOLERANCEMZ"
+qualifierppmtolerance: "TOLERANCEPPM"
+qualifierintensitypercent: "INTENSITYPERCENT"
+qualifierintensityticpercent: "INTENSITYTICPERCENT"
+qualifierintensityvalue: "INTENSITYVALUE"
+qualifierintensitymatch: "INTENSITYMATCH"
+qualifierintensitytolpercent: "INTENSITYMATCHPERCENT"
+qualifierintensityreference: "INTENSITYMATCHREFERENCE"
+qualifiermassdefect: "MASSDEFECT"
+qualifierexclude: "EXCLUDED"
+qualifiercardinality: "CARDINALITY" | "MATCHCOUNT"
+qualifierotherscan: "OTHERSCAN"
+
+function: functionscannum
+    | functionscansum
+    | functionscanrangesum
+    | functionscanmz
+    | functionscaninfo
+    | functionscanmaxint
+
+functionscannum: "scannum"
+functionscansum: "scansum" 
+functionscanrangesum: "scanrangesum"
+functionscanmz: "scanmz"
+functionscaninfo: "scaninfo"
+functionscanmaxint: "scanmaxint"
+
+booleanandconjunction: "AND"
+    | "and"
+    | "And"
+
+booleanorconjunction: "OR"
+
+param: "TOLERANCE"
+floating: /[-+]?([0-9]*\.[0-9]+|[0-9]+)/
+variable: /[XY]/
+wildcard: "ANY"
+
+// OR Numerical Expression
+numericalexpressionwithor: numericalexpression
+    | numericalexpressionwithor booleanorconjunction numericalexpressionwithor
+
+// Numerical Expression
+numericalexpression: term
+    | numericalexpression plus term
+    | numericalexpression minus term
+term: factor
+    | term multiply factor
+    | term divide factor
+factor: floating
+    | variable
+    | "formula(" moleculeformula ")"
+    | "aminoaciddelta(" aminoacids ")"
+    | peptidefunction
+    | "(" numericalexpression ")"
+peptidefunction: "peptide(" peptide "," "charge=" peptidecharge "," "ion=" peptideion ")"
+multiply: "*"
+divide: "/"
+plus: "+"
+minus: "-"
+
+moleculeformula: /[A-Z][A-Za-z0-9]*/
+aminoacids: /[A-Z][A-Z]*/
+peptide: /[A-Z][A-Z]*/
+peptidecharge: /[1-9]/
+peptideion: /[A-Za-z]/
+
+// Boiler Plate
+%import common.ESCAPED_STRING   -> STRING
+%import common.SIGNED_NUMBER    -> NUMBER
+%import common.WS
+%ignore WS
