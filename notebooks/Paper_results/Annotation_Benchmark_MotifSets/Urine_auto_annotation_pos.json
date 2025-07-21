@@ -1,254 +1,142 @@
 {
     "urine_mass2motif_1.m2m": {
         "SMILES": [
-            "O=C(O)C1CC(O)CN1",
-            "CC(O)C(N)C(=O)O",
-            "CCCC(CC(=O)O)c1c(OC)c(CC=C(C)C)c(O)c2c1OC(C)C(C)C2=O",
-            "C[S+](C)CCC(N)C(=O)[O-]",
-            "COC(=O)C1=C(N)Oc2c(c(=O)oc3ccccc23)C1c1ccc(C(F)(F)F)cc1",
-            "CC(CN)C(=O)O"
+            "C=C(CCC(C)C1CCC2(C)C3=C(CC(O)C12C)C1(C)CCC(OC(=O)CC(=O)O)C(C)(C)C1CC3)C(C)C(=O)O",
+            "CC(CCC(=O)O)C(=O)O"
         ]
     },
     "urine_mass2motif_100.m2m": {
         "SMILES": [
-            "O=c1cc[nH]cc1",
-            "NCCSSc1ccccn1",
-            "CC(COc1ccncc1)(COc1ccncc1)COc1ccncc1",
-            "O=c1n(CCCN2CCN(c3cccc(Cl)c3)CC2)nc2ccccn12"
+            "Oc1cccnc1",
+            "O=c1cccc[nH]1"
         ]
     },
     "urine_mass2motif_102.m2m": {
         "SMILES": [
-            "COc1ccc(-c2oc3c(CC=C(C)C)c(OC4OC(CO)C(O)C(O)C4O)cc(O)c3c(=O)c2OC2OC(C)C(O)C(OC3OC(CO)C(O)C(O)C3O)C2O)cc1",
-            "COc1ccc2[nH]c3c(c2c1)CN(C(=O)CCn1ccc2ccccc21)CC3",
-            "CC1CCC2C(C)C3CCC4C(CC5C4CC(O)C4CC(O)CCC45C)C3CN2C1",
-            "CC1CC2OC3(CC4(C)C5C(O)CC6C(C)(C)C(OC7OCC(O)C(O)C7O)CCC67CC57CCC4(C)C13)OC2C(C)(C)O",
-            "O=c1ccc2ccccc2o1",
-            "CC1=C2CC3C(CC(=O)C4CC(O)CCC43C)C2CCC12OC1CC(C)CNC1C2C"
+            "COc1ccc2c(C3=Cc4c(OC)c(OC)c5c(ccc6cc(OC)c(OC)cc65)c4CCN3C)cc(=O)oc2c1",
+            "COc1ccc(-c2oc3c(CC=C(C)C)c(OC4OC(CO)C(O)C(O)C4O)cc(O)c3c(=O)c2OC2OC(C)C(O)C(O)C2O)cc1",
+            "CC1=C(CCC(C)COC2OC(CO)C(O)C(O)C2O)OC2CC3C4CCC5CC(OC6OC(CO)C(O)C(O)C6OC6OC(CO)C(O)C(O)C6O)CCC5(C)C4CCC3(C)C12"
         ]
     },
     "urine_mass2motif_104.m2m": {
         "SMILES": [
-            "C=C(C)c1ccc(NC(=O)N(C)C)cc1",
-            "CC(O)C=CC1OC(=O)CC1Nc1ccc(C=O)cc1",
-            "COc1ccc(C(=O)CCNc2ccccc2C(O)=NC2CC2)cc1OC",
-            "Cn1c(=O)c2ccccc2n(CC(=O)N2CCc3ccccc3C2)c1=O"
+            "COc1cc(=O)oc(C(C)C(C)O)c1CO",
+            "CCOC(=O)C1C(=O)C(=O)Nc2ccccc21",
+            "NC1(CC(=O)O)CCOCC1"
         ]
     },
     "urine_mass2motif_105.m2m": {
         "SMILES": [
-            "Cl.Cl.NCCc1cnc[nH]1",
-            "NC(Cc1ccc(O)c(O)c1)C(=O)O",
-            "c1coc(CNc2nc[nH]c3ncnc2-3)c1",
-            "C=C(C)c1cc2cc(C(C)=O)c(O)cc2o1",
-            "CC(O)=Nc1ccccc1O",
-            "CC(C)=CCC1=C(O)C(=O)c2ccccc2C1=O",
-            "CC(=O)OCCC(C)CCC=C(C)C",
-            "Cc1ccc(C(C)C)cc2c(C)ccc1-2",
-            "COC(=O)C(O)c1ccccc1",
-            "NC(CSCSCC(N)C(=O)O)C(=O)O",
-            "CC1=CC(=O)C(C(C)C)=CC1=O",
-            "COc1ccn(C)c(=O)c1C#N",
-            "CC(=O)CC1CCCCN1.Cl",
-            "O=C(O)C(O)Cc1ccccc1"
+            "O=C(O)C=CC=Cc1ccc2c(c1)OCO2",
+            "CCCCOC(=O)c1ccc(O)cc1",
+            "COc1cc2c(cc1OC)C(C)NCC2"
         ]
     },
     "urine_mass2motif_106.m2m": {
         "SMILES": [
-            "CC1=CCCC2=CC(OC2=O)C(C)(C)C=CC1=O",
-            "CC(C)C1(O)C=C2C(=O)CC3C(C)(C(=O)O)CCCC3(C)C2CC1",
-            "CC1CC=C2C1CC1(O)C(=O)CC2(C)C1(C)CO",
-            "CCC=CCC1C(=O)CCC1CC(=O)OC",
-            "C=C1C(=O)OC2C1CCC(C)C(CCC(=O)O)C2(C)O",
-            "COC1C(O)CCC2(CO2)C1C1(C)OC1CC=C(C)C",
-            "CC1CCC2(CO)C(C(=O)O)=CCCC2C1(C)CCc1ccoc1",
-            "CC12CCC(=O)C=C1CCC1C2C(O)CC2(C)C(C(=O)CO)CCC12",
-            "CC(C)c1ccc2c(c1)C(O)CC1C(C)(C(=O)O)CCCC21C",
-            "CC(C=CC1(O)C(C)=CC(=O)CC1(C)C)=CC(=O)O",
-            "CC1(C)CC2C(C1)C(C)(O)C13CC1(COC3=O)C2O",
-            "C=C(C(=O)O)C1CCC(C)C2CCC(=O)OC2(C)C1",
-            "CCC=CCC1C(=O)C=CC1CCCCCCCC(=O)O",
-            "CC(=CC(=O)O)C=C(C)CC(C)CCCCC(O)C(CO)C(=O)O"
+            "C=C(C(=O)O)C1CC2=C(C)CCCC2(C)CC1O",
+            "Cc1coc2c1CC1OC1(C)CCC1OC1(C)C2",
+            "C=C(C(=O)O)C1CCC(C)C2CC(=O)C(C)=C2C1",
+            "C=C(C)C12OC1C1(C)C(=CC2O)CCC(O)C1C"
         ]
     },
     "urine_mass2motif_111.m2m": {
         "SMILES": [
-            "CC1(C)CCCC2(C)C1C(O)C=C1COC(=O)C12O",
-            "O=C(C=CCCc1ccccc1)CCc1ccccc1",
-            "CC1(C)CCCC2(C)C3=C(C(=O)OC3O)C(O)CC12",
-            "Fc1cc(F)c2c(c1)C1C=CCC1C(c1cccnc1)N2",
-            "CC(C)n1nnc2ccc(NC(=O)CCn3cccc3)cc2c1=O",
-            "NC(=O)c1cccnc1",
-            "CC=C(C)C(=O)OC1c2cc3ccc(=O)oc3cc2OC(C)(C)C1OC(=O)C(C)=CC",
-            "OC(c1ccc(Cl)cc1)(c1ccc(Cl)cc1)c1cccnc1",
-            "CCCC[n+]1ccccc1"
+            "CCCCCCCCCCCCCCCCn1cc[cH+]cc1",
+            "CN1C(=O)CCC1c1cccnc1",
+            "O=C(Nc1cc(C(F)(F)F)ccc1N1CCCCC1)c1ccncc1",
+            "CN=C(O)c1cccnc1"
         ]
     },
     "urine_mass2motif_115.m2m": {
         "SMILES": [
-            "CCCC(N)C(=O)O",
-            "CCC(C)c1ccc(OC2OC(CO)C(O)C(O)C2NC(C)=O)cc1",
-            "CC(C)(N)C(=O)O",
-            "CCCN",
-            "COc1cccc(OC)c1-c1cc(C(=O)NC2(C(=O)O)C3CC4CC(C3)CC2C4)nn1-c1ccnc2cc(Cl)ccc12",
-            "Cn1cnc(CC(=O)O)c1",
-            "O=C(O)C1CCCCN1",
-            "COc1ccc(CCOc2c(OC)cccc2C2CC(=O)Oc3c(C(C)=O)c(O)c4c(C)cc(=O)oc4c32)cc1",
-            "NC(Cc1c[nH]cn1)C(=O)O",
-            "CCCCCCC(N)C(=O)O",
-            "NC(CCl)C(=O)O",
-            "O=C(O)C1CCC(O)=N1"
+            "CC(N)C(=O)O",
+            "CNCC(=O)O",
+            "NC(Cc1cc(I)c(Oc2ccc(O)c(I)c2)c(I)c1)C(=O)O"
         ]
     },
     "urine_mass2motif_117.m2m": {
         "SMILES": [
-            "COc1ccc(CNC(=O)c2nnc(O)c3ccccc23)cc1OC",
-            "COc1ccc(CNc2nc(N)c(C#N)c(-c3ccc(Cl)cc3)n2)cc1OC",
-            "COc1ccc(CNC(=O)C(C)N2C(=O)N3CCc4c([nH]c5ccccc45)C3(C)C2=O)cc1OC",
-            "COc1ccc(CNC(=O)CCC(=O)N2CC3CC(C2)c2cccc(=O)n2C3)cc1OC",
-            "COc1cc(O)c(C(=O)CCc2ccc(OC)c(OC)c2)c(OC)c1",
-            "Cc1c(-c2ccccc2)oc2c(C(=O)NC(C)(CO)CO)cccc2c1=O",
-            "COc1ccc(CNC(=O)NCC2(N3CCOCC3)CCSCC2)cc1OC",
-            "COC(=O)C(=Cc1ccc(OC)cc1)C(=O)OC",
-            "COc1ccc(CN(C(=O)c2ccc(OCC(C)C)cc2)c2ccccn2)cc1OC",
-            "COc1ccc(C2(CCNCc3ccc(OC)c(OC)c3)CCOC(C)(C)C2)cc1",
-            "CCOc1nc(NC(=O)Cc2cc(OC)ccc2OC)cc(N)c1C#N",
-            "CC(CCC(=O)NC(CCCCN)C(=O)O)C1CCC2C3CCC4CC(O)CCC4(C)C3CC(O)C12C",
-            "COc1ccc(Cc2nc3c4c(C)c(C)n(CCCN(C)C)c4ncn3n2)cc1OC",
-            "CC1CC2OC3(CC4(C)C5C(O)CC6C(C)(C)C(OC7OCC(O)C(O)C7O)CCC67CC57CCC4(C)C13)OC2C(C)(C)O"
+            "CCN(Cc1cccnc1)C(=O)c1cccc(Cl)c1C1(C)C(=O)N(Cc2ccc(OC)cc2OC)c2ccc(Cl)cc21",
+            "COc1ccc(CN2CCN(Cc3ccncc3)CC2)c(OC)c1",
+            "COc1ccc(CNCCCSc2ncccn2)c(OC)c1",
+            "COc1ccc2c(c1)OCC(Cc1ccc(OC)c(OC)c1)C2=O",
+            "COCCN1CC(C(=O)NCc2cc(OC)ccc2OC)CC1=O"
         ]
     },
     "urine_mass2motif_120.m2m": {
         "SMILES": [
-            "NC(CC(=O)Nc1ccc(Oc2cc(F)c(F)cc2Br)cc1)C(=O)O",
-            "O=C1CC(C(=O)O)NC(=O)N1",
-            "NC(CNC(=O)C(=O)O)C(=O)O",
-            "CCCCCCCC(=O)NC(CC(=O)O)C(=O)O"
+            "CC(O)=NC(CC(=N)O)C(=O)O",
+            "N=C(O)NC(CC(=O)O)C(=O)O"
         ]
     },
     "urine_mass2motif_122.m2m": {
         "SMILES": [
-            "COc1cc2c(cc1OC)C(C)NCC2",
-            "COc1cc2c(cc1O)OC(c1ccccc1)C(O)C2=O",
-            "COc1ccc2nc(NC(=O)Nc3ccccc3)sc2c1",
-            "CCC1C(=O)SCC1Cc1cncn1C",
-            "COc1cc2occ(-c3ccc(O)cc3)c(=O)c2cc1OC",
-            "CN1CCN(c2nc3cc(C(F)(F)F)ccc3n3cccc23)CC1",
-            "Fc1cccc(F)c1Nc1nc(-c2ccoc2)cs1",
-            "Cc1cc(=O)nc(SCC(=O)c2cccc3ccccc23)[nH]1",
-            "COc1cc2ccc(=O)oc2c(O)c1OC"
+            "Brc1cnc(OC2(c3nccs3)COC2)nc1",
+            "O=C(CSc1nc2c(c(=O)n1-c1ccccc1)SCC2)Nc1ccc(-c2ccccc2)cn1"
         ]
     },
     "urine_mass2motif_126.m2m": {
         "SMILES": [
+            "COc1c(Cl)ccc(-c2nc(C(=O)OCc3ccccc3)c(Cl)c(N)c2F)c1F",
+            "CC1(C)Oc2cc(N3CCN(C(=O)OCc4ccccc4)CC3)c([N+](=O)[O-])cc2-c2c1cnn2-c1ccc(C(=O)O)cc1",
             "CS(=O)(=O)c1cccc(C(=O)N(Cc2ccccc2)c2nc3c(F)cc(F)cc3s2)c1",
             "N#Cc1c(NCc2ccccc2)sc(C(=O)c2ccc(Cl)s2)c1N",
-            "OC(=NCc1ccccc1)c1c(O)nc2ccccc2c1O",
-            "CC=C1C(OC2OC(CO)C(O)C(O)C2O)OC=C(C(=O)OC)C1CC(=O)OCCc1ccc(O)c(O)c1",
-            "COc1cc(CN(CCc2ccccn2)C(=O)CCCCc2ccccc2)ccc1OCc1ccccc1",
-            "CCCCCCCCCCCCCCCCn1cc[n+](Cc2ccccc2)c1C",
-            "CS(=O)(=O)n1nc(-c2ccc(Cl)cc2)nc1SCc1ccccc1",
-            "COc1ccc(C)cc1NC(=O)C(=O)NCc1ccccc1",
-            "Nn1cnc2scc(-c3ccc(Cc4ccccc4)cc3)c2c1=O",
-            "O=C(O)c1ccccc1C(=O)OCc1ccccc1",
-            "O=C(O)CCCCN(CCc1ccccc1OCc1ccc(CCc2ccccc2)cc1)Cc1ccc(C(=O)O)cc1",
-            "CCCN(CCC)C(=O)SCc1ccccc1",
-            "CC(C)CC(NC(=O)CN)C(=O)N1CCCC1C(=O)NC(CS)C(=O)NC(CC(N)=O)C(=O)OC(=O)OC(C)(C)C",
-            "CC(=O)NC1=NN(C(C)=O)C2(S1)C(=O)N(Cc1ccccc1)c1ccc(Br)cc12"
+            "ON(Cc1ccccc1)Cc1ccccc1"
         ]
     },
     "urine_mass2motif_128.m2m": {
         "SMILES": [
-            "NCC(O)CCC(N)C(=O)O",
-            "CNC(CCC(=O)O)C(=O)O",
-            "NCC1OC(OC2C(N)CC(N)C(O)C2O)C(N)CC1O",
-            "CC(=O)C1(O)CCC2(O)C3(O)CC=C4CC(O)CCC4(C)C3CC(OC(=O)C=C(C)C(C)C)C12C",
-            "O=C(O)CC=CCC(=O)O",
-            "C#CCCCC(O)C(C)(C)C(=O)N1C(=O)OC(C)(C)C1Cc1ccccc1"
+            "CC(C)OC(=O)c1cc(C(=O)OC(C)C)cc([N+](=O)[O-])c1",
+            "c1ccc(-c2nnc3sc(Cc4ccc5c(c4)CCCC5)nn23)nc1"
         ]
     },
     "urine_mass2motif_130.m2m": {
         "SMILES": [
-            "N#CC(OC(=O)c1ccccc1)c1ccccc1",
-            "CCCCOCCOCCOCCO",
-            "OCCOCCOCCOCCO"
+            "OCCOCCOCCOCCOCCOCCOCCOCCOCCOCCO",
+            "OCCOCCOCCOCCOCCOCCOCCOCCOCCO"
         ]
     },
     "urine_mass2motif_133.m2m": {
         "SMILES": [
-            "CCCCCCCCC=CCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCC=CCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCC=CCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCC=CCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCC=CCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCC=CCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "C=CCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O"
+            "CCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
+            "CCCCCCCCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
+            "CCCCCCCCC=CCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
+            "CCCCCCCCC=CCCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
+            "CCCCCCCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O"
         ]
     },
     "urine_mass2motif_134.m2m": {
         "SMILES": [
-            "CSc1nc2ccccc2s1",
-            "COc1ccc2cc(-c3nc(-c4ccc([S+](C)[O-])cc4)[nH]c3-c3ccncc3)ccc2c1",
-            "COc1c(O)cc2oc(-c3ccc(O)c(O)c3)cc(=O)c2c1O",
-            "COc1ccc2cc3[n+](cc2c1O)CCc1cc2c(cc1-3)OCO2",
-            "COc1c2ccoc2cc2oc(=O)ccc12",
-            "CC(=O)NS(=O)(=O)c1ccc(N=c2ssc3c2-c2cc(C)ccc2N(C)C3(C)C)cc1"
+            "CN(C)c1cccc(O)c1",
+            "CC1=Nc2ccc3ccccc3c2C1(C)C",
+            "COc1cccc2oc(-c3ccccc3)cc(=O)c12"
         ]
     },
     "urine_mass2motif_137.m2m": {
         "SMILES": [
-            "CCCCCC=CCC=CCCCCCCCCO",
-            "CC1(C)CC(N)CC(C)(CN)C1"
+            "O=C(NNC(=O)C1C2CCCCC21)Nc1ccc(Cl)cc1"
         ]
     },
     "urine_mass2motif_138.m2m": {
         "SMILES": [
-            "OCCNc1ncnc2n[nH]cc12",
-            "CC(C)c1cc2c(c(O)c1O)C13CCCC(C)(C)C1C(OC3=O)C2O",
-            "O=C(O)CC(O)C(=O)O",
-            "CC(=O)Oc1cc(C)c(OC(C)=O)c2ccccc12",
-            "COc1cc(OC)nc(NC(=O)NS(=O)(=O)c2ncccc2C(=O)N(C)C)n1"
+            "Cn1ccnc1"
         ]
     },
     "urine_mass2motif_141.m2m": {
         "SMILES": [
-            "CC1c2cccc(O)c2C(=O)C2=C(O)C3(O)C(=O)C(C(N)=O)=C(O)C(N(C)C)C3C(O)C21",
-            "N#Cc1c(N)nc2c(C(N)=O)c(Nc3ccccc3)sc2c1-c1ccccc1",
-            "CC1c2cccc(O)c2C(O)=C2C(=O)C3(O)C(O)=C(C(N)=O)C(=O)C(N(C)C)C3C(O)C21",
-            "C[Si]1(C)O[Si](C)(C)O[Si](C)(C)O[Si](C)(C)O[Si](C)(C)O[Si](C)(C)O1",
-            "Cc1ccc(C(=O)Nc2scc(-c3cccs3)c2C(N)=O)o1",
-            "NCCN1C(=O)c2cccc3c(Sc4ccc(Br)cc4)ccc(c23)C1=O",
-            "NCCCN",
-            "Nc1ncccc1-c1nc2ccc(-c3ccccc3)nc2n1-c1ccc(C2(N)CCC2)cc1",
-            "CC(N)c1ncc(C(=O)Nc2cc(C(F)(F)F)c(Cl)cn2)s1",
-            "NC(=O)c1c(NC(=O)C2CCCN(C(=O)c3cc(F)cc(F)c3)C2)sc2c1CCCC2",
-            "NCCc1c[nH]c2c(OCc3ccccc3)cccc12",
-            "NC1CCCN(c2c(C=C3SC(=O)NC3=O)cccc2-c2ccccc2)C1",
-            "NC(=O)NCCCC(NC(=O)Cn1ccc2ccc(OCc3ccccc3)cc21)C(=O)O",
-            "COc1cc2c(c(OC)c1OC)-c1c(cc(OC)c(OC)c1OC)CC(C)C(C)C2",
-            "CC1(C)CC(N)CC(C)(CN)C1",
-            "CCC(C)C1C(=O)OC(C(C)C)C(=O)N(C)C(C(C)C)C(=O)OC(C(C)C)C(=O)N(C)C(C(C)C)C(=O)OC(C(C)C)C(=O)N1C",
-            "CCC(C)C1C(=O)OC(C(C)C)C(=O)N(C)C(C(C)CC)C(=O)OC(C(C)C)C(=O)N(C)C(C(C)CC)C(=O)OC(C(C)C)C(=O)N1C",
-            "COc1ccc2[nH]cc(CC(N)C(=O)O)c2c1",
-            "N#Cc1c(N)nc(SCC(N)=O)c(C#N)c1-c1ccc(OCC2CC2)cc1",
-            "Cc1cc(O)c(-c2ccc(C(C)CN)cc2)c2c1[nH]c(=O)c1sccc12"
+            "NC(=O)c1c(Cl)c(Cl)c(S(=O)(=O)O)c(C(N)=O)c1Cl",
+            "CC(C)CC1OC(=O)C2CCCN2C(=O)CCNC(=O)C(Cc2ccccc2)NC(=O)C(C(C)C)N(C)C(=O)C(C(C)C)N(C)C1=O",
+            "NS(=O)(=O)c1cc(C2(O)NC(=O)c3ccccc32)ccc1Cl",
+            "C=C1c2c(Cl)ccc(O)c2C(O)=C2C(=O)C3(O)C(O)=C(C(N)=O)C(=O)C(N(C)C)C3C(O)C12"
         ]
     },
     "urine_mass2motif_147.m2m": {
         "SMILES": [
-            "CCOP(=O)(OCC)OCC",
-            "CCCCOP(=O)(O)OCCCC",
-            "CCCCOCCOP(=O)(OCCOCCCC)OCCOCCCC",
-            "CCCOP(=O)(OCCC)OCCC",
-            "COC(=O)c1c(Cl)c(Cl)c(C(=O)OC)c(Cl)c1Cl",
-            "CC(CCl)OP(=O)(OC(C)CCl)OC(C)CCl"
+            "CCCCCCCCCCCCOP(=O)(O)O",
+            "CCCCOP(=O)(OCCCC)OCCCC",
+            "CC(C)COP(=O)(OCC(C)C)OCC(C)C",
+            "CCCCC(=O)NC(Cc1ccccc1)C(=O)O"
         ]
     },
     "urine_mass2motif_148.m2m": {
@@ -256,154 +144,89 @@
             "CC(=O)OCCN(CCOC(C)=O)c1ccc(N=Nc2ccc([N+](=O)[O-])cc2C#N)cc1",
             "CC(=O)C(C)=O",
             "CCCCOCCOCCOC(C)=O",
-            "CC(=O)OCCOCCOCCOC(C)=O",
-            "Cc1ccc(-c2csc(Cn3nc(CC4OCCCO4)c4ccccc4c3=O)n2)cc1",
-            "CC(=O)OCC[N+](C)(C)C",
-            "CCOc1cc(C=NNC(=O)CC2(C)OCCO2)ccc1OCc1ccccc1",
-            "COc1cc(C2NCCC3(OCCO3)C2(C)C)cc(OC)c1OC"
+            "CC(=O)OCCOCCOCCOC(C)=O"
         ]
     },
     "urine_mass2motif_149.m2m": {
         "SMILES": [
-            "N#Cc1nc(-c2cccc3ccccc23)oc1NCc1ccc2c(c1)OCO2",
-            "COc1ccc(NC(=O)C(C)Nc2ccc3c(cc2=O)C(NC(C)=O)CCc2cc(OC)c(OC)c(OC)c2-3)cc1",
-            "c1nc(SCc2ccc3c(c2)OCO3)c2c3c(sc2n1)CCCC3",
-            "N#Cc1nc(-c2cccc3ccccc23)oc1N1CCN(Cc2ccc3c(c2)OCO3)CC1",
-            "COCCNc1nc(NCc2ccc3c(c2)OCO3)nc2nccnc12",
-            "c1cnc(N2CCN(Cc3ccc4c(c3)OCO4)CC2)nc1",
-            "O=S1(=O)CC(NCc2ccc3c(c2)OCO3)C(S(=O)(=O)c2ccccc2)C1",
-            "O=c1c2cc([N+](=O)[O-])cc([N+](=O)[O-])c2nc2n1CCC2",
-            "CCS(=O)(=O)c1nc(S(=O)(=O)c2ccc(C)cc2)c(NCc2ccc3c(c2)OCO3)s1",
-            "CCN1CC2(COC)C(O)CC(OC)C34C5CC6(O)C(OC)CC(OC(C)=O)(C5C6OC(=O)c5ccc(OC)cc5)C(C(OC)C23)C14",
-            "N#Cc1nc(Cc2cccc3ccccc23)oc1NCc1ccc2c(c1)OCO2",
-            "CC(C)(C)c1noc(C2CC(=O)N(Cc3ccc4c(c3)OCO4)C2)n1"
+            "COc1cc2c(c(OC)c1OC)-c1ccc(NCCCC(=O)NCc3ccc4c(c3)OCO4)c(=O)cc1C(NC(C)=O)CC2",
+            "COc1ccc(-c2cc(=O)c3c(OC)c(OC)c(OC)cc3o2)cc1",
+            "COc1cc(OC)c2c(c1Cl)OC1(C2=O)C(O)=C2C(=Nc3c(c(=O)n(C)c(=O)n3C)C2c2ccc(O)cc2)CC1C"
         ]
     },
     "urine_mass2motif_151.m2m": {
         "SMILES": [
-            "Oc1ncnc2[nH]cnc12",
-            "CC(C)C(NC(=O)CN)C(=O)O",
-            "CC(O)C(N)C(=O)O",
-            "CNCc1ccccc1.Cl",
-            "O=C(OCC1OC(OC(=O)c2cc(O)c(O)c(O)c2)C(O)C(OC(=O)c2cc(O)c(O)c(O)c2)C1O)c1cc(O)c(O)c(O)c1",
-            "COC(=O)c1ccc(OC)cc1"
+            "O=C(O)c1cc(=O)[nH]c(=O)[nH]1",
+            "CCNC(=O)CCC(N)C(=O)O"
         ]
     },
     "urine_mass2motif_152.m2m": {
         "SMILES": [
-            "NC(=O)NCCC(=O)O",
-            "COc1ncnc2[nH]cnc12",
-            "CC(=O)NC(CC(N)=O)C(=O)O",
-            "CC(O)(CC(=O)O)CC(=O)O",
-            "Cc1ccc(C(C)C)c(O)c1",
-            "Cn1cnc2c1c(O)nc(=O)n2C",
-            "Cc1ncnc2[nH]cnc12",
-            "Oc1ccc2ccccc2n1",
-            "CC=CC1=CC(=O)C(O)C1O",
-            "Cl.Cl.NCCCCN",
-            "O=CC(O)C(O)C(O)CO",
-            "CC(=CC(=O)O)C(=O)O",
-            "NCCc1cc(O)c(O)cc1O"
+            "O=C(O)CCCCC(=O)O",
+            "NCCCCC(N)C(=O)O",
+            "CC(=O)NC(C)C(=O)O"
         ]
     },
     "urine_mass2motif_153.m2m": {
         "SMILES": [
-            "CCCCCC=CCC=CCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
-            "CCCCCCCCCCCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
-            "CCCCCC=CCC=CCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
-            "CCCCCCCCCCCCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
-            "CCCCCCCCC=CCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
-            "CCCCCCC=CCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
-            "CCCCCCCCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
-            "CCCCCCCCC=CCCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
-            "CCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
-            "CCCCC=CCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
-            "C=CCCCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O"
+            "CCCCCCCCC=CCCCCCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
+            "CCCCCCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
+            "CCCCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
+            "CCCCCCCCCCCCCCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O",
+            "CCCCCCCCCCCCCCCCCC(=O)NC(Cc1ncc[nH]1)C(=O)O"
         ]
     },
     "urine_mass2motif_159.m2m": {
         "SMILES": [
-            "COc1c(O)cc(-c2oc3cc(O)cc(O)c3c(=O)c2OC2OC(C)C(O)C(O)C2O)cc1O",
-            "CCNC(=O)c1cc2c(-c3cc(C(C)(C)O)ccc3Oc3c(C)cc(F)cc3C)cn(C)c(=O)c2[nH]1",
-            "COCCOCCOC",
-            "COCCn1cc(C(=O)NCCc2c[nH]c3ccccc23)c2ccccc21",
-            "COCCOc1cnc(Sc2cc(C)c(-c3csc(NC(=O)c4ccncc4)n3)c(C)c2)cn1"
+            "CC(O)COC(C)COC(C)COC(C)COC(C)COC(C)COC(C)COC(C)COC(C)COC(C)CO",
+            "CC(O)COC(C)COC(C)COC(C)COC(C)COC(C)COC(C)COC(C)COC(C)CO",
+            "CC(O)COC(C)COC(C)COC(C)COC(C)CO"
         ]
     },
     "urine_mass2motif_163.m2m": {
         "SMILES": [
-            "CCOc1ccc(C(CNC(=O)c2ccccc2)c2c[nH]c3ccccc23)cc1OC",
-            "CCOc1cc(NC(=O)c2ccc(C)c([N+](=O)[O-])c2)c(OCC)cc1NC(=O)c1ccccc1",
-            "CCCCCCn1c(O)c(N=NC(=O)c2ccccc2)c2ccccc21",
-            "O=C(O)c1ccc2c(c1)nc(NC(=O)c1ccccc1)n2CCCc1ccccc1",
-            "CCOc1cc(NC(=O)c2ccccc2)c(OCC)cc1NC(=O)CC1CCS(=O)(=O)C1",
-            "CCN1CC2(COC)C(O)CC(OC)C34C5CC6(O)C(OC)CC(OC(C)=O)(C5C6OC(=O)c5ccccc5)C(C(OC)C23)C14",
-            "O=C(Nc1ccn(C2CC(O)C(CO)O2)c(=O)n1)c1ccccc1",
-            "Cc1cc(C)c(-c2csc(NC(=O)c3ccccc3)n2)c(C)c1"
+            "CC(C)OC(=O)C(C)N(C(=O)c1ccccc1)c1ccc(F)c(Cl)c1",
+            "Cc1ccc2c(Br)cc(Br)c(OC(=O)c3ccccc3)c2n1"
         ]
     },
     "urine_mass2motif_164.m2m": {
         "SMILES": [
-            "CCCCC(=O)NC(Cc1ccccc1)C(=O)O",
-            "CCCCCCCCC=CCCCCCCCCCCCC(=O)NC(Cc1ccccc1)C(=O)O",
-            "CC(C)CC(NC(=O)C(N)Cc1ccccc1)C(=O)O",
-            "Nc1ccc(CCNc2ncnc3c2ncn3C2OC(CO)C(O)C2O)cc1",
-            "CCCCCCCCCCCCCCCCCCCC(=O)NC(Cc1ccccc1)C(=O)O",
-            "CCCC(=O)NC(Cc1ccccc1)C(=O)O",
-            "Cc1cc(Cc2ccc(N)c(C)c2)ccc1N",
-            "CCCCCCCCC=CCCCCCCCC(=O)NC(Cc1ccccc1)C(=O)O"
+            "NCC(O)c1ccccc1",
+            "NC(Cc1ccccc1)C(=O)N1CC(=Cc2ccc(Cl)c(Cl)c2)C(=O)C(=Cc2ccc(Cl)c(Cl)c2)C1",
+            "C=CCc1c(OCC(=O)NC2CC2)ccc2c1c1ccnc3c4ccccc4c(=O)n2c13"
         ]
     },
     "urine_mass2motif_165.m2m": {
         "SMILES": [
+            "Cc1cccc(C)c1N(Cn1cccn1)C(=O)CS(=O)CC(=O)O",
+            "Nc1nc2ccccc2[nH]1",
             "CN(C)c1ccc(CN(CC2CCCO2)C(=O)Cc2cccc3ccccc23)cc1",
             "CC(C)C1OC(=O)C(Cc2ccccc2)N(C)C(=O)C(C(C)C)OC(=O)C(Cc2ccccc2)N(C)C(=O)C(C(C)C)OC(=O)C(Cc2ccccc2)N(C)C1=O",
-            "CCc1ccc(NCCC(=O)c2ccc3c(c2)OCO3)cc1",
-            "Cc1ccc(NCCC(=O)c2ccc3c(c2)OCO3)cc1C",
-            "Cc1cccc(C)c1N(Cn1cccn1)C(=O)CS(=O)(=O)O",
-            "CC(C)COc1ccc(C(=O)N(Cc2ccc(N(C)C)cc2)Cc2ccco2)cc1",
-            "Cc1cccc(C)c1N(Cn1cccn1)C(=O)CS(C)=O",
-            "S=C1NCN(CCc2ccccc2)CN1CC1CCCO1",
-            "COc1ccc2c(c1)C(C(=O)N(Cc1ccc(N(C)C)cc1)c1ccc(C(C)C)cc1)CCC2"
+            "CCc1ccc(NCCC(=O)c2ccc3c(c2)OCO3)cc1"
         ]
     },
     "urine_mass2motif_167.m2m": {
         "SMILES": [
-            "CCCCCCCCCCCC(=O)OC(CCCCCCCCC)CC(=O)O",
-            "CC1OC(OC2CCC3(C)C(CCC4(C)C3C=CC3=C5CC(C)(C)CCC5(CO)C(O)CC34C)C2(C)CO)C(O)C(OC2OC(CO)C(O)C(O)C2O)C1O",
-            "CCCCCCCCCCC(=O)OC(CCCCCCCCC)CC(=O)O",
-            "C=CCCCCCCCCC(=O)OC(CCCCCCCC)CC(=O)O"
+            "O=C(O)CCCCCCCCCCC(=O)O",
+            "O=C1CCCCCCCCCCC(=O)OCCO1"
         ]
     },
     "urine_mass2motif_169.m2m": {
         "SMILES": [
-            "Nc1ccc(Cl)cc1",
-            "Clc1cccc(-c2nnnn2Cc2cccnc2)c1Cl",
-            "CC1=C(C(=O)Nc2ccccc2)SCCO1",
-            "CC(=O)Nc1ccc(C)cc1",
-            "Oc1ccc2ccccc2c1N=Nc1ccccc1",
-            "N#CC(=C(N)Sc1ccc(N)cc1)c1ccccc1C(F)(F)F"
+            "Nc1ccc(S(N)(=O)=O)cc1",
+            "NC(=O)Nc1ccc(Cl)cc1"
         ]
     },
     "urine_mass2motif_173.m2m": {
         "SMILES": [
-            "CC(=O)NC1C(O)OC(CO)C(O)C1O",
-            "Cc1cnc(C(=O)O)c[n+]1[O-]",
-            "CC(=O)CC(=O)CCC(=O)O",
-            "CCOC(=O)OC(C)OC1=C(C(=O)Nc2ccccn2)N(C)S(=O)(=O)c2ccccc21",
-            "CC(=O)NC1C(O)CC(O)(C(=O)O)OC1C(O)C(O)CO"
+            "CCOC=C(C(=O)OCC)C(=O)OCC",
+            "COc1ccc(C=CC(=O)O)c(OC2OC(CO)C(O)C(O)C2O)c1"
         ]
     },
     "urine_mass2motif_175.m2m": {
         "SMILES": [
-            "O=C(NO)c1cnc(NC2(c3ccccc3)CC2)nc1",
-            "O=c1c2cc(O)c(O)cc2oc2cc(O)c(C3OC(CO)C(O)C(O)C3O)c(O)c12",
-            "CNCCC(Oc1ccccc1C)c1ccccc1",
-            "OC1COC(OCC2OC(OCC=Cc3ccccc3)C(O)C(O)C2O)C(O)C1O",
-            "NC(=O)c1cc(OC2CN(C3Cc4ccccc4C3)C2)ccn1",
-            "CC(C)=CCCC(C(=O)O)C1C(O)CC2(C)C3=CCC4C(C)(CCC(O)C4(C)C)C3=CCC12C",
-            "C=C(C)c1ccccc1",
-            "CNC(=O)Oc1cccc2ccccc12"
+            "CNCCC(Oc1ccccc1OC)c1ccccc1",
+            "COCCOC(=O)C1=C(C)NC(C)=C(C(=O)OCC=Cc2ccccc2)C1c1cccc([N+](=O)[O-])c1"
         ]
     },
     "urine_mass2motif_176.m2m": {
@@ -411,307 +234,175 @@
             "CC(C)C(=O)OCC1(N=[N+]=[N-])OC(n2ccc(N)nc2=O)C(OC(=O)C(C)C)C1OC(=O)C(C)C",
             "CC#CCn1c(N2CCCC(N)C2)nc2c1c(=O)n(Cc1nc(C)c3ccccc3n1)c(=O)n2C",
             "CCCCCCCCC=CCCCCCCCC(=O)OCC1OC(n2ccc(N)nc2=O)C(O)C1O",
-            "Nc1ccn(C2CC(O)C(COP(=O)(O)OP(=O)(O)O)O2)c(=O)n1",
-            "Nc1ccn(C2CC(O)C(CO)O2)c(=O)n1",
-            "Nc1ccn(C2OC(CO)C(OP(=O)(O)O)C2O)c(=O)n1",
-            "[N-]=[N+]=NC1(CO)OC(n2ccc(N)nc2=O)C(O)C1O"
+            "Nc1ccn(C2CC(O)C(COP(=O)(O)OP(=O)(O)O)O2)c(=O)n1"
         ]
     },
     "urine_mass2motif_177.m2m": {
         "SMILES": [
-            "Cc1ccc(NC(=O)CC2COc3ccccc3O2)cc1Cl",
-            "N=c1ccn2c(n1)OC1C(O)C(CO)OC12",
-            "CC(C)N1C(=O)c2ccccc2NS1(=O)=O",
-            "COC(=O)c1[nH]c(C)c(C(O)=C2C(=O)C(=O)N(Cc3cccnc3)C2c2ccc(C(C)C)cc2)c1C"
+            "COc1ccc2[nH]c(SCc3ncc(C)c(O)c3C)nc2c1",
+            "COCCCOc1ccnc(CSc2nc3ccccc3[nH]2)c1C"
         ]
     },
     "urine_mass2motif_18.m2m": {
         "SMILES": [
-            "CCc1cc2c(=O)c(-c3ccc4c(c3)OCCCO4)c(C)oc2cc1OCC#N",
-            "CCN(CCC#N)c1ccc(N=Nc2ccc([N+](=O)[O-])cc2)cc1",
-            "CC(=O)Nc1nnc(S(N)(=O)=O)s1",
-            "N#CCOc1c(-c2ccccc2)oc2ccccc2c1=O",
-            "COc1ccc2c(CN(C)CCC#N)cc(=O)oc2c1",
-            "Cc1ccc(-c2oc3ccccc3c(=O)c2OCC#N)cc1",
-            "CCCCCc1cc(OC)c(OC)c2c1C(=O)Oc1cc(O)c(C(=O)O)c(CCCCC)c1O2",
-            "CCCCCC(=O)Cc1cc(O)cc2c1C(=O)Oc1cc(O)c(C(=O)O)c(CCCCC)c1O2"
+            "CCN(CCC#N)c1ccc(N=Nc2c(Br)cc([N+](=O)[O-])cc2Br)cc1",
+            "Cc1oc2cc(OCC(=O)OC3CCC4(C)C(=CCC5C6CCC(C(C)CCCC(C)C)CC6(C)CCC54)C3)ccc2c(=O)c1Oc1ccc(Br)cc1",
+            "CCCCCc1cc2cc(OC)cc(OC)c2c(=O)o1",
+            "CC(C)OC(=O)C1=C(N)Oc2c(oc(CO)cc2=O)C1c1ccc(F)cc1"
         ]
     },
     "urine_mass2motif_180.m2m": {
         "SMILES": [
-            "COc1c2c(cc3oc(COC4OC(CO)C(O)C(O)C4O)cc(=O)c13)OC(C(C)(C)O)C2",
-            "COC(=O)c1cc(OC)cc(O)c1Oc1cc(C)cc(O)c1C(=O)O",
-            "CC(C)=CCCC(C)(O)C1CCC2(C)C1C(O)CC1C3(C)CCC(OC4OC(CO)C(O)C(O)C4OC4OC(CO)C(O)C(O)C4O)C(C)(C)C3CCC12C",
-            "CC1(C)CC2C3=CCC4C5(C)CCC(O)C(C)(CO)C5CCC4(C)C3(C)CCC2(C)C(O)C1O",
-            "OCc1cc(O)c2c(O)c3c(O)cccc3c(C3OC(CO)C(O)C(O)C3O)c2c1",
-            "CC1(C)Oc2ncnc(N)c2N=C1c1ccc(C23CCC(CC(=O)O)(CC2)CC3)cc1"
+            "CCOC(=O)c1c(N2C(=O)C3CC(C)=C(C)CC3C2=O)sc(C)c1C",
+            "CC12CC3CC(C)(C1)CC(N)(C3)C2",
+            "COc1ccc(C(C)=O)cc1",
+            "CC12CCC(=O)C=C1CCC1C2CCC2(C)C(O)CCC12"
         ]
     },
     "urine_mass2motif_181.m2m": {
         "SMILES": [
-            "NC(C(=O)O)C(O)C(O)C(O)CO",
-            "Nc1n[nH]c(N)c1N=Nc1ccc(O)cc1",
-            "Nc1nc(N)c2nc(-c3ccccc3)c(N)nc2n1",
-            "CSc1nc(NC2CC2)nc(NC(C)(C)C)n1",
-            "Cn1c(N)nc2nc[nH]c2c1=O",
-            "COc1ccc(N=Nc2c(N)n[nH]c2N)cc1"
+            "CC(=O)OCC1OC(OC2C(COC(C)=O)OC(OC3=CC(=O)c4c(O)cccc4C3=O)C(OC(C)=O)C2OC(C)=O)C(OC(C)=O)C(OC(C)=O)C1OC(C)=O"
         ]
     },
     "urine_mass2motif_183.m2m": {
         "SMILES": [
             "NC(N)=NC(N)=Nc1ccccc1",
             "N=C(N=C(N)N)N1CCOCC1",
-            "NC(N)=NC(=O)Cc1c(Cl)cccc1Cl",
-            "NC1=NC2n3c(cc(Br)c3Br)C(=O)N3CCCC23N1"
+            "NC(N)=NC(=O)Cc1c(Cl)cccc1Cl"
         ]
     },
     "urine_mass2motif_186.m2m": {
         "SMILES": [
-            "CC=C1CN2CCC34C(=Nc5ccccc53)C2CC1C4C(=O)OC",
-            "C=C1C(=O)OC2C1CCC(=C)C1CCC(=C)C12",
-            "COc1c2c3c(c(OC)c1OC)-c1ccccc1CC3NCC2",
-            "CN(C)CCC=C1c2ccccc2CCc2ccccc21",
-            "C#CC1(O)CCC2C3CC(O)C4=CC(=O)CCC4=C3C=CC21CC",
-            "COc1c2c3c(c(OC)c1OC)-c1ccccc1C(O)C3NCC2",
-            "COC1c2ccccc2-c2c3c(cc4c2C1N(C)CC4)OCO3",
-            "COc1c(OC)c2c3c(c1OC)C(O)CNC3C(C)(C)c1ccccc1-2",
-            "COc1c(O)c2c3c(c1OC)-c1ccccc1CC3NCC2",
-            "CNCCc1cc(OC)c(OC)c2c1ccc1ccccc12",
-            "COc1cc(CCN(C)C)c2ccc3ccccc3c2c1OC",
-            "COC1=CC=C2C3Cc4ccc(OC)c5c4C2(CCN3C)C1O5",
-            "COc1c(O)cc2c3c1-c1ccccc1C(O)C3N(C)CC2"
+            "CN(C)CCC=C1c2ccccc2C=Cc2ccccc21",
+            "O=C1CC=C2C3CC4N(CCC45c4ccccc4N1C25)CC3=CCO",
+            "COc1c2c3c(c(OC)c1OC)-c1ccccc1C(C)(C)C3NCC2"
         ]
     },
     "urine_mass2motif_187.m2m": {
         "SMILES": [
-            "NCCCCNCCCN",
-            "CC1(C)N=C(O)N=C1O",
-            "NCCCCC(N)C(=O)NC(Cc1ccccc1)C(=O)O",
-            "CC1CCC2(C(=O)O)CCC3(C)C(=CCC4C5(C)CC(O)C(O)C(C)(CO)C5CCC43C)C2C1C",
-            "CC1(C(=O)O)CCC2(C)CCC3(C)C4=CC(=O)c5c(cc(O)c(O)c5C=O)C4(C)CCC3(C)C2C1",
-            "CC1=CCC(=C(C)C)C(=O)CC(C)=CCC1",
-            "CC(=O)COc1c2occc2c(O)c2c(=O)cc(C)oc12",
-            "NCCCCC(N)C(=O)NC(CCC(=O)O)C(=O)O",
-            "CC(NC(=O)C(N)CC(=O)O)C(=O)NC1C(C)(C)SC1(C)C"
+            "CC(CNC(=N)O)C(=O)O",
+            "O=C(O)c1ccc2ccccc2c1",
+            "CC(C)n1cnc(S(=O)(=O)NCC2(O)Cc3ccccc3C2)c1"
         ]
     },
     "urine_mass2motif_190.m2m": {
         "SMILES": [
-            "CCCN(CCC)CCc1cccc2c1CC(=O)N2",
-            "COc1ccc2nc(C)cc(OCC(O)=NCc3ccccc3)c2c1",
-            "O=c1cccc2n1CC1CC2CN2CCC(O)CC12",
-            "O=c1cccc2n1CC1CC2CN2CCCCC12",
-            "Cc1ccc(C)c(N2C(=O)N(Cc3nnc(-c4ccc(F)cc4)o3)c3ccccc3S2(=O)=O)c1"
+            "O=C(NCCc1ccccc1)N1CCN(Cc2nc(-c3ccco3)cs2)CC1",
+            "CN1CC2CC(C1)c1cccc(=O)n1C2"
         ]
     },
     "urine_mass2motif_191.m2m": {
         "SMILES": [
-            "CCCCCCCCCCCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CC(C)C(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CC(C)C(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CC(O)CC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCCCCCCCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCCCCCCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCCCCC=CC(=O)OC(CC(=O)[O-])C[N+](C)(C)C"
+            "CCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
+            "CCCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
+            "CC(C)CC(=O)OC(CC(=O)O)C[N+](C)(C)C"
         ]
     },
     "urine_mass2motif_192.m2m": {
         "SMILES": [
-            "Cc1ccc(C)c(-c2nc(CSc3nc4c(O)ncnc4n3C)c(C)o2)c1",
-            "CC(=O)c1c(O)c(C)c(O)c2c1OC1=CC(=O)C(=C(C)NCC(=O)N3CCc4ccccc4C3)C(=O)C12C",
-            "C=C1C(NC)CCC23CC24CCC2(C)C(C(C)=O)C(O)CC2(C)C4CCC13",
-            "CCCN(CCC)CCc1cccc2c1CC(=O)N2",
-            "O=C1CNCC2c3ccccc3CCN12",
-            "NC(=O)c1c[nH]c2ccccc12",
-            "Cc1cc2ccccc2[nH]1"
+            "CC(=O)OCC1OC(OC2=C(OC3OC(COC(C)=O)C(OC(C)=O)C(OC(C)=O)C3OC(C)=O)C(=O)c3c(O)ccc(O)c3C2=O)C(OC(C)=O)C(OC(C)=O)C1OC(C)=O",
+            "CC1Cc2ccccc2N1NC(=O)c1ccc(Cl)c(S(N)(=O)=O)c1"
         ]
     },
     "urine_mass2motif_194.m2m": {
         "SMILES": [
-            "Cc1n[nH]c(=O)n(C)c1=O",
-            "CCNc1nc(O)nc(NC(C)(C)C)n1",
-            "CCCOc1ccc(Oc2nc(NCC)nc(N(C)C)n2)nn1",
-            "CCNc1nc(O)nc(NC(C)C)n1",
-            "CCNc1nc(=O)nc(N)[nH]1",
-            "Cc1cc(-c2nncc3c(C(C)(C)C)c(OCc4ncnn4C)nn23)no1"
+            "CN(CC(=O)O)C(=N)N",
+            "O=C(O)CCCCC1SCC2NC(=O)NC21"
         ]
     },
     "urine_mass2motif_197.m2m": {
         "SMILES": [
-            "CC(=O)C(=O)O",
-            "CC(C)c1ccc(NC(N)=O)cc1",
-            "CCCc1ncc(C[n+]2ccccc2C)c(N)n1",
-            "CC(C)c1ccc(OCC(=O)N(Cc2cccn2C)C2CC2)cc1",
-            "CNC(=O)Nc1ccc(C(C)C)cc1",
-            "CC(=O)Nc1ccc(C(=O)O)cc1",
-            "O=C(Nc1ccccc1)Nc1ccc(-c2ccc(C(=O)C3CCCC3C(=O)O)cc2)cc1",
-            "O=C(Nc1ccccc1)Nc1ccccc1"
+            "Cn1cccc1CNC(=O)CC1N=C(O)N(Cc2ccc3c(c2)OCO3)C1=O",
+            "CNCCc1ccccn1"
         ]
     },
     "urine_mass2motif_200.m2m": {
         "SMILES": [
-            "CCCc1cc2c3c(c(=O)oc2cc1OC(C)=O)CCC3",
-            "CC(=O)Nc1ccccc1-c1cccc2c1[nH]c1ccccc12",
-            "CC(=O)N1CCN(c2ccc(OCC3COC(Cn4ccnc4)(c4ccc(Cl)cc4Cl)O3)cc2)CC1",
-            "CC(=O)N1C(=O)N(NCc2cccnc2)Cc2cc(C(F)(C(F)(F)F)C(F)(F)F)ccc21",
-            "CC(=O)COc1c2occc2c(O)c2c(=O)cc(C)oc12",
-            "COc1c2ccoc2c(OC(C)=O)c2oc(C)cc(=O)c12",
-            "COc1ccc(-c2oc3cc(OC)c(OC(C)=O)c(OC)c3c(=O)c2OC)cc1OC(C)=O",
-            "CC(=O)Oc1ccc2c(=O)c(-c3ccc4c(c3)OCCCO4)c(C)oc2c1C",
-            "CC(=O)Nc1nc(C)c(S(=O)(=O)Nc2ccc(C(O)(C(F)(F)F)C(F)(F)F)cc2)s1",
-            "CN1C(=O)CC(=O)N(c2ccccc2)c2cc(Cl)ccc21"
+            "CC(=O)Oc1cc(O)c(I)c2oc(C)cc(=O)c12",
+            "CC(=O)Nc1nc(C)c(-c2ccc(Cl)c(S(=O)(=O)NCCO)c2)s1",
+            "CC(=O)Nc1nc2c(Oc3cc(-c4ccc(C(F)(F)F)cc4)ncn3)cccc2s1",
+            "CC(=O)N1CCN(S(=O)(=O)c2ccc(N3C(=O)C(C)(C)CS3(=O)=O)cc2C)CC1"
         ]
     },
     "urine_mass2motif_202.m2m": {
         "SMILES": [
-            "CC(C)C(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCCCCCCCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C"
+            "CCCCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
+            "CCCCCCCCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C"
         ]
     },
     "urine_mass2motif_203.m2m": {
         "SMILES": [
-            "CCCCCCCCCCCCCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCCCCCCCC=CCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCCCCCCCCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCCCCCCCCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCCCCCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "COc1ccc(C2CC(=O)c3c(O)cc(O)cc3O2)cc1O",
-            "CCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C"
+            "CCCCCCCCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
+            "CCCCCCCCCCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
+            "CC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
+            "CC(=O)OC(CC(=O)O)C[N+](C)(C)C"
         ]
     },
     "urine_mass2motif_207.m2m": {
         "SMILES": [
-            "CCCCCCCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCC=CCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCC=CCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCC=CCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCC=CCCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCC=CCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
-            "CCCCC=CCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O"
+            "C=CCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
+            "C=CCCCCCCCCCCC(=O)NC(CCC(N)=O)C(=O)O",
+            "N=C(O)CCC(N=C(O)Cc1ccccc1)C(=O)O"
         ]
     },
     "urine_mass2motif_208.m2m": {
         "SMILES": [
-            "CCCCCCCCCCCCCCCCCC(=O)OCC(O)COP(=O)(O)OCCN",
-            "O=P(O)(O)OC1C(OP(=O)(O)O)C(OP(=O)(O)O)C(OP(=O)(O)O)C(OP(=O)(O)O)C1OP(=O)(O)O",
-            "CC(=O)c1c(O)c(C)c(O)c2c1OC1=CC(=O)C(C(C)=O)C(=O)C12C",
-            "NC(=O)c1ccc[n+]([O-])c1",
-            "O=C(O)c1ccccc1O",
-            "Cc1cc(O)c(C=O)c2c1C(=O)Oc1c(CO)c(O)c(C(=O)O)c(C)c1O2",
-            "COc1cc2c(c3oc(=O)c(CC(=O)Nc4ccccn4)c(C)c13)CCC(C)(C)O2"
+            "O=C(O)CN(CCN(CC(=O)O)CC(=O)O)CC(=O)O",
+            "C=C1CC23CC4C5C6(C)CC(O)CC57C(C2C(O)C1C(O)C37)N4C6.Cl",
+            "Cc1cc2c(c[nH+]1)C(=Cc1ccccc1)c1ccccc1-2.[Cl-]",
+            "C[n+]1cccc(C(=O)O)c1.[Cl-]"
         ]
     },
     "urine_mass2motif_210.m2m": {
         "SMILES": [
-            "O=C1CN=C(c2ccccc2)c2cc(Cl)ccc2N1",
-            "CCCc1nc(C(C)(C)O)c(C(=O)O)n1Cc1ccc(-c2ccccc2-c2nn[nH]n2)cc1",
-            "CC(CO)N=C(O)C1C=C2c3cccc4[nH]cc(c34)CC2N(C)C1",
-            "CCCCc1nc(Cl)c(C(=O)O)n1Cc1ccc(-c2ccccc2-c2nn[nH]n2)cc1",
-            "CCN(CC)C(=O)C1C=C2c3cccc4[nH]cc(c34)CC2N(C)C1"
+            "CCOc1nc2cccc(C(=O)O)c2n1Cc1ccc(-c2ccccc2-c2nn[nH]n2)cc1",
+            "CCCc1nc(C(C)(C)O)c(C(=O)OCc2oc(=O)oc2C)n1Cc1ccc(-c2ccccc2-c2nn[nH]n2)cc1",
+            "CCCCC1=NC2(CCCC2)C(=O)N1Cc1ccc(-c2ccccc2-c2nn[nH]n2)cc1"
         ]
     },
     "urine_mass2motif_211.m2m": {
         "SMILES": [
-            "OCc1cnc(O)nc1O",
-            "CCC(C)Oc1ccc(C(=O)O)cc1",
             "O=C(NCC1(O)CCc2ccccc2C1)c1ccccc1C(F)(F)F",
-            "CC(C)c1nn(C(=O)NC(C)(C)C)c(=O)n1N"
+            "CC(C)c1nn(C(=O)NC(C)(C)C)c(=O)n1N",
+            "CN1C(=O)N=C(O)C1(C)C"
         ]
     },
     "urine_mass2motif_212.m2m": {
         "SMILES": [
-            "COc1cc(C=NN=C(O)c2ccccc2N)ccc1O",
-            "N#Cc1ccccc1Oc1cc(O)ncn1",
-            "Nc1ccc(C(=O)OCCCOC(=O)c2ccc(N)cc2)cc1",
-            "CCn1nnc2c(N3CCOCC3)nc(-c3ccc(NC(=O)Nc4ccc(C(=O)N5CCN(C)CC5)cc4)cc3)nc21",
-            "CC(=O)Nc1ccc(C(=O)Nc2ccccc2N)cc1"
+            "Nc1ccccc1C(=O)Oc1ccc2ccccc2c1",
+            "CC(C)NC(=O)c1ccccc1N"
         ]
     },
     "urine_mass2motif_213.m2m": {
         "SMILES": [
-            "CC(=O)OC(C)(C)CCC(=O)C(C)(O)C1C(O)CC2(C)C3CC=C4C(CC(O)C(O)C4(C)C)C3(C)C(=O)CC12C",
-            "COc1cc2oc(=O)ccc2cc1C(OC(=O)C=C(C)C)C(O)C(C)(C)O",
-            "CCC(C)C(O)C(=O)OC(C(=O)OC(C(=O)OCC(O)C(O)C(O)C(O)CO)C(C)CC)C(C)C",
-            "O=C1COc2cc(O)ccc21",
-            "NC1(Cc2ccc(Cl)cc2)CCN(c2ncnc3[nH]ccc23)CC1"
+            "Cc1cc(C(F)(C(F)(F)F)C(F)(F)F)ccc1NC(=O)c1cccc(I)c1C(=O)NC(C)(C)CS(C)(=O)=O",
+            "C[N+](C)(C)CC(O)CC(=O)[O-]"
         ]
     },
     "urine_mass2motif_22.m2m": {
         "SMILES": [
-            "CC(O)=NC(C)C(=O)CCCCC(C)C(=O)O",
-            "COc1ccc2[nH]c3c(c2c1)CCN1CC2CC3C1C(C(C)O)C2",
-            "CC=C1CN2CCc3c([nH]c4ccc(O)cc34)C2CC1CCO",
-            "O=C1c2c(O)cc(O)cc2OC(c2cc(O)c(O)c(O)c2)C1O",
-            "CCC12CN3CCC1CC3C(c1ccnc3ccc(O)cc13)O2",
-            "CN1CCC23c4c5ccc(O)c4OC2C(O)C=CC3C1C5",
-            "Cn1c2ccccc2c(=O)c2c(O)cccc21",
-            "O=c1c(O)c(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12",
-            "CC=C1CN2CCc3c4n(c5ccccc35)C(C(=O)OC)C1CC42",
-            "Cc1oc2cc(O)ccc2c(=O)c1-c1ccccc1"
+            "Cc1ccnc2c1NC(=O)c1cccnc1N2C1CC1",
+            "Cc1cc(OC(=O)c2c(C)cc(O)cc2O)cc(O)c1C(=O)O"
         ]
     },
     "urine_mass2motif_220.m2m": {
         "SMILES": [
-            "CCCc1cc2c(=O)c(-c3ccc4c(c3)OCO4)coc2c(CN(C)C)c1O.Cl",
-            "NC(N)=NCCN1CCCCCCC1",
-            "N=C(N=C(N)N)N1CCOCC1",
-            "Nc1nc(N)nc(N)n1",
-            "CC(C(=O)O)c1cccc(C(=O)c2ccccc2)c1",
-            "Nc1cc(=O)nc(N)[nH]1",
-            "CCC=CCC=CCC=CCC=CCC=CCC=CCCC(=O)OC(COC(=O)CCCCCCCCCCCCCCC)COP(=O)([O-])OCC[N+](C)(C)C",
-            "N=C(N)NCCCc1nc(-c2c[nH]c3ccccc23)cnc1N",
-            "N=C(N)NS(=O)(=O)c1ccc(N)cc1",
-            "CN(C)C(=N)NC(=N)N",
-            "NC1=NC2n3c(cc(Br)c3Br)C(=O)N3CCCC23N1",
-            "Cc1nc(=NC(=N)N)[nH]c2ccccc12",
-            "CCC=CCC=CCC=CCC=CCC=CCC=CCCC(=O)OC(COC(=O)CCCCCCCCCCCCCCCC)COP(=O)([O-])OCC[N+](C)(C)C",
-            "Cc1oc2c(C[NH+](C)C)c(O)ccc2c(=O)c1-c1ccc2c(c1)OCCCO2.[Cl-]",
-            "NC(N)=NC(=O)c1nc(Cl)c(N2CCCCCC2)nc1N",
-            "COC(=O)C(O)c1ccccc1",
-            "NCCCCN=C(N)N"
+            "Cc1cc(-n2cccc2)c(S(C)(=O)=O)cc1C(=O)N=C(N)N",
+            "NC(N)=NCc1cccc(I)c1"
         ]
     },
     "urine_mass2motif_221.m2m": {
         "SMILES": [
-            "O=c1c(O)c(-c2ccc(O)c(O)c2)oc2cc(O)cc(O)c12",
-            "CCN(CC)c1ncc2c(c1C#N)N(Cc1ccccc1)CC2",
-            "COc1cc(O)ccc1C(=O)C=Cc1ccc(O)cc1",
-            "C=C(C)c1ccc(NC(=O)N(C)C)cc1",
-            "CCOc1ccc2c(c1)C(C)=CC(C)(C)N2",
-            "COc1cccc(C(O)=NCCc2c(C)[nH]c3ccccc23)c1",
-            "COCCOCC(CC1(C(=O)NC2CCC(C(=O)O)CC2)CCCC1)C(=O)Oc1ccc2c(c1)CCC2"
+            "C=C1C(=O)OC2C1CC(O)C(C)=CCCC1(C)OC21",
+            "O=S(=O)(O)CCN1CCN(CCO)CC1",
+            "COC(=O)c1c(C)cc(O)cc1O",
+            "O=CCCCCCCCc1cccc[n+]1CCCCCC=O"
         ]
     },
     "urine_mass2motif_224.m2m": {
         "SMILES": [
-            "O=C(O)C(O)Cc1ccccc1",
-            "Cc1[nH]nc2c1N=C(c1ccccc1Cl)c1cc([N+](=O)[O-])ccc1N2",
-            "O=C(O)Cc1cc(O)ccc1Nc1c(Cl)cccc1Cl",
-            "C=CC(C)(C)c1c2occc2c(OC)c2ccc(=O)oc12",
-            "COc1cc2c(c(O)c1OC)c(=O)c1cccc(O)c1n2C",
-            "C=CC(C)(C)c1c2ccoc2c(OC)c2oc(=O)ccc12",
-            "Cc1ccnc2c1C(=O)c1ccccc1C2=O",
-            "NC(=O)N1c2ccccc2C=Cc2cc(O)ccc21"
+            "O=c1oc2cc(O)ccc2c2ccccc12",
+            "O=C(O)c1cccc2c(=O)c3ccccc3[nH]c12"
         ]
     },
     "urine_mass2motif_228.m2m": {
@@ -720,43 +411,23 @@
             "CCCCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
             "CCCCCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
             "CCCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
-            "NC(=O)C(c1ccccc1)C1CCCCN1",
-            "CCCCCCCCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
-            "CCCCCCCCC(=O)NC(CCCCN)C(=O)O",
-            "CCCCCCCCCCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
-            "NCCCCC(N)C(=O)O",
-            "CCCCCCCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
-            "CCCCCCCCCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
-            "CCCCCC=CCC=CCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
-            "CCCCCCCCC=CCCCCCCCCC(=O)NC(CCCCN)C(=O)O",
-            "O=C(O)C1CSC(c2cccnc2)N1",
-            "CCCCCCCCCCCC(=O)NCCCCC(N)C(=O)O",
-            "CCCCCCCCC=CCCCCCCCCCC(=O)NC(CCCCN)C(=O)O"
+            "Cc1ccc2c(NS(=O)(=O)c3ccccc3Cl)cccc2c1Oc1ncccc1-c1ccnc(NC2CCCNC2)n1"
         ]
     },
     "urine_mass2motif_229.m2m": {
         "SMILES": [
-            "CCCCCC[N+](CCCCCC)(CCCCCC)CCCCCC",
-            "CCCCCCCCCC[N+](C)(C)CCCCCCCCCC",
-            "CCCCCCCC[N+](CCCCCCCC)(CCCCCCCC)CCCCCCCC",
-            "CCCCCCCCCCCCCCCC[N+](C)(C)CCCCCCCCCCCCCCCC",
-            "CCCCC[N+](CCCCC)(CCCCC)CCCCC",
-            "CCCCc1oc2ccccc2c1C(=O)c1cc(I)c(OCCN(CC)CC)c(I)c1",
-            "CCCCCCCCCCCC[N+](C)(C)CCCCCCCCCCCC",
-            "CC1(C)CC(OC(=O)CCCCCCCCC(=O)OC2CC(C)(C)NC(C)(C)C2)CC(C)(C)N1",
-            "COc1cccc(C2(O)CCCCC2CN(C)C)c1",
-            "CN(C)CC1CCCCC1(O)c1cccc(O)c1",
-            "CCC(=O)OC(Cc1ccccc1)(c1ccccc1)C(C)CN(C)C",
-            "COc1cc(C(=O)CCN(C)C)cc(OC)c1OC"
+            "COc1ccc(C2OCC3(OC(C)=O)C(c4ccc(OC5OC(CO)C(O)C(O)C5O)c(OC)c4)OCC23)cc1OC",
+            "CCCCCCC[N+](CCCCCCC)(CCCCCCC)CCCCCCC",
+            "CCCCCCCCCCCCCC[N+](C)(C)CCCCCCCCCCCCCC",
+            "C[N+]1(C)CCc2cc3c(cc2C1C1OC(=O)c2c1ccc1c2OCO1)OCO3",
+            "COc1ccc(Cl)c(Nc2nc3ccccc3nc2NS(=O)(=O)c2cccc(NC(=O)C(C)(C)N)c2)c1"
         ]
     },
     "urine_mass2motif_23.m2m": {
         "SMILES": [
-            "NC(N)=NCC(=O)O",
-            "O=C(O)CN=C(O)c1ccccc1O",
-            "CN(C)c1cccc2c(S(=O)(=O)NC(CCC(=O)NC(CS)C(=O)NCC(=O)O)C(=O)O)cccc12",
-            "O=C(O)CNC(=O)c1ccc(O)cc1",
-            "CNC(=O)ON=C(C)SC"
+            "O=C(O)CNC(=O)c1ccc(Cl)cc1",
+            "O=C(O)CN=C(O)c1ccccc1I",
+            "CCCn1c(=O)c(CCCOC(=O)NC)nc2ccccc21"
         ]
     },
     "urine_mass2motif_230.m2m": {
@@ -765,594 +436,328 @@
             "CCCCCCCCCCCCCCCCCCCCCCC(O)C(=O)NC(CO)C(O)CCCCCCCCCCCCCCC",
             "CC(C)(O)c1cn(-c2ccc(-c3cc(F)c(CO)c(S(C)(=O)=O)c3)cc2F)c(C(C)(C)c2c(Cl)cccc2Cl)n1",
             "CCCCCCCCCCCCCCCCCCCCCC(=O)NC(CO)C(O)CCCCCCCCCCCCCCC",
-            "CC1CCC2N(C1)CC1C3CC4C(CC(=O)C5CC(OC6OC(CO)C(O)C(O)C6O)CCC54C)C3CCC1C2(C)O",
-            "CC(=O)N(CC(O)CO)c1c(I)c(C(=O)NCC(O)CO)c(I)c(C(=O)NCC(O)CO)c1I",
-            "CCCCCCCCCCCCC=CCC(O)C(CO)NC(=O)CCCCCCCCCCCCCCCCCCCCCCC",
-            "CCCCCCCCCCCCCCCCCCCCCCCC(=O)NC(CO)C(O)CCCCCCCCCCCCCCCCC",
-            "CCCCCCCCCCCCCC=CC(O)C(CO)NC(=O)CCCCCCCCCCCCCCCCCCCCC",
-            "CCCCCCCCCCCCCC=CC(O)C(CO)NC(=O)C(O)CCCCCCCCCCCCCCCCCCCCCC",
-            "Cc1c(-c2c(F)cc(C(N)=O)c3[nH]c4c(c23)CCC(C(C)(C)O)C4)cccc1-n1c(=O)c2cccc(F)c2n(C)c1=O",
-            "CCCCCCCCCCCCCC=CC(O)C(CO)NC(=O)CCCCCCCCCCCCCCCCC",
-            "O=C(O)c1cc(Oc2ccc(C(F)(F)F)cc2Cl)ccc1[N+](=O)[O-]",
-            "CC=C(C)C(=O)OC1CC(OC(C)=O)C2(C(=O)OC)COC3C2C12COC(O)(C(=O)OC)C2C(C)(C12OC1(C)C1CC2OC2OC=CC21O)C3O",
-            "CCCCCCCCCCCCCCCC(=O)NC(CO)C(O)CCCCCCCCCCCCCCC",
-            "CCCCCCCCCCCCCCCCCC(=O)NC(CO)C(O)CCCCCCCCCCCCCCC",
-            "COC=C(C(=O)O)c1ccccc1Oc1cc(Oc2ccccc2C#N)ncn1",
-            "CC(C)C1NC(=O)C(CC2(O)c3ccccc3N3C(=O)C(C)(C)NC32)n2c1nc1ccccc1c2=O",
-            "Cc1c(-c2ccc(C(N)=O)c3[nH]c4cc(C(C)(C)O)ccc4c23)cccc1-n1cnc2ccccc2c1=O",
-            "CC1CCC(n2cnc(CC(CCCN)C(=O)O)c2)CC1",
-            "Cc1noc(C)c1-c1cc(C(O)(c2ccccn2)c2ccccn2)c2nc(C3CC3)[nH]c2c1",
-            "CC1CCC2N(C1)CC1C3CC4C(CC(O)C5CC(O)CCC54C)C3CCC1C2(C)O",
-            "Cc1cc2nc3c(=O)[nH]c(=O)nc-3n(CC(O)C(O)C(O)COP(=O)(O)O)c2cc1C",
-            "CCCCCCCCCCCCCCCCCCCCCCCC(=O)OCC(O)COP(=O)([O-])OCC[N+](C)(C)C",
-            "CC(CCC(=O)NCCS(=O)(=O)O)C1CCC2C3CCC4CC(O)CCC4(C)C3CCC12C"
+            "CC1CCC2N(C1)CC1C3CC4C(CC(=O)C5CC(OC6OC(CO)C(O)C(O)C6O)CCC54C)C3CCC1C2(C)O"
         ]
     },
     "urine_mass2motif_232.m2m": {
         "SMILES": [
-            "O=C(c1cccc(O)c1)c1c(O)cc(O)cc1O",
-            "CCC(=NOCC=CCl)C1=C(O)CC(C2CCOCC2)CC1=O",
-            "Cc1nnc(-c2cccs2)c2cn(-c3cccc(Cl)c3)nc12",
-            "CC1=C2C3OC(=O)C(C)C3CCC2(C)C=CC1=O",
-            "CN1C(=O)CC(=O)N(c2ccccc2)c2cc(Cl)ccc21",
-            "COc1ccc(-c2coc3cc(OC)cc(OC)c3c2=O)cc1",
-            "COC(=O)c1ccc(OC)c(S(=O)(=O)NC2CCn3nccc3C2)c1",
-            "CN(C)Cc1ccc(S(=O)(=O)n2ccc(C=CC(=O)NO)c2)cc1",
-            "NCCC(O)=NC(Cc1cnc[nH]1)C(=O)O",
-            "Clc1ccc2c(c1)C=Nc1c(ncnc1N1CCOCC1)O2",
-            "CC1(C)SC2C(NC(=O)C(N)c3ccccc3)C(=O)N2C1C(=O)O",
-            "CCOP(=S)(OCC)Oc1ccc2c(C)c(Cl)c(=O)oc2c1",
-            "O=C(O)c1cccnc1Nc1cccc(C(F)(F)F)c1",
-            "COc1cc2oc(=O)ccc2cc1O",
-            "N#CC1=C(N)Oc2c(oc(CO)cc2=O)C1c1ccccc1[N+](=O)[O-]",
-            "O=C(C=Cc1ccc(O)c(O)c1)OC1CC(O)(C(=O)O)CC(O)C1O"
+            "COc1c(O)cc2cc(C)oc(=O)c2c1O",
+            "CC(=O)OCC1=C(C(=O)O)N2C(=O)C(N)C2SC1",
+            "O=C(O)C(O)C(O)C(O)C(O)C(=O)O",
+            "COc1ccc(-c2coc3cc(O)ccc3c2=O)cc1OC"
         ]
     },
     "urine_mass2motif_233.m2m": {
         "SMILES": [
-            "C=C(C)C(O)CCC(C)(O)C1(O)CCC2(C)C1C(OC(C)=O)CC1C3(C)CCC(OC(=O)CC(=O)O)C(C)(C)C3CCC12C",
-            "CCN1CC2(COC)C(O)CC(OC)C34C5CC6(O)C(OC)C(O)C(OC(C)=O)(C5C6OC(=O)c5ccccc5)C(C(OC)C23)C14",
-            "CCC(N)C(=O)O",
-            "C[N+](C)(C)CC(=O)[O-]",
-            "COC(=O)c1cc(C(F)(F)F)nc(SCc2cccs2)c1C#N",
-            "COCC12CN(C)C3C4C(OC)C1C3(C(OC)CC2O)C1CC2(O)C(OC)C(O)C4(OC(C)=O)C1C2OC(=O)c1ccccc1",
-            "CCC=CCC1C(=O)C=CC1(CCCCC1CCC(=O)O1)OC(C)=O",
-            "Cc1c[nH]c(C=C2C(=O)Nc3ccccc32)c1CCC(=O)O",
-            "CC(=O)OC1CC23CC24CCC(OC2OCC(O)C(O)C2O)C(C)(C)C4CC=C3C2(C)CC3OC4(CC(C)C3C12C)OCC1(C)OC14",
-            "CC(=O)OC(C)(C)C=CC(=O)C(C)(O)C1C(O)CC2(C)C3CC=C4C(CC(=O)C(O)C4(C)C)C3(C)C(=O)CC12C",
-            "CC(=O)OC1CC2(C)C(CC(O)C3C4(C)CCC(O)C(C)C4CCC32C)C1=C(CCC=C(C)C)C(=O)[O-].[Na+]",
-            "COC1C=COC2(C)Oc3c(C)c(OC(=O)c4ccc(C)cc4)c4c(c3C2=O)C(=O)C(N2CCCC2)=C(NC(=O)C(C)=CC=CC(C)C(O)C(C)C(O)C(C)C(OC(C)=O)C1C)C4=O",
-            "CC1CC(O)OC2CC3(C)C4C(OC5OC(CO)C(O)C(O)C5O)CC5C(C)(C)C(OC6OCC(O)C(O)C6O)CCC56CC46CCC3(C)C12",
-            "COC(=O)C1CC(OC)CN1S(=O)(=O)c1cc(F)ccc1OC",
-            "CC=C(C)C(=O)OC1C2C3(C)CCC(OC4CC(OC)C(OC5OC(C)C(O)C(OC)C5O)C(C)O4)CC3CCC23OC32CCC(C(C)=O)C2(C)C1OC(C)=O",
-            "COCC(=O)N(c1c(C)cccc1C)N1CCOC1=O",
-            "COc1ccc(-c2ccc3ncc4c(c3c2)n(-c2ccc(N3CCNCC3)c(C(F)(F)F)c2)c(=O)n4C)cn1",
-            "CCc1c(C(=O)OC)ncc2[nH]c3cc(OC)c(OC)cc3c12"
+            "CC(=O)OC1CC2(C)C3CC=C4C(CC(OC5OC(CO)C(O)C(O)C5O)C(O)C4(C)C)C3(C)CCC2(C)C1C(C)(O)C(=O)CCC(C)(C)O",
+            "CC(=O)OC1CC23CC24CCC(OC2OCC(O)C(O)C2O)C(C)(C)C4CCC3C2(C)CC3OC4(CC(C)C3C12C)OCC1(C)OC14",
+            "CC(=O)OC1CC23CC24CCC(OC2OCC(O)C(O)C2O)C(C)(C)C4CCC3C2(C)C(O)C34OC(CC(C)C3C12C)C(C(C)(C)O)O4",
+            "COC1C=COC2(C)Oc3c(C)c(O)c4c(c3C2=O)C(=O)C(N2CCN(c3ccccn3)CC2)=C(NC(=O)C(C)=CC=CC(C)C(O)C(C)C(O)C(C)C(OC(C)=O)C1C)C4=O",
+            "CC(=O)OC(C)(C)C=CC(=O)C(C)(O)C1C(O)CC2(C)C3CC=C4C(C=C(O)C(=O)C4(C)C)C3(C)C(=O)CC12C"
         ]
     },
     "urine_mass2motif_236.m2m": {
         "SMILES": [
-            "Cc1ccccc1OCc1nnc(SCC(N)=O)n1-c1ccccc1",
-            "COc1ccc(C=O)cc1CSc1nc2ccccc2[nH]1",
-            "c1ccc2nc3ccccc3nc2c1",
-            "O=C(OCC1=CC(O)C2C=COC(OC3OC(CO)C(O)C(O)C3O)C12)c1ccccc1",
-            "CCC1NC2CC3(C(=O)N(OC)c4cc(OC)ccc43)C3CC1C2CO3",
-            "COc1ccc(C=O)cc1CSc1nc2c(O)ncnc2n1C"
+            "COc1ccc2nc(S(=O)Cc3ncc(C)c(OC)c3C)[nH]c2c1",
+            "COc1ccc2nc(S(=O)(=O)Cc3ncc(C)c(OC)c3C)[nH]c2c1",
+            "N#Cc1c(N=Cc2ccc(O)cc2O)sc2c1C1CCN2CC1",
+            "CCCCc1c(C)nc(NCC)nc1OS(=O)(=O)N(C)C",
+            "COc1c(C)cnc(CSc2nc(O)c3ccccc3n2)c1C"
         ]
     },
     "urine_mass2motif_237.m2m": {
         "SMILES": [
-            "O=C1C=C2C=CC3CC2(O1)C1CCCCN31",
-            "NC(CSSCC(N)C(=O)O)C(=O)O",
-            "Cc1ccc2c(NS(=O)(=O)c3ccccc3Cl)cccc2c1Oc1ncccc1-c1ccnc(NC2CCCNC2)n1",
-            "Cc1cc(C(=O)CN2CCCC2)c(C)n1-c1ccc(F)cc1",
-            "CCCCCCCCC=CCCCCCCCC(=O)NC(CCCCN)C(=O)O",
-            "O=C(C=Cc1ccc(O)c(O)c1)OC(Cc1ccc(O)c(O)c1)C(=O)O",
-            "CN(C)C1C(=O)C(=C(O)NCN2CCCC2)C(=O)C2(O)C(=O)C3=C(O)c4c(O)cccc4C(C)(O)C3CC12",
-            "COc1ccc2nc(OC3CCNCC3)sc2c1",
-            "NCCCCNCCCN",
-            "C[N+](C)(C)CCCCC(N)C(=O)[O-]",
-            "O=C(NC1CCNCC1)c1[nH]ncc1NC(=O)c1c(Cl)cccc1Cl"
+            "CCC(C)OC(=O)N1CCCCC1CC(=O)O"
         ]
     },
     "urine_mass2motif_238.m2m": {
         "SMILES": [
-            "CCN=C(O)CCC(N)C(=O)O",
-            "CCCCCCCCC(=O)NC(CCCC(=O)O)C(=O)O",
-            "CC(N)C(O)=NC(CCC(=N)O)C(=O)O",
-            "C=CCN=C(O)C(O)C(O)C(O)=NCC=C",
-            "N=C(O)CCC(N=C(O)Cc1ccccc1)C(=O)O",
-            "CCCCCCCC(=O)NC(CCCC(=O)O)C(=O)O"
+            "CC(=O)NC(CCC(N)=O)C(=O)O",
+            "N=C(O)CCC(N=C(O)CN)C(=O)O",
+            "NC(CCC(=O)Nc1ccc([N+](=O)[O-])cc1)C(=O)O"
         ]
     },
     "urine_mass2motif_239.m2m": {
         "SMILES": [
-            "C=C(C)C(=O)OCCNC(C)(C)C",
-            "CCC(=O)N(c1ccccc1)C1(C(=O)OC)CCN(CCC(=O)OC)CC1",
-            "COc1cccc2c1C(=O)c1c(O)c3c(c(O)c1C2=O)CC(O)(C(=O)CO)CC3OC1CC(N)C(O)C(C)O1",
-            "CC1(C)OC2COC3(COS(N)(=O)=O)OC(C)(C)OC3C2O1",
-            "CCCC(=O)CC(=O)NC1CCOC1=O",
-            "CC(=O)CC1CC(C)C(C)(CC(=O)C(C)=CC=CC(C)=CC=CC=C(C)C=CC=C(C)C#CC2=C(C)CC(O)CC2(C)C)O1",
-            "CC(=CC(=O)N(O)CCCC(N)C(=O)OCCC(C)=CC(=O)N(O)CCCC1NC(=O)C(CCCN(O)C(=O)C=C(C)CCO)NC1=O)CCO"
+            "C=C(C)C(=O)OCCOCCOc1ccc(C(C)(C)c2ccc(OCCOC(=O)C(=C)C)cc2)cc1",
+            "C=C(C)C(=O)OCCOCCOCCOCCOCCOc1ccc(C(C)(C)c2ccc(OCCOCCOCCOCCOCCOC(=O)C(=C)C)cc2)cc1",
+            "C=C(C)C(=O)OCCOCCOCCOc1ccc(C(C)(C)c2ccc(OCCOCCOCCOC(=O)C(=C)C)cc2)cc1"
         ]
     },
     "urine_mass2motif_240.m2m": {
         "SMILES": [
-            "COc1cc(C2NCCC3(OCCO3)C2(C)C)cc(OC)c1OC",
-            "C[N+](C)(C)CCCC(=O)[O-]",
-            "CCOc1cc(C=NNC(=O)CC2(C)OCCO2)ccc1OCc1ccccc1",
-            "Cc1cc2c(F)c(Oc3ncnn4cc(OCC(C)OC(=O)C(C)N)c(C)c34)ccc2[nH]1",
-            "NCCCC(=O)O",
-            "CC(=O)OCCN(CCOC(C)=O)c1ccc(N=Nc2ccc([N+](=O)[O-])cc2C#N)cc1"
+            "CC(=O)C(C)=O",
+            "CCOC(=O)CCCSc1nc2c(c(C(F)(F)F)c1C#N)CC(C)CC2",
+            "CC(=O)OCC[N+](C)(C)C"
         ]
     },
     "urine_mass2motif_241.m2m": {
         "SMILES": [
-            "NCC1OC(OC2C(N)CC(N)C(OC3OC(CO)C(O)C(N)C3O)C2O)C(N)CC1O",
-            "NCC1OC(OC2C(N)CC(N)C(OC3OC(CO)C(O)C(N)C3O)C2O)C(O)C(O)C1O",
-            "CC12CCC(=O)C=C1CCC1C2C(=O)CC2(C)C1CCC2(O)C(=O)CO",
-            "CCCC=CC=CCC(CC(=O)O)NC(C)=O",
-            "COC1OC2OC3(C)CCC4C(C)CCC(C1C)C24OO3"
+            "NCCC(O)C(=O)NC1CC(N)C(OC2OC(CN)C(O)C(O)C2O)C(O)C1OC1OC(CO)C(O)C(N)C1O",
+            "CCCCOc1ccc(CNC(=O)C2CCN(C(=O)c3cc4ccsc4[nH]3)CC2)cc1",
+            "CCCCOc1ccc(CCC=C2SC(=O)N(CCN)C2=O)cc1"
         ]
     },
     "urine_mass2motif_242.m2m": {
         "SMILES": [
-            "O=C1C=C2CC3(O)COc4c(ccc(O)c4O)C3=C2C=C1O",
-            "COCC1(CO)C(=O)C2CCN1CC2",
-            "COc1c2c(cc3c1C(CC(O)C(C)C)N(C)CC3)OCO2",
-            "COc1ccc(C2CC(=O)c3c(O)cc(OC4OC(COC5OC(C)C(O)C(O)C5O)C(O)C(O)C4O)cc3O2)cc1OC",
-            "COc1ccc2c(=O)cc(-c3ccccc3)oc2c1"
+            "CN1C2CC(OC(=O)C(CO)c3ccccc3)CC1C1OC12",
+            "CN1C2CC(OC(=O)C3CCC(C(=O)OC4CC5C6OC6C(C4)N5C)(c4ccccc4)c4ccccc43)CC1C1OC12"
         ]
     },
     "urine_mass2motif_245.m2m": {
         "SMILES": [
-            "O=C(O)C(O)Cc1ccccc1",
-            "CCC1=CC2CN3CCc4c([nH]c5ccccc45)C(C(=O)OC)(C2)C13",
-            "CC(C)CNC(=O)C=CC=CCCCC=Cc1ccc2c(c1)OCO2",
-            "C1=C2CCCNC2C2CC1C1CCCCN1C2",
-            "CC(=O)NCC1CN(c2ccc(N3CCSCC3)c(F)c2)C(=O)O1",
-            "COc1c(O)cc2c3c1COc1cc(O)cc(c1-3)CC2",
-            "COc1c(C)c(O)c(C)c(O)c1C(=O)CCc1ccccc1",
-            "CC(=O)N(C)C1C2CN3CCC(O2)C13.Cl",
-            "NCCC(=O)NC(Cc1cnc[nH]1)C(=O)O",
-            "NC(=O)NN=Cc1ccc([N+](=O)[O-])o1",
-            "CC(C)CS(=O)(=O)Nc1ccc2c(c1)NC(=O)C(C)(C)CO2",
-            "Cc1ccc(-c2cc(N3CCCC3)c(C#N)c3c2CSCC3)cc1",
-            "Nc1nnc(-c2ccc([N+](=O)[O-])o2)o1",
-            "CC(C)(C)NCC(O)COc1cccc2[nH]c(O)nc12",
-            "CC(=CC=CC(C)C(=O)O)C1CNC(C(=O)O)C1CC(=O)O"
+            "OC1=NC(Cc2ccccc2)CN2CCCCC12",
+            "CC=C1CN2CCc3c4n(c5ccccc35)C(C(=O)OC)C1CC42",
+            "COc1cc(O)cc(OC2OC(CO)C(O)C(O)C2O)c1",
+            "OC1CC(c2nc(-c3ccncc3)no2)N(C2CCCCC2)C1"
         ]
     },
     "urine_mass2motif_246.m2m": {
         "SMILES": [
-            "COC(=O)c1cc(OC)c(O)c(OC)c1",
-            "COc1ccc(C2CC(=O)c3c(O)cc(O)cc3O2)cc1O",
-            "CC1(C)CCC2(C(=O)O)CCC3(C)C(=CCC4C5(C)CCC(O)C(C)(C)C5CCC43C)C2C1",
-            "CCCCCCCCCCCCCCCCC(=O)O",
-            "O=C(O)CN=C(O)c1cccnc1",
-            "O=C(O)C=Cc1ccc(O)c(O)c1"
+            "Cn1c(=O)[nH]c2ncn(C)c2c1=O",
+            "Cn1c(=O)c2nc[nH]c2n(C)c1=O"
         ]
     },
     "urine_mass2motif_247.m2m": {
         "SMILES": [
-            "CC(C)CC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCCCCCCCCCCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CC(C)C(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CCCCCCCCCCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCCC=CC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
-            "CCCCCCCCCCCCCC(=O)OC(CC(=O)O)C[N+](C)(C)C",
-            "CC(C)C(=O)OC(CC(=O)O)C[N+](C)(C)C"
+            "CC(=O)OC(CC(=O)O)C[N+](C)(C)C",
+            "CCCCCCCCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
+            "CCCCCCCCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
+            "CCCCCC(=O)OC(CC(=O)[O-])C[N+](C)(C)C",
+            "CC(C)CC(=O)OC(CC(=O)[O-])C[N+](C)(C)C"
         ]
     },
     "urine_mass2motif_248.m2m": {
         "SMILES": [
-            "CC(=O)c1cn(CC(=O)NC(CC(C)C)C(=O)O)c2ccccc12",
-            "O=C(Cc1c[nH]c2ccccc12)N1CCN(S(=O)(=O)c2cccc3nsnc23)CC1",
-            "c1ccc2ncccc2c1",
-            "CC1NC(=O)C(Cc2c[nH]c3ccccc23)NC1=O",
-            "O=C1NC(Cc2c[nH]c3ccccc23)C(=O)NC1Cc1ccccc1",
-            "O=C(NCc1cc2ccccc2[nH]1)c1ccc(COc2ccccc2Cl)o1",
-            "CCC(NC(=O)CCc1c[nH]c2ccccc12)C(=O)O",
-            "CC(C)(O)C1OC2CCC3(C)C(O)(CCC4Cc5c([nH]c6ccccc56)C43C)C2=CC1=O"
+            "NC(=O)NCCCC(NC(=O)Cn1ccc2ccccc21)C(=O)O",
+            "N=C(O)Cc1c[nH]c2ccccc12",
+            "O=C1NC(Cc2c[nH]c3ccccc23)C(=O)NC1Cc1c[nH]c2ccccc12"
         ]
     },
     "urine_mass2motif_249.m2m": {
         "SMILES": [
-            "CNc1ncc(CN2CCCC(c3nc(=O)cc(-c4cccs4)[nH]3)C2)cn1",
-            "N#Cc1c(N2CCN(c3ncccn3)CC2)cc(-c2cc3ccccc3o2)c2c1CCCC2",
-            "Cc1ncc(C[n+]2csc(CCOP(=O)(O)OP(=O)([O-])O)c2C)c(N)n1",
-            "O=C(O)c1c(C(=O)O)c2ccccc2[nH]c1=O"
+            "Cn1c(=N)ccn(C2OC(CO)C(O)C2O)c1=O",
+            "Cc1cn(C2OC(CO)C(O)C2O)c(=O)nc1N"
         ]
     },
     "urine_mass2motif_256.m2m": {
         "SMILES": [
-            "O=C1CCCCCN1SSN1CCCCCC1=O",
-            "CC(C)C(N)C(=O)N1CCCC1B(O)O",
-            "Cc1nc2n(c(=O)c1CCN1CCC(c3noc4cc(F)ccc34)CC1)CCCC2",
-            "CC=C1CN2C3CC45c6ccccc6NC4(O3)C2CC1C5C(=O)OC"
+            "Cc1nnc(CN2CCC(Oc3ccncc3Br)C2)n1C",
+            "CCC(C)C1OC2(C=CC1C)CC1CC(CC=C(C)C(OC3CC(OC)C(OC4CC(OC)C(NC)C(C)O4)C(C)O3)C(C)C=CC=C3COC4C(O)C(C)=CC(C(=O)O1)C34O)O2"
         ]
     },
     "urine_mass2motif_259.m2m": {
         "SMILES": [
-            "CC(C)C(N)C(=O)N1CCCC1C(=O)O",
-            "CCCCC(=O)NC(CCCN)C(=O)O",
-            "O=C(O)C1CCCN1C(=O)Nc1ccccc1",
-            "CCCCCC(=O)NC(CCCN)C(=O)O",
-            "CC(NC(C)C(=O)O)C(=O)O",
-            "NC(Cc1ccc(O)cc1)C(=O)N1CCCC1C(=O)O"
+            "CCCNC(=O)C1OC1C(=O)NC(C(=O)N1CCCC1C(=O)O)C(C)CC",
+            "CN(CCOc1ccc(-c2ccc3c(c2)OCO3)cc1C(C)(C)C)CC(=O)O"
         ]
     },
     "urine_mass2motif_260.m2m": {
         "SMILES": [
-            "CCN(CC)C(=O)c1cccc(C(=O)O)c1",
-            "O=C(O)Cc1cnc[nH]1",
-            "CCCCCOC(=O)c1ccccc1C(=O)OCCCCC",
-            "CCCCCCOC(=O)c1ccccc1C(=O)c1ccc(N(CC)CC)cc1O"
+            "OC(=Nc1cc2nn(-c3ccccc3)nc2cc1Cl)c1ccc2c(c1)OCO2",
+            "COc1ccccc1N=C(O)c1ccc2c(c1)OCO2"
         ]
     },
     "urine_mass2motif_261.m2m": {
         "SMILES": [
-            "O=c1nc(O)c(Br)cn1C(c1ccccc1)c1ccccc1",
-            "COC(=O)C(Cc1ccccc1)NC(=O)N1CCN(C(c2ccccc2)c2ccccc2)CC1",
-            "CC(C)C1NC(C(=O)O)Cc2c1[nH]c1ccccc21",
-            "COCC(=O)N1CCN(C(=O)c2cc3n(n2)CCCC3)CC1",
-            "Cn1c(=O)c2c(ncn2C)n(C)c1=O",
-            "O=C(NC(NC(=S)Nc1ccc(F)c([N+](=O)[O-])c1)C(Cl)(Cl)Cl)C(c1ccccc1)c1ccccc1",
-            "O=c1[nH]c2ccccc2n1CCCN1CCN(C(c2ccccc2)c2ccccc2)CC1",
-            "O=C(COCC(=O)N1CCN(C(c2ccccc2)c2ccccc2)CC1)Nc1ccc(Cl)cc1C(=O)O",
-            "CC1=C(C(=O)OC(C)C)C(c2cccc([N+](=O)[O-])c2)C(C(=O)OC2CN(C(c3ccccc3)c3ccccc3)C2)=C(N)N1",
-            "NC(=O)CS(=O)C(c1ccccc1)c1ccccc1",
-            "O=C(Cc1c[nH]c2ccccc12)N1CCN(C(c2ccccc2)c2ccccc2)CC1",
-            "O=C(O)Cn1cnc2c(NC(=O)OC(c3ccccc3)c3ccccc3)ncnc21"
+            "CNCCOC(c1ccccc1)c1ccccc1",
+            "O=C(NCc1cccc(C(F)(F)F)c1)c1cc2n(n1)CCCC2"
         ]
     },
     "urine_mass2motif_262.m2m": {
         "SMILES": [
-            "O=c1oc2cc(O)ccc2c2oc3cc4c(cc3c12)OCO4",
-            "CC(C)=CCc1cc(C2CC(=O)c3c(O)cc(O)cc3O2)ccc1O",
-            "CC(C)(O)C(O)Cc1cc2ccc(=O)oc2cc1O",
-            "COc1cc(CCC(=O)CC(=O)CCc2ccc(O)c(OC)c2)ccc1O",
-            "COc1cc(C=CCO)cc(OC)c1OC1OC(CO)C(O)C(O)C1O",
-            "O=C1CC(c2ccc(O)cc2)Oc2cc(O)ccc21",
-            "COc1cc2oc(=O)ccc2cc1CC=C(C)C",
-            "O=c1c(-c2ccc(O)cc2)coc2cc(O)c(O)cc12"
+            "COc1ccc(-c2coc3cc(O)ccc3c2=O)cc1",
+            "C=C(C)C1CCC2(C)CCC3(C)C(CCC4C5(C)CCC(O)C(C)(C)C5CCC43C)C12",
+            "c1ccc2c(c1)[nH]c1cnccc12"
         ]
     },
     "urine_mass2motif_266.m2m": {
         "SMILES": [
-            "CC1=CC(=O)C(C(C)C)=CC1=O",
-            "O=CC(O)C(O)C(O)CO",
-            "C=CCSSSCC=C",
-            "CC=Cc1ccc2c(c1)OCO2",
-            "Cc1nccc2c1[nH]c1ccccc12",
-            "COc1cc(C(C)=O)cc(OC)c1O",
-            "C=CCS(=O)CC(N)C(=O)O",
-            "CC=CC1=CC(=O)C(O)C1O",
-            "CC1CCC(C(C)C)C(O)C1",
-            "CC(CN)C(=O)O",
-            "NC(Cc1ccc(O)c(O)c1)C(=O)O",
-            "Cc1cc(=O)n(C)c2ccccc12",
-            "S=C=NCc1ccccc1"
+            "Cl.NCC(=O)c1ccccc1",
+            "c1cncc(C2CCCCN2)c1",
+            "Cl.Cl.NCCc1cnc[nH]1",
+            "CCC(N)Cc1c[nH]c2ccccc12"
         ]
     },
     "urine_mass2motif_268.m2m": {
         "SMILES": [
-            "COc1ccc(C(O)CNC(=O)C=Cc2ccccc2)cc1",
-            "COC(=O)C(=CC1=C(C(=O)O)C23CCCC(C)(C)C2C(OC3=O)C1=O)C(C)C",
-            "COC(=O)CC1C(C(=O)OC)=COC(OC2OC(CO)C(O)C(O)C2O)C1=CCOC(=O)C=Cc1ccccc1",
-            "O=c1ccc2ccc3occc3c2o1",
-            "O=C(O)C=Cc1ccccc1",
-            "O=c1cc(-c2ccc(O)cc2)oc2cc(O)ccc12",
-            "CC(C)c1ccc(C=CC(=O)O)cc1",
-            "COc1c2c(cc3oc(CO)cc(=O)c13)OC(C(C)(C)O)C2",
-            "CN(C)CCCSc1ccccc1NC(=O)C=Cc1ccccc1",
-            "O=C(O)CNC(=O)C=Cc1ccccc1"
+            "O=c1ccoc2cc(O)cc(O)c12",
+            "O=C1c2c(O)cccc2C(C2OC(CO)C(O)C(O)C2O)c2cc(CO)cc(O)c21",
+            "CC1=CC(=O)C2(OC3OC(C)C(O)C(OC(=O)C=Cc4ccccc4)C3O)C=COC(OC3OC(CO)C(O)C(O)C3O)C12",
+            "O=C(C=Cc1ccccc1)N1CCCC1"
         ]
     },
     "urine_mass2motif_269.m2m": {
         "SMILES": [
-            "CCC1CC2CC3c4[nH]c5ccc(OC)cc5c4CCN(C2)C13",
-            "CCCCCCCc1nc(C=CC(=O)NCC(=O)O)cs1",
-            "CCC12CCCN3CCc4c(n(c5ccccc45)C(O)(C(=O)OC)C1)C32",
-            "Cc1c(C(C)C)c(=O)n(-c2ccccc2)n1C",
-            "CC(Cc1ccc(O)c(O)c1)(NN)C(=O)O",
-            "NC(=O)c1ncn(C2OC(CO)C(O)C2O)c1N"
+            "COc1ccc2[nH]cc(CCNC(C)=O)c2c1",
+            "COc1ccc2[nH]cc(CCNC(=O)CC3(n4cccc4)CCOCC3)c2c1"
         ]
     },
     "urine_mass2motif_27.m2m": {
         "SMILES": [
-            "Cc1ncc([N+](=O)[O-])n1CC(O)CN1CCOCC1",
-            "CCn1c(CN2CCOCC2)nnc1SCc1ccc(Cl)cc1",
-            "CCCCCCC=CCCCCCCCCC(=O)NC(C(=O)O)C(C)C",
-            "COC1CC(OC2CCC3(C)C(CCC4C3CCC3(C)C(C5=CC(=O)OC5)C(OC(C)=O)CC43O)C2)OC(C)C1O",
-            "COc1cc(Cl)c(C=NNC(=O)CN2CCOCC2)cc1OC",
-            "CC(=O)NCCCCNCCCNC(C)=O",
-            "O=C(COc1ccc(Cl)cc1S(=O)(=O)NCC1CCCO1)N1CCOCC1",
-            "CNC(=O)C(C)Cn1cnc2ccc(-c3cnc(OC)c(NS(=O)(=O)c4ccc(F)cc4Cl)c3)cc2c1=O",
-            "CCCCCCCCCCCCCCCCCC(=O)NC(C(=O)O)C(C)C"
+            "C[N+](C)(C)CC(=O)[O-]",
+            "NCCCCC(=O)O",
+            "CC(C)C(N)C(=O)O",
+            "COC(=O)CCCN",
+            "CCCC(N)C(=O)O"
         ]
     },
     "urine_mass2motif_271.m2m": {
         "SMILES": [
-            "CC(CCC(=O)O)C1CCC2C3C(O)CC4CC(O)C(O)CC4(C)C3CCC12C",
-            "CC(CCC(=O)O)C1CCC2C3C(O)CC4C(O)C(O)CCC4(C)C3CCC12C",
-            "CC(C=CC(=O)O)C1CCC2C3C(O)CC4CC(O)CCC4(C)C3CCC12C",
-            "CC(CCC(=O)O)C1CCC2C3CCC4CC(O)CCC4(C)C3CC(=O)C12C",
-            "CC(CCC(=O)O)C1CCC2C3C(O)CC4CCCCC4(C)C3CC(O)C12C",
-            "COC(=O)C=CC(C)=CCC(O)C(C)=CCCC(C)C(C)O",
-            "CC(CCC(O)CCO)C1CCC2C3C(O)CC4CC(O)CCC4(C)C3CC(O)C12C",
-            "CC(CCC(=O)O)C1CCC2C3C(O)CC4CC(=O)CCC4(C)C3CCC12C",
-            "CCC=CCC1OC1CC=CCC=CCC=CCCCC(=O)O",
-            "CC12CC34CC(O)C5C(CO)(CO)CC(=O)CC5(C)C3CC1C2C4",
-            "CCC=CCC=CCC=CCC1OC1CC=CCCCC(=O)O",
-            "CC(CCCC(C)(O)CO)C1CCC2C3C(O)CC4CC(O)CCC4(C)C3CC(O)C12C"
+            "CC(CCC(=O)O)C1CCC2C3C(O)C(O)C4CC(O)CCC4(C)C3CCC12C",
+            "C=C1CC23CC(=O)C4C(CO)(CO)CCCC4(C)C2CCC1C3",
+            "C=C1CCC(OC(C)=O)C2(C)CC3OC(=O)C(C)=C3CC12",
+            "CC(CCC(=O)O)C1CCC2C3C(=O)CC4CC(O)CCC4(C)C3CCC12C"
         ]
     },
     "urine_mass2motif_272.m2m": {
         "SMILES": [
-            "CCCCCCCCCC(=O)NCCS(=O)(=O)O",
-            "CCCCCCCCCCC(=O)NCCS(=O)(=O)O",
-            "CCCCCCCCCCCCC(=O)NCCS(=O)(=O)O",
-            "C=CCCCCCCCCCCC(=O)NCCS(=O)(=O)O",
-            "CCCCCCCCCCCCCCCCC(=O)NCCS(=O)(=O)O",
-            "CCCCCCCCC=CCCCCCCCCC(=O)NCCS(=O)(=O)O"
+            "CCCCCCCCCCCCCCCCCCCCC(=O)NCCS(=O)(=O)O",
+            "CCCCCCCC(=O)NCCS(=O)(=O)O",
+            "CCCCCCCCC(=O)NCCS(=O)(=O)O"
         ]
     },
     "urine_mass2motif_273.m2m": {
         "SMILES": [
-            "CCCCCCCCC=CCCCCCCCC(=O)NCCCC(=O)O",
-            "C=CCCCCCCCCCCC(=O)NCCCC(=O)O",
-            "CCCCC=CCCCCCCCC(=O)NCCCC(=O)O",
-            "C=CCCCCCCCCCC(=O)NCCCC(=O)O",
-            "CCCCCCC=CCCCCCCCCC(=O)NCCCC(=O)O",
-            "CCCCCCC=CCCCCCCCC(=O)NCCCC(=O)O",
-            "CCCCCCC(=O)NCCCC(=O)O",
-            "C=CCCCCCCCCCCC(=O)NC(CC(C)C)C(=O)O"
+            "CCCCCCCCCCC(=O)NCCCC(=O)O",
+            "CCCCCCCCCC(=O)NCCCC(=O)O",
+            "CCCCCCCC(=O)NCCCC(=O)O",
+            "C=CCCCCCCCCC(=O)NCCCC(=O)O"
         ]
     },
     "urine_mass2motif_278.m2m": {
         "SMILES": [
-            "Nc1ccc(N=Nc2ccccc2)c(N)n1",
-            "CCNc1nc(NCC)nc(Nc2ccc(Cl)c(Cl)c2)n1",
-            "CN(C)C(N)=NCCCC(N)C(=O)O",
-            "CCNc1nc(NC(C)(C)C)nc(SC)n1",
-            "CCCOc1ccc(Oc2nc(NCC)nc(N(C)C)n2)nn1",
-            "CCn1c2ccccc2c2cc([N+](=O)[O-])ccc21",
-            "CCNc1nc(NC(C)C)nc(OC)n1"
+            "Cc1nc(N(C)C)nc(O)c1C",
+            "CC1N=C(N)NC(N(C)C)=N1"
         ]
     },
     "urine_mass2motif_279.m2m": {
         "SMILES": [
-            "Cc1ccc(C=C2C(=O)C3(C)CCC2C3(C)C)cc1",
-            "CC1=CCC(=C(C)C)C(=O)CC(C)=CCC1",
-            "CC(COc1ccc(Oc2ccccc2)cc1)Oc1ccccn1",
-            "CC(C)(O)C=Cc1c2occc2cc2ccc(=O)oc12",
-            "O=C(C=Cc1ccc(O)cc1)c1ccccc1",
-            "COc1c(O)cc(C=Cc2cc(O)cc(O)c2)cc1O",
-            "C=CCc1ccc(O)c(-c2cc(CC=C)ccc2O)c1",
-            "COc1ccc2cc(C(C)C(=O)O)ccc2c1"
+            "Cc1oc2cc3oc(=O)c(CC(=O)N(C)CCc4ccccn4)c(C)c3cc2c1C",
+            "CC1=CCCC2=CC(OC2=O)c2c(C)coc2C1"
         ]
     },
     "urine_mass2motif_281.m2m": {
         "SMILES": [
-            "COC(=O)C1=C(N)Oc2c(oc(CO)cc2=O)C1c1ccccc1[N+](=O)[O-]",
-            "CN=C1CN(O)C(c2ccccc2)=c2cc(Cl)ccc2=N1",
-            "COc1c(O)cc2c(c1O)C(=O)OC(C)C2O",
-            "CC(C)(O)C1C2OC(=O)C1C1(O)CC3OC34C(=O)OC2C14C",
-            "O=C(O)c1cccc(Nc2nccc(Nc3ccccc3C(=O)O)n2)c1",
-            "COC(=O)C(c1ccccc1Cl)N1CCc2ccsc2C1",
-            "COc1cc(C=CC(=O)O)cc(OC)c1OC",
-            "O=C(O)c1cccc(Nc2ccnc(Nc3ccccc3C(=O)O)n2)c1",
-            "O=C(O)c1cccnc1Nc1cccc(C(F)(F)F)c1",
-            "CSC1(CO)C(=O)N2C3C(=CC=CC3O)CC2(SC)C(=O)N1C"
+            "O=C(O)CC(O)(CC(=O)O)C(=O)O",
+            "Nc1cccc(Nc2ncc(-c3ccc(Cl)cc3)o2)c1"
         ]
     },
     "urine_mass2motif_282.m2m": {
         "SMILES": [
-            "CCCCCCCCCCCC(=O)NC(Cc1c[nH]c2ccccc12)C(=O)O",
-            "CCCCCCCCC(=O)NC(Cc1c[nH]c2ccccc12)C(=O)O",
-            "CCCCCCCCC=CCCCCCCCCCCCC(=O)NC(Cc1c[nH]c2ccccc12)C(=O)O",
-            "CCCCCCCCCCCCCCCC(=O)NC(Cc1c[nH]c2ccccc12)C(=O)O",
-            "C=CCCCCCCCCCC(=O)NC(Cc1c[nH]c2ccccc12)C(=O)O"
+            "O=C(O)C(Cc1c[nH]c2ccccc12)Nc1ccc([N+](=O)[O-])cc1[N+](=O)[O-]",
+            "C[N+](C)(C)C(Cc1c[nH]c2ccccc12)C(=O)[O-]"
         ]
     },
     "urine_mass2motif_283.m2m": {
         "SMILES": [
-            "O=C1NC(Cc2ccccc2)CN2CCCCC12",
-            "COC(=O)C1OC(Oc2cc3oc(-c4ccc(O)cc4)cc(=O)c3c(O)c2O)C(O)C(O)C1O",
-            "O=C(O)c1cccc2nc3ccccc3nc12",
-            "O=C(O)c1ccccn1",
-            "CCOC12CC(OC)C3(O)CC(C1C3OC(=O)c1ccc(OC)cc1)C13C(OC)CC(O)C4(COC)CN(CC)C1C2C(OC)C43",
-            "O=CN1CCN(c2cccc(Cl)c2)CC1",
-            "C=C(CO)C1Cc2c(ccc3c2OC2COc4cc(OC)c(OC)cc4C2(O)C3=O)O1",
-            "C=C(C)C1Cc2c(ccc3c2OC2C(O)Oc4cc(OC)c(OC)cc4C2(O)C3=O)O1"
+            "CN1CC(=O)NC1=O",
+            "O=C1C=CC(=O)c2c1ccc1c2ccc2ccccc21",
+            "CCCCc1ccc(C(=O)O)nc1",
+            "O=c1c2cccc3ccc4cccc1c4c32",
+            "Cc1ccc2nc3sc(=O)sc3nc2c1"
         ]
     },
     "urine_mass2motif_284.m2m": {
         "SMILES": [
-            "COCC1OC(n2cnc3c(=O)[nH]cnc32)C(O)C1O",
-            "COC1C(O)C(CO)OC1n1cnc2c(O)ncnc21",
-            "OCC1OC(n2cnc3c(O)ncnc32)C(O)C1O",
-            "COC1C(CO)OC(n2cnc3c(=O)[nH]cnc32)C1O",
-            "O=c1[nH]cnc2c1ncn2C1OC(COP(=O)(O)O)C(O)C1O"
+            "O=c1[nH]cnc2[nH]ncc12",
+            "Oc1ncnc2[nH]cnc12"
         ]
     },
     "urine_mass2motif_286.m2m": {
         "SMILES": [
-            "NCCCC(N)C(=O)O",
-            "CCOC(=O)CNC(=O)C1CCCN1C(=O)Cc1ccccc1",
-            "C=CC1C2=CCOC(=O)C2=COC1OC1OC(CO)C(O)C(O)C1O",
-            "CC(C)C(NC(=O)C1CCCN1)C(=O)O",
-            "CCCCCCC(=O)NC(CCCN)C(=O)O",
-            "C=CC1CNC(=S)O1",
-            "CCCCCCCCCCCCCC(=O)NC(CCCN)C(=O)O",
-            "CCCCCC=CCC=CCCCCCCCCCCCC(=O)NC(C(=O)O)C(C)C",
-            "CCCCCCCCCCCCCCC(=O)NC(CCCN)C(=O)O",
-            "CCCCCCCCCCCCCCCCC(=O)NC(CCCN)C(=O)O",
-            "CC1OC(OC2C(O)C(O)C(O)C(O)C2O)C(N)CC1N=C(N)C(=O)O",
-            "N=C(NCCCC(N)C(=O)O)NC(CC(=O)O)C(=O)O",
-            "O=C(O)C1CC(O)CN1C(=O)C1CCCN1",
-            "CCCCCCCCC=CCCCCCCCCC(=O)NC(CCCN)C(=O)O"
+            "NCC(=O)N1CCCC1C(=O)O",
+            "N=C(O)NCCCC(N)C(=O)O",
+            "CCc1ncnc(OC2CCN(C(=O)Cc3ccsc3)C2)c1F",
+            "N=C(N)NCCCC(N)C(=O)O",
+            "COc1ccc2c3c(c4cc(OC)c(OC)cc4c2c1)CC1CCCN1C3"
         ]
     },
     "urine_mass2motif_288.m2m": {
         "SMILES": [
-            "COc1cc(N(C)CCN(C)C)c(N)cc1Nc1nccc(-c2cn(C)c3ccccc23)n1",
-            "CNCCCN1c2ccccc2CCc2ccccc21",
-            "C=CC(=O)Nc1cc(Nc2ncc(Cl)c(-c3c[nH]c4ccccc34)n2)c(OC)cc1N(C)CCN(C)C",
-            "NCCCCNCCCN",
-            "C=CC(=O)Nc1cc(Nc2nccc(-c3cn(C)c4ccccc34)n2)c(OC)cc1N(C)CCN(C)C",
-            "CCOc1cccc(OCCN(C)C)c1C(=O)Nc1ccc(Cl)c(C(F)(F)F)c1",
-            "CN(C)CCOc1ccc(C(=C(CCCO)c2ccccc2)c2ccc(O)cc2)cc1",
-            "C=CC(=O)Nc1cccc(-n2c(=O)cc(C)c3cnc(Nc4ccc(OCCN(C)C)cc4OC)nc32)c1",
-            "COc1cc(C(=O)NCc2ccc(OCCN(C)C)cc2)cc(OC)c1OC",
-            "CCCCNc1nc(N)c2[nH]c(=O)n(Cc3ccc(OCCN(C)C)nc3)c2n1",
-            "CN(C)CCOc1cc(-c2cn[nH]c2)ccc1NC(=O)C1COc2ccccc2O1"
+            "C=CC(=O)Nc1cc(Nc2ncc(C(=O)OC(C)C)c(-c3cn(C)c4ccccc34)n2)c(OC)cc1N(C)CCN(C)C",
+            "C=CC(=O)Nc1cc(Nc2nccc(-c3cn(C4CC4)c4ccccc34)n2)c(OC)cc1N(C)CCN(C)C",
+            "C=CC(=O)Nc1cc(Nc2nccc(-c3c[nH]c4ccccc34)n2)c(OC)cc1N(C)CCN(C)C"
         ]
     },
     "urine_mass2motif_29.m2m": {
         "SMILES": [
-            "NCCCC(N)C(=O)O",
-            "O=C(C=CC=Cc1ccc2c(c1)OCO2)N1CCCCC1",
-            "c1ccc2c(c1)[nH]c1cnccc12",
-            "CCOc1ccc2ccccc2c1C(=O)NC1C(=O)N2C1SC(C)(C)C2C(=O)O",
-            "CC12CCC(O)CC1CCC1C2CCC2(C)C(C3=CC(=O)OC3)C(O)CC12O",
-            "COc1ccc(C(=O)OC2CC3CCC(C2)N3C(C)=O)cc1OC",
-            "CC1C(O)CC2C(C(=O)O)=COC(OC3OC(CO)C(O)C(O)C3O)C21"
+            "CNC(=O)Oc1cccc2ccccc12",
+            "O=C(O)C1Cc2c([nH]c3ccccc23)C(c2coc3ccccc3c2=O)N1"
         ]
     },
     "urine_mass2motif_291.m2m": {
         "SMILES": [
-            "CCOC(=O)CNC(=O)CNC(=O)C(C)NC(=O)C(Cc1ccc(OC(=O)OC(C)(C)C)cc1)NC(=O)OC(C)(C)C",
-            "CC(C)CC(NC(=O)C(N)Cc1ccc(O)cc1)C(=O)O",
-            "CCC(C)C(NC(=O)C(N)Cc1ccc(O)cc1)C(=O)O",
-            "Nc1ncnc2c1ncn2C1OC(CO)C(O)C1O",
-            "CCN(c1cc(C#CCN2CCOCC2)cc(C(=O)NCc2c(C)cc(C)[nH]c2=O)c1C)C1CCC(N(C)CCOC)CC1",
-            "CC(=O)NC1C(O)CC(O)(C(=O)O)OC1C(O)C(O)CO"
+            "C[N+](C)(C)CC#CCN1CCCC1=O",
+            "CCC(CC)n1ccc2c(C(=O)NCc3c(C)cc(C)[nH]c3=O)cc(C#N)cc21",
+            "CCN(c1cc(-c2ccc(CN3CCOCC3)cc2)cc(C(=O)NCc2c(C)cc(C)[nH]c2=O)c1C)C1CCOCC1"
         ]
     },
     "urine_mass2motif_292.m2m": {
         "SMILES": [
-            "NC(=O)NC1NC(=O)NC1=O",
-            "NC(=O)NCCCC(NC(=O)Cc1ccccc1)C(=O)O",
-            "CC(=O)NCC(C)CCC1=C(C)C2C(CC3C4CC=C5CC(O)CCC5(C)C4CCC32C)O1",
-            "CCC1OC(=O)C(C)C(OC2CC(C)(OC)C(O)C(C)O2)C(C)C(OC2OC(C)CC(N(C)C)C2O)C(C)(OC)CC(C)C(=O)C(C)C(O)C1(C)O",
-            "CCC(C)C(=O)OC1CCC=C2C=CC(C)C(CCC3CC(O)CC(=O)O3)C21"
+            "NC(=O)N1CCCC1C(=O)O",
+            "O=C(OCCN1CCOCC1)C1(c2ccccc2)CCCCC1"
         ]
     },
     "urine_mass2motif_30.m2m": {
         "SMILES": [
-            "CN1CCC(=C2c3ccccc3CC(=O)c3sccc32)CC1",
-            "CCc1cnc(OC2CCN(Cc3ncnn3C)CC2)nc1",
-            "O=C1CCCCCN1SSN1CCCCCC1=O",
-            "Cc1cc(O)cc2c1OC(C)(CCCC(C)CCCC(C)CCCC(C)C)CC2",
-            "CCC1(O)C(=O)OCc2c1cc1n(c2=O)Cc2cc3cc(O)ccc3nc2-1",
-            "COC(=O)C1CC23CCCN4CCC5(c6ccccc6NC15C2C)C43"
+            "CC(C)(C)OC(=O)N1C2CCC(C2)C1C(=O)Nc1ccc(Br)cc1N",
+            "O=C(CN1CCCCC1c1nc(-c2cccc(F)c2)no1)Nc1ccccc1F"
         ]
     },
     "urine_mass2motif_31.m2m": {
         "SMILES": [
-            "O=c1cccc2n1CC1CC2CN(C(=S)Nc2cccnc2)C1",
-            "N=C(O)CC(N)C(=O)O",
-            "N=C(N)NCCCC(NC(CCC(=O)O)C(=O)O)C(=O)O",
-            "CC(NC(CCCN=C(N)N)C(=O)O)C(=O)O",
-            "Nc1ccc(N=Nc2ccccc2)c(N)n1",
-            "CC1CCC2(C(=O)O)CCC3(C)C(=CCC4C5(C)CC(O)C(O)C(C)(CO)C5C(O)CC43C)C2C1C",
-            "N=C(N)NCCCC(=O)O",
-            "CCCCCCCCCCCCCCCCCCC(=O)NC(CCCNC(=N)N)C(=O)O"
+            "OCC(O)C(O)C(O)CO",
+            "NC(N)=NCCCCC(N)C(=O)O"
         ]
     },
     "urine_mass2motif_32.m2m": {
         "SMILES": [
-            "CC(=O)N(C)C1C2CN3CCC(O2)C13.Cl",
-            "NCCC(=O)O",
-            "Cc1cc(C)c2c(c1)C1(NC(CCC(N)=O)C3C(=O)N(CCc4ccccc4)C(=O)C31)C(=O)N2",
-            "CC1(C(=O)O)CCC2(C)CCC3(C)C(=CC(=O)C4C5(C)CCC(O)C(C)(C)C5CCC43C)C2C1",
-            "Cn1c(=O)c(-c2ccccc2)c(O)c2ccccc21",
-            "N=C(N)NOCCC(N)C(=O)O"
+            "CCCc1cc2c(=O)c(-c3ccc4c(c3)OCO4)coc2cc1OCC(=O)OC"
         ]
     },
     "urine_mass2motif_34.m2m": {
         "SMILES": [
-            "O=C(O)C(c1ccccc1)C1CCCCN1",
-            "COc1ccc(C2CC(=O)c3c(O)cc(OC4OC(COC5OC(C)C(O)C(O)C5O)C(O)C(O)C4O)cc3O2)cc1O",
-            "O=C(C=Cc1ccc(O)c(O)c1)OC(Cc1ccc(O)c(O)c1)C(=O)O",
-            "Cc1ccc2c(NS(=O)(=O)c3ccccc3Cl)cccc2c1Oc1ncccc1-c1ccnc(NC2CCCNC2)n1",
-            "CC(=O)OC1CC2CCC1(C)C2(C)C",
-            "NC(=O)C(c1ccccc1)C1CCCCN1",
-            "NCCCNCCCCNCCCN",
-            "CN(C)C1C(=O)C(=C(O)NCN2CCCC2)C(=O)C2(O)C(=O)C3=C(O)c4c(O)cccc4C(C)(O)C3CC12",
-            "Ic1cccc2c1CCN(C1CCCNC1)C2",
-            "O=S(=O)(NC1CCNCC1)c1cc(S(=O)(=O)c2ccccc2)ccc1C(F)(F)F",
-            "C=C(C)C1Cc2c(ccc3c2OC2COc4cc(OC)c(OC)cc4C2C3=O)O1",
-            "CN1CCCC1Cc1c[nH]c2ccc(CCS(=O)(=O)c3ccccc3)cc12",
-            "COc1ccc2cnoc(=O)c2c1OC",
-            "CC(O)=NCCCCC(N)C(=O)O",
-            "NCCCCNCCCN"
+            "CCCCC(=O)NC(CCCCN)C(=O)O",
+            "O=C(O)C(c1ccccc1)C1CCCCN1"
         ]
     },
     "urine_mass2motif_37.m2m": {
         "SMILES": [
-            "NC(CCC(=O)NC(CS)C(=O)NCC(=O)O)C(=O)O",
-            "COc1ccc(-n2c(C)nc3ccc(NC(=O)Nc4cc(F)ccc4F)cc3c2=O)cc1",
-            "Nc1nc(=O)c2c(CCc3ccc(C(=O)NC(CCC(=O)O)C(=O)O)cc3)c[nH]c2[nH]1",
-            "CCOC(=O)CNC(=O)N1CCN(Cc2nc3ccc(Cl)cc3o2)CC1",
-            "COc1cc2nccc(Oc3ccc(NC(=O)Nc4ccc(F)cc4F)c(F)c3)c2cc1OC"
+            "Cc1nnc(CNCCN2C(=O)c3cccc4c(N(C)C)ccc(c34)C2=O)s1",
+            "NC(CCC(=O)NC(CS)C(=O)NCC(=O)O)C(=O)O"
         ]
     },
     "urine_mass2motif_38.m2m": {
         "SMILES": [
-            "CC(C)(C)C#CC=CCNCc1cccc2ccccc12",
-            "c1ccc2cc(CN3CCN(c4ccncn4)CC3)ccc2c1",
-            "O=C(Cc1ccc2ccccc2c1)Nc1cc(C2CCC2)[nH]n1",
-            "CN(CC=CC#CC(C)(C)C)Cc1cccc2ccccc12",
-            "CCOC(=O)c1oc2ccccc2c1NC(=O)c1cc(C)n(C)n1",
-            "COc1ccc(Br)cc1S(=O)(=O)NC(=O)C=Cc1ccccc1Cc1ccc2ccccc2c1",
-            "O=C(C1=C(c2ccccc2)SCCO1)N(Cc1cccc2ccccc12)c1ccccn1",
-            "O=C1C(Cc2ccc(O)cc2)N2C(=O)CCN(C(=O)NCc3ccccc3)C2CN1Cc1cccc2ccccc12"
+            "CN(Cc1cccc2ccccc12)C(=O)c1ncn(-c2ccc(OC(F)F)cc2)n1",
+            "CCOC(=O)c1cncn1C(C)c1ccccc1",
+            "O=c1cc(CN2CCN(c3ccccc3F)CC2)occ1OCc1cccc2ccccc12"
         ]
     },
     "urine_mass2motif_39.m2m": {
         "SMILES": [
-            "O=[N+]([O-])c1ccc(O)cc1",
-            "NNC(=O)c1ccncc1",
-            "NC(Cc1c[nH]c2ccccc12)C(=O)O",
-            "NCCc1ccc(O)cc1",
-            "O=[N+]([O-])c1ccc2ccc3cccc4ccc1c2c34"
+            "COc1ccc(C)cc1N"
         ]
     },
     "urine_mass2motif_4.m2m": {
         "SMILES": [
-            "CCC(C(N)=O)N1CCCC1=O",
-            "O=C(O)C1CC(O)CN1",
-            "CCc1c(C#N)c(SCc2c(C)noc2C)nc2c1C(=O)CC(C)(C)C2",
-            "Cc1cccc(C(C)c2cnc[nH]2)c1C"
+            "C=CC(=O)Nc1cccc(Nc2nc(Nc3ccc(Oc4ccnc(C(=O)NC)c4)cc3)ncc2F)c1"
         ]
     },
     "urine_mass2motif_41.m2m": {
         "SMILES": [
-            "CC=CC=CC=CC1=CC2=C(Cl)C(=O)C(C)(OC(=O)CC(O)CC(C)O)C(=O)C2=CN1",
-            "CCCCC(=O)N(Cc1ccc(-c2ccccc2-c2nn[nH]n2)cc1)C(C(=O)O)C(C)C",
-            "CC=CC=CC=CC1=CC2=C(Cl)C(=O)C(C)(OC(=O)CC(O)CC(C)O)C(=O)C2=CN1CCCC(=O)O",
-            "CN(C(=O)C(F)(F)F)[Si](C)(C)C(C)(C)C",
-            "CC1OC(OC2CCC3(CO)C4CCC5(C)C(C6=CC(=O)OC6)CCC5(O)C4CCC3(O)C2)CC(O)C1O"
+            "CC(C)(CO)C(O)C(=O)NCCC(=O)O",
+            "CC(O)=NC(CC(C)C)C(=O)O"
         ]
     },
     "urine_mass2motif_43.m2m": {
         "SMILES": [
-            "CCOC(=O)c1c(C)[nH]c(=O)c(Sc2ccccc2)c1O",
-            "CCOC(=O)c1cccc(NS(=O)(=O)c2cc(-c3cc(C)[nH]n3)ccc2C)c1",
-            "CCOC(=O)c1c[nH]c2c(ccc3cccnc32)c1=O",
-            "CCOCN(C(=O)CCl)c1c(C)cccc1CC",
-            "CCOC(=O)c1c(O)nc2cccc3c2c1-c1ccccc1C3=O",
-            "CCOC(=O)C1C(=O)C(=O)Nc2ccccc21",
-            "CCOC(=O)c1nn(-c2ccc(F)cc2Cl)c(C)c1C(C)=O",
-            "CCOC(=O)c1cnc2cc(Cl)ccc2c1Sc1nnc(-c2ccncc2)n1C"
+            "CCOC(=O)c1c(NC(=O)c2nc3nc(C)cc(C(F)F)n3n2)sc2c1CCC(CC)C2",
+            "CCOC(=O)C1=NN(c2ccc(Cl)cc2Cl)C(C)(C(=O)OCC)C1",
+            "CCOC(=O)c1cnn(-c2ccccc2)c1NC(=O)c1cc2nc(-c3ccco3)cc(C(F)(F)Cl)n2n1",
+            "COc1cc(C)c2c(OC)cc(=O)oc2c1-c1c(OC)cc(C)c2c(OC)cc(=O)oc12",
+            "CCOC(=O)c1c(N2C(=O)C3CC(C)=C(C)CC3C2=O)sc(C)c1C"
         ]
     },
     "urine_mass2motif_47.m2m": {
@@ -1361,246 +766,151 @@
             "OCC1OC(OCC2OC(OCC=Cc3ccccc3)C(O)C(O)C2O)C(O)C1O",
             "OC1COC(OCC2OC(OCC=Cc3ccccc3)C(O)C(O)C2O)C(O)C1O",
             "NC(=O)c1cc(OC2CN(C3Cc4ccccc4C3)C2)ccn1",
-            "COCCOC(=O)C1=C(C)NC(C)=C(C(=O)OCC=Cc2ccccc2)C1c1cccc([N+](=O)[O-])c1",
-            "O=C(NC1Cc2ccccc2C1)c1ccc2c(c1)OC(F)(F)O2",
-            "CC(=O)N1CCN(Cc2ccc(C(C)Nc3nccc(N4C(=O)OCC4C(C)C)n3)cc2)CC1"
+            "COCCOC(=O)C1=C(C)NC(C)=C(C(=O)OCC=Cc2ccccc2)C1c1cccc([N+](=O)[O-])c1"
         ]
     },
     "urine_mass2motif_50.m2m": {
         "SMILES": [
-            "CC1(C)Nc2nc(O)nc(=O)n2C1O",
-            "c1cc2c(cc1C1OCC3C(c4ccc5c(c4)OCO5)OCC13)OCO2",
-            "CC=Cc1ccc2c(c1)OCO2",
-            "CC(CCC(=O)NC(CC(N)=O)C(=O)O)C1CCC2C3C(O)C(O)C4CC(O)CCC4(C)C3CCC12C",
-            "O=C(O)C1OC(O)C(O)C(O)C1O",
-            "O=P(OCCCl)(OCCCl)OCCCl",
-            "CC(C)=CCOc1cc2oc(=O)ccc2cc1O",
-            "COc1c2c3c4c(c(OC)c(=O)c5c(O)cc(OC)c(c6c(OC)cc(O)c(c1=O)c63)c54)C(C(C)=O)=C(C)C2",
-            "COc1cc2c(cc1O)CCN1Cc3c(ccc(OC)c3OC)CC21",
-            "Clc1ccc(COC(Cn2ccnc2)c2ccc(Cl)cc2Cl)c(Cl)c1",
-            "CC(O)CC1=CC(C(C)O)OC1=O"
+            "O=c1oc2ccccc2cc1-c1ccccc1Cl",
+            "Cn1c(=O)c2c(ncn2C)n(C)c1=O"
         ]
     },
     "urine_mass2motif_52.m2m": {
         "SMILES": [
-            "COC1CC(OC2CCC3(C)C(=CCC4C3C(O)C(O)C3(C)C(C(C)O)CCC43O)C2)OC(C)C1OC1CC(OC)C(OC2CC(OC)C(OC3OC(C)C(OC4OC(CO)C(O)C(O)C4O)C(OC)C3O)C(C)O2)C(C)O1",
-            "COC1CC(OC2CCC3(C)C(=CCC4(O)C3C(O)C(O)C3(C)C(C(C)O)CCC43O)C2)OC(C)C1OC1CC(OC)C(OC2CC(OC)C(OC3OC(C)C(OC4OC(CO)C(O)C(O)C4O)C(OC)C3O)C(C)O2)C(C)O1",
-            "CC(=O)OC1CC(OC2C(O)CC(OC3C(O)CC(OC4CCC5(C)C(CCC6C5CCC5(C)C(C7=CC(=O)OC7)CCC65O)C4)OC3C)OC2C)OC(C)C1OC1OC(CO)C(O)C(O)C1O",
-            "CC=C(C)C(=O)OC1CC2C(CC=C3CC(OC4CC(OC)C(OC5CC(OC)C(OC6CC(OC)C(OC7CC(OC)C(O)C(C)O7)C(C)O6)C(C)O5)C(C)O4)CCC32C)C2(O)CCC(C(C)=O)C12C",
-            "CNC(=O)Nc1ccc(-c2nc(N3CC4CCC(C3)O4)c3cnn(C4CCC5(CC4)OCCO5)c3n2)cc1",
-            "COC1CC(OC2CCC3(C)C(CCC4C3C(OC(C)=O)C(OC(=O)C=Cc3ccccc3)C3(C)C(C(C)=O)CCC43O)C2)OC(C)C1OC1CC(OC)C(OC2CC(OC)C(OC3OC(C)C(OC4OC(CO)C(O)C(O)C4O)C(OC)C3O)C(C)O2)C(C)O1"
+            "CC(CCC(=O)O)CC(=O)O",
+            "CC1OC(OC2C(O)CC(OC3C(O)CC(OC4CCC5(C)C(CCC6C5CCC5(C)C(C7=CC(=O)OC7)C(O)CC65O)C4)OC3C)OC2C)CC(O)C1O",
+            "CC12CCC(=O)C=C1CCC1C2CCC2(C)C(O)CCC12"
         ]
     },
     "urine_mass2motif_56.m2m": {
         "SMILES": [
-            "OCC(O)C(O)C(O)CO",
-            "NC1CCN(c2cccnc2)C1",
-            "Cc1cc(C)nc(Nc2ccccc2)n1",
-            "Cc1cc(O)cc(O)c1",
-            "O=CC(O)C(O)C(O)CO"
+            "Cn1cncc1CCN",
+            "Cn1cnc(CCN)c1"
         ]
     },
     "urine_mass2motif_57.m2m": {
         "SMILES": [
-            "Cc1ncc(CO)c(CO)c1O",
-            "CC12CCC(O)CC1CCC1C2CCC2(C)C(C3=CC(=O)OC3)CCC12O",
-            "Cc1ncc(CO)c(C(=O)O)c1O",
-            "CC(CCC(=O)O)C1CCC2C3C(O)C(O)C4CC(O)CCC4(C)C3CCC12C",
-            "C=C(OC1C=C(C(=O)O)C=CC1O)C(=O)O",
-            "CN1CCC(O)(c2ccsc2C(=O)c2sccc2C2(O)CCN(C)CC2)CC1",
-            "NCC1OB(O)c2c(OCCCO)cccc21",
-            "OCCNCCO"
+            "CC(C)(C)c1ccc(C(O)CCCN2CCC(C(O)(c3ccccc3)c3ccccc3)CC2)cc1",
+            "NCC1OB(O)c2c(OCCO)ccc(Cl)c21"
         ]
     },
     "urine_mass2motif_59.m2m": {
         "SMILES": [
-            "O=C(CC(O)(CC(=O)OCc1ccc(OC2OC(CO)C(O)C(O)C2O)cc1)C(=O)O)OCc1ccc(OC2OC(CO)C(O)C(O)C2O)cc1",
-            "CC(O)C(O)(Cc1ccc(O)cc1)C(=O)OCc1ccc(OC2OC(CO)C(O)C(O)C2O)cc1",
-            "CC(=O)OC(C)C(O)(Cc1ccc(O)cc1)C(=O)OCc1ccc(OC2OC(CO)C(O)C(O)C2O)cc1",
-            "CCS(=O)Cc1ccccc1OC(=O)NC",
-            "O=C(CC(O)(CC(=O)OCc1ccc(OC2OC(CO)C(O)C(O)C2O)cc1)C(=O)OCc1ccc(OC2OC(CO)C(O)C(O)C2O)cc1)OCc1ccc(OC2OC(CO)C(O)C(O)C2O)cc1",
-            "O=C1CCC=CC1(O)C(=O)OCc1ccccc1OC1OC(CO)C(O)C(O)C1O",
-            "CC(O)(CC(=O)OCc1ccc(OC2OC(CO)C(O)C(O)C2O)cc1)CC(=O)OCc1ccc(OC2OC(CO)C(O)C(O)C2O)cc1"
+            "COc1ccccc1O",
+            "COP1(=S)OCc2ccccc2O1"
         ]
     },
     "urine_mass2motif_64.m2m": {
         "SMILES": [
-            "CC(=O)NC1C(O)OC(CO)C(O)C1O",
-            "O=C(CC(C(=O)O)N1CCOCC1)Nc1ccc(F)cc1F",
-            "NC1C(O)OC(COP(=O)(O)O)C(O)C1O",
-            "CC(=O)NC(C=O)C(O)C(O)C(O)CO"
+            "CCOC(=O)C1CCCNC1=O",
+            "CC(=O)NC1C(O)OC(CO)C(O)C1O"
         ]
     },
     "urine_mass2motif_65.m2m": {
         "SMILES": [
-            "Cc1occc(=O)c1OC1OC(COC2OCC(O)(CO)C2O)C(O)C(O)C1O",
-            "O=C(NC(COc1ccc2[nH]c(=O)[nH]c2c1)c1ccccc1)c1cccn(Cc2ccc(F)c(F)c2)c1=O",
-            "COC(=O)C1=C(N)Oc2cc(C)oc(=O)c2C1c1ccccc1",
-            "Cc1occc(=O)c1OC1OC(COC(=O)CC(C)(O)CC(=O)O)C(O)C(O)C1O",
-            "CC1CCOC2Cn3cc(C(=O)NCc4ccc(F)cc4F)c(=O)c(O)c3C(=O)N12",
-            "COC1=C(OC2OC(COC(C)=O)C(OC3OC(COC(C)=O)C(OC(C)=O)C(OC(C)=O)C3OC(C)=O)C(OC(C)=O)C2OC(C)=O)C(=O)c2ccccc2C1=O",
-            "NC1CC1c1ccc(F)c(F)c1",
-            "Fc1ccc(CN2CCC(Nc3ccc(C(F)(F)F)nn3)CC2)cc1F"
+            "CC1(C)CCC2(C(=O)O)CCC3(C)C(=CCC4C5(C)CCC(OC6OCC(OC7OC(CO)C(O)C(O)C7O)C(O)C6O)C(C)(CO)C5CCC43C)C2C1",
+            "CC(C)=CCCC(C)(OC1OC(COC2OC(CO)C(O)C2O)C(O)C(O)C1O)C1CCC2(C)C1C(O)CC1C3(C)CCC(OC4OC(CO)C(O)C(O)C4O)C(C)(C)C3CCC12C"
         ]
     },
     "urine_mass2motif_66.m2m": {
         "SMILES": [
-            "CCc1c2c(nc3ccccc13)-c1cc3c(c(=O)n1C2)COC(=O)C3(O)CC",
-            "O=C(O)CC(=O)NC(Cc1c[nH]c2ccccc12)C(=O)O",
-            "COC(=O)C1(C)CCC2(C(=O)O)CCC3(C)C(=CCC4C5(C)CC(O)C(OC6OCC(OC7OC(CO)C(O)C(O)C7O)C(O)C6O)C(C)(CO)C5CCC43C)C2C1",
-            "C[n+]1cccc(C(=O)[O-])c1",
-            "CCCCCCCCCCCC(CC1OC(=O)C1CCCCCC)OC(=O)C(CC(C)C)NC=O",
-            "C[N+](C)(C)C(Cc1cnc([S-])[nH]1)C(=O)O",
-            "CCCCCC(=O)Cc1cc(O)c(O)c2c1C(=O)Oc1cc(O)c(C(=O)O)c(CCCCC)c1O2",
-            "CC1COc2c(N3CCN(C)CC3)c(F)cc3c(=O)c(C(=O)O)cn1c23"
+            "CNc1ncc(-c2ccc3c(=O)c(C(=O)O)cn(C4CC4)c3c2C)cc1C",
+            "O=C(O)c1nnn(-c2cc(F)cc(F)c2)c1-c1ccccn1",
+            "O=C(O)c1ccnc2ccccc12"
         ]
     },
     "urine_mass2motif_67.m2m": {
         "SMILES": [
-            "NC1CCCN(c2c(Br)cnc3[nH]cc(NC(=O)C4CC4)c23)C1",
-            "O=C(Nc1cccc(-c2nc(-c3ccc(NC(=O)c4cccnc4)cc3Cl)no2)c1)Nc1ccc(NC(=O)C2CC2)c(C(F)(F)F)c1",
-            "CC(C)CN(CC(O)C(Cc1ccccc1)NC(=O)OC1COC2OCCC12)S(=O)(=O)c1ccc(N)cc1",
-            "C=C(C)C(=O)Nc1cccc(-c2ncnc3[nH]cc(C(=O)OCC)c23)c1",
-            "O=C(Nc1ncc(-c2cc(C(F)F)nn2-c2c(Cl)cccc2Cl)s1)C1CC1",
-            "CCCCCNC(=O)CC(C)CC1=NS(=O)(=O)c2ccccc2N1"
+            "C=C(C)C(=O)Oc1ccc(C(C)(C)c2ccc(OC(=O)C(=C)C)cc2)cc1",
+            "O=P(O)(O)OCC(O)C(O)C(O)C(O)CO"
         ]
     },
     "urine_mass2motif_68.m2m": {
         "SMILES": [
-            "CCCCCC=CCC=CCCCCCCCC(=O)O",
-            "COC(=O)CC(CCCCCCCCCCCC(CCCCCC(C)OC1OC(CO)C(O)C(O)C1O)OC1OC(CO)C(O)C(O)C1O)OC1OC(CO)C(O)C(O)C1O",
-            "CC(=CCO)CCC1C(C)(O)CCC2C(C)(C)CC(O)CC21C",
-            "CC1(C(=O)O)CCC2(C)CCC3(C)C(=CC(=O)C4C5(C)CCC(O)C(C)(C)C5CCC43C)C2C1"
+            "CC(C)=CCCC(C)(O)CCCC(C)(O)CCCC(C)(O)CCCC(C)(O)CCCC(C)(O)CCCC(C)=CCCC(C)=CCCC(C)=CCOC1OC(CO)C(O)C(O)C1O",
+            "CC1=CCC2C(C)(CO)CCCC2(CO)C1CO",
+            "CCC(C)(O)CCCCCC1C=CC(=O)O1",
+            "C=C(C=CC(CCC(=O)O)C(C)C)CCC(C)=O"
         ]
     },
     "urine_mass2motif_7.m2m": {
         "SMILES": [
-            "NC(CCSCC(N)C(=O)O)C(=O)O.Nc1ncnc2c1ncn2C1OC(COP(=O)(O)OP(=O)(O)O)C(O)C1O",
-            "Nc1ncnc2c1ncn2C1OC(COP(=O)(O)OP(=O)(O)O)C(O)C1O",
-            "NC(=O)c1ccc[n+](C2OC(COP(=O)([O-])OP(=O)(O)OCC3OC(n4cnc5c(N)ncnc54)C(O)C3O)C(O)C2O)c1",
-            "Nc1ncnc2c1ncn2C1OC(COP(=O)(O)O)C(O)C1O",
-            "Nc1ncnc2c1ncn2C1OC(COP(=O)(O)OP(=O)(O)OCC(O)C(O)C(O)C=O)C(O)C1O",
-            "Nc1ncnc2c1ncn2C1OC(COP(=O)(O)OP(=O)(O)OCC2OC(O)C(O)C2O)C(O)C1O"
+            "NC(=O)c1ccc[n+](C2OC(COP(=O)(O)OP(=O)(O)OCC3OC(n4cnc5c(N)ncnc54)C(OP(=O)(O)O)C3O)C(O)C2O)c1",
+            "NC(=O)c1ccc[n+](C2OC(COP(=O)([O-])OP(=O)(O)OCC3OC(n4cnc5c(N)ncnc54)C(OP(=O)(O)O)C3O)C(O)C2O)c1"
         ]
     },
     "urine_mass2motif_72.m2m": {
         "SMILES": [
-            "N#Cc1cn(C2OC(CO)C(O)C2O)c2ncnc(N)c12",
-            "CN(C)c1ncnc2c1ncn2C1OC(CO)C(O)C1O",
-            "Nc1ncnc2c1[nH]c(=S)n2C1OC(CO)C(O)C1O",
-            "COc1c(-c2ccc(O)c(OC3OCC(O)C(O)C3O)c2)oc2cc(O)cc(O)c2c1=O",
-            "OCC1OC(n2cnc3c(NC4CCCCC4)ncnc32)C(O)C1O",
-            "Nc1nccc2c1ncn2C1OC(CO)C(O)C1O",
-            "N=c1nc2c(ncn2C2OC(CO)C(O)C2O)c(Cl)[nH]1",
-            "C=CCNc1ncnc2c1ncn2C1OC(CO)C(O)C1O",
-            "CCNc1ncnc2c1ncn2C1OC(CO)C(O)C1O",
-            "Nc1ncnc2c1ccn2C1OC(CO)C(O)C1O",
-            "CNC(=O)c1cnn(-c2nc(N)c3ncn(C4OC(CO)C(O)C4O)c3n2)c1",
-            "O=c1cc(O)ccn1C1OC(CO)C(O)C1O"
+            "O=c1[nH]cnc2c1ncn2C1OC(CO)C(O)C1O",
+            "NCCNC(=O)Cc1ccc(NC(=O)Cc2ccc(Nc3ncnc4c3ncn4C3OC(CO)C(O)C3O)cc2)cc1",
+            "Nc1ncnc2c1c(I)cn2C1OC(CO)C(O)C1O"
         ]
     },
     "urine_mass2motif_78.m2m": {
         "SMILES": [
-            "C[N+](C)(C)CC(=O)O",
-            "CC(N)C(=O)NC(C(=O)O)C(C)C",
-            "NCCCCC(=O)O",
-            "CC(C)=CCCC(C)=CCO",
-            "CCNC(=O)NC(=O)C(C#N)=NOC",
-            "O=C(C=Cc1ccc(O)c(O)c1)OC1CC(O)(C(=O)O)CC(O)C1O"
+            "CCOP(=O)(CN(CCO)CCO)OCC",
+            "CC1CCC2(OC1)OC1CC3C4CC=C5CC(O)CCC5(C)C4CCC3(C)C1C2C"
         ]
     },
     "urine_mass2motif_80.m2m": {
         "SMILES": [
-            "O=C1CCCC(C(=O)O)N1",
-            "Cn1ccc(=O)c(C(=N)O)c1",
-            "OCc1ncccc1O",
-            "CCN(CC)C(=O)c1cccnc1",
-            "Nc1cc(C(=O)O)ccc1O"
+            "OCc1ccc(O)cn1",
+            "O=C(Nc1ccc(C(F)(F)F)cc1)Nc1ccc(S(=O)(=O)N2CCCC2C(=O)Nc2ccccc2)cc1"
         ]
     },
     "urine_mass2motif_83.m2m": {
         "SMILES": [
-            "COc1ccc2[n-]c(S(=O)Cc3ncc(C)c(OC)c3C)nc2c1",
-            "c1cnc(N2CCOCC2)c(CN2CCC(c3cnccn3)C2)c1",
-            "CN1C(=O)CN=C(c2ccccc2F)c2cc(N)ccc21",
-            "COc1ccc2nc(S(=O)Cc3ncc(C(=O)O)c(OC)c3C)[nH]c2c1",
-            "O=C(COc1ccc2c(-c3ccccc3)cc(=O)oc2c1)NCc1ccccn1",
-            "Cc1ccc(OCC(=O)NN=C2CCOc3c(C)cccc32)cc1",
-            "CCCc1cc(=O)oc2c3c(cc(OCC(=O)NCc4ccccn4)c12)OC(C)(C)CC3",
-            "O=C(Cn1cccc1)N1CC(n2cc(COc3ccccc3)nn2)C1",
-            "OC1=NC(Cc2ccccc2)CN2CCCCC12",
-            "CNC(=O)c1ccccc1Sc1ccc2c(C=Cc3ccccn3)n[nH]c2c1"
+            "COc1ccc2[nH]c(S(=O)Cc3ncc(C)c(OC)c3C)nc2c1",
+            "COc1ccc2[nH]c(SCc3ncc(C)c(O)c3C)nc2c1",
+            "[2H]C([2H])([2H])Oc1ccc2nc(S(=O)Cc3ncc(C)c(OC)c3C)[nH]c2c1"
         ]
     },
     "urine_mass2motif_86.m2m": {
         "SMILES": [
-            "CC(C(=O)O)c1cccc(C(=O)c2ccccc2)c1",
-            "Cc1cccc2c1ccn2CC(=O)NC(CCCNC(N)=O)C(=O)O",
-            "C=C1C(=O)OCC1CC=C(C)CC1CC(C)C(=O)O1",
-            "CC1C(O)C2OC(=O)C3=C2C(CCC3)C12CC(c1ccoc1)OC2=O"
+            "NCCCC(N)C(=O)O",
+            "CC1CCC2(C)C3(C)CCC2(OC3=O)C12CC(c1ccoc1)OC2=O"
         ]
     },
     "urine_mass2motif_88.m2m": {
         "SMILES": [
-            "Cn1c(=O)c2c(ncn2CCO)n(C)c1=O",
-            "N=C(O)C(N)Cc1c[nH]c2ccccc12",
-            "OCCOCCOCCOCCOCCOCCOCCOCCOCCO",
-            "COc1cccc2c1C(=O)C1=C(CC(C)OC1C)C2=O",
-            "CN(CCO)c1ncnc2n[nH]cc12",
-            "COc1ccc(-c2nc(=S)c3c(n2CCO)CCCC3)cc1",
-            "Cc1c(O)c2c(oc1=O)C(C)(O)C(C)OC2",
-            "COc1cc2c(c3oc(=O)c4c(c13)CCOC4=O)C1C=COC1O2",
-            "COc1ccc2c(OC)c3ccoc3nc2c1OC"
+            "COc1ccc(C=CC(=O)C(C)(C)C(=O)C=Cc2ccc(OC)c(OC)c2)cc1OC",
+            "O=C(O)c1ccoc1",
+            "CCCCC(C)CC(C)C(=O)N(C)C(CC(C)C)C(=O)NC(C(=O)N(C)C(C(=O)N1CC(O)CC1C(=O)N1C(=O)CCC1C)C(C)C)C(C)O"
         ]
     },
     "urine_mass2motif_90.m2m": {
         "SMILES": [
-            "O=C(C=Cc1ccc(OC2OC(CO)C(O)C(O)C2OC2OCC(O)(CO)C2O)cc1)c1ccc(O)cc1O",
-            "Cc1ccc2cccc(NC(=O)c3ccc(OC(C)C)cc3)c2n1",
-            "O=C(C=Cc1ccccc1O)c1ccccc1O",
-            "O=C(NN=Cc1ccccn1)c1ccc(OC2CCCC2)cc1",
-            "CCCCOc1ccc(C(=O)Oc2c(C)c3c4c5c2C(=O)C(=C(N2CCCCC2)C5=O)NC(=O)C(C)=CC=CC(C)C(O)C(C)C(O)C(C)C(OC(C)=O)C(C)C(OC)C=COC(C)(O3)C4=O)cc1",
-            "COc1ccc(-c2cc(=O)c3c(O)cc(O)cc3o2)cc1-c1c(O)cc(O)c2c(=O)cc(-c3ccc(O)cc3)oc12",
-            "CC(C)Oc1ccc(C(=O)Nc2nc3c(s2)CN(C(=O)OC(C)(C)C)CC3)cc1"
+            "O=C(O)CNC(=O)c1ccccc1O",
+            "O=C(NC(O)C(=O)O)c1ccccc1",
+            "O=C(O)CNC(=O)c1ccc(O)cc1",
+            "CCCCOC(NC(=O)c1ccccc1O)C(Cl)(Cl)Cl"
         ]
     },
     "urine_mass2motif_93.m2m": {
         "SMILES": [
-            "CC12Cc3c(n[nH]c3OC3OC(C(=O)O)C(O)C(O)C3O)CC1CCC1C2CCC2(C)C1CCC2(C)O",
-            "CC1(C(=O)O)CCC2(C)CCC3(C)C(=CC(=O)C4C5(C)CCC(OC6OC(C(=O)O)C(O)C(O)C6OC6OC(C(=O)O)C(O)C(O)C6O)C(C)(C)C5CCC43C)C2C1",
-            "O=C(O)C1OC(Oc2cc3oc(-c4ccccc4)cc(=O)c3c(O)c2O)C(O)C(O)C1O",
-            "O=C(O)C1OC(Oc2cc(O)c3c(=O)cc(-c4ccc(O)c(O)c4)oc3c2)C(O)C(O)C1O",
-            "O=C(O)C1OC(Oc2cc(-c3cc(=O)c4c(O)cc(O)cc4o3)ccc2O)C(O)C(O)C1O",
-            "COc1ccc(C(c2c([O-])n(-c3ccccc3)c(=S)n(-c3ccccc3)c2=O)c2c(O)n(-c3ccccc3)c(=S)n(-c3ccccc3)c2=O)cc1C[NH+]1CC2CC(C1)c1cccc(=O)n1C2"
+            "COc1ccc(-c2cc(=O)c3c(O)c(OC)c(OC4OC(C(=O)O)C(O)C(O)C4O)cc3o2)cc1",
+            "COc1c(OC2OC(C(=O)O)C(O)C(O)C2O)cc(O)c2c(=O)cc(-c3ccccc3)oc12",
+            "COc1cc(-c2oc3cc(OC4OC(C(=O)O)C(O)C(O)C4O)cc(O)c3c(=O)c2OC)ccc1O"
         ]
     },
     "urine_mass2motif_94.m2m": {
         "SMILES": [
-            "Cc1ccc(-c2noc(CSc3nc(=O)c(C)c(C)[nH]3)n2)cc1",
-            "NC(=O)NCCCC(NC(=O)Cc1csc(-c2cccc(Br)c2)n1)C(=O)O",
-            "COC1CC(OC2CCC3(C)C(CCC45CCC(C6=CC(=O)OC6)C(C)(CCC43)C5=O)C2)OC(C)C1O",
-            "Cn1cnc(CCN)c1",
-            "NCCCN",
-            "Cc1ccc2[nH]cc(CCN)c2c1",
-            "Cc1ncc(CO)c(CN)c1O",
-            "COC(=O)C(N)Cc1c[nH]c2ccccc12",
-            "CCC1(O)C(=O)OCc2c1cc1n(c2=O)Cc2c-1nc1cc(F)c(C)c3c1c2C(N)CC3"
+            "CC1C(=O)OC2C(O)C34C5CC(C(C)(C)C)C36C(OC(=O)C6O)OC4(C(=O)O5)C12O",
+            "CCCCCCCC=O",
+            "NC(N)=S"
         ]
     },
     "urine_mass2motif_95.m2m": {
         "SMILES": [
-            "COC(CCC(C)C1OC23CC(OC(=O)CC(C(C)O)OC(=O)CC(OC)(O2)C(C)CC3(C)C)C1C)c1cccc(O)c1",
-            "Cc1ccn(-c2cc(-c3cccs3)cc(-n3ccc(C)n3)n2)n1",
-            "Cc1ccncc1Nc1nc(CN2C(=O)CCC2=O)cs1",
-            "Cc1nc(-c2ccccn2)ncc1C(=O)Nn1cc(C)c2cc(F)ccc21"
+            "CC(=O)c1ccc2ccccc2c1",
+            "CC(=O)NC(CCC(N)=O)C(=O)NC(CC(C)C)C(N)=O",
+            "COc1ccc2cc(CCC(C)=O)ccc2c1"
         ]
     },
     "urine_mass2motif_97.m2m": {
         "SMILES": [
-            "Cc1cccn2c(=O)c(-c3nn[nH]n3)cnc12",
-            "CCOc1ccc(N)cc1",
-            "Cc1ccc(-c2csc3c(=O)n(Cc4ccccn4)cnc23)cc1",
-            "CCOc1ccccc1N"
+            "CC(=O)Nc1ccc(O)cc1",
+            "COc1cc(C=O)ccc1O"
         ]
     }
 }
