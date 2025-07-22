@@ -1,0 +1,27 @@
+# MS2LDAViz — Interactive Web Interface 🌐
+
+MS2LDAViz lets you explore MS2LDA runs in your browser, with live controls and rich visualizations.
+
+---
+
+## 1. Launching the App
+
+## Wrapper Scripts
+
+The MS2LDA repository includes convenient wrapper scripts that allow the easy access to the Viz App. If you have not cloned the repository and created a conda enviroment, please go to [**Getting Started**](./home/quick_start.md), afterwards you will find inside the MS2LDA folder the **wrapper scripts**:
+
+- **`run_ms2ldaviz.sh`** (Linux/macOS)  
+- **`run_ms2ldaviz.bat`** (Windows)
+
+In order to use the scripts please type:
+
+```bash
+# For Linux/macOS
+./run_ms2ldaviz.sh
+
+# For Windows 
+./run_ms2ldaviz.bat
+```
+
+Aftewards you will be redirected to the following website:
+![Website page](../figures/MS2LDA_site_1.JPG)

@@ -8,17 +8,15 @@ repo_url: https://github.com/vdhooftcompmet/MS2LDA
 edit_uri: edit/main/docs/docs/
 
 nav:
-  - Home: index.md
+  - Home:
+      - About: index.md
+      - Behind the Scenes: home/behind_MS2LDA.md
+      - Getting Started: home/quick_start.md
   - User Guide:
-      - Getting Started: index.md
-      - Modeling: modeling.md
-      - Annotation: annotation.md
-      - Motifs: motifs.md
-      - MotifDB: motifDB.md
-      - Screening: screening.md
-      - Parameter Settings: parameter_settings.md
-      - Masking: masking.md
-  - API Reference:
+      - Overview: guide/overview.md
+      - Viz App: guide/MS2LDAViz_App.md
+      - Command Line: guide/MS2LDA_Command_Line.md
+  - Modules:
       - Overview: api/index.md
       - Core Modules:
           - MS2LDA Run: api/run.md
@@ -32,7 +30,7 @@ nav:
           - Spec2Vec: api/spec2vec.md
       - Visualization:
           - Visualization Tools: api/visualization.md
-  - Examples:
+  - Examples and Tutorials:
       - Tutorials: examples/tutorials.md
       - Use Cases: examples/use_cases.md
 
