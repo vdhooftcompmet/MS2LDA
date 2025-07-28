@@ -16,7 +16,7 @@ MS2LDA expects **preprocessed MS/MS data**, typically in:
 ### Output
 After processing, MS2LDA provides:
 
-- **Mass2Motifs** (discovered substructure patterns)
+- **Mass2Motifs** (discovered fragmentation patterns)
 - **Spectra-motif loadings**
 - Optional annotations via: **MotifDB** or **MAG**
 
