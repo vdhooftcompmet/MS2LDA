@@ -14,7 +14,7 @@ Traditional mass spectrometry analysis depends on spectral libraries or manual c
 - Aids structural elucidation of unknown compounds.
 - Bridges mass spectrometry and cheminformatics.
 
-MS2LDA applies **Latent Dirichlet Allocation (LDA)**, originally developed for text analysis, to spectral features like fragment ions and neutral losses. This allows the discovery of statistically significant patterns that often reflect chemical substructures 🔍
+MS2LDA applies **Latent Dirichlet Allocation (LDA)**, originally developed for text analysis, to fragment ions and neutral losses. This allows the discovery of statistically significant patterns that often reflect chemical substructures 🔍
 
 ---
 
