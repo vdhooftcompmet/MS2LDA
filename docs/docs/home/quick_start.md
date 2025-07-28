@@ -13,10 +13,6 @@ MS2LDA expects **preprocessed MS/MS data**, typically in:
 - `.mzML` (via conversion or direct input)
 - `.msp`  (NIST-style spectrum libraries)
 
-Each spectrum should contain:
-- Fragment ions (*m/z* values)
-- Optionally: neutral losses (computed internally)
-
 ### Output
 After processing, MS2LDA provides:
 
