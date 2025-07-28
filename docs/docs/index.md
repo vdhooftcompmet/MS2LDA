@@ -24,7 +24,7 @@ MS2LDA applies **Latent Dirichlet Allocation (LDA)**, originally developed for t
 - 🧬 **Automated Mass2Motif Annotation Guidance (MAG)** with Spec2Vec
 - 🔗 **Integration** with MassQL-searchable MotifDB
 - 📈 **Visualization app** for interactive exploration of Mass2Motifs
-- 💻 **Command-line access** for advanced users
+- 💻 **Command-line access** and **Jupyter Notebooks** for both scripted workflows and interactive data exploration
 
 ---
 
