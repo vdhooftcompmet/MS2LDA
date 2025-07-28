@@ -1,6 +1,6 @@
 ## How MS2LDA Works
 
-**MS2LDA** applies *probabilistic topic modeling*, originally developed for natural language processing (NLP), to **tandem mass spectrometry (MS/MS)** data. This allows the unsupervised discovery of substructure patterns in complex chemical mixtures using tandem masss spectrometry.
+**MS2LDA** applies *probabilistic topic modeling*, originally developed for natural language processing (NLP), to **tandem mass spectrometry (MS/MS)** data. This allows the unsupervised discovery of fragmentation patterns in complex chemical mixtures using tandem masss spectrometry.
 
 
 ## The basic Concept
