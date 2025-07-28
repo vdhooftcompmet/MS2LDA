@@ -3,15 +3,14 @@
 This document describes how to run **MS2LDA** from the command line, including available commands, flags, parameters files, etc.
 
 ---
-## Wrapper Scripts
 
-The MS2LDA repository includes convenient wrapper scripts that simplify its execution.
-If you have not cloned the repository and created a conda enviroment, please go to [**Getting Started**](./home/quick_start.md), afterwards you will find inside the MS2LDA folder the **wrapper scripts**:
+The MS2LDA repository includes convenient scripts that simplify its execution.
+If you have not cloned the repository and created a conda enviroment, please go to [**Getting Started**](./home/quick_start.md), afterwards you will find inside the MS2LDA folder the following scripts:
 
 - **`run_analysis.sh`** (Linux/macOS)  
 - **`run_analysis.bat`** (Windows)
 
-These wrappers will:
+These scripts will:
 
 1. Configure the Python environment (set `PYTHONPATH`, activate conda, etc.)  
 2. Invoke the main script `ms2lda_runfull.py` with your arguments  
