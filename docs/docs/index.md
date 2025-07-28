@@ -8,7 +8,7 @@ MS2LDA (Mass Spectrometry–Latent Dirichlet Allocation) is a framework that bri
 
 ## What is MS2LDA?
 
-Traditional mass spectrometry analysis depends on spectral libraries or manual curation. MS2LDA offers a **machine learning–driven, unsupervised alternative** that:
+Traditional mass spectrometry analysis depends on spectral libraries or manual curation. MS2LDA offers a **machine learning based, data driven, and unsupervised alternative** that:
 
 - Detects latent fragmentation motifs across large datasets.
 - Aids structural elucidation of unknown compounds.
