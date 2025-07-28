@@ -1,6 +1,6 @@
 # MS2LDAViz — Interactive Web Interface 🌐
 
-MS2LDAViz lets you explore MS2LDA runs in your browser, with live controls and rich visualizations.
+MS2LDAViz lets you run analyses and explore your results in your browser, with live controls and rich visualizations.
 
 ---
 
