@@ -8,7 +8,7 @@ MS2LDAViz lets you explore MS2LDA runs in your browser, with live controls and r
 
 ## Wrapper Scripts
 
-The MS2LDA repository includes convenient wrapper scripts that allow the easy access to the Viz App. If you have not cloned the repository and created a conda enviroment, please go to [**Getting Started**](./home/quick_start.md), afterwards you will find inside the MS2LDA folder the **wrapper scripts**:
+The MS2LDA repository includes convenient scripts that allow the easy access to the Viz App. If you have not cloned the repository and created a conda enviroment, please go to [**Getting Started**](./home/quick_start.md), afterwards you will find inside the MS2LDA folder the following scripts:
 
 - **`run_ms2ldaviz.sh`** (Linux/macOS)  
 - **`run_ms2ldaviz.bat`** (Windows)
