@@ -1,8 +1,6 @@
 # MS2LDA User Guide Overview
 
-MS2LDA’s functionality is organized into **modular steps**, each performing a discrete task on your MS/MS data.  You can mix‑and‑match modules as needed — every step is optional and driven by parameters you set.
-
-Below is just a high‑level overview of the available steps—mix and match as needed.
+MS2LDA’s functionality is organized into **modular steps**, each performing a discrete task on your MS/MS data. Below is just a high‑level overview of the process.
 
 ##Modules at a Glance:  
 • **Preprocessing** → filter & clean your spectra  
