@@ -11,9 +11,9 @@ nav:
   - Home:
       - About: index.md
       - Behind the Scenes: home/behind_MS2LDA.md
-      - Getting Started: home/quick_start.md
   - User Guide:
       - Overview: guide/overview.md
+      - Getting Started: guide/quick_start.md
       - Viz App: guide/MS2LDAViz_App.md
       - Command Line: guide/MS2LDA_Command_Line.md
   - Modules:
