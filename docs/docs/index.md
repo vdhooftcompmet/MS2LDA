@@ -2,7 +2,7 @@
 
 # Welcome to the MS2LDA Documentation
 
-MS2LDA (Mass Spectrometry–Latent Dirichlet Allocation) is a framework that brings **topic modeling** to the world of **tandem mass spectrometry (MS/MS)**. It helps identify recurring fragmentation patterns — known as **Mass2Motifs** — that represent conserved molecular **substructures** across complex spectra.
+MS2LDA (Mass Spectrometry–Latent Dirichlet Allocation) is a framework that brings the concept of **topic modeling** to the world of **tandem mass spectrometry (MS/MS)**. It helps identify recurring fragmentation patterns — known as **Mass2Motifs** — that represent conserved molecular **substructures** across complex spectra.
 
 ---
 
@@ -14,7 +14,7 @@ Traditional mass spectrometry analysis depends on spectral libraries or manual c
 - Aids structural elucidation of unknown compounds.
 - Bridges mass spectrometry and cheminformatics.
 
-MS2LDA applies **Latent Dirichlet Allocation (LDA)**, originally developed for text analysis, to fragment ions and neutral losses. This allows the discovery of statistically significant patterns that often reflect chemical substructures 🔍
+The MS2LDA framework applies **Latent Dirichlet Allocation (LDA)**, a method originally developed for text analysis, to infer co‑occurring patterns of fragment ions and neutral losses. This allows the discovery of statistically significant patterns that often reflect chemical substructures. 🔍
 
 ---
 
