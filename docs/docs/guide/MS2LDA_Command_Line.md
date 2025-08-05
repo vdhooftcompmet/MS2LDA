@@ -5,7 +5,7 @@ This document describes how to run **MS2LDA** from the command line, including a
 ---
 
 The MS2LDA repository includes convenient scripts that simplify its execution.
-If you have not cloned the repository and created a conda enviroment, please go to [**Getting Started**](./home/quick_start.md), afterwards you will find inside the MS2LDA folder the following scripts:
+If you have not cloned the repository and created a conda enviroment [(Conda Website)](http://conda.io/), please go to [**Getting Started**](./home/quick_start.md), afterwards you will find inside the MS2LDA folder the following scripts:
 
 - **`run_analysis.sh`** (Linux/macOS)  
 - **`run_analysis.bat`** (Windows)
