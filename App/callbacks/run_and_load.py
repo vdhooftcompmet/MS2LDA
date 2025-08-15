@@ -584,9 +584,10 @@ def parse_ms2lda_viz_file(base64_contents: str) -> dict:
     Output("demo-spinner", "spinner_style"),
     Input("load-mushroom-demo-button", "n_clicks"),
     Input("load-pesticides-demo-button", "n_clicks"),
+    Input("load-summer-school-demo-button", "n_clicks"),
     prevent_initial_call=True,
 )
-def load_demo_data(mushroom_clicks, pesticides_clicks):
+def load_demo_data(mushroom_clicks, pesticides_clicks, summer_school_clicks):
     """
     Load demo data when one of the demo buttons is clicked.
     Downloads the data from Zenodo and loads it into the app.
@@ -604,6 +605,9 @@ def load_demo_data(mushroom_clicks, pesticides_clicks):
     elif triggered_id == "load-pesticides-demo-button":
         demo_url = "https://zenodo.org/records/15857387/files/CaseStudy_Results_Pesticides250_ms2lda_viz.json.gz?download=1"
         demo_name = "Pesticides Demo"
+    elif triggered_id == "load-summer-school-demo-button":
+        demo_url = "https://raw.githubusercontent.com/joewandy/MS2LDA_example_data/main/SummerSchool_100M2M.json.gz"
+        demo_name = "Summer School Example"
     else:
         raise PreventUpdate
 
