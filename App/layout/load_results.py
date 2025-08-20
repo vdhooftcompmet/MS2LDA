@@ -128,6 +128,12 @@ def create_load_results_tab():
                                                 color="success",
                                                 className="me-2 mb-2",
                                             ),
+                                            dbc.Button(
+                                                "🎓 Load Summer School Example",
+                                                id="load-summer-school-demo-button",
+                                                color="success",
+                                                className="me-2 mb-2",
+                                            ),
                                             dbc.Spinner(
                                                 html.Div(id="demo-load-status", style={"marginTop": "10px"}),
                                                 id="demo-spinner",
