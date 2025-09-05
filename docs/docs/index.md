@@ -32,8 +32,7 @@ The MS2LDA framework applies **Latent Dirichlet Allocation (LDA)**, a method ori
 
 This site provides everything you need to get started:
 
-- [**Getting Started**](./home/quick_start.md): Installation, quickstart, and basic usage
-- [**User Guide**](./guide/overview): Workflow explanation and parameter tuning
+- [**User Guide**](./guide/overview): Overview, getting started, and usage of the Viz App and Command-Line
 - [**Modules Reference**](./api/): All available classes and functions
 - [**Examples & Tutorials**](./examples/): Practical use cases and annotated datasets
 
