@@ -21,5 +21,5 @@ In order to use the scripts please type:
 ./run_ms2ldaviz.bat
 ```
 
-Aftewards you will be redirected to the following website:
+Aftewards you will be redirected to the following [website](http://127.0.0.1:8000/….):
 ![Website page](../figures/MS2LDA_site_1.JPG)
