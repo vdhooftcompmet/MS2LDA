@@ -52,8 +52,9 @@ conda activate MS2LDA_v2
 
 ## Viz App vs Command-Line
 
-For detailed information on how to run your analysis through the MS2LDAViz app please check: [MS2LDAViz App guide](../guide/MS2LDAViz_App.md)
+For detailed information on how to run your analysis through:
 
-For detailed information on how to run your analysis from the commnad-line please check: [MS2LDA Command Line](../guide/MS2LDA_Command_Line.md)
+- MS2LDAViz app please check: [MS2LDAViz App guide](../guide/MS2LDAViz_App.md)
+- Commnad-line please check: [MS2LDA Command Line](../guide/MS2LDA_Command_Line.md)
 
 
