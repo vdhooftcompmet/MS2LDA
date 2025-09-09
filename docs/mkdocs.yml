@@ -32,7 +32,7 @@ nav:
           - Visualization Tools: api/visualization.md
   - Examples and Tutorials:
       - Tutorials: examples/tutorials.md
-      - Use Cases: examples/use_cases.md
+      #- Use Cases: examples/use_cases.md
 
 theme:
   name: material
