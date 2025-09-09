@@ -10,6 +10,9 @@ MS2LDA’s functionality is organized into **modular steps**, each performing a 
 
 All modules are explained in detail in the [**Modules Reference**](../api/) tab.
 
+Try the [MS2LDAViz 2.0 website](https://ms2lda.org/viz/) in your browser. Here you can load previously generated results file or explore one of the demo datasets:
+
+![Website page](../figures/MS2LDAViz_server.JPG)
 
 **Running MS2LDA 🚀**
 
