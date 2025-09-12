@@ -76,4 +76,10 @@ results/
 └─ ms2lda_viz.json.gz      # Compressed results for the MS2LDAViz web app
 ```
 
-For advanced information on how to tune your MS2LDA analysis and the usage of Jupyter Notebooks please go to: [GitHub repository](https://github.com/vdhooftcompmet/MS2LDA/blob/main/README_CLI.md).  
+
+
+For advanced tuning and notebook-based workflows, see the [GitHub repository](https://github.com/vdhooftcompmet/MS2LDA/blob/main/README_CLI.md).
+
+Want a quick refresher on the Viz App? 🔗 or looking for end-to-end examples? 📚
+
+[MS2LDAViz App Guide](MS2LDAViz_App.md){ .md-button} [Examples & Tutorials](../examples/tutorials.md){ .md-button}
