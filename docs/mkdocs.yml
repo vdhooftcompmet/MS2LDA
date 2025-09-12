@@ -83,6 +83,7 @@ plugins:
 
 markdown_extensions:
   - admonition
+  - attr_list
   - codehilite:
       guess_lang: false
   - toc:
