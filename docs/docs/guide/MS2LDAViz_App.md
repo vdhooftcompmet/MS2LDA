@@ -36,7 +36,7 @@ There you could access different tabs, explained below:
 
 ![Load results](../figures/MS2LDA_load_results.JPG)
 
-- **Motif Rankings**: Browse all Mass2Motifs ranked by probability and overlap thresholds, or search for specific motifs using **MassQL** queries. You can click a motif to view its details on the next tab.
+- **Motif Rankings**: Browse all Mass2Motifs ranked based on different tresholds, or search for specific motifs using **MassQL** queries. You can click a motif to view its details on the next tab.
 
 ![Motif rankings](../figures/MS2LDA_motif_ranking_empty.JPG)
 
