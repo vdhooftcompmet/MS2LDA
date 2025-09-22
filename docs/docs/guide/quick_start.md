@@ -2,6 +2,8 @@
 
 Welcome to MS2LDA! This quick guide helps you take your first steps into discovering interesting substructures in your data. So, let us install and use the tool, whether you are working through the web interface or the command line.
 
+**Disk space:** Downloading the required models (~6–7 GB) and storing a few runs typically requires **15–20 GB** of free space.
+
 ---
 
 ## Inputs & Outputs 📥📤
