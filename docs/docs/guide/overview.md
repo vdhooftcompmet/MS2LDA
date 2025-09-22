@@ -19,7 +19,7 @@ Try the [MS2LDAViz 2.0 website](https://ms2lda.org/viz/) in your browser. Here y
 
 **Running MS2LDA 🚀**
 
-For further details on how run MS2LDA 2.0 using the Viz App or the Command-Line click below:
+For further details on how run MS2LDA 2.0 using the Viz App or the Command-Line, click below:
 
 1. [MS2LDAViz App](MS2LDAViz_App.md) 
 

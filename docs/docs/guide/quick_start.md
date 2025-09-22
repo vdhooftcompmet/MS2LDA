@@ -1,6 +1,6 @@
 # Getting Started
 
-Welcome to MS2LDA! This quick guide helps you take your first steps into discovering interesting substructures in your data. So, let us install and use the tool, whether you're working through the web interface or the command line.
+Welcome to MS2LDA! This quick guide helps you take your first steps into discovering interesting substructures in your data. So, let us install and use the tool, whether you are working through the web interface or the command line.
 
 ---
 
