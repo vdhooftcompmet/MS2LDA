@@ -196,40 +196,19 @@ def motifDB2motifs(motifDB_ms2, filter_table=pd.DataFrame()):
 
 
 def group_ms2(ms2_df):
-    ms2_df_grouped = (
-        ms2_df.groupby("scan")
-        .agg(
-            {
-                "frag_mz": list,
-                "frag_intens": list,
-                "loss_mz": list,
-                "loss_intens": list,
-                "charge": "first",
-                "ms2accuracy": "first",
-                "short_annotation": "first",
-                "annotation": "first",
-                "motif_id": "first",
-                "motifset": "first",
-                "ms1scan": "first",
-                "analysis_massspectrometer": "first",
-                "collision_energy": "first",
-                "other_information": "first",
-                "scientific_name": "first",
-                "sample_type": "first",
-                "massive_id": "first",
-                "taxon_id": "first",
-                "analysis_ionizationsource": "first",
-                "analysis_chromatographyandphase": "first",
-                "analysis_polarity": "first",
-                "paper_url": "first",
-                "auto_annotation": "first",
-                "property": "first",
-            }
-        )
-        .reset_index()
-    )
+    # Columns that should be aggregated as lists
+    list_cols = ["frag_mz", "frag_intens", "loss_mz", "loss_intens"]
 
+    # Build aggregation dictionary: list for list_cols, first for all others
+    agg_dict = {
+        col: (list if col in list_cols else "first")
+        for col in ms2_df.columns
+        if col != "scan"  # exclude grouping key
+    }
+
+    ms2_df_grouped = ms2_df.groupby("scan").agg(agg_dict).reset_index()
     return ms2_df_grouped
+
 
 
 def store_motifDB(ms1_df, ms2_df, name="motifDB.json"):
