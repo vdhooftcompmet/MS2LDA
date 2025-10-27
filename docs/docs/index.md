@@ -1,25 +1,82 @@
-![](MS2LDA_LOGO_white.jpg)
+![MS2LDA Logo](./figures/MS2LDA_LOGO_white.jpg)
 
-## About Topic Modelling in Mass Spectrometry
+# Welcome to the MS2LDA Documentation
 
-The application of topic modelling to mass spectrometry data represents a paradigm shift in the analysis of complex molecular fragmentation patterns. Traditional approaches to mass spectral interpretation rely heavily on spectral matching against reference libraries or manual expert annotation, both of which are limited by the availability of reference spectra and the complexity of interpreting unknown compounds. Topic modelling, originally developed for natural language processing, offers an unsupervised machine learning approach that can discover latent patterns in mass spectrometry data without requiring prior knowledge of compound structures.
+MS2LDA (Mass Spectrometry–Latent Dirichlet Allocation) is a framework that brings the concept of **topic modeling** to the world of **tandem mass spectrometry (MS/MS)**. It helps identify recurring fragmentation patterns — known as **Mass2Motifs** — that represent conserved molecular **substructures** across complex spectra.
 
-In the context of mass spectrometry, topics correspond to recurring fragmentation patterns or "Mass2Motifs" that represent conserved substructures across different molecules. These patterns emerge from the statistical co-occurrence of fragment ions and neutral losses across large collections of tandem mass spectra. By decomposing complex spectra into combinations of these fundamental motifs, MS2LDA enables researchers to identify structural features even in previously uncharacterized compounds, thereby accelerating the process of molecular structure elucidation.
+---
 
-## Overview
+## What is MS2LDA?
 
-MS2LDA (Mass Spectrometry Latent Dirichlet Allocation) is a computational framework that applies probabilistic topic modelling to tandem mass spectrometry data for automated discovery and annotation of molecular substructures. The methodology extends Latent Dirichlet Allocation (LDA) to handle the unique characteristics of mass spectral data, including the sparsity of fragmentation patterns and the continuous nature of mass-to-charge ratios.
+Traditional mass spectrometry analysis depends on spectral libraries or manual curation. MS2LDA offers a **machine learning based, data driven, and unsupervised alternative** that:
 
-The core innovation of MS2LDA lies in its ability to learn Mass2Motifs directly from experimental data without supervision. These motifs capture recurring fragmentation patterns that often correspond to specific chemical substructures or functional groups. The framework incorporates several key components: preprocessing routines for spectral alignment and noise reduction, the LDA model for motif discovery, visualization tools for result interpretation, and integration with molecular networking approaches for enhanced structural annotation.
+- Detects latent fragmentation motifs across large datasets.
+- Aids structural elucidation of unknown compounds.
+- Bridges mass spectrometry and cheminformatics.
 
-Recent developments have expanded MS2LDA's capabilities through the incorporation of advanced machine learning techniques. The integration of Spec2Vec enables semantic similarity calculations between spectra based on learned embeddings, while the MotifDB provides a searchable repository of previously characterized Mass2Motifs with structural annotations. These enhancements facilitate more accurate and efficient annotation of unknown compounds in complex mixtures.
+The MS2LDA framework applies **Latent Dirichlet Allocation (LDA)**, a method originally developed for text analysis, to infer co‑occurring patterns of fragment ions and neutral losses. This allows the discovery of statistically significant patterns that often reflect chemical substructures. 🔍
 
-## Developers
+---
 
-MS2LDA is developed and maintained by an international collaborative team of computational mass spectrometry researchers. The current development is led by Rosina Torres Ortega, Jonas Dietrich, and Joe Wandy, with principal investigator Justin J.J. van der Hooft at Wageningen University & Research. The project builds upon foundational work established in the original MS2LDA publication (van der Hooft et al., PNAS, 2016) and represents ongoing efforts to advance computational methods for metabolomics and natural products research.
+## Key Features
 
-The development team welcomes contributions from the scientific community and maintains active collaborations with researchers in metabolomics, natural products chemistry, and computational biology. For detailed information about the methodology, validation studies, and recent applications, readers are referred to the comprehensive description in Torres Ortega et al. (2025) available at https://doi.org/10.1101/2025.06.19.659491.
+- 🧠 **Unsupervised learning** of Mass2Motifs at unprecedented speed
+- 🧬 **Automated Mass2Motif Annotation Guidance (MAG)** with Spec2Vec
+- 🔗 **Integration** with MassQL-searchable MotifDB
+- 📈 **Visualization app** for interactive exploration of Mass2Motifs
+- 💻 **Command-line access** and **Jupyter Notebooks** for both scripted workflows and interactive data exploration
 
-## Documentation Structure
+---
 
-This documentation provides comprehensive guidance for using MS2LDA in metabolomics research. The User Guide section covers installation, basic usage, and parameter optimization. The API Reference documents all functions and classes available for programmatic access. Examples and tutorials demonstrate practical applications across various research domains. For questions not addressed in this documentation, users are encouraged to consult the GitHub repository or contact the development team.
+## Documentation Sections
+
+This site provides everything you need to get started:
+
+- [**User Guide**](./guide/overview): Overview, getting started, and usage of the Viz App and Command-Line
+- [**Modules Reference**](./api/): All available classes and functions
+- [**Examples & Tutorials**](./examples/): Practical use cases and annotated datasets
+
+---
+
+## Developers & Contributors
+
+MS2LDA is developed by a team led by **Rosina Torres Ortega**, **Jonas Dietrich**, and **Joe Wandy**, under the supervision of **Justin J.J. van der Hooft** at Wageningen University & Research.
+
+
+📚 MS2LDA builds on the original work published in:
+
+**van der Hooft et al. PNAS, 2016** → [https://doi.org/10.1073/pnas.1608041113](https://doi.org/10.1073/pnas.1608041113)
+
+As well as MotifDB:
+
+**Rogers et al. Faraday Discussions, 2019** → [https://doi.org/10.1039/C8FD00235E](https://doi.org/10.1039/C8FD00235E)
+
+📝 For methodology details and recent updates, please read our preprint:  
+**Torres Ortega et al. bioRxiv, 2025** → [https://doi.org/10.1101/2025.06.19.659491](https://doi.org/10.1101/2025.06.19.659491)
+
+
+Ongoing development continues in collaboration with the broader metabolomics and computational biology community. We welcome feedback, issues, and pull requests on our [GitHub repository](https://github.com/vdhooftcompmet/MS2LDA).  
+
+Questions? Open an issue or contact the development team directly 🤝
+
+---
+## Acknowledgments
+
+<table style="border-collapse: collapse; width: 100%;">
+  <tr>
+    <td style="border: none; width: 50%; vertical-align: top;">
+      <img src="./figures/CompMetabolomics_logo.jpg" alt="CompMetabolomics Logo" style="height: 100px;">
+    </td>
+    <td style="border: none; width: 50%; vertical-align: top;">
+      <img src="./figures/WUR_logo.jpg" alt="WUR Logo" style="height: 100px;">
+    </td>
+  </tr>
+  <tr>
+    <td style="border: none; text-align: justify; vertical-align: top;">
+      This work was carried out by the van der Hooft Computational Metabolomics Group.
+    </td>
+    <td style="border: none; text-align: justify; vertical-align: top;">
+      This work was supported by Wageningen University & Research.
+    </td>
+  </tr>
+</table>
