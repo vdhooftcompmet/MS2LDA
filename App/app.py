@@ -29,26 +29,42 @@ app.layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        html.Img(
-                            src="assets/MS2LDA_LOGO_white.jpg",
-                            alt="MS2LDA Logo",
-                            height="100px",
-                            style={"display": "block", "margin": "auto"},
+                        html.Div(
+                            [
+                                html.Img(
+                                    src="assets/MS2LDA_LOGO_white.jpg",
+                                    alt="MS2LDA Logo",
+                                    height="100px",
+                                    style={
+                                        "display": "block",
+                                        "margin": "0 auto",
+                                    },
+                                ),
+                                html.A(
+                                    "Docs 📚",
+                                    href="https://vdhooftcompmet.github.io/MS2LDA/",
+                                    target="_blank",
+                                    style={
+                                        "position": "absolute",
+                                        "right": "20px",
+                                        "top": "50%",
+                                        "transform": "translateY(-50%)",
+                                        "fontWeight": "bold",
+                                        "fontSize": "18px",
+                                        "textDecoration": "none",
+                                    },
+                                ),
+                            ],
+                            style={
+                                "position": "relative",
+                                "padding": "0 10px",
+                            },
                         ),
-                #         dcc.Markdown(
-                #             """
-                # Developed by [Jonas Dietrich](https://github.com/j-a-dietrich),
-                # [Rosina Torres Ortega](https://github.com/rtlortega),
-                # [Joe Wandy](https://github.com/joewandy), and
-                # [Justin van der Hooft](https://github.com/justinjjvanderhooft).
-                # """,
-                #             style={"textAlign": "center"},
-                #         ),
                     ],
                     width=True,
                 ),
             ],
-            align="end",
+            align="center",
         ),
         html.Hr(),
         dcc.Tabs(
