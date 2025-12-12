@@ -8,6 +8,7 @@ from App.layout.network_view import create_cytoscape_network_tab
 from App.layout.motif_rankings import create_motif_rankings_tab
 from App.layout.motif_details import create_motif_details_tab
 from App.layout.motif_search import create_screening_tab
+from App.layout.nontarget_screening import create_nts_tab
 from App.layout.spectra_search import create_spectra_search_tab
 
 # Export all functions
@@ -18,5 +19,6 @@ __all__ = [
     'create_motif_rankings_tab',
     'create_motif_details_tab',
     'create_screening_tab',
+    'create_nts_tab'
     'create_spectra_search_tab',
 ]
