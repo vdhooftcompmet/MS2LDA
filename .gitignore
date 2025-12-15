@@ -11,7 +11,7 @@ examples/data/
 
 # C extensions
 *.so
-
+experiments 
 # tests
 tests/**/*.png
 
