@@ -11,7 +11,6 @@ from App.layout import (
     create_motif_rankings_tab,
     create_motif_details_tab,
     create_screening_tab,
-    create_nts_tab,
     create_spectra_search_tab,
 )
 from App.app_instance import app  # Import the Dash app instance
@@ -107,10 +106,6 @@ app.layout = dbc.Container(
                         value="screening-tab", 
                         id="screening-tab"
                 ),
-                dcc.Tab(label="nontarget screening",
-                        value="nts-tab",
-                        id="nts-tab"
-                )
             ],
             className="mt-3",
         ),
@@ -122,7 +117,6 @@ app.layout = dbc.Container(
         create_spectra_search_tab(),
         create_cytoscape_network_tab(),
         create_screening_tab(),
-        create_nts_tab(),
         # Hidden storage
         dcc.Store(id="motif-spectra-ids-store"),
         dcc.Store(id="selected-spectrum-index", data=0),
