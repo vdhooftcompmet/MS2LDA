@@ -145,6 +145,7 @@ notebooks/Tutorial/test_*/
 notebooks/Tutorial/*_test/
 notebooks/Tutorial/*.log
 notebooks/Tutorial/NOTEBOOK_TEST_*.md
+notebooks/Paper_results/MSn_evaluation/
 
 .idea/
 
