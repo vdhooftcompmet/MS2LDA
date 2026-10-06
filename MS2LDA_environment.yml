@@ -16,7 +16,7 @@ dependencies:
   - pydantic=2.10.3
   - rdkit>=2023.9.6   # matches Poetry min; satisfies matchms
   - requests>=2.32.3
-  - matchms>=0.27.0
+  - matchms>=0.27.0, <0.33
   - plotly>=5.23.0
   - pyarrow>=17.0.0
   - pymzml>=2.5.10
