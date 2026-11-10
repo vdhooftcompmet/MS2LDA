@@ -172,6 +172,17 @@ def generate_corpusjson_from_tomotopy(
             overlap_scores[doc_name][t] = float(doc_overlaps[t])
     lda_dict["overlap_scores"] = overlap_scores
 
+    # Normalize beta within each topic so the max probability is 1.0.
+    # This makes displayed values consistent with the .m2m files which
+    # store max-normalized intensities.  Overlap scores were computed
+    # above using the raw values so they are unaffected.
+    for t_name in lda_dict["beta"]:
+        t_dict = lda_dict["beta"][t_name]
+        if t_dict:
+            max_val = max(t_dict.values())
+            if max_val > 0:
+                lda_dict["beta"][t_name] = {w: v / max_val for w, v in t_dict.items()}
+
     # 17) Optionally save
     if filename:
         with open(filename, "w") as f:
